@@ -18,6 +18,8 @@ package com.example.android.testing.notes.model;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,12 +31,31 @@ public class InMemoryNotesRepository implements NotesRepository {
 
     private final NotesServiceApi mNotesServiceApi;
 
+    private List<Note> mCachedNotes;
+
     public InMemoryNotesRepository(@NonNull NotesServiceApi notesServiceApi) {
         mNotesServiceApi = checkNotNull(notesServiceApi);
     }
 
     @Override
-    public List<Note> getNotes() {
-        return mNotesServiceApi.getAllNotes();
+    public void getNotes(final LoadNotesCallback callback) {
+        // Load from API only if needed.
+        if (mCachedNotes == null) {
+            mNotesServiceApi.getAllNotes(new NotesServiceApi.NotesServiceCallback<List<Note>>() {
+                @Override
+                public void onLoaded(List<Note> notes) {
+                    mCachedNotes = ImmutableList.copyOf(notes);
+                    callback.onNotesLoaded(mCachedNotes);
+                }
+            });
+        } else {
+            callback.onNotesLoaded(mCachedNotes);
+        }
     }
+
+    @Override
+    public void invalidateCache() {
+        mCachedNotes = null;
+    }
+
 }

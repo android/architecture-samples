@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.presenter;
 
+import com.example.android.testing.notes.model.NotesRepository.LoadNotesCallback;
+import com.example.android.testing.notes.model.NotesServiceApi.NotesServiceCallback;
 import com.example.android.testing.notes.model.NotesServiceApiImpl;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.model.InMemoryNotesRepository;
@@ -25,8 +27,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
+/**
+ * TODO: javadoc, add tests for caching notes behaviour
+ */
 public class NotesRepositoryTest {
 
     @Mock
@@ -42,7 +48,8 @@ public class NotesRepositoryTest {
 
     @Test
     public void getNotes_RequestsAllNotesFromServiceApi() {
-        mNotesRepository.getNotes();
-        verify(mServiceApi).getAllNotes();
+        mNotesRepository.getNotes(any(LoadNotesCallback.class));
+        verify(mServiceApi).getAllNotes(any(NotesServiceCallback.class));
     }
+
 }

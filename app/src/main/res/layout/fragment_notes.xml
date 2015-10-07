@@ -13,26 +13,33 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/refresh_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/notes_list"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/notes_activity_vertical_margin"
-        android:paddingLeft="@dimen/notes_activity_horizontal_margin"
-        android:paddingRight="@dimen/notes_activity_horizontal_margin"
-        android:paddingTop="@dimen/notes_activity_vertical_margin" />
+        android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_note"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add" />
-</FrameLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/notes_list"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/notes_activity_vertical_margin"
+            android:paddingLeft="@dimen/notes_activity_horizontal_margin"
+            android:paddingRight="@dimen/notes_activity_horizontal_margin"
+            android:paddingTop="@dimen/notes_activity_vertical_margin"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_add"/>
+
+    </FrameLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

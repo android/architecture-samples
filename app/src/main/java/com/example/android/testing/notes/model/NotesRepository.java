@@ -23,5 +23,12 @@ import java.util.List;
  */
 public interface NotesRepository {
 
-    List<Note> getNotes();
+    interface LoadNotesCallback {
+        void onNotesLoaded(List<Note> notes);
+    }
+
+    void getNotes(LoadNotesCallback callback);
+
+    void invalidateCache();
+
 }

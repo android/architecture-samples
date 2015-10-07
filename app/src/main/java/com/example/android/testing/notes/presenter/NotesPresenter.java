@@ -20,9 +20,11 @@ import android.support.annotation.NonNull;
 
 import com.example.android.testing.notes.model.Note;
 
+import java.util.List;
+
 public interface NotesPresenter {
 
-    void loadNotes();
+    void loadNotes(boolean forceUpdate);
 
     void addNewNote();
 

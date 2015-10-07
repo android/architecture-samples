@@ -34,20 +34,29 @@ public class NotesPresenterImpl implements NotesPresenter {
     private final NotesRepository mNotesRepository;
     private final NotesView mNotesView;
 
-    public NotesPresenterImpl(@NonNull NotesRepository notesRepository, @NonNull NotesView notesView) {
+    public NotesPresenterImpl(
+            @NonNull NotesRepository notesRepository, @NonNull NotesView notesView) {
         mNotesRepository = checkNotNull(notesRepository, "notesRepository cannot be null");
         mNotesView = checkNotNull(notesView, "notesView cannot be null!");
     }
 
     @Override
-    public void loadNotes() {
-        List<Note> notes = mNotesRepository.getNotes();
-        if (notes.isEmpty()) {
-            mNotesView.showNotesEmptyPlaceholder();
-        } else {
-            mNotesView.setProgressIndicator();
-            mNotesView.showNotes(notes);
+    public void loadNotes(boolean forceUpdate) {
+        mNotesView.setProgressIndicator(true);
+        if (forceUpdate) {
+            mNotesRepository.invalidateCache();
         }
+        mNotesRepository.getNotes(new NotesRepository.LoadNotesCallback() {
+            @Override
+            public void onNotesLoaded(List<Note> notes) {
+                mNotesView.setProgressIndicator(false);
+                if (notes.isEmpty()) {
+                    mNotesView.showNotesEmptyPlaceholder();
+                } else {
+                    mNotesView.showNotes(notes);
+                }
+            }
+        });
     }
 
     @Override
@@ -60,4 +69,5 @@ public class NotesPresenterImpl implements NotesPresenter {
         checkNotNull(requestedNote, "requestedNote cannot be null!");
         mNotesView.showNoteDetailUi();
     }
+
 }

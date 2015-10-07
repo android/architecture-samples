@@ -16,23 +16,24 @@
 
 package com.example.android.testing.notes.view;
 
-import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.NotesPresenter;
-import com.example.android.testing.notes.presenter.NotesPresenterImpl;
-import com.example.android.testing.notes.util.ActivityUtils;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.android.testing.notes.NotesActivity;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.NotesPresenter;
+import com.example.android.testing.notes.presenter.NotesPresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class NotesFragment extends BaseFragment implements NotesView {
     @Override
     public void onResume() {
         super.onResume();
-        mNotesPresenter.loadNotes();
+        mNotesPresenter.loadNotes(false);
     }
 
     @Override
@@ -98,12 +99,31 @@ public class NotesFragment extends BaseFragment implements NotesView {
             }
         });
 
+        // Pull-to-refresh
+        SwipeRefreshLayout srl = (SwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+        srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mNotesPresenter.loadNotes(true);
+            }
+        });
+
         return root;
     }
 
     @Override
-    public void setProgressIndicator() {
-        // TODO add a progress indicator
+    public void setProgressIndicator(final boolean active) {
+
+        final SwipeRefreshLayout srl =
+                (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
+
+        // Make sure setRefreshing() is called after the layout is done with everything else.
+        srl.post(new Runnable() {
+            @Override
+            public void run() {
+                srl.setRefreshing(active);
+            }
+        });
     }
 
     public void showNotes(List<Note> notes) {

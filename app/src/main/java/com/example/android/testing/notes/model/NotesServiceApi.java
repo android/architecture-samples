@@ -18,7 +18,15 @@ package com.example.android.testing.notes.model;
 
 import java.util.List;
 
+/**
+ * TODO: javadoc
+ */
 public interface NotesServiceApi {
 
-    List<Note> getAllNotes();
+    interface NotesServiceCallback<T> {
+
+        void onLoaded(T notes);
+    }
+
+    void getAllNotes(NotesServiceCallback<List<Note>> callback);
 }

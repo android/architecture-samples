@@ -17,13 +17,12 @@
 package com.example.android.testing.notes.view;
 
 import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.NotesPresenter;
 
 import java.util.List;
 
 public interface NotesView {
 
-    void setProgressIndicator();
+    void setProgressIndicator(boolean active);
 
     void showNotes(List<Note> notes);
 

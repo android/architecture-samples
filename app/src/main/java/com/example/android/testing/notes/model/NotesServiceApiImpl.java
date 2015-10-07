@@ -16,17 +16,33 @@
 
 package com.example.android.testing.notes.model;
 
+import android.os.Handler;
 import android.support.v4.util.ArrayMap;
+
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO ideally we would get this on a background thread, use a listener and simulate network latency
+/**
+ * Implementation of the Notes Service API that adds a latency simulating network.
+ */
 public class NotesServiceApiImpl implements NotesServiceApi {
 
+    private static final int LATENCY_IN_MILLIS = 2000;
     private static final ArrayMap NOTES_SERVICE_DATA = NotesServiceApiEndpoint.DATA;
 
-    public List<Note> getAllNotes() {
-        return new ArrayList<>(NOTES_SERVICE_DATA.values());
+    @Override
+    public void getAllNotes(final NotesServiceCallback callback) {
+
+        // Simulate network by delaying the execution.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<Note> notes = new ArrayList<>(NOTES_SERVICE_DATA.values());
+                callback.onLoaded(notes);
+            }
+        }, LATENCY_IN_MILLIS);
     }
 }
