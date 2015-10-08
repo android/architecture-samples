@@ -2,4 +2,8 @@
 <resources>
     <string name="app_name">Notes</string>
     <string name="hello_world_notes_fragment">Hello world notes</string>
+
+    <!-- Add notes fragment -->
+    <string name="empty_note_message">Notes cannot be empty</string>
+    <string name="successfully_saved_note_message">Note saved</string>
 </resources>

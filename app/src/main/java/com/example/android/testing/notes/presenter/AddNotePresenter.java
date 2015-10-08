@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.model;
+package com.example.android.testing.notes.presenter;
 
-import java.util.List;
+import android.support.annotation.NonNull;
+
+import com.example.android.testing.notes.model.Note;
 
 /**
  * TODO: javadoc
  */
-public interface NotesServiceApi {
+public interface AddNotePresenter {
 
-    interface NotesServiceCallback<T> {
-
-        void onLoaded(T notes);
-    }
-
-    void getAllNotes(NotesServiceCallback<List<Note>> callback);
-
-    void saveNote(Note note);
+    void saveNote(@NonNull Note note);
 }

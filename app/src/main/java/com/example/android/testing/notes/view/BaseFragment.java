@@ -23,6 +23,9 @@ import com.example.android.testing.notes.model.NoteRepositories;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.model.NotesServiceApiImpl;
 
+/**
+ * TODO javadoc
+ */
 public class BaseFragment extends Fragment {
 
     private NotesRepository mNotesRepository;

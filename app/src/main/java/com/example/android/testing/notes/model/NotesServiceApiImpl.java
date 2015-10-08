@@ -34,7 +34,6 @@ public class NotesServiceApiImpl implements NotesServiceApi {
 
     @Override
     public void getAllNotes(final NotesServiceCallback callback) {
-
         // Simulate network by delaying the execution.
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -44,5 +43,10 @@ public class NotesServiceApiImpl implements NotesServiceApi {
                 callback.onLoaded(notes);
             }
         }, LATENCY_IN_MILLIS);
+    }
+
+    @Override
+    public void saveNote(Note note) {
+        NOTES_SERVICE_DATA.put(note.getId(), note);
     }
 }

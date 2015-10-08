@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.model;
-
-import java.util.List;
+package com.example.android.testing.notes.view;
 
 /**
- * TODO: javadoc
+ * TODO javadoc
  */
-public interface NotesServiceApi {
+public interface AddNoteView {
 
-    interface NotesServiceCallback<T> {
+    void showEmptyNoteError();
 
-        void onLoaded(T notes);
-    }
-
-    void getAllNotes(NotesServiceCallback<List<Note>> callback);
-
-    void saveNote(Note note);
+    void showNotesList();
 }

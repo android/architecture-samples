@@ -16,40 +16,51 @@
 
 package com.example.android.testing.notes.presenter;
 
-import com.example.android.testing.notes.model.NotesRepository.LoadNotesCallback;
-import com.example.android.testing.notes.model.NotesServiceApi.NotesServiceCallback;
-import com.example.android.testing.notes.model.NotesServiceApiImpl;
+import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
-import com.example.android.testing.notes.model.InMemoryNotesRepository;
+import com.example.android.testing.notes.view.AddNoteView;
+import com.example.android.testing.notes.view.NotesView;
+import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 /**
- * TODO: javadoc, add tests for caching notes behaviour
+ * TODO: javadoc
  */
-public class NotesRepositoryTest {
+public class AddNotePresenterTest {
 
     @Mock
-    private NotesServiceApiImpl mServiceApi;
-
     private NotesRepository mNotesRepository;
 
+    @Mock
+    private AddNoteView mAddNoteView;
+
+    private AddNotePresenterImpl mAddNotesPresenter;
+
     @Before
-    public void setupNotesRepository() {
+    public void setupAddNotePresenter() {
         MockitoAnnotations.initMocks(this);
-        mNotesRepository = new InMemoryNotesRepository(mServiceApi);
+        mAddNotesPresenter = new AddNotePresenterImpl(mNotesRepository, mAddNoteView);
     }
 
     @Test
-    public void getNotes_RequestsAllNotesFromServiceApi() {
-        mNotesRepository.getNotes(any(LoadNotesCallback.class));
-        verify(mServiceApi).getAllNotes(any(NotesServiceCallback.class));
+    public void savesNoteToRepository_showsSuccessMessage() {
+        final Note newNote = new Note("New Note Title", "Some Note Description");
+        mAddNotesPresenter.saveNote(newNote);
+        verify(mNotesRepository).saveNote(newNote);
+        verify(mAddNoteView).showNotesList();
+    }
+
+    @Test
+    public void saveNote_emptyNoteShowError() {
+        final Note emptyNote = new Note("", "");
+        mAddNotesPresenter.saveNote(emptyNote);
+        verify(mAddNoteView).showEmptyNoteError();
     }
 
 }

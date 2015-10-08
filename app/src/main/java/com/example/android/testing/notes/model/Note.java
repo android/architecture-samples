@@ -16,14 +16,11 @@
 
 package com.example.android.testing.notes.model;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
 
 import java.util.UUID;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Model class for a Note.
@@ -31,19 +28,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class Note {
 
     private final String mId;
+    @Nullable
     private final String mTitle;
     @Nullable
     private final String mDescription;
     @Nullable
     private final String mImageUrl;
 
-    public Note(@NonNull String title, @Nullable String description) {
+    public Note(@Nullable String title, @Nullable String description) {
         this(title, description, null);
     }
 
-    public Note(@NonNull String title, @Nullable String description, @Nullable String imageUrl) {
+    public Note(@Nullable String title, @Nullable String description, @Nullable String imageUrl) {
         mId = UUID.randomUUID().toString();
-        mTitle = checkNotNull(title);
+        mTitle = title;
         mDescription = description;
         mImageUrl = imageUrl;
     }
@@ -52,6 +50,7 @@ public final class Note {
         return mId;
     }
 
+    @Nullable
     public String getTitle() {
         return mTitle;
     }
@@ -64,6 +63,10 @@ public final class Note {
     @Nullable
     public String getImageUrl() {
         return mImageUrl;
+    }
+
+    public boolean isEmpty() {
+        return "".equals(mTitle) && "".equals(mDescription);
     }
 
     @Override

@@ -16,17 +16,28 @@
 
 package com.example.android.testing.notes.view;
 
+import com.example.android.testing.notes.NotesActivity;
 import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.AddNotePresenter;
+import com.example.android.testing.notes.presenter.AddNotePresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class AddNoteFragment extends BaseFragment {
+/**
+ * TODO javadoc
+ */
+public class AddNoteFragment extends BaseFragment implements AddNoteView {
+
+    private AddNotePresenter mAddNotePresenter;
 
     private TextView mTitle;
 
@@ -43,13 +54,13 @@ public class AddNoteFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // TODO create presenter and unit + ui tests
+        mAddNotePresenter = new AddNotePresenterImpl(getNotesRepository(), this);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_addnote, container, false);
         mTitle = (TextView) root.findViewById(R.id.add_note_title);
         mDescription = (TextView) root.findViewById(R.id.add_note_description);
@@ -58,11 +69,23 @@ public class AddNoteFragment extends BaseFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Add hook and logic for saving notes
+                // TODO: add image parameter to this.
+                mAddNotePresenter.saveNote(new Note(mTitle.getText().toString(),
+                        mDescription.getText().toString()));
             }
         });
-
         return root;
     }
 
+    @Override
+    public void showEmptyNoteError() {
+        Snackbar.make(mTitle, getString(R.string.empty_note_message), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showNotesList() {
+        Snackbar.make(mTitle, getString(R.string.successfully_saved_note_message),
+                Snackbar.LENGTH_SHORT).show();
+        ActivityUtils.<NotesActivity>cast(getActivity()).showNotesFragment();
+    }
 }

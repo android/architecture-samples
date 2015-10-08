@@ -33,4 +33,9 @@ public class FakeNotesServiceApi implements NotesServiceApi {
     public void getAllNotes(NotesServiceCallback<List<Note>> callback) {
         callback.onLoaded(Lists.newArrayList(NOTES_SERVICE_DATA.values()));
     }
+
+    @Override
+    public void saveNote(Note note) {
+        NOTES_SERVICE_DATA.put(note.getId(), note);
+    }
 }

@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
 /**
@@ -27,7 +29,9 @@ public interface NotesRepository {
         void onNotesLoaded(List<Note> notes);
     }
 
-    void getNotes(LoadNotesCallback callback);
+    void getNotes(@NonNull LoadNotesCallback callback);
+
+    void saveNote(@NonNull Note note);
 
     void invalidateCache();
 

@@ -17,6 +17,7 @@
 package com.example.android.testing.notes.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,14 +32,20 @@ public class InMemoryNotesRepository implements NotesRepository {
 
     private final NotesServiceApi mNotesServiceApi;
 
-    private List<Note> mCachedNotes;
+    /**
+     * This method has reduced visibility for testing and is only visible to tests in the same
+     * package.
+     */
+    @VisibleForTesting
+    List<Note> mCachedNotes;
 
     public InMemoryNotesRepository(@NonNull NotesServiceApi notesServiceApi) {
         mNotesServiceApi = checkNotNull(notesServiceApi);
     }
 
     @Override
-    public void getNotes(final LoadNotesCallback callback) {
+    public void getNotes(@NonNull final LoadNotesCallback callback) {
+        checkNotNull(callback);
         // Load from API only if needed.
         if (mCachedNotes == null) {
             mNotesServiceApi.getAllNotes(new NotesServiceApi.NotesServiceCallback<List<Note>>() {
@@ -51,6 +58,13 @@ public class InMemoryNotesRepository implements NotesRepository {
         } else {
             callback.onNotesLoaded(mCachedNotes);
         }
+    }
+
+    @Override
+    public void saveNote(@NonNull Note note) {
+        checkNotNull(note);
+        mNotesServiceApi.saveNote(note);
+        invalidateCache();
     }
 
     @Override

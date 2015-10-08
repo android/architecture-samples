@@ -36,13 +36,15 @@ import android.widget.Toast;
 public class NotesActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+    private NotesFragment mNotesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
-        initFragment(NotesFragment.newInstance());
+        mNotesFragment = NotesFragment.newInstance();
+        initFragment(mNotesFragment);
 
         // TODO create a presenter and view for this logic and wire it up (Toolbar + Drawer)
         // + write unit and UI tests.
@@ -107,7 +109,12 @@ public class NotesActivity extends AppCompatActivity {
     }
 
     public void showAddNoteFragment() {
-            ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
-                    AddNoteFragment.newInstance(), true);
+        ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
+                AddNoteFragment.newInstance(), true);
+    }
+
+    public void showNotesFragment() {
+        ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
+                mNotesFragment, false);
     }
 }

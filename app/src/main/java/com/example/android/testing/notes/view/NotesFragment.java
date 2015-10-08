@@ -132,8 +132,7 @@ public class NotesFragment extends BaseFragment implements NotesView {
 
     @Override
     public void showAddNote() {
-        NotesActivity notesActivity = ActivityUtils.cast(getActivity());
-        notesActivity.showAddNoteFragment();
+        ActivityUtils.<NotesActivity>cast(getActivity()).showAddNoteFragment();
     }
 
     @Override

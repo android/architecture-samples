@@ -20,6 +20,9 @@ import com.example.android.testing.notes.model.Note;
 
 import java.util.List;
 
+/**
+ * TODO javadoc
+ */
 public interface NotesView {
 
     void setProgressIndicator(boolean active);
