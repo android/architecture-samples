@@ -16,11 +16,11 @@
 
 package com.example.android.testing.notes.presenter;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.view.NotesView;
+
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -67,7 +67,7 @@ public class NotesPresenterImpl implements NotesPresenter {
     @Override
     public void openNoteDetails(@NonNull Note requestedNote) {
         checkNotNull(requestedNote, "requestedNote cannot be null!");
-        mNotesView.showNoteDetailUi();
+        mNotesView.showNoteDetailUi(requestedNote.getId());
     }
 
 }

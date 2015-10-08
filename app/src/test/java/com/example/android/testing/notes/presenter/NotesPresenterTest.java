@@ -32,6 +32,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -95,6 +96,6 @@ public class NotesPresenterTest {
     public void clickOnNote_ShowsDetailUi() {
         final Note requestedNote = new Note("Details Requested", "For this note");
         mNotesPresenter.openNoteDetails(requestedNote);
-        verify(mNotesView).showNoteDetailUi();
+        verify(mNotesView).showNoteDetailUi(any(String.class));
     }
 }

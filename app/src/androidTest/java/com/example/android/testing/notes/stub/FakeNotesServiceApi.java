@@ -27,11 +27,18 @@ import java.util.List;
 public class FakeNotesServiceApi implements NotesServiceApi {
 
     // TODO replace this with a new test specific data set.
-    private static final ArrayMap NOTES_SERVICE_DATA = new ArrayMap();
+    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = new ArrayMap();
 
     @Override
     public void getAllNotes(NotesServiceCallback<List<Note>> callback) {
         callback.onLoaded(Lists.newArrayList(NOTES_SERVICE_DATA.values()));
+    }
+
+    @Override
+    public void getNote(String noteId, NotesServiceCallback<Note> callback) {
+        // TODO: Add matching for ID here
+        Note note = NOTES_SERVICE_DATA.get(noteId);
+        callback.onLoaded(note);
     }
 
     @Override

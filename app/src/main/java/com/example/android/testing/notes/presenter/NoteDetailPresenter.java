@@ -14,33 +14,11 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.model;
+package com.example.android.testing.notes.presenter;
 
 import android.support.annotation.NonNull;
 
-import java.util.List;
+public interface NoteDetailPresenter {
 
-/**
- * Main entry point for accessing notes data.
- */
-public interface NotesRepository {
-
-    interface LoadNotesCallback {
-
-        void onNotesLoaded(List<Note> notes);
-    }
-
-    interface GetNoteCallback {
-
-        void onNoteLoaded(Note note);
-    }
-
-    void getNotes(@NonNull LoadNotesCallback callback);
-
-    void getNote(@NonNull String noteId, @NonNull GetNoteCallback callback);
-
-    void saveNote(@NonNull Note note);
-
-    void invalidateCache();
-
+    void openNote(@NonNull String noteId);
 }

@@ -60,4 +60,10 @@ public class NotesRepositoryTest {
         mNotesRepository.saveNote(newNote);
         assertThat(mNotesRepository.mCachedNotes, is(nullValue()));
     }
+    
+    @Test
+    public void getNote_RequestsSingleNoteFromServiceApi() {
+        mNotesRepository.getNote(any(String.class), any(NotesRepository.GetNoteCallback.class));
+        verify(mServiceApi).getNote(any(String.class), any(NotesServiceCallback.class));
+    }
 }

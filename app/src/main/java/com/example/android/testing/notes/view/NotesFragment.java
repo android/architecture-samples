@@ -16,7 +16,16 @@
 
 package com.example.android.testing.notes.view;
 
+import com.example.android.testing.notes.NotesActivity;
+import com.example.android.testing.notes.NotesDetailActivity;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.NotesPresenter;
+import com.example.android.testing.notes.presenter.NotesPresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
+
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -27,13 +36,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.NotesPresenter;
-import com.example.android.testing.notes.presenter.NotesPresenterImpl;
-import com.example.android.testing.notes.util.ActivityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,7 @@ public class NotesFragment extends BaseFragment implements NotesView {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new NotesAdapter(new ArrayList<Note>(0));
+        mListAdapter = new NotesAdapter(new ArrayList<Note>(0), mItemListener);
     }
 
     @Override
@@ -111,6 +113,16 @@ public class NotesFragment extends BaseFragment implements NotesView {
         return root;
     }
 
+    /**
+     * Listener for clicks on notes in the RecyclerView.
+     */
+    NoteItemListener mItemListener = new NoteItemListener() {
+        @Override
+        public void onNoteClick(Note clickedNote) {
+            mNotesPresenter.openNoteDetails(clickedNote);
+        }
+    };
+
     @Override
     public void setProgressIndicator(final boolean active) {
 
@@ -141,19 +153,24 @@ public class NotesFragment extends BaseFragment implements NotesView {
     }
 
     @Override
-    public void showNoteDetailUi() {
+    public void showNoteDetailUi(String noteId) {
         // TODO implement show detail note feature, please implement this in a fragment but hosted
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
+        Intent intent = new Intent(getContext(), NotesDetailActivity.class);
+        intent.putExtra(NotesDetailActivity.EXTRA_NOTE_ID, noteId);
+        startActivity(intent);
     }
 
-    //TODO wire up a listener to make items clickable
+
     private static class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
 
         private List<Note> mNotes;
+        private NoteItemListener mItemListener;
 
-        public NotesAdapter(List<Note> notes) {
+        public NotesAdapter(List<Note> notes, NoteItemListener itemListener) {
             mNotes = checkNotNull(notes);
+            mItemListener = itemListener;
         }
 
         @Override
@@ -162,7 +179,7 @@ public class NotesFragment extends BaseFragment implements NotesView {
             LayoutInflater inflater = LayoutInflater.from(context);
             View noteView = inflater.inflate(R.layout.item_note, parent, false);
 
-            ViewHolder holder = new ViewHolder(noteView);
+            ViewHolder holder = new ViewHolder(noteView, mItemListener);
             return holder;
         }
 
@@ -184,18 +201,38 @@ public class NotesFragment extends BaseFragment implements NotesView {
             return mNotes.size();
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public Note getItem(int position) {
+            return mNotes.get(position);
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             public TextView title;
 
             public TextView description;
+            private NoteItemListener mItemListener;
 
-            public ViewHolder(View itemView) {
+            public ViewHolder(View itemView, NoteItemListener listener) {
                 super(itemView);
+                mItemListener = listener;
                 title = (TextView) itemView.findViewById(R.id.note_title);
                 description = (TextView) itemView.findViewById(R.id.note_description);
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                int position = getAdapterPosition();
+                Note note = getItem(position);
+                mItemListener.onNoteClick(note);
+
             }
         }
+    }
+
+    public interface NoteItemListener {
+
+        void onNoteClick(Note clickedNote);
     }
 
 }

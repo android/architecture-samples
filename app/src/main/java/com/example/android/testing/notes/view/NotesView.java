@@ -33,5 +33,5 @@ public interface NotesView {
 
     void showNotesEmptyPlaceholder();
 
-    void showNoteDetailUi();
+    void showNoteDetailUi(String noteId);
 }

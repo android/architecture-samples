@@ -19,8 +19,6 @@ package com.example.android.testing.notes.model;
 import android.os.Handler;
 import android.support.v4.util.ArrayMap;
 
-import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +28,7 @@ import java.util.List;
 public class NotesServiceApiImpl implements NotesServiceApi {
 
     private static final int LATENCY_IN_MILLIS = 2000;
-    private static final ArrayMap NOTES_SERVICE_DATA = NotesServiceApiEndpoint.DATA;
+    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = NotesServiceApiEndpoint.DATA;
 
     @Override
     public void getAllNotes(final NotesServiceCallback callback) {
@@ -44,9 +42,15 @@ public class NotesServiceApiImpl implements NotesServiceApi {
             }
         }, LATENCY_IN_MILLIS);
     }
-
+    @Override
+    public void getNote(final String noteId, final NotesServiceCallback callback) {
+        //TODO: Add network latency here too.
+        Note note = NOTES_SERVICE_DATA.get(noteId);
+        callback.onLoaded(note);
+    }
     @Override
     public void saveNote(Note note) {
         NOTES_SERVICE_DATA.put(note.getId(), note);
     }
+
 }
