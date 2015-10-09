@@ -15,8 +15,8 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,23 +33,15 @@
             android:layout_height="wrap_content"
             android:hint="Title"
             android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
         <EditText
             android:id="@+id/add_note_description"
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:gravity="top"
-            android:hint="Enter your note here." />
+            android:hint="Enter your note here."/>
 
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_done"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_done" />
 </FrameLayout>
 

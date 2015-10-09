@@ -16,13 +16,7 @@
 
 package com.example.android.testing.notes.view;
 
-import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.AddNotePresenter;
-import com.example.android.testing.notes.presenter.AddNotePresenterImpl;
-import com.example.android.testing.notes.util.ActivityUtils;
-
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -30,7 +24,15 @@ import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+
+import com.example.android.testing.notes.NotesActivity;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.AddNotePresenter;
+import com.example.android.testing.notes.presenter.AddNotePresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
 
 /**
  * TODO javadoc
@@ -55,6 +57,13 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAddNotePresenter = new AddNotePresenterImpl(getNotesRepository(), this);
+
+        // Set the focus on the title field and open keyboard.
+        mTitle.setFocusableInTouchMode(true);
+        mTitle.requestFocus();
+        InputMethodManager imm =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mTitle, InputMethodManager.SHOW_IMPLICIT);
     }
 
     @Nullable
@@ -65,7 +74,9 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
         mTitle = (TextView) root.findViewById(R.id.add_note_title);
         mDescription = (TextView) root.findViewById(R.id.add_note_description);
 
-        FloatingActionButton fab = (FloatingActionButton) root.findViewById(R.id.fab_done);
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_notes);
+        fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +85,7 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
                         mDescription.getText().toString()));
             }
         });
+
         return root;
     }
 

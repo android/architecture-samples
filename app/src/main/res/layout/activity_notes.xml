@@ -34,12 +34,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize" />
+            android:minHeight="?attr/actionBarSize"/>
 
-        <FrameLayout
-            android:id="@+id/contentFrame"
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/coordinatorLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/contentFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_notes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:src="@drawable/ic_add"
+                app:fabSize="normal"
+                app:layout_anchor="@id/coordinatorLayout"
+                app:layout_anchorGravity="bottom|right|end"/>
+        </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>
 
@@ -51,7 +67,7 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_actions" />
+        app:menu="@menu/drawer_actions"/>
 
 
 </android.support.v4.widget.DrawerLayout>

@@ -56,7 +56,9 @@ public class NotesActivityTest {
         return new TypeSafeMatcher<View>() {
             @Override
             public boolean matchesSafely(View item) {
-                return allOf(isDescendantOfA(withId(R.id.notes_list)), withText(itemText)).matches(item);
+                return allOf(
+                        isDescendantOfA(withId(R.id.notes_list)),
+                        withText(itemText)).matches(item);
             }
 
             @Override
@@ -80,8 +82,8 @@ public class NotesActivityTest {
 
     @Test
     public void clickAddNoteButton_opensAddNoteUi() throws Exception {
-        onView(withId(R.id.fab_add_note)).perform(click());
-        onView(withId(R.id.fab_done)).check(matches(isDisplayed()));
+        onView(withId(R.id.fab_notes)).perform(click());
+        onView(withId(R.id.add_note_title)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -89,13 +91,13 @@ public class NotesActivityTest {
         final String newNoteTitle = "Espresso";
         final String newNoteDescription = "Ui testing for Android";
 
-        onView(withId(R.id.fab_add_note)).perform(click());
+        onView(withId(R.id.fab_notes)).perform(click());
         // Add note title and description
         onView(withId(R.id.add_note_title)).perform(typeText(newNoteTitle));
         onView(withId(R.id.add_note_description)).perform(typeText(newNoteDescription),
                 closeSoftKeyboard());
         // Save the note
-        onView(withId(R.id.fab_done)).perform(click());
+        onView(withId(R.id.fab_notes)).perform(click());
 
         // Verify successful save snackbar is shown
         String successfullySavedNoteMessage = getTargetContext()
@@ -103,19 +105,20 @@ public class NotesActivityTest {
         onView(withText(successfullySavedNoteMessage)).check(matches(isDisplayed()));
 
         // Verify note is displayed on screen
-        onView(withId(R.id.notes_list)).perform(scrollTo(hasDescendant(withText(newNoteDescription))));
+        onView(withId(R.id.notes_list)).perform(
+                scrollTo(hasDescendant(withText(newNoteDescription))));
         onView(withItemText(newNoteDescription)).check(matches(isDisplayed()));
     }
 
     @Test
     public void errorShownOnEmptyMessage() throws InterruptedException {
-        onView(withId(R.id.fab_add_note)).perform(click());
+        onView(withId(R.id.fab_notes)).perform(click());
         // Add note title and description
         onView(withId(R.id.add_note_title)).perform(typeText(""));
         onView(withId(R.id.add_note_description)).perform(typeText(""),
                 closeSoftKeyboard());
         // Save the note
-        onView(withId(R.id.fab_done)).perform(click());
+        onView(withId(R.id.fab_notes)).perform(click());
 
         // Verify empty notes snackbar is shown
         String emptyNoteMessageText = getTargetContext().getString(R.string.empty_note_message);

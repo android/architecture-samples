@@ -72,7 +72,8 @@ public class NotesDetailPresenterTest {
         mGetNoteCallbackCaptor.getValue().onNoteLoaded(note); // Trigger callback
 
         verify(mNoteDetailsView).setProgressIndicator(false);
-        verify(mNoteDetailsView).showNote(TITLE_TEST, DESCRIPTION_TEST);
+        verify(mNoteDetailsView).showTitle(TITLE_TEST);
+        verify(mNoteDetailsView).showTitle(DESCRIPTION_TEST);
     }
 
     @Test

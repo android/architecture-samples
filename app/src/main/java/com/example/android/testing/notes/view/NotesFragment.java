@@ -16,17 +16,10 @@
 
 package com.example.android.testing.notes.view;
 
-import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.NotesDetailActivity;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.NotesPresenter;
-import com.example.android.testing.notes.presenter.NotesPresenterImpl;
-import com.example.android.testing.notes.util.ActivityUtils;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -35,7 +28,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+
+import com.example.android.testing.notes.NotesActivity;
+import com.example.android.testing.notes.NotesDetailActivity;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.NotesPresenter;
+import com.example.android.testing.notes.presenter.NotesPresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,14 @@ public class NotesFragment extends BaseFragment implements NotesView {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mNotesPresenter = new NotesPresenterImpl(getNotesRepository(), this);
+
+        // Hide keyboard
+        InputMethodManager imm =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        IBinder windowToken = getView().getWindowToken();
+        if (windowToken != null) {
+            imm.hideSoftInputFromWindow(windowToken, 0);
+        }
     }
 
     @Nullable
@@ -93,7 +103,10 @@ public class NotesFragment extends BaseFragment implements NotesView {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
 
         // Set up floating action button
-        FloatingActionButton fab = (FloatingActionButton) root.findViewById(R.id.fab_add_note);
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_notes);
+
+        fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,6 +139,9 @@ public class NotesFragment extends BaseFragment implements NotesView {
     @Override
     public void setProgressIndicator(final boolean active) {
 
+        if (getView() == null) {
+            return;
+        }
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
 

@@ -16,10 +16,6 @@
 
 package com.example.android.testing.notes;
 
-import com.example.android.testing.notes.util.ActivityUtils;
-import com.example.android.testing.notes.view.AddNoteFragment;
-import com.example.android.testing.notes.view.NotesFragment;
-
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -32,6 +28,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.example.android.testing.notes.util.ActivityUtils;
+import com.example.android.testing.notes.view.AddNoteFragment;
+import com.example.android.testing.notes.view.NotesFragment;
 
 public class NotesActivity extends AppCompatActivity {
 
