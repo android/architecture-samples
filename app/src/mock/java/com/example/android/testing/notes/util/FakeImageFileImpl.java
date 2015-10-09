@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.presenter;
+package com.example.android.testing.notes.util;
 
-import java.io.IOException;
+import android.support.annotation.VisibleForTesting;
 
 /**
  * TODO: javadoc
  */
-public interface AddNotePresenter {
+public class FakeImageFileImpl extends ImageFileImpl {
 
-    void saveNote(String title, String description);
-
-    void takePicture() throws IOException;
-
-    void imageAvailable();
-
-    void imageCaptureFailed();
+    @Override
+    public String getPath() {
+        return "file:///android_asset/atsl-logo.png";
+    }
 }

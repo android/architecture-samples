@@ -16,11 +16,9 @@
 
 package com.example.android.testing.notes.presenter;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.testing.notes.model.Note;
 
-import java.util.List;
+import android.support.annotation.NonNull;
 
 public interface NotesPresenter {
 

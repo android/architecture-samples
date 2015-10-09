@@ -16,34 +16,54 @@
 
 package com.example.android.testing.notes.view;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.NotesActivity;
 import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.presenter.AddNotePresenter;
 import com.example.android.testing.notes.presenter.AddNotePresenterImpl;
 import com.example.android.testing.notes.util.ActivityUtils;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.io.IOException;
+
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * TODO javadoc
  */
-public class AddNoteFragment extends BaseFragment implements AddNoteView {
+public class AddNoteFragment extends Fragment implements AddNoteView {
+
+    public static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
+    public static final int ADD_PHOTO_MENU_ITEM_ID = 0x1001;
 
     private AddNotePresenter mAddNotePresenter;
 
     private TextView mTitle;
 
     private TextView mDescription;
+
+    private ImageView mImageThumbnail;
 
     public static AddNoteFragment newInstance() {
         return new AddNoteFragment();
@@ -56,14 +76,8 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mAddNotePresenter = new AddNotePresenterImpl(getNotesRepository(), this);
-
-        // Set the focus on the title field and open keyboard.
-        mTitle.setFocusableInTouchMode(true);
-        mTitle.requestFocus();
-        InputMethodManager imm =
-                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mTitle, InputMethodManager.SHOW_IMPLICIT);
+        mAddNotePresenter = new AddNotePresenterImpl(Injection.provideNotesRepository(), this,
+                Injection.provideImageFile());
     }
 
     @Nullable
@@ -73,6 +87,7 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
         View root = inflater.inflate(R.layout.fragment_addnote, container, false);
         mTitle = (TextView) root.findViewById(R.id.add_note_title);
         mDescription = (TextView) root.findViewById(R.id.add_note_description);
+        mImageThumbnail = (ImageView) root.findViewById(R.id.add_note_image_thumbnail);
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_notes);
@@ -80,13 +95,35 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: add image parameter to this.
-                mAddNotePresenter.saveNote(new Note(mTitle.getText().toString(),
-                        mDescription.getText().toString()));
+                mAddNotePresenter.saveNote(mTitle.getText().toString(),
+                        mDescription.getText().toString());
             }
         });
-
+        setHasOptionsMenu(true);
         return root;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case ADD_PHOTO_MENU_ITEM_ID:
+                try {
+                    mAddNotePresenter.takePicture();
+                } catch (IOException ioe) {
+                    if (getView() != null) {
+                        Snackbar.make(getView(), "Could not take picture", Snackbar.LENGTH_LONG)
+                                .show();
+                    }
+                }
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.add(Menu.NONE, ADD_PHOTO_MENU_ITEM_ID, Menu.NONE, R.string.add_picture);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -99,5 +136,43 @@ public class AddNoteFragment extends BaseFragment implements AddNoteView {
         Snackbar.make(mTitle, getString(R.string.successfully_saved_note_message),
                 Snackbar.LENGTH_SHORT).show();
         ActivityUtils.<NotesActivity>cast(getActivity()).showNotesFragment();
+    }
+
+    @Override
+    public void openCamera(String saveTo) {
+        // Open the camera to take a picture.
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(saveTo));
+            startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
+        } else {
+            Snackbar.make(mTitle, getString(R.string.cannot_connect_to_camera_message),
+                    Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void showImagePreview(@NonNull String imageUrl) {
+        checkState(!TextUtils.isEmpty(imageUrl), "imageUrl cannot be null or empty!");
+        mImageThumbnail.setVisibility(View.VISIBLE);
+        Glide.with(this)
+                .load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(mImageThumbnail);
+    }
+
+    @Override
+    public void showImageError() {
+        Snackbar.make(mTitle, getString(R.string.cannot_connect_to_camera_message), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If an image is received, display it on the ImageView.
+        if (REQUEST_CODE_IMAGE_CAPTURE == requestCode && Activity.RESULT_OK == resultCode) {
+            mAddNotePresenter.imageAvailable();
+        } else {
+            mAddNotePresenter.imageCaptureFailed();
+        }
     }
 }

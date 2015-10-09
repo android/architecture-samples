@@ -16,15 +16,6 @@
 
 package com.example.android.testing.notes;
 
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.text.TextUtils;
-import android.view.View;
-
-import com.example.android.testing.notes.model.NoteRepositories;
-import com.example.android.testing.notes.stub.FakeNotesServiceApi;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -32,13 +23,27 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.app.Activity;
+import android.app.Instrumentation.ActivityResult;
+import android.provider.MediaStore;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.espresso.matcher.BoundedMatcher;
+import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ImageView;
+
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.scrollTo;
+import static android.support.test.espresso.intent.Intents.intending;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -46,6 +51,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -68,17 +74,23 @@ public class NotesActivityTest {
         };
     }
 
-    @Rule
-    public ActivityTestRule<NotesActivity> mNotesActivityTestRule =
-            new ActivityTestRule<NotesActivity>(NotesActivity.class) {
+    private BoundedMatcher<View, ImageView> hasDrawable() {
+        return new BoundedMatcher<View, ImageView>(ImageView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has drawable");
+            }
 
-                @Override
-                protected void beforeActivityLaunched() {
-                    // TODO this is kinda messed up refactor code to make for a cleaner Service API
-                    // injection or use dagger
-                    NoteRepositories.getInMemoryRepoInstance(new FakeNotesServiceApi());
-                }
-            };
+            @Override
+            public boolean matchesSafely(ImageView imageView) {
+                return imageView.getDrawable() != null;
+            }
+        };
+    }
+
+    @Rule
+    public IntentsTestRule<NotesActivity> mNotesIntentsTestRule =
+            new IntentsTestRule<>(NotesActivity.class);
 
     @Test
     public void clickAddNoteButton_opensAddNoteUi() throws Exception {
@@ -123,6 +135,35 @@ public class NotesActivityTest {
         // Verify empty notes snackbar is shown
         String emptyNoteMessageText = getTargetContext().getString(R.string.empty_note_message);
         onView(withText(emptyNoteMessageText)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void addImageToNoteShowsThumbnailInUi() {
+        // Stub take image Intent.
+        ActivityResult result = createImageCaptureActivityResultStub();
+        intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
+
+        // Open add notes screen
+        onView(withId(R.id.fab_notes)).perform(click());
+
+        // Check thumbnail view is not shown
+        onView(withId(R.id.add_note_image_thumbnail)).check(matches(not(isDisplayed())));
+        selectTakeImageFromMenu();
+
+        onView(withId(R.id.add_note_image_thumbnail))
+                .check(matches(allOf(
+                        hasDrawable(),
+                        isDisplayed())));
+    }
+
+    private void selectTakeImageFromMenu() {
+        openActionBarOverflowOrOptionsMenu(getTargetContext());
+        onView(withText(R.string.add_picture)).perform(click());
+    }
+
+    private ActivityResult createImageCaptureActivityResultStub() {
+        // Create the ActivityResult with a null Intent.
+        return new ActivityResult(Activity.RESULT_OK, null);
     }
 
 }

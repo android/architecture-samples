@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.view;
 
+import java.io.File;
+
 public interface NoteDetailsView {
 
     void setProgressIndicator(boolean active);
@@ -25,6 +27,10 @@ public interface NoteDetailsView {
     void hideTitle();
 
     void showTitle(String title);
+
+    void showImage(File imageFile);
+
+    void hideImage();
 
     void hideDescription();
 

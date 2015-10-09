@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.presenter;
+package com.example.android.testing.notes.util;
 
 import java.io.IOException;
 
 /**
  * TODO: javadoc
  */
-public interface AddNotePresenter {
+public interface ImageFile {
+    void create(String name, String extension) throws IOException;
 
-    void saveNote(String title, String description);
+    boolean exists();
 
-    void takePicture() throws IOException;
+    void delete();
 
-    void imageAvailable();
-
-    void imageCaptureFailed();
+    String getPath();
 }

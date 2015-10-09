@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.NotesActivity;
 import com.example.android.testing.notes.NotesDetailActivity;
 import com.example.android.testing.notes.R;
@@ -47,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Display a grid of {@link Note}s
  */
-public class NotesFragment extends BaseFragment implements NotesView {
+public class NotesFragment extends Fragment implements NotesView {
 
     private NotesPresenter mNotesPresenter;
 
@@ -78,7 +80,7 @@ public class NotesFragment extends BaseFragment implements NotesView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mNotesPresenter = new NotesPresenterImpl(getNotesRepository(), this);
+        mNotesPresenter = new NotesPresenterImpl(Injection.provideNotesRepository(), this);
 
         // Hide keyboard
         InputMethodManager imm =

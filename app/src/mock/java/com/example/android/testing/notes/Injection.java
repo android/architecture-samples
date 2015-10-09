@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.view;
+package com.example.android.testing.notes;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-
+import com.example.android.testing.notes.model.FakeNotesServiceApiImpl;
 import com.example.android.testing.notes.model.NoteRepositories;
 import com.example.android.testing.notes.model.NotesRepository;
-import com.example.android.testing.notes.model.NotesServiceApiImpl;
+import com.example.android.testing.notes.util.FakeImageFileImpl;
+import com.example.android.testing.notes.util.ImageFile;
 
 /**
- * TODO javadoc
+ * TODO: javadoc
  */
-public class BaseFragment extends Fragment {
+public class Injection {
 
-    private NotesRepository mNotesRepository;
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mNotesRepository = NoteRepositories
-                .getInMemoryRepoInstance(new NotesServiceApiImpl());
+    public static ImageFile provideImageFile() {
+        return new FakeImageFileImpl();
     }
 
-    protected NotesRepository getNotesRepository() {
-        return mNotesRepository;
+    public static NotesRepository provideNotesRepository() {
+        return NoteRepositories.getInMemoryRepoInstance(new FakeNotesServiceApiImpl());
     }
 }

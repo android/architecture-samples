@@ -16,12 +16,17 @@
 
 package com.example.android.testing.notes.presenter;
 
+import android.support.annotation.NonNull;
+
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.view.NoteDetailsView;
 
-import android.support.annotation.NonNull;
+import java.io.File;
 
+/**
+ * TODO: javadoc
+ */
 public class NoteDetailPresenterImpl implements NoteDetailPresenter {
 
     private final NotesRepository mNotesRepository;
@@ -70,5 +75,17 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
         } else {
             mNotesDetailView.showDescription(description);
         }
+
+        if (note.getImageUrl() != null) {
+            File imageFile = new File(note.getImageUrl());
+            if (imageFile.exists()) {
+                mNotesDetailView.showImage(imageFile);
+            } else {
+                mNotesDetailView.hideImage();
+            }
+        } else {
+            mNotesDetailView.hideImage();
+        }
+
     }
 }

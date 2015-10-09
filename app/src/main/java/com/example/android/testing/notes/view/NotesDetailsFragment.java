@@ -16,18 +16,25 @@
 
 package com.example.android.testing.notes.view;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.presenter.NoteDetailPresenter;
 import com.example.android.testing.notes.presenter.NoteDetailPresenterImpl;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import java.io.File;
 
-public class NotesDetailsFragment extends BaseFragment implements NoteDetailsView {
+public class NotesDetailsFragment extends Fragment implements NoteDetailsView {
 
     public static final String ARGUMENT_NOTE_ID = "NOTE_ID";
 
@@ -36,6 +43,8 @@ public class NotesDetailsFragment extends BaseFragment implements NoteDetailsVie
     private TextView mTitle;
 
     private TextView mDescription;
+
+    private ImageView mImage;
 
     public static NotesDetailsFragment newInstance(String noteId) {
         Bundle arguments = new Bundle();
@@ -49,7 +58,8 @@ public class NotesDetailsFragment extends BaseFragment implements NoteDetailsVie
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mNoteDetailPresenter = new NoteDetailPresenterImpl(getNotesRepository(), this);
+        mNoteDetailPresenter = new NoteDetailPresenterImpl(Injection.provideNotesRepository(),
+                this);
     }
 
     @Nullable
@@ -59,6 +69,7 @@ public class NotesDetailsFragment extends BaseFragment implements NoteDetailsVie
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
         mTitle = (TextView) root.findViewById(R.id.note_title);
         mDescription = (TextView) root.findViewById(R.id.note_description);
+        mImage = (ImageView) root.findViewById(R.id.note_image_thumbnail);
         return root;
     }
 
@@ -99,6 +110,24 @@ public class NotesDetailsFragment extends BaseFragment implements NoteDetailsVie
     public void showTitle(String title) {
         mTitle.setVisibility(View.VISIBLE);
         mTitle.setText(title);
+    }
+
+    @Override
+    public void showImage(File imageFile) {
+        mImage.setVisibility(View.VISIBLE);
+        // TODO: Move to bg thread
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+
+        Bitmap imageBmp = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
+        mImage.setImageBitmap(imageBmp);
+    }
+
+    @Override
+    public void hideImage() {
+        mImage.setImageDrawable(null); //TODO: check if this is right/useful.
+        mImage.setVisibility(View.GONE);
     }
 
     @Override

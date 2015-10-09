@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.stub;
+package com.example.android.testing.notes.model;
 
-import android.support.test.espresso.core.deps.guava.collect.Lists;
+import com.google.common.collect.Lists;
+
 import android.support.v4.util.ArrayMap;
-
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.model.NotesServiceApi;
 
 import java.util.List;
 
-public class FakeNotesServiceApi implements NotesServiceApi {
+public class FakeNotesServiceApiImpl implements NotesServiceApi {
 
     // TODO replace this with a new test specific data set.
     private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = new ArrayMap();

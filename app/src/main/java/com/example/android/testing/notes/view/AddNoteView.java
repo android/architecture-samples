@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.view;
 
+import android.support.annotation.NonNull;
+
 /**
  * TODO javadoc
  */
@@ -24,4 +26,10 @@ public interface AddNoteView {
     void showEmptyNoteError();
 
     void showNotesList();
+
+    void openCamera(String saveTo);
+
+    void showImagePreview(@NonNull String uri);
+
+    void showImageError();
 }

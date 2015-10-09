@@ -73,7 +73,7 @@ public class NotesDetailPresenterTest {
 
         verify(mNoteDetailsView).setProgressIndicator(false);
         verify(mNoteDetailsView).showTitle(TITLE_TEST);
-        verify(mNoteDetailsView).showTitle(DESCRIPTION_TEST);
+        verify(mNoteDetailsView).showDescription(DESCRIPTION_TEST);
     }
 
     @Test

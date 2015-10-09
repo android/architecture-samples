@@ -31,10 +31,12 @@ ext {
     // App dependencies
     supportLibraryVersion = '23.0.1'
     guavaVersion = '18.0'
+    glideVersion = '3.6.1'
     junitVersion = '4.12'
     mocktioVersion = '1.10.19'
+    powerMockito = '1.6.2'
     hamcrestVersion = '1.3'
-    runnerVersion = '0.4'
-    rulesVersion = '0.4'
+    runnerVersion = '0.4.1'
+    rulesVersion = '0.4.1'
     espressoVersion = '2.2.1'
 }

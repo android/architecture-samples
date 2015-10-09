@@ -35,4 +35,10 @@
         android:layout_height="wrap_content"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/note_image_thumbnail"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:visibility="invisible"/>
 </LinearLayout>

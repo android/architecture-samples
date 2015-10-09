@@ -18,16 +18,21 @@ package com.example.android.testing.notes.presenter;
 
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
+import com.example.android.testing.notes.util.ImageFile;
 import com.example.android.testing.notes.view.AddNoteView;
-import com.example.android.testing.notes.view.NotesView;
-import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * TODO: javadoc
@@ -38,6 +43,9 @@ public class AddNotePresenterTest {
     private NotesRepository mNotesRepository;
 
     @Mock
+    private ImageFile mImageFile;
+
+    @Mock
     private AddNoteView mAddNoteView;
 
     private AddNotePresenterImpl mAddNotesPresenter;
@@ -45,22 +53,57 @@ public class AddNotePresenterTest {
     @Before
     public void setupAddNotePresenter() {
         MockitoAnnotations.initMocks(this);
-        mAddNotesPresenter = new AddNotePresenterImpl(mNotesRepository, mAddNoteView);
+        mAddNotesPresenter = new AddNotePresenterImpl(mNotesRepository, mAddNoteView, mImageFile);
     }
 
     @Test
-    public void savesNoteToRepository_showsSuccessMessage() {
-        final Note newNote = new Note("New Note Title", "Some Note Description");
-        mAddNotesPresenter.saveNote(newNote);
-        verify(mNotesRepository).saveNote(newNote);
+    public void saveNoteToRepository_showsSuccessMessageUi() {
+        mAddNotesPresenter.saveNote("New Note Title", "Some Note Description");
+        verify(mNotesRepository).saveNote(any(Note.class));
         verify(mAddNoteView).showNotesList();
     }
 
     @Test
-    public void saveNote_emptyNoteShowError() {
-        final Note emptyNote = new Note("", "");
-        mAddNotesPresenter.saveNote(emptyNote);
+    public void saveNote_WithImage_SavesNoteToRepository() {
+        // TODO: add captor which checks if images is in Note when image present in file.
+    }
+
+    @Test
+    public void saveNote_emptyNoteShowsErrorUi() {
+        mAddNotesPresenter.saveNote("", "");
         verify(mAddNoteView).showEmptyNoteError();
+    }
+
+    @Test
+    public void takePicture_CreatesFileAndOpensCamera() throws IOException {
+        mAddNotesPresenter.takePicture();
+        verify(mImageFile).create(anyString(), anyString());
+        verify(mImageFile).getPath();
+        verify(mAddNoteView).openCamera(anyString());
+    }
+
+    @Test
+    public void imageAvailable_SavesImageAndUpdatesUiWithThumbnail() {
+        final String imageUrl = "path/to/file";
+        when(mImageFile.exists()).thenReturn(true);
+        when(mImageFile.getPath()).thenReturn(imageUrl);
+        mAddNotesPresenter.imageAvailable();
+        verify(mAddNoteView).showImagePreview(contains(imageUrl));
+    }
+
+    @Test
+    public void imageAvailable_FileDoesNotExistShowsErrorUi() {
+        when(mImageFile.exists()).thenReturn(false);
+        mAddNotesPresenter.imageAvailable();
+        verify(mAddNoteView).showImageError();
+        verify(mImageFile).delete();
+    }
+
+    @Test
+    public void noImageAvailable_ShowsErrorUi() {
+        mAddNotesPresenter.imageCaptureFailed();
+        verify(mAddNoteView).showImageError();
+        verify(mImageFile).delete();
     }
 
 }
