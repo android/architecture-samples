@@ -66,7 +66,8 @@ public final class Note {
     }
 
     public boolean isEmpty() {
-        return "".equals(mTitle) && "".equals(mDescription);
+        return (mTitle == null || "".equals(mTitle)) &&
+                (mDescription == null || "".equals(mDescription));
     }
 
     @Override
