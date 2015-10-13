@@ -16,7 +16,7 @@
 
 package com.example.android.testing.notes;
 
-import com.example.android.testing.notes.view.NotesDetailsFragment;
+import com.example.android.testing.notes.view.NoteDetailFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,7 +26,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-public class NotesDetailActivity extends AppCompatActivity {
+public class NoteDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NOTE_ID = "NOTE_ID";
 
@@ -46,7 +46,7 @@ public class NotesDetailActivity extends AppCompatActivity {
 
         final String noteId = getIntent().getStringExtra(EXTRA_NOTE_ID);
 
-        initFragment(NotesDetailsFragment.newInstance(noteId));
+        initFragment(NoteDetailFragment.newInstance(noteId));
     }
 
     @Override

@@ -18,11 +18,12 @@ package com.example.android.testing.notes.presenter;
 
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
-import com.example.android.testing.notes.view.NoteDetailsView;
+import com.example.android.testing.notes.view.NoteDetailView;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.io.File;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * TODO: javadoc
@@ -31,17 +32,17 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
 
     private final NotesRepository mNotesRepository;
 
-    private final NoteDetailsView mNotesDetailView;
+    private final NoteDetailView mNotesDetailView;
 
-    public NoteDetailPresenterImpl(NotesRepository notesRepository,
-                                   NoteDetailsView noteDetailsView) {
-        mNotesRepository = notesRepository;
-        mNotesDetailView = noteDetailsView;
+    public NoteDetailPresenterImpl(@NonNull NotesRepository notesRepository,
+                                   @NonNull NoteDetailView noteDetailView) {
+        mNotesRepository = checkNotNull(notesRepository, "notesRepository cannot be null!");
+        mNotesDetailView = checkNotNull(noteDetailView, "noteDetailView cannot be null!");
     }
 
     @Override
-    public void openNote(String noteId) {
-        if (noteId == null || noteId.isEmpty()) {
+    public void openNote(@Nullable String noteId) {
+        if (null == noteId || noteId.isEmpty()) {
             mNotesDetailView.showMissingNote();
             return;
         }
@@ -51,7 +52,7 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
             @Override
             public void onNoteLoaded(Note note) {
                 mNotesDetailView.setProgressIndicator(false);
-                if (note == null) {
+                if (null == note) {
                     mNotesDetailView.showMissingNote();
                 } else {
                     showNote(note);
@@ -60,9 +61,10 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
         });
     }
 
-    private void showNote(@NonNull Note note) {
+    private void showNote(Note note) {
         final String title = note.getTitle();
         final String description = note.getDescription();
+        final String imageUrl = note.getImageUrl();
 
         if (title.isEmpty()) {
             mNotesDetailView.hideTitle();
@@ -76,13 +78,8 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
             mNotesDetailView.showDescription(description);
         }
 
-        if (note.getImageUrl() != null) {
-            File imageFile = new File(note.getImageUrl());
-            if (imageFile.exists()) {
-                mNotesDetailView.showImage(imageFile);
-            } else {
-                mNotesDetailView.hideImage();
-            }
+        if (imageUrl != null) {
+            mNotesDetailView.showImage(imageUrl);
         } else {
             mNotesDetailView.hideImage();
         }

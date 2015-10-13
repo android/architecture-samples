@@ -16,7 +16,6 @@
 
 package com.example.android.testing.notes;
 
-import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,11 +24,8 @@ import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
 import android.provider.MediaStore;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.view.View;
-import android.widget.ImageView;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
@@ -43,26 +39,13 @@ import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAct
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.example.android.testing.notes.custom.matcher.ImageViewHasDrawableMatcher.hasDrawable;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AddNoteScreenTest {
-
-    private BoundedMatcher<View, ImageView> hasDrawable() {
-        return new BoundedMatcher<View, ImageView>(ImageView.class) {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("has drawable");
-            }
-
-            @Override
-            public boolean matchesSafely(ImageView imageView) {
-                return imageView.getDrawable() != null;
-            }
-        };
-    }
 
     @Rule
     public IntentsTestRule<NotesActivity> mNotesIntentsTestRule =

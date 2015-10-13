@@ -16,9 +16,9 @@
 
 package com.example.android.testing.notes.presenter;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public interface NoteDetailPresenter {
 
-    void openNote(@NonNull String noteId);
+    void openNote(@Nullable String noteId);
 }

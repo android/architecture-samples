@@ -16,13 +16,13 @@
 
 package com.example.android.testing.notes.view;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.presenter.NoteDetailPresenter;
 import com.example.android.testing.notes.presenter.NoteDetailPresenterImpl;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,26 +32,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-
-public class NotesDetailsFragment extends Fragment implements NoteDetailsView {
+public class NoteDetailFragment extends Fragment implements NoteDetailView {
 
     public static final String ARGUMENT_NOTE_ID = "NOTE_ID";
 
     private NoteDetailPresenter mNoteDetailPresenter;
 
-    private TextView mTitle;
+    private TextView mDetailTitle;
 
-    private TextView mDescription;
+    private TextView mDetailDescription;
 
-    private ImageView mImage;
+    private ImageView mDetailImage;
 
-    public static NotesDetailsFragment newInstance(String noteId) {
+    public static NoteDetailFragment newInstance(String noteId) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_NOTE_ID, noteId);
-        NotesDetailsFragment fragment = new NotesDetailsFragment();
+        NoteDetailFragment fragment = new NoteDetailFragment();
         fragment.setArguments(arguments);
-
         return fragment;
     }
 
@@ -67,9 +64,9 @@ public class NotesDetailsFragment extends Fragment implements NoteDetailsView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
-        mTitle = (TextView) root.findViewById(R.id.note_title);
-        mDescription = (TextView) root.findViewById(R.id.note_description);
-        mImage = (ImageView) root.findViewById(R.id.note_image_thumbnail);
+        mDetailTitle = (TextView) root.findViewById(R.id.note_detail_title);
+        mDetailDescription = (TextView) root.findViewById(R.id.note_detail_description);
+        mDetailImage = (ImageView) root.findViewById(R.id.note_detail_image);
         return root;
     }
 
@@ -84,56 +81,53 @@ public class NotesDetailsFragment extends Fragment implements NoteDetailsView {
     public void setProgressIndicator(boolean active) {
         // TODO
         if (active) {
-            mTitle.setText("");
-            mDescription.setText("LOADING");
+            mDetailTitle.setText("");
+            mDetailDescription.setText("LOADING");
         }
-
     }
 
     @Override
     public void hideDescription() {
-        mDescription.setVisibility(View.GONE);
+        mDetailDescription.setVisibility(View.GONE);
     }
 
     @Override
     public void hideTitle() {
-        mTitle.setVisibility(View.GONE);
+        mDetailTitle.setVisibility(View.GONE);
     }
 
     @Override
     public void showDescription(String description) {
-        mDescription.setVisibility(View.VISIBLE);
-        mDescription.setText(description);
+        mDetailDescription.setVisibility(View.VISIBLE);
+        mDetailDescription.setText(description);
     }
 
     @Override
     public void showTitle(String title) {
-        mTitle.setVisibility(View.VISIBLE);
-        mTitle.setText(title);
+        mDetailTitle.setVisibility(View.VISIBLE);
+        mDetailTitle.setText(title);
     }
 
     @Override
-    public void showImage(File imageFile) {
-        mImage.setVisibility(View.VISIBLE);
-        // TODO: Move to bg thread
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 4;
-
-        Bitmap imageBmp = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
-        mImage.setImageBitmap(imageBmp);
+    public void showImage(String imageUrl) {
+        mDetailImage.setVisibility(View.VISIBLE);
+        Glide.with(this)
+                .load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(mDetailImage);
     }
 
     @Override
     public void hideImage() {
-        mImage.setImageDrawable(null); //TODO: check if this is right/useful.
-        mImage.setVisibility(View.GONE);
+        mDetailImage.setImageDrawable(null); //TODO: check if this is right/useful.
+        mDetailImage.setVisibility(View.GONE);
     }
 
     @Override
     public void showMissingNote() {
         // TODO
-        mTitle.setText("");
-        mDescription.setText("No data");
+        mDetailTitle.setText("");
+        mDetailDescription.setText("No data");
     }
 }

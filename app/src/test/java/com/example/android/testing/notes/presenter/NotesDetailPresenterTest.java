@@ -18,7 +18,7 @@ package com.example.android.testing.notes.presenter;
 
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
-import com.example.android.testing.notes.view.NoteDetailsView;
+import com.example.android.testing.notes.view.NoteDetailView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class NotesDetailPresenterTest {
     private NotesRepository mNotesRepository;
 
     @Mock
-    private NoteDetailsView mNoteDetailsView;
+    private NoteDetailView mNoteDetailView;
 
     @Captor
     private ArgumentCaptor<NotesRepository.GetNoteCallback> mGetNoteCallbackCaptor;
@@ -55,7 +55,7 @@ public class NotesDetailPresenterTest {
     @Before
     public void setupNotesPresenter() {
         MockitoAnnotations.initMocks(this);
-        mNotesDetailsPresenter = new NoteDetailPresenterImpl(mNotesRepository, mNoteDetailsView);
+        mNotesDetailsPresenter = new NoteDetailPresenterImpl(mNotesRepository, mNoteDetailView);
     }
 
     @Test
@@ -66,14 +66,14 @@ public class NotesDetailPresenterTest {
         Note note = new Note(TITLE_TEST, DESCRIPTION_TEST);
 
         mNotesDetailsPresenter.openNote(note.getId());
-        verify(mNoteDetailsView).setProgressIndicator(true);
+        verify(mNoteDetailView).setProgressIndicator(true);
         verify(mNotesRepository).getNote(eq(note.getId()), mGetNoteCallbackCaptor.capture());
 
         mGetNoteCallbackCaptor.getValue().onNoteLoaded(note); // Trigger callback
 
-        verify(mNoteDetailsView).setProgressIndicator(false);
-        verify(mNoteDetailsView).showTitle(TITLE_TEST);
-        verify(mNoteDetailsView).showDescription(DESCRIPTION_TEST);
+        verify(mNoteDetailView).setProgressIndicator(false);
+        verify(mNoteDetailView).showTitle(TITLE_TEST);
+        verify(mNoteDetailView).showDescription(DESCRIPTION_TEST);
     }
 
     @Test
@@ -82,12 +82,12 @@ public class NotesDetailPresenterTest {
         // When loading of a note is requested
 
         mNotesDetailsPresenter.openNote(INVALID_ID);
-        verify(mNoteDetailsView).setProgressIndicator(true);
+        verify(mNoteDetailView).setProgressIndicator(true);
         verify(mNotesRepository).getNote(eq(INVALID_ID), mGetNoteCallbackCaptor.capture());
 
         mGetNoteCallbackCaptor.getValue().onNoteLoaded(null); // Trigger callback
 
-        verify(mNoteDetailsView).setProgressIndicator(false);
-        verify(mNoteDetailsView).showMissingNote();
+        verify(mNoteDetailView).setProgressIndicator(false);
+        verify(mNoteDetailView).showMissingNote();
     }
 }

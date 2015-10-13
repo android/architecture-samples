@@ -158,6 +158,7 @@ public class AddNoteFragment extends Fragment implements AddNoteView {
         Glide.with(this)
                 .load(imageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
                 .into(mImageThumbnail);
     }
 

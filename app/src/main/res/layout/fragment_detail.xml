@@ -22,23 +22,24 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
+    <ImageView
+            android:id="@+id/note_detail_image"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:visibility="invisible"/>
+
     <TextView
-        android:id="@+id/note_title"
+        android:id="@+id/note_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello!"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/note_description"
+        android:id="@+id/note_detail_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <ImageView
-        android:id="@+id/note_image_thumbnail"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:visibility="invisible"/>
 </LinearLayout>

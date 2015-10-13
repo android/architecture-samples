@@ -29,13 +29,13 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/note_title"
+            android:id="@+id/note_detail_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/note_description"
+            android:id="@+id/note_detail_description"
             style="@android:style/TextAppearance.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

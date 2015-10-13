@@ -16,8 +16,6 @@
 
 package com.example.android.testing.notes.util;
 
-import android.support.annotation.VisibleForTesting;
-
 /**
  * TODO: javadoc
  */

@@ -18,7 +18,7 @@ package com.example.android.testing.notes.view;
 
 import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.NotesDetailActivity;
+import com.example.android.testing.notes.NoteDetailActivity;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.presenter.NotesPresenter;
@@ -175,8 +175,8 @@ public class NotesFragment extends Fragment implements NotesView {
         // TODO implement show detail note feature, please implement this in a fragment but hosted
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), NotesDetailActivity.class);
-        intent.putExtra(NotesDetailActivity.EXTRA_NOTE_ID, noteId);
+        Intent intent = new Intent(getContext(), NoteDetailActivity.class);
+        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, noteId);
         startActivity(intent);
     }
 
@@ -233,8 +233,8 @@ public class NotesFragment extends Fragment implements NotesView {
             public ViewHolder(View itemView, NoteItemListener listener) {
                 super(itemView);
                 mItemListener = listener;
-                title = (TextView) itemView.findViewById(R.id.note_title);
-                description = (TextView) itemView.findViewById(R.id.note_description);
+                title = (TextView) itemView.findViewById(R.id.note_detail_title);
+                description = (TextView) itemView.findViewById(R.id.note_detail_description);
                 itemView.setOnClickListener(this);
             }
 
