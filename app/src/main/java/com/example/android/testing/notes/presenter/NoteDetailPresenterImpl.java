@@ -16,11 +16,11 @@
 
 package com.example.android.testing.notes.presenter;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.view.NoteDetailsView;
+
+import android.support.annotation.NonNull;
 
 import java.io.File;
 
@@ -34,7 +34,7 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
     private final NoteDetailsView mNotesDetailView;
 
     public NoteDetailPresenterImpl(NotesRepository notesRepository,
-            NoteDetailsView noteDetailsView) {
+                                   NoteDetailsView noteDetailsView) {
         mNotesRepository = notesRepository;
         mNotesDetailView = noteDetailsView;
     }

@@ -56,7 +56,7 @@ public class AddNotePresenterImpl implements AddNotePresenter {
             imageUrl = mImageFile.getPath();
         }
         Note newNote = new Note(title, description, imageUrl);
-        if(newNote.isEmpty()) {
+        if (newNote.isEmpty()) {
             mAddNoteView.showEmptyNoteError();
         } else {
             mNotesRepository.saveNote(newNote);

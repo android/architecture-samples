@@ -16,10 +16,10 @@
 
 package com.example.android.testing.notes.model;
 
+import com.google.common.collect.ImmutableList;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 

@@ -16,6 +16,15 @@
 
 package com.example.android.testing.notes.view;
 
+import com.example.android.testing.notes.Injection;
+import com.example.android.testing.notes.NotesActivity;
+import com.example.android.testing.notes.NotesDetailActivity;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.presenter.NotesPresenter;
+import com.example.android.testing.notes.presenter.NotesPresenterImpl;
+import com.example.android.testing.notes.util.ActivityUtils;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,15 +40,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-
-import com.example.android.testing.notes.Injection;
-import com.example.android.testing.notes.NotesActivity;
-import com.example.android.testing.notes.NotesDetailActivity;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.model.Note;
-import com.example.android.testing.notes.presenter.NotesPresenter;
-import com.example.android.testing.notes.presenter.NotesPresenterImpl;
-import com.example.android.testing.notes.util.ActivityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +94,7 @@ public class NotesFragment extends Fragment implements NotesView {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.notes_list);
         mRecyclerView.setAdapter(mListAdapter);

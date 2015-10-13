@@ -36,7 +36,7 @@ public class ActivityUtils {
     }
 
     public static void showFragment(@NonNull FragmentManager fragmentManager, int containerResId,
-                                     @NonNull Fragment fragment, boolean addToBackStack) {
+                                    @NonNull Fragment fragment, boolean addToBackStack) {
         showFragment(fragmentManager, containerResId, fragment, addToBackStack, null);
     }
 

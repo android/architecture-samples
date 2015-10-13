@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes;
 
+import com.example.android.testing.notes.view.NotesDetailsFragment;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,8 +25,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import com.example.android.testing.notes.view.NotesDetailsFragment;
 
 public class NotesDetailActivity extends AppCompatActivity {
 

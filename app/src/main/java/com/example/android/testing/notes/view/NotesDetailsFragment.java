@@ -16,6 +16,11 @@
 
 package com.example.android.testing.notes.view;
 
+import com.example.android.testing.notes.Injection;
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.presenter.NoteDetailPresenter;
+import com.example.android.testing.notes.presenter.NoteDetailPresenterImpl;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -26,11 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.example.android.testing.notes.Injection;
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.presenter.NoteDetailPresenter;
-import com.example.android.testing.notes.presenter.NoteDetailPresenterImpl;
 
 import java.io.File;
 
@@ -65,7 +65,7 @@ public class NotesDetailsFragment extends Fragment implements NoteDetailsView {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
         mTitle = (TextView) root.findViewById(R.id.note_title);
         mDescription = (TextView) root.findViewById(R.id.note_description);

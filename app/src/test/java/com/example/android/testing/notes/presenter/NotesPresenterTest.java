@@ -16,11 +16,12 @@
 
 package com.example.android.testing.notes.presenter;
 
+import com.google.common.collect.Lists;
+
 import com.example.android.testing.notes.model.Note;
 import com.example.android.testing.notes.model.NotesRepository;
 import com.example.android.testing.notes.model.NotesRepository.LoadNotesCallback;
 import com.example.android.testing.notes.view.NotesView;
-import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;

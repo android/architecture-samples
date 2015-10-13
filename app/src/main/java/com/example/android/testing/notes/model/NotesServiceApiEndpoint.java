@@ -21,7 +21,7 @@ import android.support.v4.util.ArrayMap;
 public final class NotesServiceApiEndpoint {
 
     static {
-        DATA =  new ArrayMap(2);
+        DATA = new ArrayMap(2);
         addNote("Oh yes!", "I demand trial by Unit testing", null);
         addNote("Espresso", "UI Testing for Android", null);
     }
