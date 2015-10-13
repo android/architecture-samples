@@ -53,8 +53,6 @@ public class NotesFragment extends Fragment implements NotesView {
 
     private NotesPresenter mNotesPresenter;
 
-    private RecyclerView mRecyclerView;
-
     private NotesAdapter mListAdapter;
 
     public NotesFragment() {
@@ -96,13 +94,13 @@ public class NotesFragment extends Fragment implements NotesView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
-        mRecyclerView = (RecyclerView) root.findViewById(R.id.notes_list);
-        mRecyclerView.setAdapter(mListAdapter);
+        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.notes_list);
+        recyclerView.setAdapter(mListAdapter);
 
         int numColumns = getContext().getResources().getInteger(R.integer.num_notes_columns);
 
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
 
         // Set up floating action button
         FloatingActionButton fab =
@@ -197,8 +195,7 @@ public class NotesFragment extends Fragment implements NotesView {
             LayoutInflater inflater = LayoutInflater.from(context);
             View noteView = inflater.inflate(R.layout.item_note, parent, false);
 
-            ViewHolder holder = new ViewHolder(noteView, mItemListener);
-            return holder;
+            return new ViewHolder(noteView, mItemListener);
         }
 
         @Override

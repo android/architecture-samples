@@ -31,7 +31,7 @@
                 android:id="@+id/add_note_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Title"
+                android:hint="@string/title_hint"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:gravity="top"
-                android:hint="Enter your note here."/>
+                android:hint="@string/description_hint"/>
 
         <ImageView
                 android:id="@+id/add_note_image_thumbnail"
