@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.model;
 
+import android.support.annotation.NonNull;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class NoteRepositories {
@@ -26,7 +28,7 @@ public class NoteRepositories {
 
     private static NotesRepository repository = null;
 
-    public synchronized static NotesRepository getInMemoryRepoInstance(NotesServiceApi notesServiceApi) {
+    public synchronized static NotesRepository getInMemoryRepoInstance(@NonNull NotesServiceApi notesServiceApi) {
         checkNotNull(notesServiceApi);
         if (null == repository) {
             repository = new InMemoryNotesRepository(notesServiceApi);

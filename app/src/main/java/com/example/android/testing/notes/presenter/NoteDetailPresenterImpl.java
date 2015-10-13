@@ -66,13 +66,13 @@ public class NoteDetailPresenterImpl implements NoteDetailPresenter {
         final String description = note.getDescription();
         final String imageUrl = note.getImageUrl();
 
-        if (title.isEmpty()) {
+        if (title != null && title.isEmpty()) {
             mNotesDetailView.hideTitle();
         } else {
             mNotesDetailView.showTitle(title);
         }
 
-        if (description.isEmpty()) {
+        if (description != null && description.isEmpty()) {
             mNotesDetailView.hideDescription();
         } else {
             mNotesDetailView.showDescription(description);

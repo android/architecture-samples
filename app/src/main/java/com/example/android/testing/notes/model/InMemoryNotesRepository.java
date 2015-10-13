@@ -69,6 +69,8 @@ public class InMemoryNotesRepository implements NotesRepository {
 
     @Override
     public void getNote(@NonNull final String noteId, @NonNull final GetNoteCallback callback) {
+        checkNotNull(noteId);
+        checkNotNull(callback);
         // Load notes matching the id always directly from the API.
         mNotesServiceApi.getNote(noteId, new NotesServiceApi.NotesServiceCallback<Note>() {
             @Override
