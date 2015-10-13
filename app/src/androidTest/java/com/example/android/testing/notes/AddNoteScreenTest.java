@@ -17,8 +17,6 @@
 package com.example.android.testing.notes;
 
 import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +28,6 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -41,38 +38,17 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.contrib.RecyclerViewActions.scrollTo;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class NotesActivityTest {
-
-    private Matcher<View> withItemText(final String itemText) {
-        checkArgument(!TextUtils.isEmpty(itemText), "itemText cannot be null or empty");
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public boolean matchesSafely(View item) {
-                return allOf(
-                        isDescendantOfA(withId(R.id.notes_list)),
-                        withText(itemText)).matches(item);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("is isDescendantOfA RV with text " + itemText);
-            }
-        };
-    }
+public class AddNoteScreenTest {
 
     private BoundedMatcher<View, ImageView> hasDrawable() {
         return new BoundedMatcher<View, ImageView>(ImageView.class) {
@@ -93,51 +69,6 @@ public class NotesActivityTest {
             new IntentsTestRule<>(NotesActivity.class);
 
     @Test
-    public void clickAddNoteButton_opensAddNoteUi() throws Exception {
-        onView(withId(R.id.fab_notes)).perform(click());
-        onView(withId(R.id.add_note_title)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void addNoteToNotesList() throws Exception {
-        final String newNoteTitle = "Espresso";
-        final String newNoteDescription = "Ui testing for Android";
-
-        onView(withId(R.id.fab_notes)).perform(click());
-        // Add note title and description
-        onView(withId(R.id.add_note_title)).perform(typeText(newNoteTitle));
-        onView(withId(R.id.add_note_description)).perform(typeText(newNoteDescription),
-                closeSoftKeyboard());
-        // Save the note
-        onView(withId(R.id.fab_notes)).perform(click());
-
-        // Verify successful save snackbar is shown
-        String successfullySavedNoteMessage = getTargetContext()
-                .getString(R.string.successfully_saved_note_message);
-        onView(withText(successfullySavedNoteMessage)).check(matches(isDisplayed()));
-
-        // Verify note is displayed on screen
-        onView(withId(R.id.notes_list)).perform(
-                scrollTo(hasDescendant(withText(newNoteDescription))));
-        onView(withItemText(newNoteDescription)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void errorShownOnEmptyMessage() throws InterruptedException {
-        onView(withId(R.id.fab_notes)).perform(click());
-        // Add note title and description
-        onView(withId(R.id.add_note_title)).perform(typeText(""));
-        onView(withId(R.id.add_note_description)).perform(typeText(""),
-                closeSoftKeyboard());
-        // Save the note
-        onView(withId(R.id.fab_notes)).perform(click());
-
-        // Verify empty notes snackbar is shown
-        String emptyNoteMessageText = getTargetContext().getString(R.string.empty_note_message);
-        onView(withText(emptyNoteMessageText)).check(matches(isDisplayed()));
-    }
-
-    @Test
     public void addImageToNoteShowsThumbnailInUi() {
         // Stub take image Intent.
         ActivityResult result = createImageCaptureActivityResultStub();
@@ -154,6 +85,21 @@ public class NotesActivityTest {
                 .check(matches(allOf(
                         hasDrawable(),
                         isDisplayed())));
+    }
+
+    @Test
+    public void errorShownOnEmptyMessage() throws InterruptedException {
+        onView(withId(R.id.fab_notes)).perform(click());
+        // Add note title and description
+        onView(withId(R.id.add_note_title)).perform(typeText(""));
+        onView(withId(R.id.add_note_description)).perform(typeText(""),
+                closeSoftKeyboard());
+        // Save the note
+        onView(withId(R.id.fab_notes)).perform(click());
+
+        // Verify empty notes snackbar is shown
+        String emptyNoteMessageText = getTargetContext().getString(R.string.empty_note_message);
+        onView(withText(emptyNoteMessageText)).check(matches(isDisplayed()));
     }
 
     private void selectTakeImageFromMenu() {
