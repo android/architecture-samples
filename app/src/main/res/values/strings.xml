@@ -8,4 +8,5 @@
     <string name="successfully_saved_note_message">Note saved</string>
     <string name="cannot_connect_to_camera_message">Cannot connect to camera</string>
     <string name="add_picture">Add picture</string>
+    <string name="take_picture_error">Could not take picture</string>
 </resources>

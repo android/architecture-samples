@@ -111,8 +111,8 @@ public class AddNoteFragment extends Fragment implements AddNoteView {
                     mAddNotePresenter.takePicture();
                 } catch (IOException ioe) {
                     if (getView() != null) {
-                        Snackbar.make(getView(), "Could not take picture", Snackbar.LENGTH_LONG)
-                                .show();
+                        Snackbar.make(getView(), getString(R.string.take_picture_error),
+                                Snackbar.LENGTH_LONG).show();
                     }
                 }
                 return true;
@@ -164,7 +164,8 @@ public class AddNoteFragment extends Fragment implements AddNoteView {
 
     @Override
     public void showImageError() {
-        Snackbar.make(mTitle, getString(R.string.cannot_connect_to_camera_message), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mTitle, getString(R.string.cannot_connect_to_camera_message),
+                Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

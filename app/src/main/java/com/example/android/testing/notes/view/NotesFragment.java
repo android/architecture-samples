@@ -187,7 +187,7 @@ public class NotesFragment extends Fragment implements NotesView {
         private NoteItemListener mItemListener;
 
         public NotesAdapter(List<Note> notes, NoteItemListener itemListener) {
-            mNotes = checkNotNull(notes);
+            setList(notes);
             mItemListener = itemListener;
         }
 
@@ -210,8 +210,12 @@ public class NotesFragment extends Fragment implements NotesView {
         }
 
         public void replaceData(List<Note> notes) {
-            mNotes = notes;
+            setList(notes);
             notifyDataSetChanged();
+        }
+
+        private void setList(List<Note> notes) {
+            mNotes = checkNotNull(notes);
         }
 
         @Override
