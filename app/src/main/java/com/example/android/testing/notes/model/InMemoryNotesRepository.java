@@ -64,7 +64,7 @@ public class InMemoryNotesRepository implements NotesRepository {
     public void saveNote(@NonNull Note note) {
         checkNotNull(note);
         mNotesServiceApi.saveNote(note);
-        invalidateCache();
+        refreshData();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class InMemoryNotesRepository implements NotesRepository {
     }
 
     @Override
-    public void invalidateCache() {
+    public void refreshData() {
         mCachedNotes = null;
     }
 

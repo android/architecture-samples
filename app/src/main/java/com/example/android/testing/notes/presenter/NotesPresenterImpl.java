@@ -44,7 +44,7 @@ public class NotesPresenterImpl implements NotesPresenter {
     public void loadNotes(boolean forceUpdate) {
         mNotesView.setProgressIndicator(true);
         if (forceUpdate) {
-            mNotesRepository.invalidateCache();
+            mNotesRepository.refreshData();
         }
         mNotesRepository.getNotes(new NotesRepository.LoadNotesCallback() {
             @Override

@@ -68,7 +68,7 @@ public class InMemoryNotesRepositoryTest {
         NotesRepository.LoadNotesCallback callback = mock(NotesRepository.LoadNotesCallback.class);
         makeTwoCallsToRepository(callback);
 
-        mNotesRepository.invalidateCache();
+        mNotesRepository.refreshData();
         mNotesRepository.getNotes(callback); // Second call to API
         verify(mServiceApi, times(2)).getAllNotes(any(NotesServiceApi.NotesServiceCallback.class));
     }

@@ -41,6 +41,6 @@ public interface NotesRepository {
 
     void saveNote(@NonNull Note note);
 
-    void invalidateCache();
+    void refreshData();
 
 }
