@@ -20,12 +20,14 @@ import com.example.android.testing.notes.data.FakeNotesServiceApiImpl;
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.notedetails.NoteDetailActivity;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.content.Intent;
+import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -40,10 +42,12 @@ import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class NoteDetailScreen {
+public class NoteDetailScreenTest {
 
     private static String NOTE_TITLE = "ATSL";
+
     private static String NOTE_DESCRIPTION = "Rocks";
+
     private static String NOTE_IMAGE = "file:///android_asset/atsl-logo.png";
 
     private static Note NOTE = new Note(NOTE_TITLE, NOTE_DESCRIPTION, NOTE_IMAGE);
@@ -59,6 +63,7 @@ public class NoteDetailScreen {
         final Intent startIntent = new Intent();
         startIntent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, NOTE.getId());
         mNoteDetailActivityTestRule.launchActivity(startIntent);
+        registerIdlingResource();
     }
 
     @Test
@@ -70,4 +75,14 @@ public class NoteDetailScreen {
                 isDisplayed())));
     }
 
+    @After
+    public void unregisterIdlingResource() {
+        Espresso.unregisterIdlingResources(
+                mNoteDetailActivityTestRule.getActivity().getCountingIdlingResource());
+    }
+
+    private void registerIdlingResource() {
+        Espresso.registerIdlingResources(
+                mNoteDetailActivityTestRule.getActivity().getCountingIdlingResource());
+    }
 }

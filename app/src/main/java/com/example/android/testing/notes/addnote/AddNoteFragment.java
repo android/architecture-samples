@@ -18,10 +18,14 @@ package com.example.android.testing.notes.addnote;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.notes.NotesActivity;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.util.ActivityUtils;
+import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -98,7 +102,6 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
         mDescription = (TextView) root.findViewById(R.id.add_note_description);
         mImageThumbnail = (ImageView) root.findViewById(R.id.add_note_image_thumbnail);
 
-
         setHasOptionsMenu(true);
         setRetainInstance(true);
         return root;
@@ -156,11 +159,22 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     public void showImagePreview(@NonNull String imageUrl) {
         checkState(!TextUtils.isEmpty(imageUrl), "imageUrl cannot be null or empty!");
         mImageThumbnail.setVisibility(View.VISIBLE);
+        // The image is loaded in a different thread so in order to UI-test this, an idling resource
+        // is used to specify when the app is idle.
+        EspressoIdlingResource.increment(); // App is busy until further notice.
+
         Glide.with(this)
                 .load(imageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
-                .into(mImageThumbnail);
+                .into(new GlideDrawableImageViewTarget(mImageThumbnail) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource,
+                                                GlideAnimation<? super GlideDrawable> animation) {
+                        super.onResourceReady(resource, animation);
+                        EspressoIdlingResource.decrement(); // App is idle.
+                    }
+                });
     }
 
     @Override

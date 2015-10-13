@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import org.junit.runner.RunWith;
 import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
 import android.provider.MediaStore;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -72,6 +75,12 @@ public class AddNoteScreenTest {
                         isDisplayed())));
     }
 
+    @Before
+    public void registerIdlingResource() {
+        Espresso.registerIdlingResources(
+                mNotesIntentsTestRule.getActivity().getCountingIdlingResource());
+    }
+
     @Test
     public void errorShownOnEmptyMessage() throws InterruptedException {
         onView(withId(R.id.fab_notes)).perform(click());
@@ -86,6 +95,13 @@ public class AddNoteScreenTest {
         String emptyNoteMessageText = getTargetContext().getString(R.string.empty_note_message);
         onView(withText(emptyNoteMessageText)).check(matches(isDisplayed()));
     }
+
+    @After
+    public void unregisterIdlingResource() {
+        Espresso.unregisterIdlingResources(
+                mNotesIntentsTestRule.getActivity().getCountingIdlingResource());
+    }
+
 
     private void selectTakeImageFromMenu() {
         openActionBarOverflowOrOptionsMenu(getTargetContext());

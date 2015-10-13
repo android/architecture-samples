@@ -19,9 +19,12 @@ package com.example.android.testing.notes.notes;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.util.ActivityUtils;
 import com.example.android.testing.notes.addnote.AddNoteFragment;
+import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -34,6 +37,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class NotesActivity extends AppCompatActivity {
+
+    private static final String TAG = "NotesActivity";
 
     private static final String ADD_NOTE_FRAGMENT_TAG = "ADD_NOTE_FRAGMENT_TAG";
 
@@ -134,4 +139,8 @@ public class NotesActivity extends AppCompatActivity {
                 mNotesFragment, NOTES_FRAGMENT_TAG, false);
     }
 
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
+    }
 }

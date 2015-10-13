@@ -17,8 +17,11 @@
 package com.example.android.testing.notes.notedetails;
 
 import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -27,6 +30,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 public class NoteDetailActivity extends AppCompatActivity {
+
+    private static final String TAG = "NoteDetailActivity";
 
     public static final String EXTRA_NOTE_ID = "NOTE_ID";
 
@@ -42,7 +47,6 @@ public class NoteDetailActivity extends AppCompatActivity {
         final ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
-
 
         final String noteId = getIntent().getStringExtra(EXTRA_NOTE_ID);
 
@@ -61,5 +65,10 @@ public class NoteDetailActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.contentFrame, detailFragment);
         transaction.commit();
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

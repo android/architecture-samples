@@ -18,8 +18,12 @@ package com.example.android.testing.notes.notedetails;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -108,12 +112,23 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
 
     @Override
     public void showImage(String imageUrl) {
+        // The image is loaded in a different thread so in order to UI-test this, an idling resource
+        // is used to specify when the app is idle.
+        EspressoIdlingResource.increment(); // App is busy until further notice.
+
         mDetailImage.setVisibility(View.VISIBLE);
         Glide.with(this)
                 .load(imageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
-                .into(mDetailImage);
+                .into(new GlideDrawableImageViewTarget(mDetailImage) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource,
+                                                GlideAnimation<? super GlideDrawable> animation) {
+                        super.onResourceReady(resource, animation);
+                        EspressoIdlingResource.decrement(); // App is idle.
+                    }
+                });
     }
 
     @Override
