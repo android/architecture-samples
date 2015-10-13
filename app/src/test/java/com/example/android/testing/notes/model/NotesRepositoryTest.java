@@ -16,6 +16,7 @@
 
 package com.example.android.testing.notes.model;
 
+import com.example.android.testing.notes.model.NotesRepository.GetNoteCallback;
 import com.example.android.testing.notes.model.NotesRepository.LoadNotesCallback;
 import com.example.android.testing.notes.model.NotesServiceApi.NotesServiceCallback;
 
@@ -28,6 +29,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -35,11 +37,16 @@ import static org.mockito.Mockito.verify;
  */
 public class NotesRepositoryTest {
 
+    private final static String NOTE_TITLE = "title";
+
     @Mock
     private NotesServiceApiImpl mServiceApi;
 
     @Mock
     private LoadNotesCallback mLoadNotesCallback;
+
+    @Mock
+    private GetNoteCallback mGetNoteCallback;
 
     private InMemoryNotesRepository mNotesRepository;
 
@@ -50,21 +57,21 @@ public class NotesRepositoryTest {
     }
 
     @Test
-    public void getNotes_RequestsAllNotesFromServiceApi() {
+    public void getNotes_requestsAllNotesFromServiceApi() {
         mNotesRepository.getNotes(mLoadNotesCallback);
         verify(mServiceApi).getAllNotes(any(NotesServiceCallback.class));
     }
 
     @Test
     public void saveNote_savesNoteToServiceAPIAndInvalidatesCache() {
-        final Note newNote = new Note("New Note Title", "Some Note Description");
+        final Note newNote = new Note(NOTE_TITLE, "Some Note Description");
         mNotesRepository.saveNote(newNote);
         assertThat(mNotesRepository.mCachedNotes, is(nullValue()));
     }
-    
+
     @Test
-    public void getNote_RequestsSingleNoteFromServiceApi() {
-        mNotesRepository.getNote(any(String.class), any(NotesRepository.GetNoteCallback.class));
-        verify(mServiceApi).getNote(any(String.class), any(NotesServiceCallback.class));
+    public void getNote_requestsSingleNoteFromServiceApi() {
+        mNotesRepository.getNote(NOTE_TITLE, mGetNoteCallback);
+        verify(mServiceApi).getNote(eq(NOTE_TITLE), any(NotesServiceCallback.class));
     }
 }
