@@ -31,23 +31,24 @@ public class ActivityUtils {
     }
 
     public static void showFragment(@NonNull FragmentManager fragmentManager, int containerResId,
-                                    @NonNull Fragment fragment) {
-        showFragment(fragmentManager, containerResId, fragment, false);
+                                    @NonNull Fragment fragment, String fragmentTag) {
+        showFragment(fragmentManager, containerResId, fragment, fragmentTag, false);
     }
 
     public static void showFragment(@NonNull FragmentManager fragmentManager, int containerResId,
-                                    @NonNull Fragment fragment, boolean addToBackStack) {
-        showFragment(fragmentManager, containerResId, fragment, addToBackStack, null);
+                                    @NonNull Fragment fragment, String fragmentTag,
+                                    boolean addToBackStack) {
+        showFragment(fragmentManager, containerResId, fragment, fragmentTag, addToBackStack, null);
     }
 
     public static void showFragment(@NonNull FragmentManager fragmentManager, int containerResId,
-                                    @NonNull Fragment fragment, boolean addToBackStack,
-                                    String nameOnBackstack) {
+                                    @NonNull Fragment fragment, String fragmentTag,
+                                    boolean addToBackStack, String nameOnBackstack) {
         checkNotNull(fragmentManager);
         checkNotNull(fragment);
-        // Display the add note fragment
+
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(containerResId, fragment);
+        transaction.replace(containerResId, fragment, fragmentTag);
         if (addToBackStack) {
             transaction.addToBackStack(nameOnBackstack);
         }

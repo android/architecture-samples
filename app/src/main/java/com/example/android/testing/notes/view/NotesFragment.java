@@ -78,6 +78,9 @@ public class NotesFragment extends Fragment implements NotesView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        setRetainInstance(true);
+
         mNotesPresenter = new NotesPresenterImpl(Injection.provideNotesRepository(), this);
 
         // Hide keyboard

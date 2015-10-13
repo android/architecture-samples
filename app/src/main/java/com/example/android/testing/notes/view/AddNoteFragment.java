@@ -78,16 +78,6 @@ public class AddNoteFragment extends Fragment implements AddNoteView {
         super.onActivityCreated(savedInstanceState);
         mAddNotePresenter = new AddNotePresenterImpl(Injection.provideNotesRepository(), this,
                 Injection.provideImageFile());
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_addnote, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_note_title);
-        mDescription = (TextView) root.findViewById(R.id.add_note_description);
-        mImageThumbnail = (ImageView) root.findViewById(R.id.add_note_image_thumbnail);
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_notes);
@@ -99,7 +89,20 @@ public class AddNoteFragment extends Fragment implements AddNoteView {
                         mDescription.getText().toString());
             }
         });
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_addnote, container, false);
+        mTitle = (TextView) root.findViewById(R.id.add_note_title);
+        mDescription = (TextView) root.findViewById(R.id.add_note_description);
+        mImageThumbnail = (ImageView) root.findViewById(R.id.add_note_image_thumbnail);
+
+
         setHasOptionsMenu(true);
+        setRetainInstance(true);
         return root;
     }
 

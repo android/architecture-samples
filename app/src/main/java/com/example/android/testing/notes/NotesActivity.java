@@ -35,8 +35,14 @@ import android.widget.Toast;
 
 public class NotesActivity extends AppCompatActivity {
 
+    private static final String ADD_NOTE_FRAGMENT_TAG = "ADD_NOTE_FRAGMENT_TAG";
+
+    private static final String NOTES_FRAGMENT_TAG = "NOTES_FRAGMENT_TAG";
+
     private DrawerLayout mDrawerLayout;
+
     private NotesFragment mNotesFragment;
+
     private AddNoteFragment mAddNotesFragment;
 
     @Override
@@ -44,8 +50,15 @@ public class NotesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
-        mNotesFragment = NotesFragment.newInstance();
-        initFragment(mNotesFragment);
+
+        FragmentManager fm = getSupportFragmentManager();
+        mNotesFragment = (NotesFragment) fm.findFragmentByTag(NOTES_FRAGMENT_TAG);
+        mAddNotesFragment = (AddNoteFragment) fm.findFragmentByTag(ADD_NOTE_FRAGMENT_TAG);
+
+        if (mNotesFragment == null) {
+            mNotesFragment = NotesFragment.newInstance();
+            initFragment(mNotesFragment);
+        }
 
         // TODO create a presenter and view for this logic and wire it up (Toolbar + Drawer)
         // + write unit and UI tests.
@@ -112,13 +125,13 @@ public class NotesActivity extends AppCompatActivity {
     public void showAddNoteFragment() {
         mAddNotesFragment = AddNoteFragment.newInstance();
         ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
-                mAddNotesFragment, true);
+                mAddNotesFragment, ADD_NOTE_FRAGMENT_TAG, true);
     }
 
     public void showNotesFragment() {
         mAddNotesFragment = null;
         ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
-                mNotesFragment, false);
+                mNotesFragment, NOTES_FRAGMENT_TAG, false);
     }
 
 }
