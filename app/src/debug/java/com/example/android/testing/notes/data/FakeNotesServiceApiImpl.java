@@ -25,7 +25,8 @@ import java.util.List;
 public class FakeNotesServiceApiImpl implements NotesServiceApi {
 
     // TODO replace this with a new test specific data set.
-    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = new ArrayMap();
+    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA =
+            NotesServiceApiEndpoint.loadPersistedNotes();
 
     @Override
     public void getAllNotes(NotesServiceCallback<List<Note>> callback) {

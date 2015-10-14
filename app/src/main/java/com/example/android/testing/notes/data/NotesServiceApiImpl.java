@@ -28,7 +28,8 @@ import java.util.List;
 public class NotesServiceApiImpl implements NotesServiceApi {
 
     private static final int LATENCY_IN_MILLIS = 2000;
-    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = NotesServiceApiEndpoint.DATA;
+    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA =
+            NotesServiceApiEndpoint.loadPersistedNotes();
 
     @Override
     public void getAllNotes(final NotesServiceCallback callback) {
