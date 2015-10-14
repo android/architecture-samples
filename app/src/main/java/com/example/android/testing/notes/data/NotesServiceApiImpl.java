@@ -16,26 +16,36 @@
 
 package com.example.android.testing.notes.data;
 
-import com.google.common.collect.Lists;
-
-import android.support.annotation.VisibleForTesting;
+import android.os.Handler;
 import android.support.v4.util.ArrayMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class FakeNotesServiceApiImpl implements NotesServiceApi {
+/**
+ * Implementation of the Notes Service API that adds a latency simulating network.
+ */
+public class NotesServiceApiImpl implements NotesServiceApi {
 
-    // TODO replace this with a new test specific data set.
-    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = new ArrayMap();
+    private static final int LATENCY_IN_MILLIS = 2000;
+    private static final ArrayMap<String, Note> NOTES_SERVICE_DATA = NotesServiceApiEndpoint.DATA;
 
     @Override
-    public void getAllNotes(NotesServiceCallback<List<Note>> callback) {
-        callback.onLoaded(Lists.newArrayList(NOTES_SERVICE_DATA.values()));
+    public void getAllNotes(final NotesServiceCallback callback) {
+        // Simulate network by delaying the execution.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<Note> notes = new ArrayList<>(NOTES_SERVICE_DATA.values());
+                callback.onLoaded(notes);
+            }
+        }, LATENCY_IN_MILLIS);
     }
 
     @Override
-    public void getNote(String noteId, NotesServiceCallback<Note> callback) {
-        // TODO: Add matching for ID here
+    public void getNote(final String noteId, final NotesServiceCallback callback) {
+        //TODO: Add network latency here too.
         Note note = NOTES_SERVICE_DATA.get(noteId);
         callback.onLoaded(note);
     }
@@ -45,10 +55,4 @@ public class FakeNotesServiceApiImpl implements NotesServiceApi {
         NOTES_SERVICE_DATA.put(note.getId(), note);
     }
 
-    @VisibleForTesting
-    public static void addNotes(Note... notes) {
-        for (Note note : notes) {
-            NOTES_SERVICE_DATA.put(note.getId(), note);
-        }
-    }
 }

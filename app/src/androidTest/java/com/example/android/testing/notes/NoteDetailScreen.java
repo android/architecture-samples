@@ -16,8 +16,9 @@
 
 package com.example.android.testing.notes;
 
-import com.example.android.testing.notes.model.FakeNotesServiceApiImpl;
-import com.example.android.testing.notes.model.Note;
+import com.example.android.testing.notes.data.FakeNotesServiceApiImpl;
+import com.example.android.testing.notes.data.Note;
+import com.example.android.testing.notes.notedetails.NoteDetailActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

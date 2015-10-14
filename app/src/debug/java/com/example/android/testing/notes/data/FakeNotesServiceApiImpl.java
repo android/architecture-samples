@@ -18,7 +18,6 @@ package com.example.android.testing.notes.data;
 
 import com.google.common.collect.Lists;
 
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.ArrayMap;
 
 import java.util.List;
@@ -43,12 +42,5 @@ public class FakeNotesServiceApiImpl implements NotesServiceApi {
     @Override
     public void saveNote(Note note) {
         NOTES_SERVICE_DATA.put(note.getId(), note);
-    }
-
-    @VisibleForTesting
-    public static void addNotes(Note... notes) {
-        for (Note note : notes) {
-            NOTES_SERVICE_DATA.put(note.getId(), note);
-        }
     }
 }

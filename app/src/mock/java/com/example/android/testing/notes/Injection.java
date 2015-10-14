@@ -16,9 +16,9 @@
 
 package com.example.android.testing.notes;
 
-import com.example.android.testing.notes.model.FakeNotesServiceApiImpl;
-import com.example.android.testing.notes.model.NoteRepositories;
-import com.example.android.testing.notes.model.NotesRepository;
+import com.example.android.testing.notes.data.FakeNotesServiceApiImpl;
+import com.example.android.testing.notes.data.NoteRepositories;
+import com.example.android.testing.notes.data.NotesRepository;
 import com.example.android.testing.notes.util.FakeImageFileImpl;
 import com.example.android.testing.notes.util.ImageFile;
 

@@ -29,6 +29,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.example.android.testing.notes.notes.NotesActivity;
+
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
