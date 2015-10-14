@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.notedetails;
+package com.example.android.testing.notes.notedetail;
 
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.data.NotesRepository;

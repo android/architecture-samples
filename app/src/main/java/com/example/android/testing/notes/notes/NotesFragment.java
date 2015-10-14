@@ -17,7 +17,7 @@
 package com.example.android.testing.notes.notes;
 
 import com.example.android.testing.notes.Injection;
-import com.example.android.testing.notes.notedetails.NoteDetailActivity;
+import com.example.android.testing.notes.notedetail.NoteDetailActivity;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.util.ActivityUtils;

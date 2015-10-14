@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.notedetails;
+package com.example.android.testing.notes.notedetail;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;

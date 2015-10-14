@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.notedetails;
+package com.example.android.testing.notes.notedetail;
 
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.data.NotesRepository;
-import com.example.android.testing.notes.notedetails.NoteDetailPresenter;
 
 import org.junit.Before;
 import org.junit.Test;

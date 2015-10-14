@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes;
+package com.example.android.testing.notes.addnote;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +30,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
+import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.notes.NotesActivity;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;

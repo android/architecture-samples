@@ -38,8 +38,6 @@ android {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
     }
-
-    testBuildType 'debug'
 }
 
 /*

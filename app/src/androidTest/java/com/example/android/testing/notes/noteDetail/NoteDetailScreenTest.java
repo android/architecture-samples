@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes;
+package com.example.android.testing.notes.noteDetail;
 
+import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.data.FakeNotesServiceApiImpl;
 import com.example.android.testing.notes.data.Note;
-import com.example.android.testing.notes.notedetails.NoteDetailActivity;
+import com.example.android.testing.notes.notedetail.NoteDetailActivity;
 
 import org.junit.After;
 import org.junit.Before;

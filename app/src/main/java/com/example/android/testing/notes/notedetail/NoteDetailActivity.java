@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.notedetails;
+package com.example.android.testing.notes.notedetail;
 
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.util.EspressoIdlingResource;

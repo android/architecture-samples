@@ -1,4 +1,4 @@
-package com.example.android.testing.notes.notedetails;
+package com.example.android.testing.notes.notedetail;
 
 import android.support.annotation.Nullable;
 
