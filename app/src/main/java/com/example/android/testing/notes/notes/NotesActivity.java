@@ -118,6 +118,8 @@ public class NotesActivity extends AppCompatActivity {
                                 Toast.makeText(NotesActivity.this, "Statistics", Toast.LENGTH_SHORT)
                                         .show();
                                 break;
+                            default:
+                                break;
                         }
                         // Close the navigation drawer when an item is selected.
                         menuItem.setChecked(true);
