@@ -21,6 +21,7 @@
         </activity>
         <activity android:name=".notedetail.NoteDetailActivity" />
         <activity android:name=".addnote.AddNoteActivity" />
+        <activity android:name=".statistics.StatisticsActivity" />
     </application>
 
 </manifest>

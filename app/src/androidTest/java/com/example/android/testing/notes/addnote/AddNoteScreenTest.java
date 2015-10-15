@@ -58,7 +58,7 @@ public class AddNoteScreenTest {
             new IntentsTestRule<>(AddNoteActivity.class);
 
     @Test
-    public void addImageToNoteShowsThumbnailInUi() {
+    public void addImageToNote_ShowsThumbnailInUi() {
         // Stub take image Intent.
         ActivityResult result = createImageCaptureActivityResultStub();
         intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
@@ -83,7 +83,7 @@ public class AddNoteScreenTest {
     }
 
     @Test
-    public void errorShownOnEmptyMessage() throws InterruptedException {
+    public void errorShownOnEmptyMessage() {
         onView(withId(R.id.fab_notes)).perform(click());
         // Add note title and description
         onView(withId(R.id.add_note_title)).perform(typeText(""));

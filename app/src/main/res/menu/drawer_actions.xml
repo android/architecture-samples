@@ -18,11 +18,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- TODO: add icons -->
-
     <item
-        android:id="@+id/drawer_home"
-        android:title="Notes" />
-    <item
-        android:id="@+id/drawer_statistics"
+        android:id="@+id/statistics_navigation_menu_item"
         android:title="Statistics" />
 </menu>

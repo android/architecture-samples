@@ -16,7 +16,6 @@
 
 package com.example.android.testing.notes.notes;
 
-import com.example.android.testing.notes.notes.NotesPresenter;
 import com.google.common.collect.Lists;
 
 import com.example.android.testing.notes.data.Note;

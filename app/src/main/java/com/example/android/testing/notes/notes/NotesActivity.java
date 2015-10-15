@@ -17,8 +17,10 @@
 package com.example.android.testing.notes.notes;
 
 import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.statistics.StatisticsActivity;
 import com.example.android.testing.notes.util.EspressoIdlingResource;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
@@ -91,14 +93,8 @@ public class NotesActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
-                            // TODO figure out what we want to do for the drawer
-                            case R.id.drawer_home:
-                                Toast.makeText(NotesActivity.this, "Notes", Toast.LENGTH_SHORT)
-                                        .show();
-                                break;
-                            case R.id.drawer_statistics:
-                                Toast.makeText(NotesActivity.this, "Statistics", Toast.LENGTH_SHORT)
-                                        .show();
+                            case R.id.statistics_navigation_menu_item:
+                                startActivity(new Intent(NotesActivity.this, StatisticsActivity.class));
                                 break;
                             default:
                                 break;
