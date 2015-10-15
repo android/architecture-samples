@@ -3,6 +3,7 @@
     <string name="app_name">Notes</string>
 
     <!-- Add notes fragment -->
+    <string name="add_note">New Note</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your note here.</string>
     <string name="empty_note_message">Notes cannot be empty</string>
