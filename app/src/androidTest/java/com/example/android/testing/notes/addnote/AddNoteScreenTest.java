@@ -38,6 +38,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
@@ -71,6 +72,7 @@ public class AddNoteScreenTest {
         selectTakeImageFromMenu();
 
         onView(withId(R.id.add_note_image_thumbnail))
+                .perform(scrollTo())
                 .check(matches(allOf(
                         hasDrawable(),
                         isDisplayed())));
