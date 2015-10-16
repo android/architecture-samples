@@ -17,13 +17,15 @@
 package com.example.android.testing.notes.custom.matcher;
 
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.view.View;
 import android.widget.ImageView;
 
 /**
- * A Matcher for Espresso that checks if an ImageView has a drawable applied to it.
+ * A custom {@link Matcher} for Espresso that checks if an {@link ImageView} has a drawable applied
+ * to it.
  */
 public class ImageViewHasDrawableMatcher {
 

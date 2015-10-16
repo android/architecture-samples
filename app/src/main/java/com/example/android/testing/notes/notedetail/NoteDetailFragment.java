@@ -34,6 +34,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * Main UI for the note detail screen.
+ */
 public class NoteDetailFragment extends Fragment implements NoteDetailContract.View {
 
     public static final String ARGUMENT_NOTE_ID = "NOTE_ID";
@@ -75,16 +78,15 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        final String noteId = getArguments().getString(ARGUMENT_NOTE_ID);
+        String noteId = getArguments().getString(ARGUMENT_NOTE_ID);
         mActionsListener.openNote(noteId);
     }
 
     @Override
     public void setProgressIndicator(boolean active) {
-        // TODO
         if (active) {
             mDetailTitle.setText("");
-            mDetailDescription.setText(getResources().getString(R.string.loading));
+            mDetailDescription.setText(getString(R.string.loading));
         }
     }
 
@@ -117,6 +119,8 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
         EspressoIdlingResource.increment(); // App is busy until further notice.
 
         mDetailImage.setVisibility(View.VISIBLE);
+
+        // This app uses Glide for image loading
         Glide.with(this)
                 .load(imageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -133,14 +137,13 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
 
     @Override
     public void hideImage() {
-        mDetailImage.setImageDrawable(null); //TODO: check if this is right/useful.
+        mDetailImage.setImageDrawable(null);
         mDetailImage.setVisibility(View.GONE);
     }
 
     @Override
     public void showMissingNote() {
-        // TODO
         mDetailTitle.setText("");
-        mDetailDescription.setText(getResources().getString(R.string.no_data));
+        mDetailDescription.setText(getString(R.string.no_data));
     }
 }

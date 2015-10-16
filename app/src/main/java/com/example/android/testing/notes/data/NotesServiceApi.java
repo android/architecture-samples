@@ -19,7 +19,8 @@ package com.example.android.testing.notes.data;
 import java.util.List;
 
 /**
- * TODO: javadoc
+ * Defines an interface to the service API that is used by this application. All data request should
+ * be piped through this interface.
  */
 public interface NotesServiceApi {
 

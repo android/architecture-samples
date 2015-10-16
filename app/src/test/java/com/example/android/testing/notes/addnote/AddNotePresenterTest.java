@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * TODO: javadoc
+ * Unit tests for the implementation of {@link AddNotePresenter}.
  */
 public class AddNotePresenterTest {
 
@@ -51,31 +51,39 @@ public class AddNotePresenterTest {
 
     @Before
     public void setupAddNotePresenter() {
+        // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
+        // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
+
+        // Get a reference to the class under test
         mAddNotesPresenter = new AddNotePresenter(mNotesRepository, mAddNoteView, mImageFile);
     }
 
     @Test
     public void saveNoteToRepository_showsSuccessMessageUi() {
+        // When the presenter is asked to save a note
         mAddNotesPresenter.saveNote("New Note Title", "Some Note Description");
-        verify(mNotesRepository).saveNote(any(Note.class));
-        verify(mAddNoteView).showNotesList();
-    }
 
-    @Test
-    public void saveNote_WithImage_SavesNoteToRepository() {
-        // TODO: add captor which checks if images is in Note when image present in file.
+        // Then a note is,
+        verify(mNotesRepository).saveNote(any(Note.class)); // saved to the model
+        verify(mAddNoteView).showNotesList(); // shown in the UI
     }
 
     @Test
     public void saveNote_emptyNoteShowsErrorUi() {
+        // When the presenter is asked to save an empty note
         mAddNotesPresenter.saveNote("", "");
+
+        // Then an empty not error is shown in the UI
         verify(mAddNoteView).showEmptyNoteError();
     }
 
     @Test
     public void takePicture_CreatesFileAndOpensCamera() throws IOException {
+        // When the presenter is asked to take an image
         mAddNotesPresenter.takePicture();
+
+        // Then an image file is created snd camera is opened
         verify(mImageFile).create(anyString(), anyString());
         verify(mImageFile).getPath();
         verify(mAddNoteView).openCamera(anyString());
@@ -83,24 +91,37 @@ public class AddNotePresenterTest {
 
     @Test
     public void imageAvailable_SavesImageAndUpdatesUiWithThumbnail() {
-        final String imageUrl = "path/to/file";
+        // Given an a stubbed image file
+        String imageUrl = "path/to/file";
         when(mImageFile.exists()).thenReturn(true);
         when(mImageFile.getPath()).thenReturn(imageUrl);
+
+        // When an image is made available to the presenter
         mAddNotesPresenter.imageAvailable();
+
+        // Then the preview image of the stubbed image is shown in the UI
         verify(mAddNoteView).showImagePreview(contains(imageUrl));
     }
 
     @Test
     public void imageAvailable_FileDoesNotExistShowsErrorUi() {
+        // Given the image file does not exist
         when(mImageFile.exists()).thenReturn(false);
+
+        // When an image is made available to the presenter
         mAddNotesPresenter.imageAvailable();
+
+        // Then an error is shown in the UI and the image file is deleted
         verify(mAddNoteView).showImageError();
         verify(mImageFile).delete();
     }
 
     @Test
     public void noImageAvailable_ShowsErrorUi() {
+        // When the presenter is notified that image capturing failed
         mAddNotesPresenter.imageCaptureFailed();
+
+        // Then an error is shown in the UI and the image file is deleted
         verify(mAddNoteView).showImageError();
         verify(mImageFile).delete();
     }

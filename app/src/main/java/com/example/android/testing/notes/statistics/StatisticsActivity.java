@@ -23,6 +23,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+/**
+ * Show statistics for notes. At this point this is just a dummy implementation.
+ */
 public class StatisticsActivity extends AppCompatActivity {
 
     @Override
@@ -34,7 +37,7 @@ public class StatisticsActivity extends AppCompatActivity {
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
+        ActionBar ab = getSupportActionBar();
         ab.setTitle(R.string.statistics_title);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);

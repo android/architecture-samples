@@ -16,6 +16,9 @@
 
 package com.example.android.testing.notes.addnote;
 
+import com.example.android.testing.notes.R;
+import com.example.android.testing.notes.util.EspressoIdlingResource;
+
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
@@ -26,24 +29,23 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.util.EspressoIdlingResource;
-
+/**
+ * Displays an add note screen.
+ */
 public class AddNoteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_addnote);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
-        ab.setTitle(R.string.add_note);
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.add_note);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
 
         initFragment(AddNoteFragment.newInstance());
     }

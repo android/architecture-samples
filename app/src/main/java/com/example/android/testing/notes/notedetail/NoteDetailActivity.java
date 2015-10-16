@@ -29,6 +29,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+/**
+ * Displays note details screen.
+ */
 public class NoteDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NOTE_ID = "NOTE_ID";
@@ -42,11 +45,12 @@ public class NoteDetailActivity extends AppCompatActivity {
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
+        ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
 
-        final String noteId = getIntent().getStringExtra(EXTRA_NOTE_ID);
+        // Get the requested note id
+        String noteId = getIntent().getStringExtra(EXTRA_NOTE_ID);
 
         initFragment(NoteDetailFragment.newInstance(noteId));
     }

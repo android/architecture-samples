@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * Model class for a Note.
+ * Immutable model class for a Note.
  */
 public final class Note {
 

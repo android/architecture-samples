@@ -48,7 +48,8 @@ public final class NavigationViewActions {
      * Returns a {@link ViewAction} that navigates to a menu item in {@link NavigationView} using a
      * menu item resource id.
      *
-     * <p> View constraints:
+     * <p>
+     * View constraints:
      * <ul>
      * <li>View must be a child of a {@link DrawerLayout}
      * <li>View must be of type {@link NavigationView}
@@ -57,7 +58,6 @@ public final class NavigationViewActions {
      * <ul>
      *
      * @param menuItemId the resource id of the menu item
-     *
      * @return a {@link ViewAction} that navigates on a menu item
      */
     public static ViewAction navigateTo(final int menuItemId) {
@@ -66,7 +66,7 @@ public final class NavigationViewActions {
 
             @Override
             public void perform(UiController uiController, View view) {
-                final NavigationView navigationView = (NavigationView) view;
+                NavigationView navigationView = (NavigationView) view;
                 Menu menu = navigationView.getMenu();
                 if (null == menu.findItem(menuItemId)) {
                     throw new PerformException.Builder()

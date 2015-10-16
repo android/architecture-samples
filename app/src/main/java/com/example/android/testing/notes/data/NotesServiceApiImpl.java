@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class NotesServiceApiImpl implements NotesServiceApi {
 
-    private static final int LATENCY_IN_MILLIS = 2000;
+    private static final int SERVICE_LATENCY_IN_MILLIS = 2000;
     private static final ArrayMap<String, Note> NOTES_SERVICE_DATA =
             NotesServiceApiEndpoint.loadPersistedNotes();
 
@@ -41,7 +41,7 @@ public class NotesServiceApiImpl implements NotesServiceApi {
                 List<Note> notes = new ArrayList<>(NOTES_SERVICE_DATA.values());
                 callback.onLoaded(notes);
             }
-        }, LATENCY_IN_MILLIS);
+        }, SERVICE_LATENCY_IN_MILLIS);
     }
 
     @Override

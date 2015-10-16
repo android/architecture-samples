@@ -17,7 +17,6 @@
 package com.example.android.testing.notes.notes;
 
 import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.notes.NotesActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +25,7 @@ import org.junit.runner.RunWith;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.widget.DrawerLayout;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.Gravity;
 
@@ -40,10 +40,21 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.example.android.testing.notes.custom.action.NavigationViewActions.navigateTo;
 
+/**
+ * Tests for the {@link DrawerLayout} layout component in {@link NotesActivity} which manages
+ * navigation within the app.
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AppNavigationTest {
 
+    /**
+     * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
+     *
+     * <p>
+     * Rules are interceptors which are executed for each test method and are important building
+     * blocks of Junit tests.
+     */
     @Rule
     public ActivityTestRule<NotesActivity> mActivityTestRule =
             new ActivityTestRule<>(NotesActivity.class);
@@ -67,12 +78,14 @@ public class AppNavigationTest {
 
     @Test
     public void clickOnAndroidHomeIcon_OpensNavigation() {
+        // Check that left drawer is closed at startup
         onView(withId(R.id.drawer_layout))
                 .check(matches(isClosed(Gravity.LEFT))); // Left Drawer should be closed.
 
         // Open Drawer
         onView(withContentDescription("Navigate up")).perform(click());
 
+        // Check if drawer is open
         onView(withId(R.id.drawer_layout))
                 .check(matches(isOpen(Gravity.LEFT))); // Left drawer is open open.
     }

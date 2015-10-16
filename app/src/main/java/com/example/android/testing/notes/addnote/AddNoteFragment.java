@@ -50,12 +50,13 @@ import java.io.IOException;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * TODO javadoc
+ * Main UI for the add note screen. Users can enter a note title and description. Images can be
+ * added to notes by clicking on the options menu.
  */
 public class AddNoteFragment extends Fragment implements AddNoteContract.View {
 
-    public static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
-    public static final int ADD_PHOTO_MENU_ITEM_ID = 0x1001;
+    public static final int REQUEST_CODE_IMAGE_CAPTURE = 0x1001;
+    public static final int ADD_PHOTO_MENU_ITEM_ID = 0x2001;
 
     private AddNoteContract.UserActionsListener mActionListener;
 
@@ -80,7 +81,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
                 Injection.provideImageFile());
 
         FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_notes);
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_notes);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +144,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     public void openCamera(String saveTo) {
         // Open the camera to take a picture.
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Check if there is a camera app installed to handle our Intent
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(saveTo));
             startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
@@ -161,6 +163,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
         // is used to specify when the app is idle.
         EspressoIdlingResource.increment(); // App is busy until further notice.
 
+        // This app uses Glide for image loading
         Glide.with(this)
                 .load(imageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)

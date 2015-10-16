@@ -17,7 +17,7 @@
 package com.example.android.testing.notes.util;
 
 /**
- * TODO: javadoc
+ * Fake implementation of {@link ImageFile} to inject a fake image in a hermetic test.
  */
 public class FakeImageFileImpl extends ImageFileImpl {
 

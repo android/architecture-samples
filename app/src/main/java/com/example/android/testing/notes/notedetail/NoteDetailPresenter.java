@@ -62,9 +62,9 @@ public class NoteDetailPresenter implements NoteDetailContract.UserActionsListen
     }
 
     private void showNote(Note note) {
-        final String title = note.getTitle();
-        final String description = note.getDescription();
-        final String imageUrl = note.getImageUrl();
+        String title = note.getTitle();
+        String description = note.getDescription();
+        String imageUrl = note.getImageUrl();
 
         if (title != null && title.isEmpty()) {
             mNotesDetailView.hideTitle();

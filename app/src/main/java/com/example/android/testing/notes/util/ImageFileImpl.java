@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * TODO: javadoc
+ * A thin wrapper around Android file APIs to make them more testable and allows the injection of a
+ * fake implementation for hermetic UI tests.
  */
 public class ImageFileImpl implements ImageFile {
 

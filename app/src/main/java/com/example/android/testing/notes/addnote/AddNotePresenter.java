@@ -16,11 +16,11 @@
 
 package com.example.android.testing.notes.addnote;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.data.NotesRepository;
 import com.example.android.testing.notes.util.ImageFile;
+
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,8 +29,8 @@ import java.util.Date;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Listens to user actions from the UI ({@link AddNoteFragment}), retrieves the data and updates the
- * UI as required.
+ * Listens to user actions from the UI ({@link AddNoteFragment}), retrieves the data and updates
+ * the UI as required.
  */
 public class AddNotePresenter implements AddNoteContract.UserActionsListener {
 

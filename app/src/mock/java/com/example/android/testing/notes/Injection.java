@@ -23,9 +23,9 @@ import com.example.android.testing.notes.util.FakeImageFileImpl;
 import com.example.android.testing.notes.util.ImageFile;
 
 /**
- * Enables to inject a different implementation of {@link ImageFile} and
- * {@link NotesRepository} at runtime. This is used when testing, as this allows us to use
- * a fake implementation of the class to isolate the dependencies.
+ * Enables injection of mock implementations for {@link ImageFile} and
+ * {@link NotesRepository} at compile time. This is useful for testing, since it allows us to use
+ * a fake instance of the class to isolate the dependencies and run a test hermetically.
  */
 public class Injection {
 

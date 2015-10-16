@@ -19,7 +19,7 @@ package com.example.android.testing.notes.util;
 import java.io.IOException;
 
 /**
- * TODO: javadoc
+ * A wrapper for handling image files.
  */
 public interface ImageFile {
     void create(String name, String extension) throws IOException;
