@@ -54,8 +54,8 @@ import static org.hamcrest.Matchers.not;
 public class AddNoteScreenTest {
 
     @Rule
-    public IntentsTestRule<NotesActivity> mNotesIntentsTestRule =
-            new IntentsTestRule<>(NotesActivity.class);
+    public IntentsTestRule<AddNoteActivity> mAddNoteIntentsTestRule =
+            new IntentsTestRule<>(AddNoteActivity.class);
 
     @Test
     public void addImageToNoteShowsThumbnailInUi() {
@@ -79,7 +79,7 @@ public class AddNoteScreenTest {
     @Before
     public void registerIdlingResource() {
         Espresso.registerIdlingResources(
-                mNotesIntentsTestRule.getActivity().getCountingIdlingResource());
+                mAddNoteIntentsTestRule.getActivity().getCountingIdlingResource());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class AddNoteScreenTest {
     @After
     public void unregisterIdlingResource() {
         Espresso.unregisterIdlingResources(
-                mNotesIntentsTestRule.getActivity().getCountingIdlingResource());
+                mAddNoteIntentsTestRule.getActivity().getCountingIdlingResource());
     }
 
 

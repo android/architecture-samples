@@ -17,8 +17,6 @@
 package com.example.android.testing.notes.notes;
 
 import com.example.android.testing.notes.R;
-import com.example.android.testing.notes.util.ActivityUtils;
-import com.example.android.testing.notes.addnote.AddNoteFragment;
 import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 import android.os.Bundle;
@@ -40,30 +38,13 @@ public class NotesActivity extends AppCompatActivity {
 
     private static final String TAG = "NotesActivity";
 
-    private static final String ADD_NOTE_FRAGMENT_TAG = "ADD_NOTE_FRAGMENT_TAG";
-
-    private static final String NOTES_FRAGMENT_TAG = "NOTES_FRAGMENT_TAG";
-
     private DrawerLayout mDrawerLayout;
-
-    private NotesFragment mNotesFragment;
-
-    private AddNoteFragment mAddNotesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
-
-        FragmentManager fm = getSupportFragmentManager();
-        mNotesFragment = (NotesFragment) fm.findFragmentByTag(NOTES_FRAGMENT_TAG);
-        mAddNotesFragment = (AddNoteFragment) fm.findFragmentByTag(ADD_NOTE_FRAGMENT_TAG);
-
-        if (mNotesFragment == null) {
-            mNotesFragment = NotesFragment.newInstance();
-            initFragment(mNotesFragment);
-        }
 
         // TODO create a presenter and view for this logic and wire it up (Toolbar + Drawer)
         // + write unit and UI tests.
@@ -82,10 +63,11 @@ public class NotesActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
+        initFragment(NotesFragment.newInstance());
     }
 
     private void initFragment(Fragment notesFragment) {
-        // Add the NotesView to the layout
+        // Add the NotesFragment to the layout
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.contentFrame, notesFragment);
@@ -127,18 +109,6 @@ public class NotesActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-    }
-
-    public void showAddNoteFragment() {
-        mAddNotesFragment = AddNoteFragment.newInstance();
-        ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
-                mAddNotesFragment, ADD_NOTE_FRAGMENT_TAG, true);
-    }
-
-    public void showNotesFragment() {
-        mAddNotesFragment = null;
-        ActivityUtils.showFragment(getSupportFragmentManager(), R.id.contentFrame,
-                mNotesFragment, NOTES_FRAGMENT_TAG, false);
     }
 
     @VisibleForTesting

@@ -137,9 +137,8 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
 
     @Override
     public void showNotesList() {
-        Snackbar.make(mTitle, getString(R.string.successfully_saved_note_message),
-                Snackbar.LENGTH_SHORT).show();
-        ActivityUtils.<NotesActivity>cast(getActivity()).showNotesFragment();
+        getActivity().setResult(Activity.RESULT_OK);
+        getActivity().finish();
     }
 
     @Override

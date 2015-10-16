@@ -17,17 +17,20 @@
 package com.example.android.testing.notes.notes;
 
 import com.example.android.testing.notes.Injection;
+import com.example.android.testing.notes.addnote.AddNoteActivity;
 import com.example.android.testing.notes.notedetail.NoteDetailActivity;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.data.Note;
 import com.example.android.testing.notes.util.ActivityUtils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -47,6 +50,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Display a grid of {@link Note}s
  */
 public class NotesFragment extends Fragment implements NotesContract.View {
+
+    private static final int REQUEST_ADD_NOTE = 1;
 
     private NotesContract.UserActionsListener mActionsListener;
 
@@ -80,12 +85,14 @@ public class NotesFragment extends Fragment implements NotesContract.View {
 
         mActionsListener = new NotesPresenter(Injection.provideNotesRepository(), this);
 
-        // Hide keyboard
-        InputMethodManager imm =
-                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        IBinder windowToken = getView().getWindowToken();
-        if (windowToken != null) {
-            imm.hideSoftInputFromWindow(windowToken, 0);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If a note was successfully added, show snackbar
+        if (REQUEST_ADD_NOTE == requestCode && Activity.RESULT_OK == resultCode) {
+            Snackbar.make(getView(), getString(R.string.successfully_saved_note_message),
+                    Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -160,7 +167,8 @@ public class NotesFragment extends Fragment implements NotesContract.View {
 
     @Override
     public void showAddNote() {
-        ActivityUtils.<NotesActivity>cast(getActivity()).showAddNoteFragment();
+        Intent intent = new Intent(getContext(),AddNoteActivity.class);
+        startActivityForResult(intent, REQUEST_ADD_NOTE);
     }
 
     @Override

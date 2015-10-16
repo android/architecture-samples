@@ -91,9 +91,9 @@ public class NotesScreenTest {
         onView(withId(R.id.fab_notes)).perform(click());
 
         // Verify successful save snackbar is shown
-        String successfullySavedNoteMessage = getTargetContext()
+         String successfullySavedNoteMessage = getTargetContext()
                 .getString(R.string.successfully_saved_note_message);
-        onView(withText(successfullySavedNoteMessage)).check(matches(isDisplayed()));
+         onView(withText(successfullySavedNoteMessage)).check(matches(isDisplayed()));
 
         // Verify note is displayed on screen
         onView(withId(R.id.notes_list)).perform(
