@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.addnote;
 
+import com.example.android.testing.notes.R;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,8 +31,6 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-
-import com.example.android.testing.notes.R;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;

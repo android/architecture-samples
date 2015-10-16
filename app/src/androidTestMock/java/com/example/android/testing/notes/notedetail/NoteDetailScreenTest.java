@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.example.android.testing.notes.noteDetail;
+package com.example.android.testing.notes.notedetail;
 
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.data.FakeNotesServiceApiImpl;
 import com.example.android.testing.notes.data.Note;
-import com.example.android.testing.notes.notedetail.NoteDetailActivity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,6 +28,7 @@ import org.junit.runner.RunWith;
 
 import android.content.Intent;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -69,7 +69,7 @@ public class NoteDetailScreenTest {
 
     @Test
     public void noteDetails_DisplayedInUi() throws Exception {
-        onView(withId(R.id.note_detail_title)).check(matches(withText(NOTE_TITLE)));
+        onView(ViewMatchers.withId(R.id.note_detail_title)).check(matches(withText(NOTE_TITLE)));
         onView(withId(R.id.note_detail_description)).check(matches(withText(NOTE_DESCRIPTION)));
         onView(withId(R.id.note_detail_image)).check(matches(allOf(
                 hasDrawable(),
