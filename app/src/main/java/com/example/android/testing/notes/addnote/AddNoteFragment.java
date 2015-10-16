@@ -156,6 +156,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     public void showImagePreview(@NonNull String imageUrl) {
         checkState(!TextUtils.isEmpty(imageUrl), "imageUrl cannot be null or empty!");
         mImageThumbnail.setVisibility(View.VISIBLE);
+
         // The image is loaded in a different thread so in order to UI-test this, an idling resource
         // is used to specify when the app is idle.
         EspressoIdlingResource.increment(); // App is busy until further notice.
@@ -169,7 +170,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
                     public void onResourceReady(GlideDrawable resource,
                                                 GlideAnimation<? super GlideDrawable> animation) {
                         super.onResourceReady(resource, animation);
-                        EspressoIdlingResource.decrement(); // App is idle.
+                        EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 });
     }
