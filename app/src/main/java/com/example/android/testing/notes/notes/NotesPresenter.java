@@ -25,8 +25,10 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+
 /**
- * Orchestrates communication between the Notes view and its corresponding data model.
+ * Listens to user actions from the UI ({@link NotesFragment}), retrieves the data and updates the
+ * UI as required.
  */
 public class NotesPresenter implements NotesContract.UserActionsListener {
 

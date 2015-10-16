@@ -29,7 +29,8 @@ import java.util.Date;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * TODO javadoc
+ * Listens to user actions from the UI ({@link AddNoteFragment}), retrieves the data and updates the
+ * UI as required.
  */
 public class AddNotePresenter implements AddNoteContract.UserActionsListener {
 
