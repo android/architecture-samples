@@ -34,11 +34,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class NotesActivity extends AppCompatActivity {
-
-    private static final String TAG = "NotesActivity";
 
     private DrawerLayout mDrawerLayout;
 
