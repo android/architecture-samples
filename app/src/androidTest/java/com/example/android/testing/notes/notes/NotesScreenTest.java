@@ -16,6 +16,8 @@
 
 package com.example.android.testing.notes.notes;
 
+import com.example.android.testing.notes.R;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -29,9 +31,6 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.example.android.testing.notes.R;
-
-import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -89,11 +88,6 @@ public class NotesScreenTest {
                 closeSoftKeyboard());
         // Save the note
         onView(withId(R.id.fab_notes)).perform(click());
-
-        // Verify successful save snackbar is shown
-         String successfullySavedNoteMessage = getTargetContext()
-                .getString(R.string.successfully_saved_note_message);
-         onView(withText(successfullySavedNoteMessage)).check(matches(isDisplayed()));
 
         // Verify note is displayed on screen
         onView(withId(R.id.notes_list)).perform(
