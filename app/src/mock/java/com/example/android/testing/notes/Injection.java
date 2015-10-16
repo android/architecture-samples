@@ -23,7 +23,9 @@ import com.example.android.testing.notes.util.FakeImageFileImpl;
 import com.example.android.testing.notes.util.ImageFile;
 
 /**
- * TODO: javadoc
+ * Enables to inject a different implementation of {@link ImageFile} and
+ * {@link NotesRepository} at runtime. This is used when testing, as this allows us to use
+ * a fake implementation of the class to isolate the dependencies.
  */
 public class Injection {
 

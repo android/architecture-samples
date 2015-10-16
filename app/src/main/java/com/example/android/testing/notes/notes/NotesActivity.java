@@ -45,8 +45,6 @@ public class NotesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notes);
 
 
-        // TODO create a presenter and view for this logic and wire it up (Toolbar + Drawer)
-        // + write unit and UI tests.
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
