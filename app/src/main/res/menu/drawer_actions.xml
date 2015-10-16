@@ -20,5 +20,5 @@
     <!-- TODO: add icons -->
     <item
         android:id="@+id/statistics_navigation_menu_item"
-        android:title="Statistics" />
+        android:title="@string/statistics_title" />
 </menu>

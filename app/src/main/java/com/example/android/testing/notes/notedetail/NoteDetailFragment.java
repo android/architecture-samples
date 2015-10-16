@@ -84,7 +84,7 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
         // TODO
         if (active) {
             mDetailTitle.setText("");
-            mDetailDescription.setText("LOADING");
+            mDetailDescription.setText(getResources().getString(R.string.loading));
         }
     }
 
@@ -141,6 +141,6 @@ public class NoteDetailFragment extends Fragment implements NoteDetailContract.V
     public void showMissingNote() {
         // TODO
         mDetailTitle.setText("");
-        mDetailDescription.setText("No data");
+        mDetailDescription.setText(getResources().getString(R.string.no_data));
     }
 }

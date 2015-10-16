@@ -21,13 +21,11 @@ import com.example.android.testing.notes.addnote.AddNoteActivity;
 import com.example.android.testing.notes.notedetail.NoteDetailActivity;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.data.Note;
-import com.example.android.testing.notes.util.ActivityUtils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -38,7 +36,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import java.util.ArrayList;

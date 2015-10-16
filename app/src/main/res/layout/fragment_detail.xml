@@ -33,7 +33,6 @@
         android:id="@+id/note_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello!"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView

@@ -31,8 +31,6 @@ import com.example.android.testing.notes.util.EspressoIdlingResource;
 
 public class AddNoteActivity extends AppCompatActivity {
 
-    private static final String TAG = "AddNoteActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

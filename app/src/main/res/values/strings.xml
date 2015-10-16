@@ -28,4 +28,7 @@
     <string name="username">Username</string>
     <string name="statistics_title">Statistics</string>
     <string name="no_statistics_available">No statistics available!</string>
+    <string name="no_data">No data</string>
+    <string name="loading">LOADING</string>
+
 </resources>

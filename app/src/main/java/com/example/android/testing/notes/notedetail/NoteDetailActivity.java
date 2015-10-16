@@ -31,8 +31,6 @@ import android.support.v7.widget.Toolbar;
 
 public class NoteDetailActivity extends AppCompatActivity {
 
-    private static final String TAG = "NoteDetailActivity";
-
     public static final String EXTRA_NOTE_ID = "NOTE_ID";
 
     @Override
