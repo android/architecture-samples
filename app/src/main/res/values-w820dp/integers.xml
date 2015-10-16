@@ -16,5 +16,5 @@
   -->
 
 <resources>
-    <integer name="num_notes_columns">2</integer>
+    <integer name="num_notes_columns">4</integer>
 </resources>

@@ -17,7 +17,6 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- TODO: add icons -->
     <item
         android:id="@+id/statistics_navigation_menu_item"
         android:title="@string/statistics_title" />
