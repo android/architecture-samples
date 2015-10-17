@@ -18,6 +18,7 @@
     <string name="app_name">Notes</string>
 
     <string name="add_note">New Note</string>
+    <string name="navigation_view_header_title">ATSL Notes</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your note here.</string>
     <string name="empty_note_message">Notes cannot be empty</string>
@@ -25,7 +26,6 @@
     <string name="cannot_connect_to_camera_message">Cannot connect to camera</string>
     <string name="add_picture">Add picture</string>
     <string name="take_picture_error">Could not take picture</string>
-    <string name="username">Username</string>
     <string name="statistics_title">Statistics</string>
     <string name="no_statistics_available">No statistics available!</string>
     <string name="no_data">No data</string>

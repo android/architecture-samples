@@ -19,5 +19,6 @@
 
     <item
         android:id="@+id/statistics_navigation_menu_item"
+        android:icon="@drawable/ic_statistics"
         android:title="@string/statistics_title" />
 </menu>
