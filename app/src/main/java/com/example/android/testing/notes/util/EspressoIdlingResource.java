@@ -25,8 +25,8 @@ public class EspressoIdlingResource {
 
     private static final String RESOURCE = "GLOBAL";
 
-    private static CountingIdlingResource mCountingIdlingResource =
-            new CountingIdlingResource(RESOURCE);
+    private static SimpleCountingIdlingResource mCountingIdlingResource =
+            new SimpleCountingIdlingResource(RESOURCE);
 
     public static void increment() {
         mCountingIdlingResource.increment();
