@@ -58,11 +58,7 @@ public class NotesPresenter implements NotesContract.UserActionsListener {
             public void onNotesLoaded(List<Note> notes) {
                 EspressoIdlingResource.decrement(); // Set app as idle.
                 mNotesView.setProgressIndicator(false);
-                if (notes.isEmpty()) {
-                    mNotesView.showNotesEmptyPlaceholder();
-                } else {
-                    mNotesView.showNotes(notes);
-                }
+                mNotesView.showNotes(notes);
             }
         });
     }

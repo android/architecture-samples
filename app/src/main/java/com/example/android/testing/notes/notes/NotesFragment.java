@@ -132,7 +132,6 @@ public class NotesFragment extends Fragment implements NotesContract.View {
                 mActionsListener.loadNotes(true);
             }
         });
-
         return root;
     }
 
@@ -175,13 +174,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
     }
 
     @Override
-    public void showNotesEmptyPlaceholder() {
-        // TODO add placeholder asset when no data is available
-    }
-
-    @Override
     public void showNoteDetailUi(String noteId) {
-        // TODO implement show detail note feature, please implement this in a fragment but hosted
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
         Intent intent = new Intent(getContext(), NoteDetailActivity.class);

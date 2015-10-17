@@ -35,8 +35,6 @@ public interface NotesContract {
 
         void showAddNote();
 
-        void showNotesEmptyPlaceholder();
-
         void showNoteDetailUi(String noteId);
     }
 

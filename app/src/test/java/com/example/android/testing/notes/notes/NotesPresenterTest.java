@@ -86,19 +86,6 @@ public class NotesPresenterTest {
     }
 
     @Test
-    public void emptyNotes_showsEmptyNotesPlaceholder() {
-        // When loading of Notes is requested
-        mNotesPresenter.loadNotes(true);
-
-        // Callback is captured and invoked with stubbed notes
-        verify(mNotesRepository).getNotes(mLoadNotesCallbackCaptor.capture());
-        mLoadNotesCallbackCaptor.getValue().onNotesLoaded(EMPTY_NOTES);
-
-        // Then verify that empty placeholder is shown
-        verify(mNotesView).showNotesEmptyPlaceholder();
-    }
-
-    @Test
     public void clickOnFab_ShowsAddsNoteUi() {
         // When adding a new note
         mNotesPresenter.addNewNote();

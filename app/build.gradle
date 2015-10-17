@@ -69,7 +69,6 @@ dependencies {
     // Espresso UI Testing
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
     androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion") {
-        // TODO talk to the tools team and figure out what the hell is going on here. https://github.com/googlesamples/android-testing/pull/55
         exclude module: 'recyclerview-v7'
     }
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
