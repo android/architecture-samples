@@ -89,9 +89,6 @@ public class AddNoteScreenTest {
         // a stubbed result.
         intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
 
-        // Open add notes screen
-        onView(withId(R.id.fab_add_notes)).perform(click());
-
         // Check thumbnail view is not displayed
         onView(withId(R.id.add_note_image_thumbnail)).check(matches(not(isDisplayed())));
 
