@@ -18,7 +18,7 @@
     <string name="app_name">Notes</string>
 
     <string name="add_note">New Note</string>
-    <string name="navigation_view_header_title">ATSL Notes</string>
+    <string name="navigation_view_header_title">Notes</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your note here.</string>
     <string name="empty_note_message">Notes cannot be empty</string>
