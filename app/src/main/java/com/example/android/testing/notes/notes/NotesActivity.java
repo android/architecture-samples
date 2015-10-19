@@ -60,7 +60,9 @@ public class NotesActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        initFragment(NotesFragment.newInstance());
+        if (null == savedInstanceState) {
+            initFragment(NotesFragment.newInstance());
+        }
     }
 
     private void initFragment(Fragment notesFragment) {

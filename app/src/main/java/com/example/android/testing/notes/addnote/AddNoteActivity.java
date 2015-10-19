@@ -47,7 +47,9 @@ public class AddNoteActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        initFragment(AddNoteFragment.newInstance());
+        if (null == savedInstanceState) {
+            initFragment(AddNoteFragment.newInstance());
+        }
     }
 
     @Override
