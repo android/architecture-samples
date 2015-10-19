@@ -30,6 +30,5 @@
     <string name="no_statistics_available">No statistics</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
-    <string name="permissions_granted">Permission Granted</string>
 
 </resources>

@@ -25,10 +25,8 @@ import com.example.android.testing.notes.Injection;
 import com.example.android.testing.notes.R;
 import com.example.android.testing.notes.util.EspressoIdlingResource;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -37,7 +35,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,9 +55,8 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class AddNoteFragment extends Fragment implements AddNoteContract.View {
 
-    public static final int REQUEST_CODE_IMAGE_CAPTURE = 0;
-    public static final int ADD_PHOTO_MENU_ITEM_ID = 1;
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 2;
+    public static final int REQUEST_CODE_IMAGE_CAPTURE = 0x1001;
+    public static final int ADD_PHOTO_MENU_ITEM_ID = 0x2001;
 
     private AddNoteContract.UserActionsListener mActionListener;
 
@@ -114,16 +110,15 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case ADD_PHOTO_MENU_ITEM_ID:
-                if (ContextCompat.checkSelfPermission(getContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    takePicture();
-                    return true;
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_EXTERNAL_STORAGE);
-                    return false;
+                try {
+                    mActionListener.takePicture();
+                } catch (IOException ioe) {
+                    if (getView() != null) {
+                        Snackbar.make(getView(), getString(R.string.take_picture_error),
+                                Snackbar.LENGTH_LONG).show();
+                    }
                 }
+                return true;
         }
         return false;
     }
@@ -201,40 +196,6 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
             mActionListener.imageAvailable();
         } else {
             mActionListener.imageCaptureFailed();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-        if (REQUEST_WRITE_EXTERNAL_STORAGE == requestCode) {
-            if (1 == grantResults.length && PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                // Write external storage permission has been granted, preview can be displayed
-                Snackbar.make(mTitle, R.string.permissions_granted, Snackbar.LENGTH_LONG)
-                        .setAction(getString(R.string.add_picture), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                takePicture();
-                            }
-                        })
-                        .show();
-            } else {
-                Snackbar.make(mTitle, getString(R.string.take_picture_error),
-                        Snackbar.LENGTH_LONG).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private void takePicture() {
-        try {
-            mActionListener.takePicture();
-        } catch (IOException ioe) {
-            if (getView() != null) {
-                Snackbar.make(getView(), getString(R.string.take_picture_error),
-                        Snackbar.LENGTH_LONG).show();
-            }
         }
     }
 }
