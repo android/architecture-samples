@@ -56,7 +56,6 @@ import static com.google.common.base.Preconditions.checkState;
 public class AddNoteFragment extends Fragment implements AddNoteContract.View {
 
     public static final int REQUEST_CODE_IMAGE_CAPTURE = 0x1001;
-    public static final int ADD_PHOTO_MENU_ITEM_ID = 0x2001;
 
     private AddNoteContract.UserActionsListener mActionListener;
 
@@ -109,7 +108,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case ADD_PHOTO_MENU_ITEM_ID:
+            case R.id.take_picture:
                 try {
                     mActionListener.takePicture();
                 } catch (IOException ioe) {
@@ -125,7 +124,7 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.add(Menu.NONE, ADD_PHOTO_MENU_ITEM_ID, Menu.NONE, R.string.add_picture);
+        inflater.inflate(R.menu.fragment_addnote_options_menu_actions, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

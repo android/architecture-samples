@@ -133,7 +133,7 @@ public class AddNoteScreenTest {
         openActionBarOverflowOrOptionsMenu(getTargetContext());
 
         // Click on add picture option
-        onView(withText(R.string.add_picture)).perform(click());
+        onView(withText(R.string.take_picture)).perform(click());
     }
 
     private ActivityResult createImageCaptureActivityResultStub() {
