@@ -1,23 +1,13 @@
-# Android End-to-End testing codelab
+# Android Testing Codelab
 
-This folder contains the source code for the Android end-to-end testing codelab. It gives an introduction into testing on Android, including unit tests and UI tests. 
+This folder contains the source code for the Android testing codelab. It gives an introduction into testing on Android, including unit tests and UI tests. 
 
 ### Getting Started
 
-Check out branch `master` to start and follow the instructions here. ``TODO``
+Check out branch `master` to start and follow the instructions here: http://www.code-labs.io/codelabs/android-testing/
 
 
 Clone this repository, enter the top level directory and run <code>./gradlew tasks</code> to get an overview of all the tasks available for this project.
-
-Some important tasks are:
-
-```
-assembleDebug - Assembles all Debug builds.
-installDebug - Installs the Debug build.
-connectedAndroidTest - Installs and runs the tests for Debug build on connected
-devices.
-test - Run all unit tests.
-```
 
 ### License
 
