@@ -60,7 +60,7 @@ dependencies {
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
     compile "com.github.bumptech.glide:glide:$rootProject.glideVersion"
-    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.1'
+    compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.ext.espressoVersion"
 
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"
@@ -73,10 +73,19 @@ dependencies {
     androidTestCompile "com.android.support.test:runner:$rootProject.ext.runnerVersion"
     androidTestCompile "com.android.support.test:rules:$rootProject.ext.runnerVersion"
 
-    // Espresso UI Testing
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion") {
-        exclude module: 'recyclerview-v7'
+    /* Espresso UI Testing dependencies. All app dependencies need to be excluded from the test apk!
+    This is necessary to allow for the case where the production and test APKs both contain the same
+    class. Otherwise will result in an dex verification error at runtime.
+     */
+    androidTestCompile ("com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion") {
+        exclude module: 'espresso-idling-resource'
     }
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
+    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion") {
+        exclude module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'espresso-idling-resource'
+    }
+    androidTestCompile ("com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion") {
+        exclude module: 'espresso-idling-resource'
+    }
 }
