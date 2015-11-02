@@ -163,6 +163,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
         });
     }
 
+    @Override
     public void showNotes(List<Note> notes) {
         mListAdapter.replaceData(notes);
     }
