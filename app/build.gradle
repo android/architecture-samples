@@ -91,7 +91,7 @@ configurations.all {
 All direct/transitive dependencies shared between your test and production APKs need to be
 excluded from the test APK! This is necessary because both APKs will contain the same classes. Not
 excluding these dependencies from your test configuration will result in an dex pre-verifier error
-at runtime.
+at runtime. More info in this tools bug: (https://code.google.com/p/android/issues/detail?id=192497)
 */
 configurations.compile.dependencies.each { compileDependency ->
     println "Excluding compile dependency: ${compileDependency.getName()}"
