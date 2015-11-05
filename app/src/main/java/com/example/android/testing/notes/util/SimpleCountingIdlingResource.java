@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An simple counter implementation of {@link IdlingResource} that determines idleness by
+ * A simple counter implementation of {@link IdlingResource} that determines idleness by
  * maintaining an internal counter. When the counter is 0 - it is considered to be idle, when it is
  * non-zero it is not idle. This is very similar to the way a {@link java.util.concurrent.Semaphore}
  * behaves.
