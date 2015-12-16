@@ -67,6 +67,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mListAdapter = new NotesAdapter(new ArrayList<Note>(0), mItemListener);
+        mActionsListener = new NotesPresenter(Injection.provideNotesRepository(), this);
     }
 
     @Override
@@ -80,9 +81,6 @@ public class NotesFragment extends Fragment implements NotesContract.View {
         super.onActivityCreated(savedInstanceState);
 
         setRetainInstance(true);
-
-        mActionsListener = new NotesPresenter(Injection.provideNotesRepository(), this);
-
     }
 
     @Override
