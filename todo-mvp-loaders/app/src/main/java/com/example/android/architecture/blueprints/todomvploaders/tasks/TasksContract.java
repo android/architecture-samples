@@ -44,6 +44,22 @@ public interface TasksContract {
         void showCompletedTasksCleared();
 
         void showLoadingTasksError();
+
+        void setUserActionsListener(UserActionsListener userActionsListener);
+
+        void showNoTodoTasks();
+
+        void showNoTasksActive();
+
+        void showNoTasksCompleted();
+
+        void showNoTasks();
+
+        void showActiveFilterLabel();
+
+        void showCompletedFilterLabel();
+
+        void showAllFilterLabel();
     }
 
     interface UserActionsListener {
@@ -63,5 +79,7 @@ public interface TasksContract {
         void activateTask(@NonNull Task activeTask);
 
         void clearCompletedTasks();
+
+        void setFilterType(int filterType);
     }
 }
