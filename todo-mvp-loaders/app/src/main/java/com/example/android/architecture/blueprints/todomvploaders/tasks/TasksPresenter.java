@@ -30,11 +30,8 @@ import com.example.android.architecture.blueprints.todomvploaders.data.source.Ta
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.ACTIVE_TASKS;
-import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.ALL_TASKS;
-import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.COMPLETED_TASKS;
+import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.*;
 import static com.google.common.base.Preconditions.checkNotNull;
-
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
@@ -52,15 +49,32 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private final TasksLoader mLoader;
 
+    private final LoaderManager mLoaderManager;
+
     private List<Task> mCurrentTasks;
 
-    protected int mFilterType;
+    private int mFilterType;
 
     public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView) {
+                          @NonNull TasksContract.View tasksView, LoaderManager loaderManager) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mLoader = checkNotNull(loader, "loader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager);
+    }
+
+    public void startPresenting() {
+        mTasksView.setUserActionsListener(this);
+        startLoader();
+        loadAllTasks(false);
+    }
+
+    public void stopPresenting() {
+
+    }
+
+    public int getFilterType() {
+        return mFilterType;
     }
 
     /**
@@ -69,10 +83,25 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
      * constructor to enable writing unit tests for the non loader methods in the TasksPresenter
      * (creating an instance from a unit test would fail if this method were called from it).
      */
-    public TasksPresenter startLoader(TasksFragment fragment) {
-        mFilterType = fragment.getCurrentFiltering();
-        fragment.getLoaderManager().initLoader(TASKS_QUERY, null, this);
-        return this;
+    public void startLoader() {
+        mLoaderManager.initLoader(TASKS_QUERY, null, this);
+    }
+
+    private void loadTasks() {
+        switch (mFilterType) {
+            case ALL_TASKS:
+                loadAllTasks(false);
+                break;
+            case ACTIVE_TASKS:
+                loadActiveTasks(false);
+                break;
+            case COMPLETED_TASKS:
+                loadCompletedTasks(false);
+                break;
+            default:
+                loadAllTasks(false);
+                break;
+        }
     }
 
     @Override
@@ -120,6 +149,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
+        loadTasks();
     }
 
     @Override
@@ -127,14 +157,24 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
+        loadTasks();
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
+        loadTasks();
     }
 
+    @Override
+    public void setFilterType(int filterType) {
+        int previousFilterType = mFilterType;
+        mFilterType = filterType;
+        if (mFilterType != previousFilterType) {
+            loadTasks();
+        }
+    }
 
     @Override
     public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
@@ -178,13 +218,38 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
                 }
             }
         }
-
-        mTasksView.showTasks(tasksToDisplay);
+        if (tasksToDisplay.size() == 0) {
+            showNoTasks();
+        } else {
+            showTasks(tasksToDisplay);
+        }
     }
 
+    private void showTasks(List<Task> tasksToDisplay) {
+        mTasksView.showTasks(tasksToDisplay);
+        if (mFilterType == ACTIVE_TASKS) {
+            mTasksView.showActiveFilterLabel();
+        } else if (mFilterType == COMPLETED_TASKS) {
+            mTasksView.showCompletedFilterLabel();
+        } else {
+            mTasksView.showAllFilterLabel();
+        }
+    }
+
+    private void showNoTasks() {
+        mTasksView.showNoTodoTasks();
+        if (mFilterType == ACTIVE_TASKS) {
+            mTasksView.showNoTasksActive();
+        } else if (mFilterType == COMPLETED_TASKS) {
+            mTasksView.showNoTasksCompleted();
+        } else {
+            mTasksView.showNoTasks();
+        }
+    }
 
     @Override
     public void onLoaderReset(Loader<List<Task>> loader) {
 
     }
+
 }

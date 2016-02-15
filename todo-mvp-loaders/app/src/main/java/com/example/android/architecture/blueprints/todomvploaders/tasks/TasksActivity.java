@@ -28,14 +28,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todomvploaders.Injection;
 import com.example.android.architecture.blueprints.todomvploaders.R;
+import com.example.android.architecture.blueprints.todomvploaders.data.source.TasksLoader;
 import com.example.android.architecture.blueprints.todomvploaders.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todomvploaders.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todomvploaders.util.EspressoIdlingResource;
 
 public class TasksActivity extends AppCompatActivity {
 
+    public static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+
     private DrawerLayout mDrawerLayout;
+    private TasksPresenter tasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +62,47 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
+        TasksFragment tasksFragment;
+        int savedFilterType = TasksFragment.ALL_TASKS;
         if (null == savedInstanceState) {
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TasksFragment.newInstance(), R.id.contentFrame);
+            tasksFragment = TasksFragment.newInstance();
+            ActivityUtils.addFragmentToActivityWithTag(getSupportFragmentManager(),
+                                                       tasksFragment, R.id.contentFrame, TasksFragment.TAG
+            );
+        } else {
+            tasksFragment = getTasksFragment();
+            savedFilterType = savedInstanceState.getInt(CURRENT_FILTERING_KEY, TasksFragment.ALL_TASKS);
         }
+        tasksPresenter = new TasksPresenter(
+                new TasksLoader(this, Injection.provideTasksRepository(this)),
+                Injection.provideTasksRepository(this),
+                tasksFragment,
+                getSupportLoaderManager()
+        );
+        tasksPresenter.setFilterType(savedFilterType);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(CURRENT_FILTERING_KEY, tasksPresenter.getFilterType());
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private TasksFragment getTasksFragment() {
+        return (TasksFragment) getSupportFragmentManager().findFragmentByTag(TasksFragment.TAG);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        tasksPresenter.startPresenting();
+    }
+
+    @Override
+    protected void onStop() {
+        tasksPresenter.stopPresenting();
+        super.onStop();
     }
 
     @Override

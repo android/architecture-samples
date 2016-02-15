@@ -45,6 +45,19 @@ public class ActivityUtils {
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
+     */
+    public static void addFragmentToActivityWithTag(@NonNull FragmentManager fragmentManager,
+                                             @NonNull Fragment fragment, int frameId, String fragmentTag) {
+        checkNotNull(fragmentManager);
+        checkNotNull(fragment);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(frameId, fragment, fragmentTag);
+        transaction.commit();
+    }
+
+    /**
+     * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
+     * performed by the {@code fragmentManager}.
      *
      */
     public static void addNonUIFragmentToActivity (@NonNull FragmentManager fragmentManager,
