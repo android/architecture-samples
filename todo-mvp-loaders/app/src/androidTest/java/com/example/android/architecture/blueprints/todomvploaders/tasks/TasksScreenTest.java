@@ -235,8 +235,8 @@ public class TasksScreenTest {
     public void showCompletedTasks() {
         // Add 2 completed tasks
         createTask(TITLE1, DESCRIPTION);
-        clickCheckBoxForTask(TITLE1);
         createTask(TITLE2, DESCRIPTION);
+        clickCheckBoxForTask(TITLE1);
         clickCheckBoxForTask(TITLE2);
 
         // Verify that all our tasks are shown
@@ -251,8 +251,8 @@ public class TasksScreenTest {
 
         // Add 2 complete tasks
         createTask(TITLE1, DESCRIPTION);
-        clickCheckBoxForTask(TITLE1);
         createTask(TITLE2, DESCRIPTION);
+        clickCheckBoxForTask(TITLE1);
         clickCheckBoxForTask(TITLE2);
 
         // Click clear completed in menu
