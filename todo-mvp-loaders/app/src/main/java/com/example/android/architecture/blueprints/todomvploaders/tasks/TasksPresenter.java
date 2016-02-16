@@ -56,17 +56,18 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     private int mFilterType;
 
     public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView, LoaderManager loaderManager) {
+                          @NonNull TasksContract.View tasksView, LoaderManager loaderManager, int savedFilterType) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mLoader = checkNotNull(loader, "loader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager);
+        mFilterType = savedFilterType;
     }
 
     public void startPresenting() {
         mTasksView.setUserActionsListener(this);
         startLoader();
-        loadAllTasks(false);
+        loadTasks();
     }
 
     public void stopPresenting() {
@@ -83,7 +84,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
      * constructor to enable writing unit tests for the non loader methods in the TasksPresenter
      * (creating an instance from a unit test would fail if this method were called from it).
      */
-    public void startLoader() {
+    private void startLoader() {
         mLoaderManager.initLoader(TASKS_QUERY, null, this);
     }
 
@@ -104,20 +105,17 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         }
     }
 
-    @Override
-    public void loadAllTasks(boolean forceUpdate) {
+    private void loadAllTasks(boolean forceUpdate) {
         mFilterType = ALL_TASKS;
         loadTasks(forceUpdate);
     }
 
-    @Override
-    public void loadActiveTasks(boolean forceUpdate) {
+    private void loadActiveTasks(boolean forceUpdate) {
         mFilterType = ACTIVE_TASKS;
         loadTasks(forceUpdate);
     }
 
-    @Override
-    public void loadCompletedTasks(boolean forceUpdate) {
+    private void loadCompletedTasks(boolean forceUpdate) {
         mFilterType = COMPLETED_TASKS;
         loadTasks(forceUpdate);
     }
@@ -125,7 +123,8 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     /**
      * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
      */
-    private void loadTasks(boolean forceUpdate) {
+    @Override
+    public void loadTasks(boolean forceUpdate) {
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
         } else {
@@ -195,7 +194,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     }
 
     private void showFilteredTasks() {
-        List<Task> tasksToDisplay = new ArrayList<Task>();
+        List<Task> tasksToDisplay = new ArrayList<>();
         if (mCurrentTasks != null) {
             for (Task task : mCurrentTasks) {
                 switch (mFilterType) {

@@ -77,9 +77,10 @@ public class TasksActivity extends AppCompatActivity {
                 new TasksLoader(this, Injection.provideTasksRepository(this)),
                 Injection.provideTasksRepository(this),
                 tasksFragment,
-                getSupportLoaderManager()
+                getSupportLoaderManager(),
+                savedFilterType
         );
-        tasksPresenter.setFilterType(savedFilterType);
+
     }
 
     @Override

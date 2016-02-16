@@ -111,14 +111,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setRetainInstance(true);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         // If a task was successfully added, show snackbar
         if (REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
             Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
@@ -174,7 +168,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mActionsListener.loadAllTasks(true);
+                mActionsListener.loadTasks(true);
             }
         });
 
