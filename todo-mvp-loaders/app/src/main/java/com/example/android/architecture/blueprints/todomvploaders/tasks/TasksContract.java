@@ -64,11 +64,7 @@ public interface TasksContract {
 
     interface UserActionsListener {
 
-        void loadAllTasks(boolean forceUpdate);
-
-        void loadActiveTasks(boolean forceUpdate);
-
-        void loadCompletedTasks(boolean forceUpdate);
+        void loadTasks(boolean forceUpdate);
 
         void addNewTask();
 
