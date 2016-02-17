@@ -125,7 +125,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
         } else {
-            showFilteredTasks();
+            updateTasks();
         }
     }
 
@@ -186,11 +186,21 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         if (mCurrentTasks == null) {
             mTasksView.showLoadingTasksError();
         } else {
-            showFilteredTasks();
+            updateTasks();
         }
     }
 
-    private void showFilteredTasks() {
+    private void updateTasks() {
+        List<Task> tasksToDisplay = filterTasks();
+        if (tasksToDisplay.size() == 0) {
+            showNoTasks();
+        } else {
+            showTasks(tasksToDisplay);
+        }
+    }
+
+    @NonNull
+    private List<Task> filterTasks() {
         List<Task> tasksToDisplay = new ArrayList<>();
         if (mCurrentTasks != null) {
             for (Task task : mCurrentTasks) {
@@ -214,11 +224,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
                 }
             }
         }
-        if (tasksToDisplay.size() == 0) {
-            showNoTasks();
-        } else {
-            showTasks(tasksToDisplay);
-        }
+        return tasksToDisplay;
     }
 
     private void showTasks(List<Task> tasksToDisplay) {

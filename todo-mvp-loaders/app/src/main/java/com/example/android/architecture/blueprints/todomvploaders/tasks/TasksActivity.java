@@ -87,7 +87,6 @@ public class TasksActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(CURRENT_FILTERING_KEY, tasksPresenter.getFilterType());
         super.onSaveInstanceState(outState);
-
     }
 
     @Override
