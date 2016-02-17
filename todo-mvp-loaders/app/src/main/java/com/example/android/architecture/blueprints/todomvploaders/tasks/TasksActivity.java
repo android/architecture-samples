@@ -63,7 +63,7 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         TasksFragment tasksFragment;
-        int savedFilterType = TasksFragment.ALL_TASKS;
+        TaskFilterType savedFilterType = TaskFilterType.ALL_TASKS;
         if (null == savedInstanceState) {
             tasksFragment = TasksFragment.newInstance();
             ActivityUtils.addFragmentToActivityWithTag(getSupportFragmentManager(),
@@ -71,7 +71,8 @@ public class TasksActivity extends AppCompatActivity {
             );
         } else {
             tasksFragment = (TasksFragment) ActivityUtils.getFragmentByTag(getSupportFragmentManager(), TasksFragment.TAG);
-            savedFilterType = savedInstanceState.getInt(CURRENT_FILTERING_KEY, TasksFragment.ALL_TASKS);
+            int filter = savedInstanceState.getInt(CURRENT_FILTERING_KEY);
+            savedFilterType = TaskFilterType.from(filter);
         }
         tasksPresenter = new TasksPresenter(
                 new TasksLoader(this, Injection.provideTasksRepository(this)),
@@ -80,12 +81,11 @@ public class TasksActivity extends AppCompatActivity {
                 getSupportLoaderManager(),
                 savedFilterType
         );
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_FILTERING_KEY, tasksPresenter.getFilterType());
+        outState.putInt(CURRENT_FILTERING_KEY, tasksPresenter.getFilterType().ordinal());
         super.onSaveInstanceState(outState);
     }
 
