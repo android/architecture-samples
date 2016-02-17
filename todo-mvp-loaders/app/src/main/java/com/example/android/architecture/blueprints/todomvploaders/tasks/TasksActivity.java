@@ -70,7 +70,7 @@ public class TasksActivity extends AppCompatActivity {
                                                        tasksFragment, R.id.contentFrame, TasksFragment.TAG
             );
         } else {
-            tasksFragment = getTasksFragment();
+            tasksFragment = (TasksFragment) ActivityUtils.getFragmentByTag(getSupportFragmentManager(), TasksFragment.TAG);
             savedFilterType = savedInstanceState.getInt(CURRENT_FILTERING_KEY, TasksFragment.ALL_TASKS);
         }
         tasksPresenter = new TasksPresenter(
@@ -88,10 +88,6 @@ public class TasksActivity extends AppCompatActivity {
         outState.putInt(CURRENT_FILTERING_KEY, tasksPresenter.getFilterType());
         super.onSaveInstanceState(outState);
 
-    }
-
-    private TasksFragment getTasksFragment() {
-        return (TasksFragment) getSupportFragmentManager().findFragmentByTag(TasksFragment.TAG);
     }
 
     @Override

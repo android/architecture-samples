@@ -50,7 +50,7 @@ public class ActivityUtils {
                                                     @NonNull Fragment fragment, int frameId, @NonNull String fragmentTag) {
         checkNotNull(fragmentManager);
         checkNotNull(fragment);
-        checkArgument(!fragmentTag.isEmpty(), fragmentTag);
+        checkArgument(!fragmentTag.isEmpty());
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment, fragmentTag);
         transaction.commit();
@@ -67,6 +67,15 @@ public class ActivityUtils {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(nonUIFragment, fragmentTag);
         transaction.commit();
+    }
+
+    /**
+     * Finds a {@code fragment} that was identified by the given tag. The operation is
+     * performed by the {@code fragmentManager}.
+     */
+    public static Fragment getFragmentByTag(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
+        checkArgument(!tag.isEmpty());
+        return fragmentManager.findFragmentByTag(tag);
     }
 
 }
