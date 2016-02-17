@@ -71,7 +71,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     }
 
     public void stopPresenting() {
-
+        //no-op
     }
 
     public int getFilterType() {
@@ -90,7 +90,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void loadTasks() {
         switch (mFilterType) {
-            case ALL_TASKS:
+            case ALL_TASKS: default:
                 loadAllTasks(false);
                 break;
             case ACTIVE_TASKS:
@@ -98,9 +98,6 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
                 break;
             case COMPLETED_TASKS:
                 loadCompletedTasks(false);
-                break;
-            default:
-                loadAllTasks(false);
                 break;
         }
     }
