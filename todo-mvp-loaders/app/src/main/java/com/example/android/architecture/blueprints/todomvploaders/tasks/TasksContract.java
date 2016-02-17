@@ -76,6 +76,6 @@ public interface TasksContract {
 
         void clearCompletedTasks();
 
-        void setFilterType(int filterType);
+        void setFilterType(TaskFilterType filterType);
     }
 }

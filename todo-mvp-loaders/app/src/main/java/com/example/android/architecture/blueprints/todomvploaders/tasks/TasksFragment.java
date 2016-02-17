@@ -54,21 +54,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
 
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int ALL_TASKS = 0;
-
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int ACTIVE_TASKS = 1;
-
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int COMPLETED_TASKS = 2;
-
     final static String TAG = "tasksFragment";
 
     private static final int REQUEST_ADD_TASK = 1;
@@ -204,16 +189,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.all:
-                        mActionsListener.setFilterType(ALL_TASKS);
+                        mActionsListener.setFilterType(TaskFilterType.ALL_TASKS);
                         break;
                     case R.id.active:
-                        mActionsListener.setFilterType(ACTIVE_TASKS);
+                        mActionsListener.setFilterType(TaskFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mActionsListener.setFilterType(COMPLETED_TASKS);
+                        mActionsListener.setFilterType(TaskFilterType.COMPLETED_TASKS);
                         break;
                 }
-
                 return true;
             }
         });

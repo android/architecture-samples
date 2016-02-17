@@ -30,7 +30,6 @@ import com.example.android.architecture.blueprints.todomvploaders.data.source.Ta
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -53,10 +52,10 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private List<Task> mCurrentTasks;
 
-    private int mFilterType;
+    private TaskFilterType mFilterType;
 
     public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView, @NonNull LoaderManager loaderManager, @NonNull int savedFilterType) {
+                          @NonNull TasksContract.View tasksView, @NonNull LoaderManager loaderManager, @NonNull TaskFilterType savedFilterType) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mLoader = checkNotNull(loader, "loader cannot be null!");
@@ -74,7 +73,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         //no-op
     }
 
-    public int getFilterType() {
+    public TaskFilterType getFilterType() {
         return mFilterType;
     }
 
@@ -90,7 +89,8 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void loadTasks() {
         switch (mFilterType) {
-            case ALL_TASKS: default:
+            case ALL_TASKS:
+            default:
                 loadAllTasks(false);
                 break;
             case ACTIVE_TASKS:
@@ -103,17 +103,17 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     }
 
     private void loadAllTasks(boolean forceUpdate) {
-        mFilterType = ALL_TASKS;
+        mFilterType = TaskFilterType.ALL_TASKS;
         loadTasks(forceUpdate);
     }
 
     private void loadActiveTasks(boolean forceUpdate) {
-        mFilterType = ACTIVE_TASKS;
+        mFilterType = TaskFilterType.ACTIVE_TASKS;
         loadTasks(forceUpdate);
     }
 
     private void loadCompletedTasks(boolean forceUpdate) {
-        mFilterType = COMPLETED_TASKS;
+        mFilterType = TaskFilterType.COMPLETED_TASKS;
         loadTasks(forceUpdate);
     }
 
@@ -164,8 +164,8 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     }
 
     @Override
-    public void setFilterType(int filterType) {
-        int previousFilterType = mFilterType;
+    public void setFilterType(TaskFilterType filterType) {
+        TaskFilterType previousFilterType = mFilterType;
         mFilterType = filterType;
         if (mFilterType != previousFilterType) {
             loadTasks();
@@ -229,9 +229,9 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void showTasks(List<Task> tasksToDisplay) {
         mTasksView.showTasks(tasksToDisplay);
-        if (ACTIVE_TASKS == mFilterType) {
+        if (TaskFilterType.ACTIVE_TASKS == mFilterType) {
             mTasksView.showActiveFilterLabel();
-        } else if (COMPLETED_TASKS == mFilterType) {
+        } else if (TaskFilterType.COMPLETED_TASKS == mFilterType) {
             mTasksView.showCompletedFilterLabel();
         } else {
             mTasksView.showAllFilterLabel();
@@ -240,9 +240,9 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void showNoTasks() {
         mTasksView.showNoTodoTasks();
-        if (ACTIVE_TASKS == mFilterType) {
+        if (TaskFilterType.ACTIVE_TASKS == mFilterType) {
             mTasksView.showNoTasksActive();
-        } else if (COMPLETED_TASKS == mFilterType) {
+        } else if (TaskFilterType.COMPLETED_TASKS == mFilterType) {
             mTasksView.showNoTasksCompleted();
         } else {
             mTasksView.showNoTasks();
