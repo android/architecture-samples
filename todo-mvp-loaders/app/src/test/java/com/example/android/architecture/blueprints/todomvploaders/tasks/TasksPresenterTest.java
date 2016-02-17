@@ -33,7 +33,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.example.android.architecture.blueprints.todomvploaders.tasks.TasksFragment.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -75,7 +74,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksLoader, mTasksRepository, mTasksView, mLoaderManager, TasksFragment.ALL_TASKS);
+        mTasksPresenter = new TasksPresenter(mTasksLoader, mTasksRepository, mTasksView, mLoaderManager, TaskFilterType.ALL_TASKS);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
@@ -85,7 +84,7 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        mTasksPresenter.setFilterType(ALL_TASKS);
+        mTasksPresenter.setFilterType(TaskFilterType.ALL_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and all tasks are shown in UI
@@ -97,7 +96,7 @@ public class TasksPresenterTest {
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to active
-        mTasksPresenter.setFilterType(ACTIVE_TASKS);
+        mTasksPresenter.setFilterType(TaskFilterType.ACTIVE_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and active tasks are shown in UI
@@ -109,7 +108,7 @@ public class TasksPresenterTest {
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to completed
-        mTasksPresenter.setFilterType(COMPLETED_TASKS);
+        mTasksPresenter.setFilterType(TaskFilterType.COMPLETED_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
@@ -168,7 +167,7 @@ public class TasksPresenterTest {
     @Test
     public void unavailableTasks_ShowsError() {
         // When the loader finishes with error
-        mTasksPresenter.setFilterType(COMPLETED_TASKS);
+        mTasksPresenter.setFilterType(TaskFilterType.COMPLETED_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), null);
 
         // Then an error message is shown
