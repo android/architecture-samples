@@ -56,7 +56,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     private int mFilterType;
 
     public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView, LoaderManager loaderManager, int savedFilterType) {
+                          @NonNull TasksContract.View tasksView, @NonNull LoaderManager loaderManager, @NonNull int savedFilterType) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mLoader = checkNotNull(loader, "loader cannot be null!");
