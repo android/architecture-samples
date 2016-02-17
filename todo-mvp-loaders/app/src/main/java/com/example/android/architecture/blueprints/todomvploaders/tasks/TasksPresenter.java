@@ -223,9 +223,9 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void showTasks(List<Task> tasksToDisplay) {
         mTasksView.showTasks(tasksToDisplay);
-        if (mFilterType == ACTIVE_TASKS) {
+        if (ACTIVE_TASKS == mFilterType) {
             mTasksView.showActiveFilterLabel();
-        } else if (mFilterType == COMPLETED_TASKS) {
+        } else if (COMPLETED_TASKS == mFilterType) {
             mTasksView.showCompletedFilterLabel();
         } else {
             mTasksView.showAllFilterLabel();
@@ -234,9 +234,9 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private void showNoTasks() {
         mTasksView.showNoTodoTasks();
-        if (mFilterType == ACTIVE_TASKS) {
+        if (ACTIVE_TASKS == mFilterType) {
             mTasksView.showNoTasksActive();
-        } else if (mFilterType == COMPLETED_TASKS) {
+        } else if (COMPLETED_TASKS == mFilterType) {
             mTasksView.showNoTasksCompleted();
         } else {
             mTasksView.showNoTasks();
