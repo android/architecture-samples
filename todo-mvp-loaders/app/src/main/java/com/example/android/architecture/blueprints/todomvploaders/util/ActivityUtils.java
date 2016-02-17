@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -31,10 +32,9 @@ public class ActivityUtils {
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
-     *
      */
-    public static void addFragmentToActivity (@NonNull FragmentManager fragmentManager,
-                                              @NonNull Fragment fragment, int frameId) {
+    public static void addFragmentToActivity(@NonNull FragmentManager fragmentManager,
+                                             @NonNull Fragment fragment, int frameId) {
         checkNotNull(fragmentManager);
         checkNotNull(fragment);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -47,10 +47,10 @@ public class ActivityUtils {
      * performed by the {@code fragmentManager}.
      */
     public static void addFragmentToActivityWithTag(@NonNull FragmentManager fragmentManager,
-                                             @NonNull Fragment fragment, int frameId, @NonNull String fragmentTag) {
+                                                    @NonNull Fragment fragment, int frameId, @NonNull String fragmentTag) {
         checkNotNull(fragmentManager);
         checkNotNull(fragment);
-        checkNotNull(fragmentTag);
+        checkArgument(!fragmentTag.isEmpty(), fragmentTag);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment, fragmentTag);
         transaction.commit();
@@ -59,10 +59,9 @@ public class ActivityUtils {
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
-     *
      */
-    public static void addNonUIFragmentToActivity (@NonNull FragmentManager fragmentManager,
-                                              @NonNull Fragment nonUIFragment, String fragmentTag) {
+    public static void addNonUIFragmentToActivity(@NonNull FragmentManager fragmentManager,
+                                                  @NonNull Fragment nonUIFragment, String fragmentTag) {
         checkNotNull(fragmentManager);
         checkNotNull(nonUIFragment);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
