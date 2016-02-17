@@ -47,9 +47,10 @@ public class ActivityUtils {
      * performed by the {@code fragmentManager}.
      */
     public static void addFragmentToActivityWithTag(@NonNull FragmentManager fragmentManager,
-                                             @NonNull Fragment fragment, int frameId, String fragmentTag) {
+                                             @NonNull Fragment fragment, int frameId, @NonNull String fragmentTag) {
         checkNotNull(fragmentManager);
         checkNotNull(fragment);
+        checkNotNull(fragmentTag);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment, fragmentTag);
         transaction.commit();
