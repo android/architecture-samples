@@ -79,8 +79,11 @@ dependencies {
 
     // Espresso UI Testing
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion") {
-        exclude module: 'recyclerview-v7'
-    }
+    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion")
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
+
+    // Resolve conflicts between main and test APK:
+    androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
 }

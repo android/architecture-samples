@@ -26,4 +26,8 @@
         android:id="@+id/menu_clear"
         android:title="@string/menu_clear"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="@string/refresh"
+        app:showAsAction="never"/>
 </menu>

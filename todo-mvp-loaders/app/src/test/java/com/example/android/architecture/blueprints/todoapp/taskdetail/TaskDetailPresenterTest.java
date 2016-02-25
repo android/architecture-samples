@@ -1,0 +1,154 @@
+/*
+ * Copyright 2016, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.example.android.architecture.blueprints.todoapp.taskdetail;
+
+import android.support.v4.content.Loader;
+
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+/**
+ * Unit tests for the implementation of {@link TaskDetailPresenter}
+ */
+public class TaskDetailPresenterTest {
+
+    public static final String TITLE_TEST = "title";
+
+    public static final String DESCRIPTION_TEST = "description";
+
+    public static final String INVALID_TASK_ID = "";
+
+    public static final Task ACTIVE_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST);
+
+    public static final Task COMPLETED_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
+
+    @Mock
+    private TasksRepository mTasksRepository;
+
+    @Mock
+    private TaskDetailContract.View mTaskDetailFragment;
+
+    @Mock
+    private TaskLoader mTaskLoader;
+
+    private TaskDetailPresenter mTaskDetailPresenter;
+
+    @Before
+    public void setupTasksPresenter() {
+        // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
+        // inject the mocks in the test the initMocks method needs to be called.
+        MockitoAnnotations.initMocks(this);
+
+        // Get a reference to the class under test
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader);
+    }
+
+    @Test
+    public void getActiveTaskFromRepositoryAndLoadIntoView() {
+        // When tasks presenter is asked to open an ACTIVE_TASK
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), ACTIVE_TASK);
+
+        // Then progress indicator is hidden and title, description and completion status are shown
+        // in UI
+        verify(mTaskDetailFragment).setProgressIndicator(false);
+        verify(mTaskDetailFragment).showTitle(TITLE_TEST);
+        verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
+    }
+
+    @Test
+    public void getCompletedTaskFromRepositoryAndLoadIntoView() {
+        // When tasks presenter is asked to open a completed task
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), COMPLETED_TASK);
+
+        // Then progress indicator is hidden and title, description and completion status are shown
+        // in UI
+        verify(mTaskDetailFragment).setProgressIndicator(false);
+        verify(mTaskDetailFragment).showTitle(TITLE_TEST);
+        verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
+        verify(mTaskDetailFragment).showCompletionStatus(true);
+    }
+
+    @Test
+    public void loadANullTask_showsMissingTaskError() {
+        // When loading of an ACTIVE_TASK is requested with an invalid task.
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), null);
+
+        // Then progress indicator is hidden and missing ACTIVE_TASK UI is shown
+        verify(mTaskDetailFragment).showMissingTask();
+    }
+
+    @Test
+    public void userActions_deleteTask() {
+        // When the deletion of an ACTIVE_TASK is requested
+        mTaskDetailPresenter.deleteTask(ACTIVE_TASK.getId());
+
+        // Then the repository and the view are notified
+        verify(mTasksRepository).deleteTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskDeleted();
+    }
+
+    @Test
+    public void userActions_editTask_correctId() {
+        // When the edit of an ACTIVE_TASK is requested
+        mTaskDetailPresenter.editTask(ACTIVE_TASK.getId());
+
+        // Then the view is notified
+        verify(mTaskDetailFragment).showEditTask(ACTIVE_TASK.getId());
+    }
+
+    @Test
+    public void userActions_editTask_incorrectId() {
+        // When the edit of an invalid task id is requested
+        mTaskDetailPresenter.editTask(INVALID_TASK_ID);
+
+        // Then the edit mode is never started
+        verify(mTaskDetailFragment, never()).showEditTask(INVALID_TASK_ID);
+        // instead, the error is shown.
+        verify(mTaskDetailFragment).showMissingTask();
+    }
+
+    @Test
+    public void userActions_completeTask() {
+        // When the presenter is asked to complete the ACTIVE_TASK
+        mTaskDetailPresenter.completeTask(ACTIVE_TASK.getId());
+
+        // Then a request is sent to the repository and the UI is updated
+        verify(mTasksRepository).completeTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskMarkedComplete();
+    }
+
+    @Test
+    public void userActions_activateTask() {
+        // When the presenter is asked to activate the ACTIVE_TASK
+        mTaskDetailPresenter.activateTask(ACTIVE_TASK.getId());
+
+        // Then a request is sent to the repository and the UI is updated
+        verify(mTasksRepository).activateTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskMarkedActive();
+    }
+}

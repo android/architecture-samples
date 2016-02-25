@@ -16,7 +16,7 @@
   -->
 
 <manifest
-    package="com.example.android.architecture.blueprints.todomvploaders"
+    package="com.example.android.architecture.blueprints.todoapp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -28,16 +28,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-                android:name=".tasks.TasksActivity"
+                android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
                 android:theme="@style/AppTheme.OverlapSystemBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".taskdetail.TaskDetailActivity" />
-        <activity android:name=".addedittask.AddEditTaskActivity" />
-        <activity android:name=".statistics.StatisticsActivity" />
+        <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity" />
+        <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
+        <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
     </application>
 
 </manifest>
