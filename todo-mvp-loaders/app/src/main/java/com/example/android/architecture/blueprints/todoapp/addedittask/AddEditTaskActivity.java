@@ -23,7 +23,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -40,40 +42,41 @@ public class AddEditTaskActivity extends AppCompatActivity {
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // If there's a Task ID in the Bundle, this is an edit. Otherwise it's a new task.
-        String taskId = null;
-
-
-        if (null == savedInstanceState) {
-            AddEditTaskFragment addEditTaskFragment = AddEditTaskFragment.newInstance();
-            // Edit or creation?
-            if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                // Edit mode.
-                taskId = getIntent().getStringExtra(
-                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
-                Bundle bundle = new Bundle();
-                bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-                addEditTaskFragment.setArguments(bundle);
-            }
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), addEditTaskFragment,
-                    R.id.contentFrame);
-        }
-
-        setActionBar();
-
-    }
-
-    private void setActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
-        if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-            actionBar.setTitle(R.string.edit_task);
-        } else {
-            // New TO-DO.
-            actionBar.setTitle(R.string.add_task);
+
+        AddEditTaskFragment addEditTaskFragment =
+                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+
+        String taskId = null;
+        if (addEditTaskFragment == null) {
+            addEditTaskFragment = AddEditTaskFragment.newInstance();
+
+            if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
+                taskId = getIntent().getStringExtra(
+                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+                actionBar.setTitle(R.string.edit_task);
+                Bundle bundle = new Bundle();
+                bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+                addEditTaskFragment.setArguments(bundle);
+            } else {
+                actionBar.setTitle(R.string.add_task);
+            }
+
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    addEditTaskFragment, R.id.contentFrame);
         }
+
+        // Create the loader and presenter
+        TaskLoader taskLoader = new TaskLoader(taskId, getApplicationContext());
+        AddEditTaskPresenter addEditTaskPresenter = new AddEditTaskPresenter(
+                taskId,
+                Injection.provideTasksRepository(getApplicationContext()),
+                addEditTaskFragment,
+                taskLoader);
+
+        addEditTaskFragment.setPresenter(addEditTaskPresenter);
     }
 
     @Override

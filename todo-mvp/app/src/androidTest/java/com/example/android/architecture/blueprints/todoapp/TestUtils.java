@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.support.test.rule.ActivityTestRule;
 
 /**
@@ -30,8 +31,24 @@ public class TestUtils {
                 .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
-    public void rotateToPortrait(ActivityTestRule<? extends Activity> activityTestRule) {
+    public static void rotateToPortrait(ActivityTestRule<? extends Activity> activityTestRule) {
         activityTestRule.getActivity()
                 .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    public static void rotateOrientation(ActivityTestRule<? extends Activity> activityTestRule) {
+        int currentOrientation =
+                activityTestRule.getActivity().getResources().getConfiguration().orientation;
+
+        switch (currentOrientation) {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                rotateToPortrait(activityTestRule);
+                break;
+            case Configuration.ORIENTATION_PORTRAIT:
+                rotateToLandscape(activityTestRule);
+                break;
+            default:
+                rotateToLandscape(activityTestRule);
+        }
     }
 }

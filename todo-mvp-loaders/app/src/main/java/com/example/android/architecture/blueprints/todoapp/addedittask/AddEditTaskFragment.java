@@ -17,8 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,9 +28,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -39,13 +39,13 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.UserActionsListener mActionListener;
-
     private TextView mTitle;
 
     private TextView mDescription;
 
     private String mEditedTaskId;
+
+    private AddEditTaskPresenter mTasksPresenter;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -55,17 +55,15 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         // Required empty public constructor
     }
 
+    public void setPresenter(@NonNull AddEditTaskPresenter presenter) {
+        mTasksPresenter = checkNotNull(presenter);
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         setTaskIdIfAny();
-
-        Context context = getContext();
-
-        mActionListener = new AddEditTaskPresenter(mEditedTaskId,
-                Injection.provideTasksRepository(context), this,
-                new TaskLoader(mEditedTaskId, context)).startLoader(this);
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
@@ -74,11 +72,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
             @Override
             public void onClick(View v) {
                 if (isNewTask()) {
-                    mActionListener.createTask(
+                    mTasksPresenter.createTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 } else {
-                    mActionListener.updateTask(
+                    mTasksPresenter.updateTask(
                             mEditedTaskId,
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
@@ -99,6 +97,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         setHasOptionsMenu(true);
         setRetainInstance(true);
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTasksPresenter.startLoader(this);
     }
 
     @Override

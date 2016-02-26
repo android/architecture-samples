@@ -44,15 +44,23 @@ public interface TasksContract {
         void showCompletedTasksCleared();
 
         void showLoadingTasksError();
+
+        void showNoTasks();
+
+        void showActiveFilterLabel();
+
+        void showCompletedFilterLabel();
+
+        void showAllFilterLabel();
+
+        void showNoActiveTasks();
+
+        void showNoCompletedTasks();
     }
 
     interface UserActionsListener {
 
-        void loadAllTasks(boolean forceUpdate);
-
-        void loadActiveTasks(boolean forceUpdate);
-
-        void loadCompletedTasks(boolean forceUpdate);
+        void loadTasks(boolean forceUpdate);
 
         void addNewTask();
 
@@ -63,5 +71,9 @@ public interface TasksContract {
         void activateTask(@NonNull Task activeTask);
 
         void clearCompletedTasks();
+
+        void setFiltering(TasksFilterType requestType);
+
+        TasksFilterType getFiltering();
     }
 }

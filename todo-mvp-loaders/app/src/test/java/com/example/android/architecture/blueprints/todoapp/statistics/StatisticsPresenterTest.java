@@ -69,7 +69,7 @@ public class StatisticsPresenterTest {
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
-        verify(mStatisticsView).displayStatistics(0, 0);
+        verify(mStatisticsView).showStatistics(0, 0);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class StatisticsPresenterTest {
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
-        verify(mStatisticsView).displayStatistics(1, 2);
+        verify(mStatisticsView).showStatistics(1, 2);
     }
 
     @Test

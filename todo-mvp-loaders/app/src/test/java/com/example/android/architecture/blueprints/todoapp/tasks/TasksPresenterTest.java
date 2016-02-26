@@ -32,9 +32,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.ACTIVE_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.ALL_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.COMPLETED_TASKS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -83,7 +80,7 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        mTasksPresenter.mFilterType = ALL_TASKS;
+        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and all tasks are shown in UI
@@ -95,7 +92,7 @@ public class TasksPresenterTest {
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to active
-        mTasksPresenter.mFilterType = ACTIVE_TASKS;
+        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and active tasks are shown in UI
@@ -107,7 +104,7 @@ public class TasksPresenterTest {
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to completed
-        mTasksPresenter.mFilterType = COMPLETED_TASKS;
+        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
@@ -166,7 +163,7 @@ public class TasksPresenterTest {
     @Test
     public void unavailableTasks_ShowsError() {
         // When the loader finishes with error
-        mTasksPresenter.mFilterType = COMPLETED_TASKS;
+        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.onLoadFinished(mock(Loader.class), null);
 
         // Then an error message is shown

@@ -30,9 +30,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.ACTIVE_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.ALL_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment.COMPLETED_TASKS;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
@@ -54,7 +51,9 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private List<Task> mCurrentTasks;
 
-    protected int mFilterType;
+    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
+
+    private boolean mFirstLoad;
 
     public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
                           @NonNull TasksContract.View tasksView) {
@@ -70,37 +69,111 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
      * (creating an instance from a unit test would fail if this method were called from it).
      */
     public TasksPresenter startLoader(TasksFragment fragment) {
-        mFilterType = fragment.getCurrentFiltering();
         fragment.getLoaderManager().initLoader(TASKS_QUERY, null, this);
         return this;
     }
 
     @Override
-    public void loadAllTasks(boolean forceUpdate) {
-        mFilterType = ALL_TASKS;
-        loadTasks(forceUpdate);
+    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+        mTasksView.setProgressIndicator(true);
+        return mLoader;
     }
 
     @Override
-    public void loadActiveTasks(boolean forceUpdate) {
-        mFilterType = ACTIVE_TASKS;
-        loadTasks(forceUpdate);
+    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+        mTasksView.setProgressIndicator(false);
+
+        mCurrentTasks = data;
+        if (mCurrentTasks == null) {
+            mTasksView.showLoadingTasksError();
+        } else {
+            showFilteredTasks();
+        }
     }
 
+    private void showFilteredTasks() {
+        List<Task> tasksToDisplay = new ArrayList<>();
+        if (mCurrentTasks != null) {
+            for (Task task : mCurrentTasks) {
+                switch (mCurrentFiltering) {
+                    case ALL_TASKS:
+                        tasksToDisplay.add(task);
+                        break;
+                    case ACTIVE_TASKS:
+                        if (task.isActive()) {
+                            tasksToDisplay.add(task);
+                        }
+                        break;
+                    case COMPLETED_TASKS:
+                        if (task.isCompleted()) {
+                            tasksToDisplay.add(task);
+                        }
+                        break;
+                    default:
+                        tasksToDisplay.add(task);
+                        break;
+                }
+            }
+        }
+
+        processTasks(tasksToDisplay);
+    }
+
+
     @Override
-    public void loadCompletedTasks(boolean forceUpdate) {
-        mFilterType = COMPLETED_TASKS;
-        loadTasks(forceUpdate);
+    public void onLoaderReset(Loader<List<Task>> loader) {
+        // no-op
     }
 
     /**
      * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
      */
-    private void loadTasks(boolean forceUpdate) {
-        if (forceUpdate) {
+    public void loadTasks(boolean forceUpdate) {
+        if (forceUpdate || mFirstLoad) {
+            mFirstLoad = false;
             mTasksRepository.refreshTasks();
         } else {
             showFilteredTasks();
+        }
+    }
+
+    private void processTasks(List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            // Show a message indicating there are no tasks for that filter type.
+            processEmptyTasks();
+        } else {
+            // Show the list of tasks
+            mTasksView.showTasks(tasks);
+            // Set the filter label's text.
+            showFilterLabel();
+        }
+    }
+
+    private void showFilterLabel() {
+        switch (mCurrentFiltering) {
+            case ACTIVE_TASKS:
+                mTasksView.showActiveFilterLabel();
+                break;
+            case COMPLETED_TASKS:
+                mTasksView.showCompletedFilterLabel();
+                break;
+            default:
+                mTasksView.showAllFilterLabel();
+                break;
+        }
+    }
+
+    private void processEmptyTasks() {
+        switch (mCurrentFiltering) {
+            case ACTIVE_TASKS:
+                mTasksView.showNoActiveTasks();
+                break;
+            case COMPLETED_TASKS:
+                mTasksView.showNoCompletedTasks();
+                break;
+            default:
+                mTasksView.showNoTasks();
+                break;
         }
     }
 
@@ -135,56 +208,19 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         mTasksView.showCompletedTasksCleared();
     }
 
-
+    /**
+     * Sets the current task filtering type.
+     *
+     * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
+     * {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     */
     @Override
-    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-        mTasksView.setProgressIndicator(true);
-        return mLoader;
+    public void setFiltering(TasksFilterType requestType) {
+        mCurrentFiltering = requestType;
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-        mTasksView.setProgressIndicator(false);
-
-        mCurrentTasks = data;
-        if (mCurrentTasks == null) {
-            mTasksView.showLoadingTasksError();
-        } else {
-            showFilteredTasks();
-        }
-    }
-
-    private void showFilteredTasks() {
-        List<Task> tasksToDisplay = new ArrayList<Task>();
-        if (mCurrentTasks != null) {
-            for (Task task : mCurrentTasks) {
-                switch (mFilterType) {
-                    case ALL_TASKS:
-                        tasksToDisplay.add(task);
-                        break;
-                    case ACTIVE_TASKS:
-                        if (task.isActive()) {
-                            tasksToDisplay.add(task);
-                        }
-                        break;
-                    case COMPLETED_TASKS:
-                        if (task.isCompleted()) {
-                            tasksToDisplay.add(task);
-                        }
-                        break;
-                    default:
-                        tasksToDisplay.add(task);
-                        break;
-                }
-            }
-        }
-
-        mTasksView.showTasks(tasksToDisplay);
-    }
-
-
-    @Override
-    public void onLoaderReset(Loader<List<Task>> loader) {
-
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
     }
 }

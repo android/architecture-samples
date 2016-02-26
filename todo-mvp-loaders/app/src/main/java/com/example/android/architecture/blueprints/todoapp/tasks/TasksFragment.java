@@ -17,9 +17,9 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -40,11 +40,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
@@ -57,38 +55,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
 
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int ALL_TASKS = 0;
-
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int ACTIVE_TASKS = 1;
-
-    /**
-     * This value corresponds to the position in the array shown in the navigation spinner.
-     */
-    final static int COMPLETED_TASKS = 2;
-
-    /**
-     * Must be one of the following: {@link #ALL_TASKS}, {@link #ACTIVE_TASKS},
-     * {@link #COMPLETED_TASKS}.
-     */
-    private int mCurrentFiltering;
-
-    public static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
     private static final int REQUEST_ADD_TASK = 1;
 
-    private TasksContract.UserActionsListener mActionsListener;
+    private TasksPresenter mTasksPresenter;
 
     private TasksAdapter mListAdapter;
 
-    private ListView mListView;
-
-    private LinearLayout mNoTasksView;
+    private View mNoTasksView;
 
     private ImageView mNoTaskIcon;
 
@@ -108,6 +81,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return new TasksFragment();
     }
 
+    public void setPresenter(@NonNull TasksPresenter presenter) {
+        mTasksPresenter = checkNotNull(presenter);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,30 +92,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_FILTERING_KEY, mCurrentFiltering);
-
-        super.onSaveInstanceState(outState);
+    public void onResume() {
+        super.onResume();
+        mTasksPresenter.startLoader(this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        setRetainInstance(true);
-
-        Context context = getContext();
-
-        mActionsListener = new TasksPresenter(new TasksLoader(context,
-                Injection.provideTasksRepository(context)),
-                Injection.provideTasksRepository(context), this).startLoader(this);
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(CURRENT_FILTERING_KEY)) {
-            mCurrentFiltering = savedInstanceState.getInt(CURRENT_FILTERING_KEY);
-
-        } else {
-            mActionsListener.loadAllTasks(false);
-        }
     }
 
     @Override
@@ -157,13 +118,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
-        mListView = (ListView) root.findViewById(R.id.tasks_list);
+        ListView mListView = (ListView) root.findViewById(R.id.tasks_list);
         mListView.setAdapter(mListAdapter);
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
         // Set up  no tasks view
-        mNoTasksView = (LinearLayout) root.findViewById(R.id.noTasks);
+        mNoTasksView = root.findViewById(R.id.noTasks);
         mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
         mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
         mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
@@ -182,21 +143,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActionsListener.addNewTask();
+                mTasksPresenter.addNewTask();
             }
         });
 
-        // Pull-to-refresh
-        SwipeRefreshLayout swipeRefreshLayout =
-                (SwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+        // Set up progress indicator
+        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
+                (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
+        // Set the scrolling view in the custom SwipeRefreshLayout.
+        swipeRefreshLayout.setScrollUpChild(mListView);
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mActionsListener.loadAllTasks(true);
+                loadTasks(true);
             }
         });
 
@@ -209,10 +173,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mActionsListener.clearCompletedTasks();
+                mTasksPresenter.clearCompletedTasks();
                 return true;
             case R.id.menu_filter:
                 showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
+                return true;
+            case R.id.menu_refresh:
+                loadTasks(true);
                 return true;
         }
         return false;
@@ -224,31 +191,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    public int getCurrentFiltering() {
-        return mCurrentFiltering;
-    }
-
     private void showFilteringPopUpMenu(View viewToAttachPopUpMenu) {
         PopupMenu popup = new PopupMenu(getContext(), viewToAttachPopUpMenu);
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
-                int previousFilter = mCurrentFiltering;
                 switch (item.getItemId()) {
-                    case R.id.all:
-                        mCurrentFiltering = ALL_TASKS;
-                        break;
                     case R.id.active:
-                        mCurrentFiltering = ACTIVE_TASKS;
+                        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mCurrentFiltering = COMPLETED_TASKS;
+                        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        break;
+                    default:
+                        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                if (mCurrentFiltering != previousFilter) {
-                    loadTasks();
-                }
+                mTasksPresenter.loadTasks(false);
                 return true;
             }
         });
@@ -262,17 +222,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mActionsListener.openTaskDetails(clickedTask);
+            mTasksPresenter.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mActionsListener.completeTask(completedTask);
+            mTasksPresenter.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mActionsListener.activateTask(activatedTask);
+            mTasksPresenter.activateTask(activatedTask);
         }
     };
 
@@ -294,45 +254,59 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         });
     }
 
+    @Override
     public void showTasks(List<Task> tasks) {
         mListAdapter.replaceData(tasks);
-        if (tasks.size() == 0) {
-            mTasksView.setVisibility(View.GONE);
-            mNoTasksView.setVisibility(View.VISIBLE);
-            showNoTasks();
-        } else {
-            mTasksView.setVisibility(View.VISIBLE);
-            mNoTasksView.setVisibility(View.GONE);
-            showFilterLabel();
-        }
+
+        mTasksView.setVisibility(View.VISIBLE);
+        mNoTasksView.setVisibility(View.GONE);
     }
 
-    private void showNoTasks() {
-        String mainText = getResources().getString(R.string.no_tasks_all);
-        int iconRes = R.drawable.ic_assignment_turned_in_24dp;
-        boolean showAddView = true;
-        if (mCurrentFiltering == ACTIVE_TASKS) {
-            mainText = getResources().getString(R.string.no_tasks_active);
-            iconRes = R.drawable.ic_check_circle_24dp;
-            showAddView = false;
-        } else if (mCurrentFiltering == COMPLETED_TASKS) {
-            mainText = getResources().getString(R.string.no_tasks_completed);
-            iconRes = R.drawable.ic_verified_user_24dp;
-            showAddView = false;
-        }
+    @Override
+    public void showNoActiveTasks() {
+        showNoTasksViews(getResources().getString(R.string.no_tasks_active),
+                R.drawable.ic_check_circle_24dp,
+                false);
+    }
+
+    @Override
+    public void showNoTasks() {
+        showNoTasksViews(
+                getResources().getString(R.string.no_tasks_all),
+                R.drawable.ic_assignment_turned_in_24dp,
+                false);
+    }
+
+    @Override
+    public void showNoCompletedTasks() {
+        showNoTasksViews(
+                getResources().getString(R.string.no_tasks_completed),
+                R.drawable.ic_verified_user_24dp,
+                false);
+    }
+
+    private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
+        mTasksView.setVisibility(View.GONE);
+        mNoTasksView.setVisibility(View.VISIBLE);
+
         mNoTaskMainView.setText(mainText);
         mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
-    private void showFilterLabel() {
-        String label = getResources().getString(R.string.label_all);
-        if (mCurrentFiltering == ACTIVE_TASKS) {
-            label = getResources().getString(R.string.label_active);
-        } else if (mCurrentFiltering == COMPLETED_TASKS) {
-            label = getResources().getString(R.string.label_completed);
-        }
-        mFilteringLabelView.setText(label);
+    @Override
+    public void showActiveFilterLabel() {
+        mFilteringLabelView.setText(getResources().getString(R.string.label_active));
+    }
+
+    @Override
+    public void showCompletedFilterLabel() {
+        mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
+    }
+
+    @Override
+    public void showAllFilterLabel() {
+        mFilteringLabelView.setText(getResources().getString(R.string.label_all));
     }
 
     @Override
@@ -354,21 +328,21 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public void showTaskMarkedComplete() {
         Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
                 .show();
-        loadTasks();
+        loadTasks(false);
     }
 
     @Override
     public void showTaskMarkedActive() {
         Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
                 .show();
-        loadTasks();
+        loadTasks(false);
     }
 
     @Override
     public void showCompletedTasksCleared() {
         Snackbar.make(getView(), getString(R.string.completed_tasks_cleared), Snackbar.LENGTH_LONG)
                 .show();
-        loadTasks();
+        loadTasks(false);
     }
 
     @Override
@@ -377,21 +351,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 .show();
     }
 
-    private void loadTasks() {
-        switch (mCurrentFiltering) {
-            case ALL_TASKS:
-                mActionsListener.loadAllTasks(false);
-                break;
-            case ACTIVE_TASKS:
-                mActionsListener.loadActiveTasks(false);
-                break;
-            case COMPLETED_TASKS:
-                mActionsListener.loadCompletedTasks(false);
-                break;
-            default:
-                mActionsListener.loadAllTasks(false);
-                break;
-        }
+    private void loadTasks(boolean forceUpdate) {
+        mTasksPresenter.loadTasks(forceUpdate);
     }
 
     private static class TasksAdapter extends BaseAdapter {

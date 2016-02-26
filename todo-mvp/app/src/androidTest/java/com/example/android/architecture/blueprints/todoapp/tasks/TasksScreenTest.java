@@ -54,8 +54,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.IsNot.not;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -64,11 +64,11 @@ import static org.hamcrest.Matchers.allOf;
 @LargeTest
 public class TasksScreenTest {
 
-    private final static String TITLE1 = "TO DO TEST 1";
+    private final static String TITLE1 = "TITLE1";
 
-    private final static String DESCRIPTION = "TO DO DESCRIPTION";
+    private final static String DESCRIPTION = "DESCR";
 
-    private final static String TITLE2 = "TO DO TEST 2";
+    private final static String TITLE2 = "TITLE2";
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
@@ -120,7 +120,6 @@ public class TasksScreenTest {
             }
         };
     }
-
 
     @Test
     public void clickAddTaskButton_opensAddTaskUi() {
@@ -358,7 +357,7 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(not(isDisplayed())));
 
         // when rotating the screen
-        TestUtils.rotateToLandscape(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule);
 
         // then nothing changes
         onView(withText(TITLE1)).check(doesNotExist());

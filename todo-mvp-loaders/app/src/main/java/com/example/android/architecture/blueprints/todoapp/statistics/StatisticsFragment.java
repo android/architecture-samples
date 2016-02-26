@@ -16,8 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,9 +25,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the statistics screen.
@@ -36,19 +36,14 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
+    private StatisticsPresenter mTasksPresenter;
+
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Context context = getContext();
-
-        new StatisticsPresenter(this,
-                new TasksLoader(context, Injection.provideTasksRepository(context)))
-                .startLoader(this);
+    public void setPresenter(@NonNull StatisticsPresenter presenter) {
+        mTasksPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -60,6 +55,11 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTasksPresenter.startLoader(this);
+    }
 
     @Override
     public void setProgressIndicator(boolean active) {
@@ -71,7 +71,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public void displayStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
+    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {

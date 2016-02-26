@@ -14,12 +14,14 @@
   ~ limitations under the License.
   -->
 
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/tasksContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -83,6 +85,6 @@
 
         </LinearLayout>
     </RelativeLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+</com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout>
 
 

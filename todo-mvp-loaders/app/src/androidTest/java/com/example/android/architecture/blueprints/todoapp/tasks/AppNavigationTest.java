@@ -94,7 +94,7 @@ public class AppNavigationTest {
                 .perform(navigateTo(R.id.list_navigation_menu_item));
 
         // Check that Tasks Activity was opened.
-        onView(withId(R.id.tasks_list)).check(matches(isDisplayed()));
+        onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()));
     }
 
     @Test

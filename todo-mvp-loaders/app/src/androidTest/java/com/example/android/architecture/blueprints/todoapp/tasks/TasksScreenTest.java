@@ -64,11 +64,11 @@ import static org.hamcrest.core.IsNot.not;
 @LargeTest
 public class TasksScreenTest {
 
-    private final static String TITLE1 = "TO DO TEST 1";
+    private final static String TITLE1 = "TITLE1";
 
-    private final static String DESCRIPTION = "TO DO DESCRIPTION";
+    private final static String DESCRIPTION = "DESCR";
 
-    private final static String TITLE2 = "TO DO TEST 2";
+    private final static String TITLE2 = "TITLE2";
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
@@ -357,7 +357,7 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(not(isDisplayed())));
 
         // when rotating the screen
-        TestUtils.rotateToLandscape(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule);
 
         // then nothing changes
         onView(withText(TITLE1)).check(doesNotExist());

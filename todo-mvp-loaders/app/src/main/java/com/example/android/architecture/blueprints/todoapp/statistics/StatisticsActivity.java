@@ -26,7 +26,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -54,17 +56,26 @@ public class StatisticsActivity extends AppCompatActivity {
         // Set up the navigation drawer.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
 
-        if (null == savedInstanceState) {
+        StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+        if (statisticsFragment == null) {
+            statisticsFragment = StatisticsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    StatisticsFragment.newInstance(), R.id.contentFrame);
+                    statisticsFragment, R.id.contentFrame);
         }
 
+        TasksLoader tasksLoader = new TasksLoader(getApplicationContext(),
+                Injection.provideTasksRepository(getApplicationContext()));
+
+        StatisticsPresenter mStatisticsPresenter = new StatisticsPresenter(statisticsFragment,
+                tasksLoader);
+
+        statisticsFragment.setPresenter(mStatisticsPresenter);
     }
 
     @Override

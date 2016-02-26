@@ -93,7 +93,7 @@ public class StatisticsPresenter implements LoaderManager.LoaderCallbacks<List<T
 
             mStatisticsView.setProgressIndicator(false);
 
-            mStatisticsView.displayStatistics(activeTasks, completedTasks);
+            mStatisticsView.showStatistics(activeTasks, completedTasks);
         }
     }
 }
