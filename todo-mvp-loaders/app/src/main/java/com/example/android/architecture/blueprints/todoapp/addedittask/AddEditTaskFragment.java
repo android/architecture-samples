@@ -39,13 +39,13 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
+    private AddEditTaskPresenter mTasksPresenter;
+
     private TextView mTitle;
 
     private TextView mDescription;
 
     private String mEditedTaskId;
-
-    private AddEditTaskPresenter mTasksPresenter;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -53,6 +53,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public AddEditTaskFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTasksPresenter.startLoader(this);
     }
 
     public void setPresenter(@NonNull AddEditTaskPresenter presenter) {
@@ -97,12 +103,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         setHasOptionsMenu(true);
         setRetainInstance(true);
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mTasksPresenter.startLoader(this);
     }
 
     @Override

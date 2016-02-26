@@ -57,7 +57,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private static final int REQUEST_ADD_TASK = 1;
 
-    private TasksPresenter mTasksPresenter;
+    private TasksContract.UserActionsListener mUserActionsListener;
 
     private TasksAdapter mListAdapter;
 
@@ -82,11 +82,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setActionListener(@NonNull TasksPresenter presenter) {
-        mTasksPresenter = checkNotNull(presenter);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mItemListener);
@@ -95,7 +90,12 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.loadTasks(false);
+        mUserActionsListener.loadTasks(false);
+    }
+
+    @Override
+    public void setActionListener(@NonNull TasksContract.UserActionsListener listener) {
+        mUserActionsListener = checkNotNull(listener);
     }
 
     @Override
@@ -119,8 +119,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
-        ListView mListView = (ListView) root.findViewById(R.id.tasks_list);
-        mListView.setAdapter(mListAdapter);
+        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
+        listView.setAdapter(mListAdapter);
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
@@ -144,7 +144,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTasksPresenter.addNewTask();
+                mUserActionsListener.addNewTask();
             }
         });
 
@@ -156,7 +156,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(mListView);
+        swipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -174,7 +174,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mTasksPresenter.clearCompletedTasks();
+                mUserActionsListener.clearCompletedTasks();
                 return true;
             case R.id.menu_filter:
                 showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
@@ -200,16 +200,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mUserActionsListener.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mUserActionsListener.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mUserActionsListener.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mTasksPresenter.loadTasks(false);
+                mUserActionsListener.loadTasks(false);
                 return true;
             }
         });
@@ -223,17 +223,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mTasksPresenter.openTaskDetails(clickedTask);
+            mUserActionsListener.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mTasksPresenter.completeTask(completedTask);
+            mUserActionsListener.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mTasksPresenter.activateTask(activatedTask);
+            mUserActionsListener.activateTask(activatedTask);
         }
     };
 
@@ -347,18 +347,18 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public boolean isInactive() {
-        return !isAdded();
-    }
-
-    @Override
     public void showLoadingTasksError() {
         Snackbar.make(getView(), getString(R.string.loading_tasks_error), Snackbar.LENGTH_LONG)
                 .show();
     }
 
+    @Override
+    public boolean isActive() {
+        return isAdded();
+    }
+
     private void loadTasks(boolean forceUpdate) {
-        mTasksPresenter.loadTasks(forceUpdate);
+        mUserActionsListener.loadTasks(forceUpdate);
     }
 
     private static class TasksAdapter extends BaseAdapter {

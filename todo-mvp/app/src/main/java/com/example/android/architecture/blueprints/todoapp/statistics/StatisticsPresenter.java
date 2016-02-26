@@ -74,7 +74,7 @@ public class StatisticsPresenter implements StatisticsContract.UserActionsListen
                     }
                 }
                 // The View may not be on screen anymore when this callback is returned
-                if (mStatisticsView.isInactive()) {
+                if (!mStatisticsView.isActive()) {
                     return;
                 }
                 mStatisticsView.setProgressIndicator(false);
@@ -85,7 +85,7 @@ public class StatisticsPresenter implements StatisticsContract.UserActionsListen
             @Override
             public void onDataNotAvailable() {
                 // The View may not be on screen anymore when this callback is returned
-                if (mStatisticsView.isInactive()) {
+                if (!mStatisticsView.isActive()) {
                     return;
                 }
                 mStatisticsView.showLoadingStatisticsError();

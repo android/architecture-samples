@@ -45,8 +45,6 @@ public interface TasksContract {
 
         void showLoadingTasksError();
 
-        void setActionListener(TasksPresenter presenter);
-
         void showNoTasks();
 
         void showActiveFilterLabel();
@@ -59,7 +57,9 @@ public interface TasksContract {
 
         void showNoCompletedTasks();
 
-        boolean isInactive();
+        void setActionListener(UserActionsListener listener);
+
+        boolean isActive();
     }
 
     interface UserActionsListener {

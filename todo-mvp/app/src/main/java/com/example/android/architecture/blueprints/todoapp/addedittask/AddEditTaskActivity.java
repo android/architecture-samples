@@ -33,8 +33,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
-    private AddEditTaskPresenter mAddEditTaskPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +67,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        mAddEditTaskPresenter = new AddEditTaskPresenter(
+        new AddEditTaskPresenter(
                 Injection.provideTasksRepository(getApplicationContext()), addEditTaskFragment);
     }
 

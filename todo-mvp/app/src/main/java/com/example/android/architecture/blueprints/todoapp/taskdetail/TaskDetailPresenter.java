@@ -54,7 +54,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
             @Override
             public void onTaskLoaded(Task task) {
                 // The View may not be on screen anymore when this callback is returned
-                if (mTaskDetailView.isInactive()) {
+                if (!mTaskDetailView.isActive()) {
                     return;
                 }
                 mTaskDetailView.setProgressIndicator(false);
@@ -68,7 +68,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
             @Override
             public void onDataNotAvailable() {
                 // The View may not be on screen anymore when this callback is returned
-                if (mTaskDetailView.isInactive()) {
+                if (!mTaskDetailView.isActive()) {
                     return;
                 }
                 mTaskDetailView.showMissingTask();

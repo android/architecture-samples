@@ -81,10 +81,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return new TasksFragment();
     }
 
-    public void setPresenter(@NonNull TasksPresenter presenter) {
-        mTasksPresenter = checkNotNull(presenter);
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,9 +93,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mTasksPresenter.startLoader(this);
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void setPresenter(@NonNull TasksPresenter presenter) {
+        mTasksPresenter = checkNotNull(presenter);
     }
 
     @Override
@@ -118,8 +113,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
-        ListView mListView = (ListView) root.findViewById(R.id.tasks_list);
-        mListView.setAdapter(mListAdapter);
+        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
+        listView.setAdapter(mListAdapter);
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
@@ -155,7 +150,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(mListView);
+        swipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

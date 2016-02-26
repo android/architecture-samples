@@ -33,7 +33,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
@@ -57,6 +56,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     private CheckBox mDetailCompleteStatus;
 
+    private String mTaskId;
+
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_TASK_ID, taskId);
@@ -68,8 +69,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActionsListener = new TaskDetailPresenter(Injection.provideTasksRepository(getContext()),
-                this);
+        mTaskId = getArguments().getString(ARGUMENT_TASK_ID);
     }
 
     @Nullable
@@ -89,8 +89,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-                mActionsListener.editTask(taskId);
+                mActionsListener.editTask(mTaskId);
             }
         });
 
@@ -100,25 +99,19 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        openTask();
+        mActionsListener.openTask(mTaskId);
     }
 
     @Override
-    public void setActionListener(@NonNull TaskDetailPresenter presenter) {
-        mActionsListener = checkNotNull(presenter);
-    }
-
-    private void openTask() {
-        String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-        mActionsListener.openTask(taskId);
+    public void setActionListener(@NonNull TaskDetailContract.UserActionsListener listener) {
+        mActionsListener = checkNotNull(listener);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-                mActionsListener.deleteTask(taskId);
+                mActionsListener.deleteTask(mTaskId);
                 return true;
         }
         return false;
@@ -161,9 +154,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 if (complete) {
-                    mActionsListener.activateTask(getArguments().getString(ARGUMENT_TASK_ID));
+                    mActionsListener.activateTask(mTaskId);
                 } else {
-                    mActionsListener.completeTask(getArguments().getString(ARGUMENT_TASK_ID));
+                    mActionsListener.completeTask(mTaskId);
                 }
             }
         });
@@ -184,19 +177,12 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void showTaskMarkedComplete() {
         Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
                 .show();
-        openTask();
     }
 
     @Override
     public void showTaskMarkedActive() {
         Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
                 .show();
-        openTask();
-    }
-
-    @Override
-    public boolean isInactive() {
-        return !isAdded();
     }
 
     @Override
@@ -221,5 +207,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void showMissingTask() {
         mDetailTitle.setText("");
         mDetailDescription.setText(getString(R.string.no_data));
+    }
+
+    @Override
+    public boolean isActive() {
+        return isAdded();
     }
 }

@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link StatisticsPresenter}
@@ -63,6 +64,9 @@ public class StatisticsPresenterTest {
 
         // Get a reference to the class under test
         mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+
+        // The presenter won't update the view unless it's active.
+        when(mStatisticsView.isActive()).thenReturn(true);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),

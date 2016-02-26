@@ -107,7 +107,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
                     }
                 }
                 // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isInactive()) {
+                if (!mTasksView.isActive()) {
                     return;
                 }
                 if (showLoadingUI) {
@@ -120,7 +120,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
             @Override
             public void onDataNotAvailable() {
                 // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isInactive()) {
+                if (!mTasksView.isActive()) {
                     return;
                 }
                 mTasksView.showLoadingTasksError();

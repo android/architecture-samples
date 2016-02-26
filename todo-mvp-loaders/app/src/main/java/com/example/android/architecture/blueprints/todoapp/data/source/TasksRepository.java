@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
- * <p/>
+ * <p>
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
@@ -52,7 +52,8 @@ public class TasksRepository implements TasksDataSource {
     Map<String, Task> mCachedTasks;
 
     /**
-     * This variable has package local visibility so it can be accessed from tests.
+     * Marks the cache as invalid, to force an update the next time data is requested. This variable
+     * has package local visibility so it can be accessed from tests.
      */
     boolean mCacheIsDirty;
 
@@ -72,8 +73,8 @@ public class TasksRepository implements TasksDataSource {
     }
 
     /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new
-     * instance next time it's called.
+     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new instance
+     * next time it's called.
      */
     public static void destroyInstance() {
         INSTANCE = null;

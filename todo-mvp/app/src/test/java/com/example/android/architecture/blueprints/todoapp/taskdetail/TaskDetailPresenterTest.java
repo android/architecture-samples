@@ -29,6 +29,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TaskDetailPresenter}
@@ -64,6 +65,9 @@ public class TaskDetailPresenterTest {
 
         // Get a reference to the class under test
         mTaskDetailPresenter = new TaskDetailPresenter(mTasksRepository, mTaskDetailView);
+
+        // The presenter won't update the view unless it's active.
+        when(mTaskDetailView.isActive()).thenReturn(true);
     }
 
     @Test

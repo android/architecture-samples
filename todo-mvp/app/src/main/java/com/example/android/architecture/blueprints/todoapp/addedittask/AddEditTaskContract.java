@@ -27,11 +27,13 @@ public interface AddEditTaskContract {
 
         void showTasksList();
 
-        void setUserActionListener(UserActionsListener listener);
-
         void setTitle(String title);
 
         void setDescription(String description);
+
+        void setActionListener(UserActionsListener listener);
+
+        boolean isActive();
     }
 
     interface UserActionsListener {

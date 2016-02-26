@@ -47,9 +47,9 @@ public interface TaskDetailContract {
 
         void showTaskMarkedActive();
 
-        void setActionListener(TaskDetailPresenter presenter);
+        void setActionListener(UserActionsListener listener);
 
-        boolean isInactive();
+        boolean isActive();
     }
 
     interface UserActionsListener {

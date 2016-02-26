@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -46,6 +45,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mDescription;
 
+    private String mEditedTaskId;
+
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
     }
@@ -58,16 +59,20 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void onResume() {
         super.onResume();
         if (!isNewTask()) {
-            String taskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
-            mActionListener.populateTask(taskId);
+            mActionListener.populateTask(mEditedTaskId);
         }
+    }
+
+    @Override
+    public void setActionListener(@NonNull AddEditTaskContract.UserActionsListener listener) {
+        mActionListener = checkNotNull(listener);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActionListener = new AddEditTaskPresenter(
-                Injection.provideTasksRepository(getContext()), this);
+
+        setTaskIdIfAny();
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
@@ -115,11 +120,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     }
 
     @Override
-    public void setUserActionListener(@NonNull AddEditTaskContract.UserActionsListener listener) {
-        mActionListener = checkNotNull(listener);
-    }
-
-    @Override
     public void setTitle(String title) {
         mTitle.setText(title);
     }
@@ -129,7 +129,19 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mDescription.setText(description);
     }
 
+    @Override
+    public boolean isActive() {
+        return isAdded();
+    }
+
+
+    private void setTaskIdIfAny() {
+        if (getArguments() != null && getArguments().containsKey(ARGUMENT_EDIT_TASK_ID)) {
+            mEditedTaskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
+        }
+    }
+
     private boolean isNewTask() {
-        return getArguments() == null || !getArguments().containsKey(ARGUMENT_EDIT_TASK_ID);
+        return mEditedTaskId == null;
     }
 }

@@ -33,6 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksPresenter}
@@ -65,6 +66,9 @@ public class TasksPresenterTest {
         // Get a reference to the class under test
         mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
 
+        // The presenter won't update the view unless it's active.
+        when(mTasksView.isActive()).thenReturn(true);
+
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
@@ -81,8 +85,9 @@ public class TasksPresenterTest {
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
-        // Then progress indicator is hidden and all tasks are shown in UI
+        // Then progress indicator is shown
         verify(mTasksView).setProgressIndicator(true);
+        // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setProgressIndicator(false);
         ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());

@@ -40,7 +40,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
             @NonNull AddEditTaskContract.View addTaskView) {
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-        addTaskView.setUserActionListener(this);
+        addTaskView.setActionListener(this);
     }
 
     @Override
@@ -67,12 +67,18 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
 
     @Override
     public void onTaskLoaded(Task task) {
-        mAddTaskView.setTitle(task.getTitle());
-        mAddTaskView.setDescription(task.getDescription());
+        // The View may not be on screen anymore when this callback is returned
+        if (mAddTaskView.isActive()) {
+            mAddTaskView.setTitle(task.getTitle());
+            mAddTaskView.setDescription(task.getDescription());
+        }
     }
 
     @Override
     public void onDataNotAvailable() {
-        mAddTaskView.showEmptyTaskError();
+        // The View may not be on screen anymore when this callback is returned
+        if (mAddTaskView.isActive()) {
+            mAddTaskView.showEmptyTaskError();
+        }
     }
 }

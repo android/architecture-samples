@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.statistics;
+package com.example.android.architecture.blueprints.todoapp.tasks;
 
 /**
- * This specifies the contract between the view and the presenter.
+ * Used with the filter spinner in the tasks list.
  */
-public interface StatisticsContract {
+public enum TasksFilterType {
+    /**
+     * Do not filter tasks.
+     */
+    ALL_TASKS,
 
-    interface View {
+    /**
+     * Filters only the active (not completed yet) tasks.
+     */
+    ACTIVE_TASKS,
 
-        void setProgressIndicator(boolean active);
-
-        void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks);
-
-        void showLoadingStatisticsError();
-
-        void setActionListener(UserActionsListener listener);
-
-        boolean isActive();
-    }
-
-    interface UserActionsListener {
-
-        void loadStatistics();
-    }
+    /**
+     * Filters only the completed tasks.
+     */
+    COMPLETED_TASKS
 }

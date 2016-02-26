@@ -72,10 +72,10 @@ public class StatisticsActivity extends AppCompatActivity {
         TasksLoader tasksLoader = new TasksLoader(getApplicationContext(),
                 Injection.provideTasksRepository(getApplicationContext()));
 
-        StatisticsPresenter mStatisticsPresenter = new StatisticsPresenter(statisticsFragment,
+        StatisticsPresenter statisticsPresenter = new StatisticsPresenter(statisticsFragment,
                 tasksLoader);
 
-        statisticsFragment.setPresenter(mStatisticsPresenter);
+        statisticsFragment.setPresenter(statisticsPresenter);
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -59,6 +60,9 @@ public class AddEditTaskPresenterTest {
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(mTasksRepository, mAddEditTaskView);
+
+        // The presenter wont't update the view unless it's active.
+        when(mAddEditTaskView.isActive()).thenReturn(true);
     }
 
     @Test

@@ -37,6 +37,8 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Main UI for the task detail screen.
  */
@@ -62,10 +64,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    public void setPresenter(@NonNull TaskDetailPresenter presenter) {
-        mTaskDetailPresenter = presenter;
     }
 
     @Override
@@ -102,6 +100,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void onResume() {
         super.onResume();
         mTaskDetailPresenter.startLoader(this);
+    }
+
+    public void setPresenter(@NonNull TaskDetailPresenter presenter) {
+        mTaskDetailPresenter = checkNotNull(presenter);
     }
 
     @Override
