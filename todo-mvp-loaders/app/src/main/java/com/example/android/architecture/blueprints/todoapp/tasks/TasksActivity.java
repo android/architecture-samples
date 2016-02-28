@@ -77,6 +77,7 @@ public class TasksActivity extends AppCompatActivity {
         TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
         mTasksPresenter = new TasksPresenter(
                 new TasksLoader(getApplicationContext(), repository),
+                getSupportLoaderManager(),
                 repository,
                 tasksFragment);
 
