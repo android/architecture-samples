@@ -57,6 +57,8 @@ public interface TasksContract {
         void showNoActiveTasks();
 
         void showNoCompletedTasks();
+
+        void showSuccessfullySavedMessage();
     }
 
     interface Presenter extends BasePresenter {

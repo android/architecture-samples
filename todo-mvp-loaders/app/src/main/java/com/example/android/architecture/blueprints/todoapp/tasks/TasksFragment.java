@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -54,8 +53,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
-
-    private static final int REQUEST_ADD_TASK = 1;
 
     private TasksPresenter mTasksPresenter;
 
@@ -99,11 +96,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If a task was successfully added, show snackbar
-        if (REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
-            Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        mTasksPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -280,6 +273,12 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 false);
     }
 
+    @Override
+    public void showSuccessfullySavedMessage() {
+        Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
+                      Snackbar.LENGTH_SHORT
+        ).show();
+    }
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
         mTasksView.setVisibility(View.GONE);
         mNoTasksView.setVisibility(View.VISIBLE);
@@ -307,7 +306,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showAddTask() {
         Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, REQUEST_ADD_TASK);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
     }
 
     @Override

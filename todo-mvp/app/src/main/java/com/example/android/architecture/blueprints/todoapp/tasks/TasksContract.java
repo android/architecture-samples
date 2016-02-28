@@ -58,6 +58,8 @@ public interface TasksContract {
 
         void showNoCompletedTasks();
 
+        void showSuccessfullySavedMessage();
+
         void setActionListener(Presenter listener);
 
         boolean isActive();

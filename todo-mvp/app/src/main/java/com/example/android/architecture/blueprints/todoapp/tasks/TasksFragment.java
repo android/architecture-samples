@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -54,8 +53,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
-
-    private static final int REQUEST_ADD_TASK = 1;
 
     private TasksContract.Presenter mPresenter;
 
@@ -105,11 +102,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If a task was successfully added, show snackbar
-        if (REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
-            Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -154,7 +147,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
-                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
+                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
+        );
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
 
@@ -265,9 +259,11 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showNoActiveTasks() {
-        showNoTasksViews(getResources().getString(R.string.no_tasks_active),
+        showNoTasksViews(
+                getResources().getString(R.string.no_tasks_active),
                 R.drawable.ic_check_circle_24dp,
-                false);
+                false
+        );
     }
 
     @Override
@@ -275,7 +271,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false);
+                false
+        );
     }
 
     @Override
@@ -283,7 +280,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_completed),
                 R.drawable.ic_verified_user_24dp,
-                false);
+                false
+        );
+    }
+
+    @Override
+    public void showSuccessfullySavedMessage() {
+        Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
+                      Snackbar.LENGTH_SHORT
+        ).show();
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
@@ -313,7 +318,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showAddTask() {
         Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, REQUEST_ADD_TASK);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
     }
 
     @Override
@@ -414,10 +419,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             completeCB.setChecked(task.isCompleted());
             if (task.isCompleted()) {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                                                      .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
             } else {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
+                                                      .getResources().getDrawable(R.drawable.touch_feedback));
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {
