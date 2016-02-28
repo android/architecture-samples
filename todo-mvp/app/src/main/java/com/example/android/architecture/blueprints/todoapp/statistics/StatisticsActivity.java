@@ -38,8 +38,6 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private StatisticsPresenter mStatisticsPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +65,14 @@ public class StatisticsActivity extends AppCompatActivity {
         if (statisticsFragment == null) {
             statisticsFragment = StatisticsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    statisticsFragment, R.id.contentFrame);
+                                                statisticsFragment, R.id.contentFrame
+            );
         }
 
-        mStatisticsPresenter = new StatisticsPresenter(
+        StatisticsPresenter statisticsPresenter = new StatisticsPresenter(
                 Injection.provideTasksRepository(getApplicationContext()), statisticsFragment);
+
+        statisticsFragment.setPresenter(statisticsPresenter);
     }
 
     @Override

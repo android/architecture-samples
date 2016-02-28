@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import com.example.android.architecture.blueprints.todoapp.util.BasePresenter;
+
 /**
  * This specifies the contract between the view and the presenter.
  */
@@ -29,13 +31,10 @@ public interface StatisticsContract {
 
         void showLoadingStatisticsError();
 
-        void setActionListener(UserActionsListener listener);
-
         boolean isActive();
     }
 
-    interface UserActionsListener {
+    interface Presenter extends BasePresenter {
 
-        void loadStatistics();
     }
 }

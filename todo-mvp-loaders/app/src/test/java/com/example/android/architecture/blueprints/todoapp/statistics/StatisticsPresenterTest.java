@@ -16,18 +16,19 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 import com.google.common.collect.Lists;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -45,6 +46,9 @@ public class StatisticsPresenterTest {
     @Mock
     private TasksLoader mTasksLoader;
 
+    @Mock
+    private LoaderManager mLoaderManager;
+
     private StatisticsPresenter mStatisticsPresenter;
 
     @Before
@@ -54,7 +58,7 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mStatisticsView, mTasksLoader);
+        mStatisticsPresenter = new StatisticsPresenter(mStatisticsView, mTasksLoader, mLoaderManager);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),

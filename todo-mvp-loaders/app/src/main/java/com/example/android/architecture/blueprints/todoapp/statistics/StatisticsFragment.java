@@ -58,7 +58,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.startLoader(this);
+        mTasksPresenter.resume();
     }
 
     @Override

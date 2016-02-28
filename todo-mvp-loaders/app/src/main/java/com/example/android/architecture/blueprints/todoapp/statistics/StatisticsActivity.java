@@ -72,8 +72,7 @@ public class StatisticsActivity extends AppCompatActivity {
         TasksLoader tasksLoader = new TasksLoader(getApplicationContext(),
                 Injection.provideTasksRepository(getApplicationContext()));
 
-        StatisticsPresenter statisticsPresenter = new StatisticsPresenter(statisticsFragment,
-                tasksLoader);
+        StatisticsPresenter statisticsPresenter = new StatisticsPresenter(statisticsFragment, tasksLoader, getSupportLoaderManager());
 
         statisticsFragment.setPresenter(statisticsPresenter);
     }
