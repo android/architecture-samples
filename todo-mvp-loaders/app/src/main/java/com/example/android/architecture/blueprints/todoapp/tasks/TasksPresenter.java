@@ -82,11 +82,6 @@ public class TasksPresenter implements TasksContract.Presenter,
     }
 
     @Override
-    public void pause() {
-
-    }
-
-    @Override
     public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
         mTasksView.setLoadingIndicator(true);
         return mLoader;

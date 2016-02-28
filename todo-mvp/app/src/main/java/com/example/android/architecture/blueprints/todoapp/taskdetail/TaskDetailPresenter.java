@@ -48,7 +48,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     @Override
-    public void created() {
+    public void resume() {
         openTask();
     }
 
@@ -86,46 +86,37 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     @Override
-    public void resume() {
-        // no-op
-    }
-
-    @Override
-    public void pause() {
-        // no-op
-    }
-
-    @Override
-    public void editTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void editTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(taskId);
+        mTaskDetailView.showEditTask(mTaskId);
     }
 
     @Override
-    public void deleteTask(@Nullable String taskId) {
-        mTasksRepository.deleteTask(taskId);
+    public void deleteTask() {
+        mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
-    public void completeTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    @Override
+    public void completeTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(taskId);
+        mTasksRepository.completeTask(mTaskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
-    public void activateTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void activateTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(taskId);
+        mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
