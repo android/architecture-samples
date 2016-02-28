@@ -155,7 +155,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadTasks(true);
+                mPresenter.loadTasks(false);
             }
         });
 
@@ -266,9 +266,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showSuccessfullySavedMessage() {
-        Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
-                      Snackbar.LENGTH_SHORT
-        ).show();
+        showMessage(getString(R.string.successfully_saved_task_message));
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
@@ -312,38 +310,31 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.task_marked_complete));
     }
 
     @Override
     public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.task_marked_active));
     }
 
     @Override
     public void showCompletedTasksCleared() {
-        Snackbar.make(getView(), getString(R.string.completed_tasks_cleared), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.completed_tasks_cleared));
     }
 
     @Override
     public void showLoadingTasksError() {
-        Snackbar.make(getView(), getString(R.string.loading_tasks_error), Snackbar.LENGTH_LONG)
-                .show();
+        showMessage(getString(R.string.loading_tasks_error));
+    }
+
+    private void showMessage(String message) {
+        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public boolean isActive() {
         return isAdded();
-    }
-
-    private void loadTasks(boolean forceUpdate) {
-        mPresenter.loadTasks(forceUpdate);
     }
 
     private static class TasksAdapter extends BaseAdapter {
