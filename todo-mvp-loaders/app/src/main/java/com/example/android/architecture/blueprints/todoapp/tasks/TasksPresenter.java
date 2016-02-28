@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -227,6 +228,37 @@ public class TasksPresenter implements TasksContract.Presenter,
     @Override
     public void setFiltering(TasksFilterType requestType) {
         mCurrentFiltering = requestType;
+    }
+
+    @Override
+    public void optionsItemSelected(int itemId) {
+        switch (itemId) {
+            case R.id.menu_clear:
+                clearCompletedTasks();
+                break;
+            case R.id.menu_filter:
+                mTasksView.showFilteringPopUpMenu();
+                break;
+            case R.id.menu_refresh:
+                loadTasks(true);
+                break;
+        }
+    }
+
+    @Override
+    public void popupItemSelected(int itemId) {
+        switch (itemId) {
+            case R.id.active:
+                setFiltering(TasksFilterType.ACTIVE_TASKS);
+                break;
+            case R.id.completed:
+                setFiltering(TasksFilterType.COMPLETED_TASKS);
+                break;
+            default:
+                setFiltering(TasksFilterType.ALL_TASKS);
+                break;
+        }
+        loadTasks(false);
     }
 
     @Override

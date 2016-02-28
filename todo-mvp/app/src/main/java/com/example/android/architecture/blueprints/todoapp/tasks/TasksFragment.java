@@ -166,18 +166,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
-                return true;
-            case R.id.menu_filter:
-                showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
-                return true;
-            case R.id.menu_refresh:
-                loadTasks(true);
-                return true;
-        }
-        return false;
+        mPresenter.optionsItemSelected(item.getItemId());
+        return true;
     }
 
     @Override
@@ -186,24 +176,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void showFilteringPopUpMenu(View viewToAttachPopUpMenu) {
-        PopupMenu popup = new PopupMenu(getContext(), viewToAttachPopUpMenu);
+    @Override
+    public void showFilteringPopUpMenu() {
+        PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.active:
-                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
-                        break;
-                    case R.id.completed:
-                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-                        break;
-                    default:
-                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
-                        break;
-                }
-                mPresenter.loadTasks(false);
+                mPresenter.popupItemSelected(item.getItemId());
                 return true;
             }
         });

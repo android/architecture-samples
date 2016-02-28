@@ -59,6 +59,8 @@ public interface TasksContract {
         void showNoCompletedTasks();
 
         void showSuccessfullySavedMessage();
+
+        void showFilteringPopUpMenu();
     }
 
     interface Presenter extends BasePresenter {
@@ -76,6 +78,10 @@ public interface TasksContract {
         void clearCompletedTasks();
 
         void setFiltering(TasksFilterType requestType);
+
+        void optionsItemSelected(int itemId);
+
+        void popupItemSelected(int itemId);
 
         TasksFilterType getFiltering();
     }
