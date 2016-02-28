@@ -34,6 +34,8 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
+    public static final int REQUEST_ADD_TASK = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
