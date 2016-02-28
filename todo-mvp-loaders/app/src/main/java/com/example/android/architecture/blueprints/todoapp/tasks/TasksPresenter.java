@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
-public class TasksPresenter implements TasksContract.UserActionsListener,
+public class TasksPresenter implements TasksContract.Presenter,
         LoaderManager.LoaderCallbacks<List<Task>> {
 
     private final static int TASKS_QUERY = 1;
@@ -49,28 +49,30 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private final TasksLoader mLoader;
 
+    private final LoaderManager mLoaderManager;
+
     private List<Task> mCurrentTasks;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksLoader loader, @NonNull LoaderManager loaderManager,
+                          @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+        mLoader = checkNotNull(loader, "loader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-        mLoader = checkNotNull(loader, "loader cannot be null!");
     }
 
-    /**
-     * This starts the {@link LoaderManager}, querying the list of tasks. It returns the
-     * TasksPresenter so it can be chained with the constructor. This isn't called from the
-     * constructor to enable writing unit tests for the non loader methods in the TasksPresenter
-     * (creating an instance from a unit test would fail if this method were called from it).
-     */
-    public TasksPresenter startLoader(TasksFragment fragment) {
-        fragment.getLoaderManager().initLoader(TASKS_QUERY, null, this);
-        return this;
+    @Override
+    public void resume() {
+        mLoaderManager.initLoader(TASKS_QUERY, null, this);
+    }
+
+    @Override
+    public void pause() {
+
     }
 
     @Override
@@ -223,4 +225,5 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
     }
+
 }

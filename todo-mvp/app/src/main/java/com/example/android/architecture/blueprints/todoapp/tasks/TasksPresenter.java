@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
  */
-public class TasksPresenter implements TasksContract.UserActionsListener {
+public class TasksPresenter implements TasksContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
@@ -48,6 +48,16 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         tasksView.setActionListener(this);
+    }
+
+    @Override
+    public void resume() {
+        loadTasks(false);
+    }
+
+    @Override
+    public void pause() {
+
     }
 
     @Override
@@ -214,4 +224,5 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
     }
+
 }

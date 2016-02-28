@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.util.BasePresenter;
 
 import java.util.List;
 
@@ -57,12 +58,12 @@ public interface TasksContract {
 
         void showNoCompletedTasks();
 
-        void setActionListener(UserActionsListener listener);
+        void setActionListener(Presenter listener);
 
         boolean isActive();
     }
 
-    interface UserActionsListener {
+    interface Presenter extends BasePresenter {
 
         void loadTasks(boolean forceUpdate);
 

@@ -90,7 +90,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.startLoader(this);
+        mTasksPresenter.resume();
     }
 
     public void setPresenter(@NonNull TasksPresenter presenter) {
