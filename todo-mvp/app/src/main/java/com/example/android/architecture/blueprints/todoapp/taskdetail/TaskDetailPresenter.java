@@ -29,35 +29,44 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.UserActionsListener {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
     private final TaskDetailContract.View mTaskDetailView;
 
-    public TaskDetailPresenter(@NonNull TasksRepository tasksRepository,
+    @Nullable
+    private String mTaskId;
+
+    public TaskDetailPresenter(@Nullable String taskId,
+                               @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView) {
+        this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mTaskDetailView.setActionListener(this);
+        mTaskDetailView.setPresenter(this);
     }
 
     @Override
-    public void openTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void created() {
+        openTask();
+    }
+
+    private void openTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
 
-        mTaskDetailView.setProgressIndicator(true);
-        mTasksRepository.getTask(taskId, new TasksDataSource.GetTaskCallback() {
+        mTaskDetailView.setLoadingIndicator(true);
+        mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
                 // The View may not be on screen anymore when this callback is returned
                 if (!mTaskDetailView.isActive()) {
                     return;
                 }
-                mTaskDetailView.setProgressIndicator(false);
+                mTaskDetailView.setLoadingIndicator(false);
                 if (null == task) {
                     mTaskDetailView.showMissingTask();
                 } else {
@@ -74,6 +83,16 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
                 mTaskDetailView.showMissingTask();
             }
         });
+    }
+
+    @Override
+    public void resume() {
+        // no-op
+    }
+
+    @Override
+    public void pause() {
+        // no-op
     }
 
     @Override
@@ -127,4 +146,5 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
     }
+
 }

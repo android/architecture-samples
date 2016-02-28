@@ -67,7 +67,8 @@ public class TaskDetailActivity extends AppCompatActivity {
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 taskDetailFragment,
-                new TaskLoader(taskId, getApplicationContext()));
+                new TaskLoader(taskId, getApplicationContext()),
+                getSupportLoaderManager());
 
         taskDetailFragment.setPresenter(mTaskDetailPresenter);
     }

@@ -80,14 +80,14 @@ public class TaskDetailPresenterTest {
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(mTasksRepository).getTask(eq(task.getId()), mGetTaskCallbackCaptor.capture());
-        verify(mTaskDetailView).setProgressIndicator(true);
+        verify(mTaskDetailView).setLoadingIndicator(true);
 
         // When task is finally loaded
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(task); // Trigger callback
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailView).setProgressIndicator(false);
+        verify(mTaskDetailView).setLoadingIndicator(false);
         verify(mTaskDetailView).showTitle(TITLE_TEST);
         verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
         verify(mTaskDetailView).showCompletionStatus(false);
@@ -103,14 +103,14 @@ public class TaskDetailPresenterTest {
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(mTasksRepository).getTask(eq(task.getId()), mGetTaskCallbackCaptor.capture());
-        verify(mTaskDetailView).setProgressIndicator(true);
+        verify(mTaskDetailView).setLoadingIndicator(true);
 
         // When task is finally loaded
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(task); // Trigger callback
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailView).setProgressIndicator(false);
+        verify(mTaskDetailView).setLoadingIndicator(false);
         verify(mTaskDetailView).showTitle(TITLE_TEST);
         verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
         verify(mTaskDetailView).showCompletionStatus(true);
@@ -123,14 +123,14 @@ public class TaskDetailPresenterTest {
 
         // Then task with invalid id is attempted to load from model, callback is captured and
         // progress indicator is shown.
-        verify(mTaskDetailView).setProgressIndicator(true);
+        verify(mTaskDetailView).setLoadingIndicator(true);
         verify(mTasksRepository).getTask(eq(INVALID_ID), mGetTaskCallbackCaptor.capture());
 
         // When task is finally loaded
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(null); // Trigger callback
 
         // Then progress indicator is hidden and missing task UI is shown
-        verify(mTaskDetailView).setProgressIndicator(false);
+        verify(mTaskDetailView).setLoadingIndicator(false);
         verify(mTaskDetailView).showMissingTask();
     }
 

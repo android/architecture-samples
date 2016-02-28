@@ -75,7 +75,7 @@ public class TaskDetailPresenterTest {
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailFragment).setProgressIndicator(false);
+        verify(mTaskDetailFragment).setLoadingIndicator(false);
         verify(mTaskDetailFragment).showTitle(TITLE_TEST);
         verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
     }
@@ -87,7 +87,7 @@ public class TaskDetailPresenterTest {
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailFragment).setProgressIndicator(false);
+        verify(mTaskDetailFragment).setLoadingIndicator(false);
         verify(mTaskDetailFragment).showTitle(TITLE_TEST);
         verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
         verify(mTaskDetailFragment).showCompletionStatus(true);

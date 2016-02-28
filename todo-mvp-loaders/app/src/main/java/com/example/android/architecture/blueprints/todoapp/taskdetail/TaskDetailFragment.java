@@ -48,15 +48,13 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     public static final int REQUEST_EDIT_TASK = 1;
 
-    private TaskDetailPresenter mTaskDetailPresenter;
+    private TaskDetailContract.Presenter mPresenter;
 
     private TextView mDetailTitle;
 
     private TextView mDetailDescription;
 
     private CheckBox mDetailCompleteStatus;
-
-    private String mTaskId;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -67,9 +65,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mTaskId = getArguments().getString(ARGUMENT_TASK_ID);
+    public void onResume() {
+        super.onResume();
+        mPresenter.resume();
     }
 
     @Nullable
@@ -89,28 +87,22 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTaskDetailPresenter.editTask(mTaskId);
+                mPresenter.editTask();
             }
         });
 
         return root;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mTaskDetailPresenter.startLoader(this);
-    }
-
     public void setPresenter(@NonNull TaskDetailPresenter presenter) {
-        mTaskDetailPresenter = checkNotNull(presenter);
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                mTaskDetailPresenter.deleteTask(mTaskId);
+                mPresenter.deleteTask();
                 return true;
         }
         return false;
@@ -123,7 +115,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void setProgressIndicator(boolean active) {
+    public void setLoadingIndicator(boolean active) {
         if (active) {
             mDetailTitle.setText("");
             mDetailDescription.setText(getString(R.string.loading));
@@ -153,9 +145,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 if (complete) {
-                    mTaskDetailPresenter.activateTask(mTaskId);
+                    mPresenter.activateTask();
                 } else {
-                    mTaskDetailPresenter.completeTask(mTaskId);
+                    mPresenter.completeTask();
                 }
             }
         });

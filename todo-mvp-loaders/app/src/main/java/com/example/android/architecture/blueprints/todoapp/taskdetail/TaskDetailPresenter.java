@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.UserActionsListener,
+public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         LoaderManager.LoaderCallbacks<Task> {
 
     private static final int TASK_QUERY = 3;
@@ -43,61 +43,63 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
 
     private TaskLoader mTaskLoader;
 
+    private LoaderManager mLoaderManager;
+
     @Nullable
     private String mTaskId;
 
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskLoader taskLoader) {
+                               @NonNull TaskLoader taskLoader,
+                               @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be nulL!");
-    }
-
-    /**
-     * This starts the {@link LoaderManager}, querying the task. It returns the TaskDetailPresenter
-     * so it can be chained with the constructor. This isn't called from the constructor to enable
-     * writing unit tests for the non loader methods in the TaskDetailPresenter (creating an
-     * instance from a unit test would fail if this method were called from it).
-     */
-    public TaskDetailPresenter startLoader(TaskDetailFragment fragment) {
-        fragment.getLoaderManager().initLoader(TASK_QUERY, null, this);
-        return this;
+        mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
     }
 
     @Override
-    public void editTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void resume() {
+        openTask();
+    }
+
+    private void openTask() {
+        mLoaderManager.initLoader(TASK_QUERY, null, this);
+    }
+
+    @Override
+    public void editTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(taskId);
+        mTaskDetailView.showEditTask(mTaskId);
     }
 
     @Override
-    public void deleteTask(@Nullable String taskId) {
-        mTasksRepository.deleteTask(taskId);
+    public void deleteTask() {
+        mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
-    public void completeTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void completeTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(taskId);
+        mTasksRepository.completeTask(mTaskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
-    public void activateTask(@Nullable String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void activateTask() {
+        if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(taskId);
+        mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
@@ -117,7 +119,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
             mTaskDetailView.showDescription(description);
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
-        mTaskDetailView.setProgressIndicator(false);
+        mTaskDetailView.setLoadingIndicator(false);
     }
 
     @Override
@@ -125,7 +127,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
         if (mTaskId == null) {
             return null;
         }
-        mTaskDetailView.setProgressIndicator(true);
+        mTaskDetailView.setLoadingIndicator(true);
         return mTaskLoader;
     }
 
@@ -140,6 +142,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
 
     @Override
     public void onLoaderReset(Loader<Task> loader) {
-
+        // no-op
     }
+
 }

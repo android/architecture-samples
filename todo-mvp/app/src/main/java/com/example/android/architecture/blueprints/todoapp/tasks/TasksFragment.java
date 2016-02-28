@@ -90,7 +90,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mPresenter.resume();
     }
 
-    @Override
     public void setPresenter(@NonNull TasksContract.Presenter listener) {
         mPresenter = checkNotNull(listener);
     }
