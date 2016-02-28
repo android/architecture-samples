@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -23,14 +24,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoad
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.collect.Lists;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -61,6 +62,9 @@ public class TasksPresenterTest {
     @Mock
     private TasksLoader mTasksLoader;
 
+    @Mock
+    private LoaderManager mLoaderManager;
+
     private TasksPresenter mTasksPresenter;
 
     @Before
@@ -70,11 +74,12 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksLoader, mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+                                   new Task("Title2", "Description2", true), new Task("Title3", "Description3", true)
+        );
     }
 
     @Test

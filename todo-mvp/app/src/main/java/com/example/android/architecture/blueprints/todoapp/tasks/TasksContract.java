@@ -60,14 +60,14 @@ public interface TasksContract {
 
         void showSuccessfullySavedMessage();
 
-        void setPresenter(Presenter listener);
-
         boolean isActive();
 
         void showFilteringPopUpMenu();
     }
 
     interface Presenter extends BasePresenter {
+
+        void result(int requestCode, int resultCode);
 
         void loadTasks(boolean forceUpdate);
 

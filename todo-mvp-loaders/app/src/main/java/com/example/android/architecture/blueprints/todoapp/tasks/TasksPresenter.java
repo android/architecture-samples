@@ -65,6 +65,7 @@ public class TasksPresenter implements TasksContract.Presenter,
         mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+
     }
 
     @Override

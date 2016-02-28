@@ -65,6 +65,8 @@ public interface TasksContract {
 
     interface Presenter extends BasePresenter {
 
+        void result(int requestCode, int resultCode);
+
         void loadTasks(boolean forceUpdate);
 
         void addNewTask();

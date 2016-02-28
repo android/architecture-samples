@@ -31,7 +31,6 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
@@ -46,11 +45,9 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(
-            @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-        tasksView.setPresenter(this);
     }
 
     @Override
@@ -79,7 +76,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
@@ -107,7 +104,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                 }
 
                 // We filter the tasks based on the requestType
-                for (Task task: tasks) {
+                for (Task task : tasks) {
                     switch (mCurrentFiltering) {
                         case ALL_TASKS:
                             tasksToShow.add(task);
@@ -135,7 +132,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     mTasksView.setLoadingIndicator(false);
                 }
 
-               processTasks(tasksToShow);
+                processTasks(tasksToShow);
             }
 
             @Override
@@ -227,7 +224,7 @@ public class TasksPresenter implements TasksContract.Presenter {
      * Sets the current task filtering type.
      *
      * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
-     * {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
     public void setFiltering(TasksFilterType requestType) {

@@ -81,6 +81,8 @@ public class TasksActivity extends AppCompatActivity {
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             mTasksPresenter.setFiltering(currentFiltering);
         }
+
+        tasksFragment.setPresenter(mTasksPresenter);
     }
 
     @Override
