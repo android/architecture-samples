@@ -49,7 +49,7 @@ public class TasksPresenter implements TasksContract.Presenter {
             @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-        tasksView.setActionListener(this);
+        tasksView.setPresenter(this);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class TasksPresenter implements TasksContract.Presenter {
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setProgressIndicator(true);
+            mTasksView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
@@ -131,7 +131,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     return;
                 }
                 if (showLoadingUI) {
-                    mTasksView.setProgressIndicator(false);
+                    mTasksView.setLoadingIndicator(false);
                 }
 
                processTasks(tasksToShow);

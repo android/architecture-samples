@@ -54,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
 
-    private TasksPresenter mTasksPresenter;
+    private TasksContract.Presenter mPresenter;
 
     private TasksAdapter mListAdapter;
 
@@ -87,16 +87,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.resume();
+        mPresenter.resume();
     }
 
     public void setPresenter(@NonNull TasksPresenter presenter) {
-        mTasksPresenter = checkNotNull(presenter);
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mTasksPresenter.result(requestCode, resultCode);
+        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -131,7 +131,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTasksPresenter.addNewTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -161,7 +161,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mTasksPresenter.clearCompletedTasks();
+                mPresenter.clearCompletedTasks();
                 return true;
             case R.id.menu_filter:
                 showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
@@ -187,16 +187,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mTasksPresenter.loadTasks(false);
+                mPresenter.loadTasks(false);
                 return true;
             }
         });
@@ -210,22 +210,22 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mTasksPresenter.openTaskDetails(clickedTask);
+            mPresenter.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mTasksPresenter.completeTask(completedTask);
+            mPresenter.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mTasksPresenter.activateTask(activatedTask);
+            mPresenter.activateTask(activatedTask);
         }
     };
 
     @Override
-    public void setProgressIndicator(final boolean active) {
+    public void setLoadingIndicator(final boolean active) {
 
         if (getView() == null) {
             return;
@@ -346,7 +346,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     private void loadTasks(boolean forceUpdate) {
-        mTasksPresenter.loadTasks(forceUpdate);
+        mPresenter.loadTasks(forceUpdate);
     }
 
     private static class TasksAdapter extends BaseAdapter {

@@ -91,7 +91,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setActionListener(@NonNull TasksContract.Presenter listener) {
+    public void setPresenter(@NonNull TasksContract.Presenter listener) {
         mPresenter = checkNotNull(listener);
     }
 
@@ -232,7 +232,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     };
 
     @Override
-    public void setProgressIndicator(final boolean active) {
+    public void setLoadingIndicator(final boolean active) {
 
         if (getView() == null) {
             return;

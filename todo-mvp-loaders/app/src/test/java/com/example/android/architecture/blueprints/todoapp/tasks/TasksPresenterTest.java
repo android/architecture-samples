@@ -84,7 +84,7 @@ public class TasksPresenterTest {
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and all tasks are shown in UI
-        verify(mTasksView).setProgressIndicator(false);
+        verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
         assertThat(mShowTasksArgumentCaptor.getValue().size(), is(3));
     }
@@ -96,7 +96,7 @@ public class TasksPresenterTest {
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and active tasks are shown in UI
-        verify(mTasksView).setProgressIndicator(false);
+        verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
         assertThat(mShowTasksArgumentCaptor.getValue().size(), is(1));
     }
@@ -108,7 +108,7 @@ public class TasksPresenterTest {
         mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
-        verify(mTasksView).setProgressIndicator(false);
+        verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
         assertThat(mShowTasksArgumentCaptor.getValue().size(), is(2));
     }

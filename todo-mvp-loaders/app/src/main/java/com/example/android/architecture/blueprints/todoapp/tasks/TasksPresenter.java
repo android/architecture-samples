@@ -86,13 +86,13 @@ public class TasksPresenter implements TasksContract.Presenter,
 
     @Override
     public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-        mTasksView.setProgressIndicator(true);
+        mTasksView.setLoadingIndicator(true);
         return mLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-        mTasksView.setProgressIndicator(false);
+        mTasksView.setLoadingIndicator(false);
 
         mCurrentTasks = data;
         if (mCurrentTasks == null) {

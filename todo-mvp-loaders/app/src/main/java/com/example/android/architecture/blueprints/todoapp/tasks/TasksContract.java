@@ -30,7 +30,7 @@ public interface TasksContract {
 
     interface View {
 
-        void setProgressIndicator(boolean active);
+        void setLoadingIndicator(boolean active);
 
         void showTasks(List<Task> tasks);
 
