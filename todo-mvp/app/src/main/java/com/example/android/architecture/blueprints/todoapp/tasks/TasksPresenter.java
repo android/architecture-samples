@@ -221,7 +221,8 @@ public class TasksPresenter implements TasksContract.Presenter {
      * Sets the current task filtering type.
      *
      * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
-     *                    {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or
+     *                    {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
     public void setFiltering(TasksFilterType requestType) {

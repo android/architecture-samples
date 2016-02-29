@@ -389,10 +389,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             completeCB.setChecked(task.isCompleted());
             if (task.isCompleted()) {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                                                      .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
             } else {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                                                      .getResources().getDrawable(R.drawable.touch_feedback));
+                        .getResources().getDrawable(R.drawable.touch_feedback));
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {
