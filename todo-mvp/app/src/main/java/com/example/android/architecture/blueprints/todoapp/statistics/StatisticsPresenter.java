@@ -77,7 +77,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                         activeTasks += 1;
                     }
                 }
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;
                 }
@@ -88,7 +88,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
             @Override
             public void onDataNotAvailable() {
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;
                 }

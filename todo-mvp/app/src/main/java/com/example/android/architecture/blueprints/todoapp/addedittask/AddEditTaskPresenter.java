@@ -66,7 +66,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void onTaskLoaded(Task task) {
-        // The View may not be on screen anymore when this callback is returned
+        // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
@@ -75,7 +75,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void onDataNotAvailable() {
-        // The View may not be on screen anymore when this callback is returned
+        // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
