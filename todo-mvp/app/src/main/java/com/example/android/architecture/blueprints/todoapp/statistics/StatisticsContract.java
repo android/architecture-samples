@@ -17,13 +17,14 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import com.example.android.architecture.blueprints.todoapp.util.BasePresenter;
+import com.example.android.architecture.blueprints.todoapp.util.BaseView;
 
 /**
  * This specifies the contract between the view and the presenter.
  */
 public interface StatisticsContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
         void setProgressIndicator(boolean active);
 

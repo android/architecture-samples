@@ -67,7 +67,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.resume();
+        mPresenter.start();
     }
 
     @Nullable

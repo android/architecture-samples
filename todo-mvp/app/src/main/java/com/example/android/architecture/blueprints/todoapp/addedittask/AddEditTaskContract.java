@@ -31,12 +31,10 @@ public interface AddEditTaskContract {
 
         void setDescription(String description);
 
-        void setActionListener(UserActionsListener listener);
-
         boolean isActive();
     }
 
-    interface UserActionsListener {
+    interface Presenter {
 
         void createTask(String title, String description);
 

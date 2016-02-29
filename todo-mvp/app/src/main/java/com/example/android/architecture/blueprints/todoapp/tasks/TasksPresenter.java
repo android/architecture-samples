@@ -51,7 +51,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void resume() {
+    public void start() {
         loadTasks(false);
     }
 

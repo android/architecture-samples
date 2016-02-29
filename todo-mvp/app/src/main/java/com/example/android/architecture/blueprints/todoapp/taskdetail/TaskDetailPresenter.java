@@ -48,7 +48,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     @Override
-    public void resume() {
+    public void start() {
         openTask();
     }
 

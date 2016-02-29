@@ -42,8 +42,9 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         return new StatisticsFragment();
     }
 
-    public void setPresenter(@NonNull StatisticsContract.Presenter listener) {
-        mPresenter = checkNotNull(listener);
+    @Override
+    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -58,7 +59,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.resume();
+        mPresenter.start();
     }
 
     @Override
@@ -91,4 +92,5 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public boolean isActive() {
         return isAdded();
     }
+
 }

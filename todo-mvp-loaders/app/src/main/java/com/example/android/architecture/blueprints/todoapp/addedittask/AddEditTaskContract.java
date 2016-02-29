@@ -32,7 +32,7 @@ public interface AddEditTaskContract {
         void setDescription(String description);
     }
 
-    interface UserActionsListener {
+    interface Presenter {
 
         void createTask(String title, String description);
 

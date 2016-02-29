@@ -1,7 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.util;
 
-public interface BasePresenter {
+public interface BaseView<T> {
 
-    void start();
+    void setPresenter(T presenter);
 
 }

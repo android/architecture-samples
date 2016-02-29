@@ -87,7 +87,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.resume();
+        mPresenter.start();
     }
 
     public void setPresenter(@NonNull TasksContract.Presenter listener) {
