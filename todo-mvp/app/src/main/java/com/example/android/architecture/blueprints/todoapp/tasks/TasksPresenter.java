@@ -106,7 +106,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
                             break;
                     }
                 }
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mTasksView.isActive()) {
                     return;
                 }
@@ -119,7 +119,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
 
             @Override
             public void onDataNotAvailable() {
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mTasksView.isActive()) {
                     return;
                 }

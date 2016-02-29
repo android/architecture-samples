@@ -53,7 +53,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
         mTasksRepository.getTask(taskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mTaskDetailView.isActive()) {
                     return;
                 }
@@ -67,7 +67,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
 
             @Override
             public void onDataNotAvailable() {
-                // The View may not be on screen anymore when this callback is returned
+                // The view may not be able to handle UI updates anymore
                 if (!mTaskDetailView.isActive()) {
                     return;
                 }
