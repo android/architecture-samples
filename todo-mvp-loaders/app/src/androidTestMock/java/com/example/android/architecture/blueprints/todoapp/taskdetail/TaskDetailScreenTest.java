@@ -133,7 +133,7 @@ public class TaskDetailScreenTest {
         // Check delete menu item is displayed and is unique
         onView(withId(R.id.menu_delete)).check(matches(isDisplayed()));
 
-        TestUtils.rotateToLandscape(mTaskDetailActivityTestRule);
+        TestUtils.rotateOrientation(mTaskDetailActivityTestRule);
 
         onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));
         onView(withId(R.id.task_detail_description)).check(matches(withText(TASK_DESCRIPTION)));

@@ -90,13 +90,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mPresenter.start();
     }
 
-    public void setPresenter(@NonNull TasksContract.Presenter listener) {
-        mPresenter = checkNotNull(listener);
-    }
-
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override

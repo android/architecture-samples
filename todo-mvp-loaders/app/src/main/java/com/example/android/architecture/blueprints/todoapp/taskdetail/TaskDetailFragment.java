@@ -67,7 +67,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.resume();
+        mPresenter.start();
     }
 
     @Nullable
@@ -94,7 +94,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return root;
     }
 
-    public void setPresenter(@NonNull TaskDetailPresenter presenter) {
+    @Override
+    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
 

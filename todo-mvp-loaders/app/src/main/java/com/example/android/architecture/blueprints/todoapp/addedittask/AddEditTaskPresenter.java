@@ -35,6 +35,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         LoaderManager.LoaderCallbacks<Task> {
 
+    private static final int TASK_QUERY = 2;
+
     @NonNull
     private TasksDataSource mTasksRepository;
 
@@ -46,25 +48,23 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     private TaskLoader mTaskLoader;
 
-    private int TASK_QUERY = 2;
+    private final LoaderManager mLoaderManager;
 
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader) {
+            @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
+            @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
         mTaskLoader = checkNotNull(taskLoader);
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
+
+        mAddTaskView.setPresenter(this);
     }
 
-    /**
-     * This starts the {@link LoaderManager}, querying the task. It returns the AddEditTaskPresenter
-     * so it can be chained with the constructor. This isn't called from the constructor to enable
-     * writing unit tests for the non loader methods in the AddEditTaskPresenter (creating an
-     * instance from a unit test would fail if this method were called from it).
-     */
-    public AddEditTaskPresenter startLoader(AddEditTaskFragment fragment) {
-        fragment.getLoaderManager().initLoader(TASK_QUERY, null, this);
-        return this;
+    @Override
+    public void start() {
+        mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 
     @Override

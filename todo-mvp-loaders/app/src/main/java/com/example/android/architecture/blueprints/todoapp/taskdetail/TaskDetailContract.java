@@ -16,14 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import com.example.android.architecture.blueprints.todoapp.util.BasePresenter;
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
+import com.example.android.architecture.blueprints.todoapp.BaseView;
 
 /**
  * This specifies the contract between the view and the presenter.
  */
 public interface TaskDetailContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
         void setLoadingIndicator(boolean active);
 

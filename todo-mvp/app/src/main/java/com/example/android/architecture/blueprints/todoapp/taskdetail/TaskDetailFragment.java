@@ -95,8 +95,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void setPresenter(@NonNull TaskDetailContract.Presenter listener) {
-        mPresenter = checkNotNull(listener);
+    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override

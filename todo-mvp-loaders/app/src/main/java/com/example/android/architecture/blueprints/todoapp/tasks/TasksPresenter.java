@@ -66,6 +66,7 @@ public class TasksPresenter implements TasksContract.Presenter,
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
 
+        mTasksView.setPresenter(this);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class TasksPresenter implements TasksContract.Presenter,
     }
 
     @Override
-    public void resume() {
+    public void start() {
         mLoaderManager.initLoader(TASKS_QUERY, null, this);
     }
 

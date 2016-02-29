@@ -87,10 +87,11 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.resume();
+        mPresenter.start();
     }
 
-    public void setPresenter(@NonNull TasksPresenter presenter) {
+    @Override
+    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
 
@@ -379,10 +380,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             completeCB.setChecked(task.isCompleted());
             if (task.isCompleted()) {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                                                      .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
             } else {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                                                      .getResources().getDrawable(R.drawable.touch_feedback));
+                        .getResources().getDrawable(R.drawable.touch_feedback));
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {

@@ -26,12 +26,12 @@ import android.support.test.rule.ActivityTestRule;
  */
 public class TestUtils {
 
-    public static void rotateToLandscape(ActivityTestRule<? extends Activity> activityTestRule) {
+    private static void rotateToLandscape(ActivityTestRule<? extends Activity> activityTestRule) {
         activityTestRule.getActivity()
                 .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
-    public static void rotateToPortrait(ActivityTestRule<? extends Activity> activityTestRule) {
+    private static void rotateToPortrait(ActivityTestRule<? extends Activity> activityTestRule) {
         activityTestRule.getActivity()
                 .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }

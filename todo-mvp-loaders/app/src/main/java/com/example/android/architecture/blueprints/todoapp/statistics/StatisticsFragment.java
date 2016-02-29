@@ -36,14 +36,15 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
-    private StatisticsPresenter mTasksPresenter;
+    private StatisticsContract.Presenter mPresenter;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
-    public void setPresenter(@NonNull StatisticsPresenter presenter) {
-        mTasksPresenter = checkNotNull(presenter);
+    @Override
+    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -58,7 +59,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.resume();
+        mPresenter.start();
     }
 
     @Override

@@ -48,10 +48,12 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
         mTasksLoader = checkNotNull(tasksLoader, "tasksLoader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
+
+        mStatisticsView.setPresenter(this);
     }
 
     @Override
-    public void resume() {
+    public void start() {
         mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 

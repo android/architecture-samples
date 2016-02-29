@@ -58,10 +58,12 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
+
+        mTaskDetailView.setPresenter(this);
     }
 
     @Override
-    public void resume() {
+    public void start() {
         openTask();
     }
 

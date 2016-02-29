@@ -18,8 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.util.BasePresenter;
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public interface TasksContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
         void setLoadingIndicator(boolean active);
 

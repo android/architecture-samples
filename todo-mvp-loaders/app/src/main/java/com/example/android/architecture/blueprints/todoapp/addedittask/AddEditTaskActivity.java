@@ -72,13 +72,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         // Create the loader and presenter
         TaskLoader taskLoader = new TaskLoader(taskId, getApplicationContext());
-        AddEditTaskPresenter addEditTaskPresenter = new AddEditTaskPresenter(
+        new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 addEditTaskFragment,
-                taskLoader);
-
-        addEditTaskFragment.setPresenter(addEditTaskPresenter);
+                taskLoader,
+                getSupportLoaderManager());
     }
 
     @Override

@@ -377,7 +377,7 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(isDisplayed()));
 
         // when rotating the screen
-        TestUtils.rotateToLandscape(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule);
 
         // then nothing changes
         onView(withText(TITLE1)).check(matches(isDisplayed()));

@@ -81,13 +81,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
                 if (isNewTask()) {
                     mPresenter.createTask(
                             mTitle.getText().toString(),
-                            mDescription.getText().toString()
-                    );
+                            mDescription.getText().toString());
                 } else {
                     mPresenter.updateTask(
                             mTitle.getText().toString(),
-                            mDescription.getText().toString()
-                    );
+                            mDescription.getText().toString());
                 }
 
             }
