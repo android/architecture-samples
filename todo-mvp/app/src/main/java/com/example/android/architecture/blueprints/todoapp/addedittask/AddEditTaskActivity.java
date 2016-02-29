@@ -50,11 +50,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
+        String taskId = null;
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                String taskId = getIntent().getStringExtra(
+                taskId = getIntent().getStringExtra(
                         AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
@@ -69,9 +70,10 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        AddEditTaskPresenter addEditTaskPresenter = new AddEditTaskPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), addEditTaskFragment);
-        addEditTaskFragment.setPresenter(addEditTaskPresenter);
+        new AddEditTaskPresenter(
+                taskId,
+                Injection.provideTasksRepository(getApplicationContext()),
+                addEditTaskFragment);
     }
 
     @Override

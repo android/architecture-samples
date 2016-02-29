@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -36,10 +37,30 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
-    public AddEditTaskPresenter(@NonNull TasksDataSource tasksRepository,
+    @Nullable
+    private String mTaskId;
+
+    /**
+     * Creates a presenter for the add/edit view.
+     *
+     * @param taskId ID of the task to edit or null for a new task
+     * @param tasksRepository a repository of data for tasks
+     * @param addTaskView the add/edit view
+     */
+    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
             @NonNull AddEditTaskContract.View addTaskView) {
+        mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
+
+        mAddTaskView.setPresenter(this);
+    }
+
+    @Override
+    public void start() {
+        if (mTaskId != null) {
+            populateTask();
+        }
     }
 
     @Override
@@ -54,14 +75,20 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void updateTask(String taskId, String title, String description) {
-        mTasksRepository.saveTask(new Task(title, description, taskId));
+    public void updateTask(String title, String description) {
+        if (mTaskId == null) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        mTasksRepository.saveTask(new Task(title, description, mTaskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
     @Override
-    public void populateTask(String taskId) {
-        mTasksRepository.getTask(taskId, this);
+    public void populateTask() {
+        if (mTaskId == null) {
+            throw new RuntimeException("populateTask() was called but task is new.");
+        }
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override

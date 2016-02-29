@@ -44,6 +44,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
+
         mTaskDetailView.setPresenter(this);
     }
 

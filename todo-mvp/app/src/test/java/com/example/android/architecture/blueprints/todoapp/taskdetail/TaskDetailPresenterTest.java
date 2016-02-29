@@ -68,8 +68,6 @@ public class TaskDetailPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        // Get a reference to the class under test
-
         // The presenter won't update the view unless it's active.
         when(mTaskDetailView.isActive()).thenReturn(true);
     }

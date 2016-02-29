@@ -42,6 +42,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
 
+        mStatisticsView.setPresenter(this);
     }
 
     @Override
