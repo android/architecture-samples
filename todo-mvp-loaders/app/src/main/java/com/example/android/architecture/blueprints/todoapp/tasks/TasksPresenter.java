@@ -265,5 +265,4 @@ public class TasksPresenter implements TasksContract.Presenter,
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
     }
-
 }

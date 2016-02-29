@@ -72,7 +72,8 @@ public class TaskDetailPresenterTest {
 
         // Get a reference to the class under test
         mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader,
+                mLoaderManager);
         mTaskDetailPresenter.onLoadFinished(mock(Loader.class), ACTIVE_TASK);
 
         // Then progress indicator is hidden and title, description and completion status are shown
@@ -85,8 +86,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
         // When tasks presenter is asked to open a completed task
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(COMPLETED_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.onLoadFinished(mock(Loader.class), COMPLETED_TASK);
 
         // Then progress indicator is hidden and title, description and completion status are shown
@@ -100,8 +101,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void getUnknownTaskFromRepositoryAndLoadIntoView() {
         // When loading of an ACTIVE_TASK is requested with an invalid task
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(INVALID_TASK_ID, mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.onLoadFinished(mock(Loader.class), null);
 
         // Then progress indicator is hidden and missing ACTIVE_TASK UI is shown
@@ -111,8 +112,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void deleteTask() {
         // When the deletion of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.deleteTask();
 
         // Then the repository and the view are notified
@@ -123,8 +124,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void completeTask() {
         // When the presenter is asked to complete the ACTIVE_TASK
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.completeTask();
 
         // Then a request is sent to the repository and the UI is updated
@@ -135,8 +136,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void activateTask() {
         // When the presenter is asked to activate the ACTIVE_TASK
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.activateTask();
 
         // Then a request is sent to the repository and the UI is updated
@@ -147,8 +148,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void activeTaskIsShownWhenEditing() {
         // When the edit of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.editTask();
 
         // Then the view is notified
@@ -158,8 +159,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void invalidTaskIsNotShownWhenEditing() {
         // When the edit of an invalid task id is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter = new TaskDetailPresenter(INVALID_TASK_ID, mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.editTask();
 
         // Then the edit mode is never started

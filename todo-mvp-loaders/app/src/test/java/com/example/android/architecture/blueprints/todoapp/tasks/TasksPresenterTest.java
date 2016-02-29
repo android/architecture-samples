@@ -74,11 +74,13 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(
+                mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                                   new Task("Title2", "Description2", true), new Task("Title3", "Description3", true)
+                new Task("Title2", "Description2", true),
+                new Task("Title3", "Description3", true)
         );
     }
 

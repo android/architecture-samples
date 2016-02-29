@@ -138,5 +138,4 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
     }
-
 }

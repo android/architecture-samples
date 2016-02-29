@@ -97,5 +97,4 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
             }
         });
     }
-
 }

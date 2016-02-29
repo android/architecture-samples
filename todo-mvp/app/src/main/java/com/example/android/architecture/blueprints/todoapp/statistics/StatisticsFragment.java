@@ -92,5 +92,4 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public boolean isActive() {
         return isAdded();
     }
-
 }

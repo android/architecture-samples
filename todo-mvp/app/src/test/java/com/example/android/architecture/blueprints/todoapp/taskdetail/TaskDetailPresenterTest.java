@@ -75,7 +75,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void getActiveTaskFromRepositoryAndLoadIntoView() {
         // When tasks presenter is asked to open a task
-        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
@@ -95,11 +96,13 @@ public class TaskDetailPresenterTest {
 
     @Test
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
-        mTaskDetailPresenter = new TaskDetailPresenter(COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(mTasksRepository).getTask(eq(COMPLETED_TASK.getId()), mGetTaskCallbackCaptor.capture());
+        verify(mTasksRepository).getTask(
+                eq(COMPLETED_TASK.getId()), mGetTaskCallbackCaptor.capture());
         verify(mTaskDetailView).setLoadingIndicator(true);
 
         // When task is finally loaded
@@ -116,7 +119,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void getUnknownTaskFromRepositoryAndLoadIntoView() {
         // When loading of a task is requested with an invalid task ID.
-        mTaskDetailPresenter = new TaskDetailPresenter(INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
         verify(mTaskDetailView).showMissingTask();
     }
@@ -127,7 +131,8 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
 
         // When the deletion of a task is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                task.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.deleteTask();
 
         // Then the repository and the view are notified
@@ -139,7 +144,8 @@ public class TaskDetailPresenterTest {
     public void completeTask() {
         // Given an initialized presenter with an active task
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
-        mTaskDetailPresenter = new TaskDetailPresenter(task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                task.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
 
         // When the presenter is asked to complete the task
@@ -154,7 +160,8 @@ public class TaskDetailPresenterTest {
     public void activateTask() {
         // Given an initialized presenter with a completed task
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
-        mTaskDetailPresenter = new TaskDetailPresenter(task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                task.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
 
         // When the presenter is asked to activate the task

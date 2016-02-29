@@ -58,7 +58,8 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mStatisticsView, mTasksLoader, mLoaderManager);
+        mStatisticsPresenter = new StatisticsPresenter(
+                mStatisticsView, mTasksLoader, mLoaderManager);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
