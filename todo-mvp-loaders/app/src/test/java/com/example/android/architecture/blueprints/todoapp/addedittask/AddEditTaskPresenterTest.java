@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -49,6 +50,9 @@ public class AddEditTaskPresenterTest {
     @Mock
     private TaskLoader mTaskLoader;
 
+    @Mock
+    private LoaderManager mLoaderManager;
+
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -66,7 +70,7 @@ public class AddEditTaskPresenterTest {
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,
-                mTaskLoader);
+                mTaskLoader, mLoaderManager);
     }
 
     @Test

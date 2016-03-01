@@ -36,15 +36,15 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.UserActionsListener mUserActionsListener;
+    private StatisticsContract.Presenter mPresenter;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
     @Override
-    public void setActionListener(@NonNull StatisticsContract.UserActionsListener listener) {
-        mUserActionsListener = checkNotNull(listener);
+    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -59,7 +59,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mUserActionsListener.loadStatistics();
+        mPresenter.start();
     }
 
     @Override

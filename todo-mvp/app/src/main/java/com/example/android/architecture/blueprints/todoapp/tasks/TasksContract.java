@@ -18,7 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 
@@ -27,9 +29,9 @@ import java.util.List;
  */
 public interface TasksContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
-        void setProgressIndicator(boolean active);
+        void setLoadingIndicator(boolean active);
 
         void showTasks(List<Task> tasks);
 
@@ -57,12 +59,16 @@ public interface TasksContract {
 
         void showNoCompletedTasks();
 
-        void setActionListener(UserActionsListener listener);
+        void showSuccessfullySavedMessage();
 
         boolean isActive();
+
+        void showFilteringPopUpMenu();
     }
 
-    interface UserActionsListener {
+    interface Presenter extends BasePresenter {
+
+        void result(int requestCode, int resultCode);
 
         void loadTasks(boolean forceUpdate);
 

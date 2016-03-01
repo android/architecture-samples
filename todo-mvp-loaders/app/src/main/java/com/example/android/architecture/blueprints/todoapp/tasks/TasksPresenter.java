@@ -16,12 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
@@ -32,13 +34,12 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
-public class TasksPresenter implements TasksContract.UserActionsListener,
+public class TasksPresenter implements TasksContract.Presenter,
         LoaderManager.LoaderCallbacks<List<Task>> {
 
     private final static int TASKS_QUERY = 1;
@@ -49,39 +50,46 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
     private final TasksLoader mLoader;
 
+    private final LoaderManager mLoaderManager;
+
     private List<Task> mCurrentTasks;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull TasksLoader loader, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksLoader loader, @NonNull LoaderManager loaderManager,
+                          @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+        mLoader = checkNotNull(loader, "loader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-        mLoader = checkNotNull(loader, "loader cannot be null!");
+
+        mTasksView.setPresenter(this);
     }
 
-    /**
-     * This starts the {@link LoaderManager}, querying the list of tasks. It returns the
-     * TasksPresenter so it can be chained with the constructor. This isn't called from the
-     * constructor to enable writing unit tests for the non loader methods in the TasksPresenter
-     * (creating an instance from a unit test would fail if this method were called from it).
-     */
-    public TasksPresenter startLoader(TasksFragment fragment) {
-        fragment.getLoaderManager().initLoader(TASKS_QUERY, null, this);
-        return this;
+    @Override
+    public void result(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+            mTasksView.showSuccessfullySavedMessage();
+        }
+    }
+
+    @Override
+    public void start() {
+        mLoaderManager.initLoader(TASKS_QUERY, null, this);
     }
 
     @Override
     public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-        mTasksView.setProgressIndicator(true);
+        mTasksView.setLoadingIndicator(true);
         return mLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
-        mTasksView.setProgressIndicator(false);
+        mTasksView.setLoadingIndicator(false);
 
         mCurrentTasks = data;
         if (mCurrentTasks == null) {
@@ -118,7 +126,6 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
 
         processTasks(tasksToDisplay);
     }
-
 
     @Override
     public void onLoaderReset(Loader<List<Task>> loader) {
@@ -193,6 +200,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
+        loadTasks(false);
     }
 
     @Override
@@ -200,19 +208,21 @@ public class TasksPresenter implements TasksContract.UserActionsListener,
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
+        loadTasks(false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
+        loadTasks(false);
     }
 
     /**
      * Sets the current task filtering type.
      *
      * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
-     * {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
     public void setFiltering(TasksFilterType requestType) {

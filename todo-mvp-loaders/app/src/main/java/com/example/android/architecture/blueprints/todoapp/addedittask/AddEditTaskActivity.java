@@ -34,6 +34,8 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
+    public static final int REQUEST_ADD_TASK = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +48,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment =
-                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
 
         String taskId = null;
         if (addEditTaskFragment == null) {
@@ -70,13 +72,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         // Create the loader and presenter
         TaskLoader taskLoader = new TaskLoader(taskId, getApplicationContext());
-        AddEditTaskPresenter addEditTaskPresenter = new AddEditTaskPresenter(
+        new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 addEditTaskFragment,
-                taskLoader);
-
-        addEditTaskFragment.setPresenter(addEditTaskPresenter);
+                taskLoader,
+                getSupportLoaderManager());
     }
 
     @Override

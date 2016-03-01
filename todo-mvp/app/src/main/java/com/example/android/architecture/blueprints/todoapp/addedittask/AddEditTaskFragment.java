@@ -39,7 +39,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.UserActionsListener mActionListener;
+    private AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
@@ -58,14 +58,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        if (!isNewTask()) {
-            mActionListener.populateTask(mEditedTaskId);
-        }
+        mPresenter.start();
     }
 
     @Override
-    public void setActionListener(@NonNull AddEditTaskContract.UserActionsListener listener) {
-        mActionListener = checkNotNull(listener);
+    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
@@ -81,12 +79,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
             @Override
             public void onClick(View v) {
                 if (isNewTask()) {
-                    mActionListener.createTask(
+                    mPresenter.createTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 } else {
-                    mActionListener.updateTask(
-                            getArguments().getString(ARGUMENT_EDIT_TASK_ID),
+                    mPresenter.updateTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 }
@@ -133,7 +130,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public boolean isActive() {
         return isAdded();
     }
-
 
     private void setTaskIdIfAny() {
         if (getArguments() != null && getArguments().containsKey(ARGUMENT_EDIT_TASK_ID)) {

@@ -16,8 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -28,12 +31,11 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
  */
-public class TasksPresenter implements TasksContract.UserActionsListener {
+public class TasksPresenter implements TasksContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
@@ -43,11 +45,24 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(
-            @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-        tasksView.setActionListener(this);
+
+        mTasksView.setPresenter(this);
+    }
+
+    @Override
+    public void start() {
+        loadTasks(false);
+    }
+
+    @Override
+    public void result(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+            mTasksView.showSuccessfullySavedMessage();
+        }
     }
 
     @Override
@@ -58,12 +73,12 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
     }
 
     /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setProgressIndicator(true);
+            mTasksView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
@@ -86,7 +101,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
                 }
 
                 // We filter the tasks based on the requestType
-                for (Task task: tasks) {
+                for (Task task : tasks) {
                     switch (mCurrentFiltering) {
                         case ALL_TASKS:
                             tasksToShow.add(task);
@@ -111,10 +126,10 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
                     return;
                 }
                 if (showLoadingUI) {
-                    mTasksView.setProgressIndicator(false);
+                    mTasksView.setLoadingIndicator(false);
                 }
 
-               processTasks(tasksToShow);
+                processTasks(tasksToShow);
             }
 
             @Override
@@ -184,6 +199,7 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
+        loadTasks(false);
     }
 
     @Override
@@ -191,19 +207,22 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
+        loadTasks(false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
+        loadTasks(false);
     }
 
     /**
      * Sets the current task filtering type.
      *
      * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
-     * {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or
+     *                    {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
     public void setFiltering(TasksFilterType requestType) {
@@ -214,4 +233,5 @@ public class TasksPresenter implements TasksContract.UserActionsListener {
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
     }
+
 }

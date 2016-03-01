@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements LoaderManager.LoaderCallbacks<List<Task>> {
+public class StatisticsPresenter implements StatisticsContract.Presenter, LoaderManager.LoaderCallbacks<List<Task>> {
 
     private static final int TASK_QUERY = 3;
 
@@ -40,22 +40,21 @@ public class StatisticsPresenter implements LoaderManager.LoaderCallbacks<List<T
 
     private TasksLoader mTasksLoader;
 
+    private LoaderManager mLoaderManager;
+
     public StatisticsPresenter(@NonNull StatisticsContract.View statisticsView,
-                               @NonNull TasksLoader tasksLoader) {
+                               @NonNull TasksLoader tasksLoader,
+                               @NonNull LoaderManager loaderManager) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
         mTasksLoader = checkNotNull(tasksLoader, "tasksLoader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
+
+        mStatisticsView.setPresenter(this);
     }
 
-    /**
-     * This starts the {@link LoaderManager}, querying the list of tasks. It returns the
-     * StatisticsPresenter so it can be chained with the constructor. This isn't called from the
-     * constructor to enable writing unit tests for the non loader methods in the
-     * StatisticsPresenter (creating an instance from a unit test would fail if this method were
-     * called from it).
-     */
-    public StatisticsPresenter startLoader(StatisticsFragment fragment) {
-        fragment.getLoaderManager().initLoader(TASK_QUERY, null, this);
-        return this;
+    @Override
+    public void start() {
+        mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 
     @Override
@@ -75,7 +74,6 @@ public class StatisticsPresenter implements LoaderManager.LoaderCallbacks<List<T
     }
 
     private void loadStatistics(List<Task> tasks) {
-
         if (tasks == null) {
             mStatisticsView.showLoadingStatisticsError();
         } else {
@@ -96,4 +94,5 @@ public class StatisticsPresenter implements LoaderManager.LoaderCallbacks<List<T
             mStatisticsView.showStatistics(activeTasks, completedTasks);
         }
     }
+
 }

@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.UserActionsListener {
+public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
@@ -41,11 +41,16 @@ public class StatisticsPresenter implements StatisticsContract.UserActionsListen
                                @NonNull StatisticsContract.View statisticsView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mStatisticsView.setActionListener(this);
+
+        mStatisticsView.setPresenter(this);
     }
 
     @Override
-    public void loadStatistics() {
+    public void start() {
+        loadStatistics();
+    }
+
+    private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows

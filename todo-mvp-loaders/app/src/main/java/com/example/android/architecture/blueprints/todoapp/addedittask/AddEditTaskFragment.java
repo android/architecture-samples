@@ -39,7 +39,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskPresenter mTasksPresenter;
+    private AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
@@ -58,11 +58,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.startLoader(this);
+        mPresenter.start();
     }
 
-    public void setPresenter(@NonNull AddEditTaskPresenter presenter) {
-        mTasksPresenter = checkNotNull(presenter);
+    @Override
+    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
@@ -78,11 +79,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
             @Override
             public void onClick(View v) {
                 if (isNewTask()) {
-                    mTasksPresenter.createTask(
+                    mPresenter.createTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 } else {
-                    mTasksPresenter.updateTask(
+                    mPresenter.updateTask(
                             mEditedTaskId,
                             mTitle.getText().toString(),
                             mDescription.getText().toString());

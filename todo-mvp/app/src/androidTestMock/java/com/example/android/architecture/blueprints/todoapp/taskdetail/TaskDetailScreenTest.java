@@ -127,13 +127,17 @@ public class TaskDetailScreenTest {
     }
 
     @Test
-    public void orientationChange_menuPersists() {
+    public void orientationChange_menuAndTaskPersist() {
         loadActiveTask();
 
         // Check delete menu item is displayed and is unique
         onView(withId(R.id.menu_delete)).check(matches(isDisplayed()));
 
-        TestUtils.rotateToLandscape(mTaskDetailActivityTestRule);
+        TestUtils.rotateOrientation(mTaskDetailActivityTestRule);
+
+        // Check that the task is shown
+        onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));
+        onView(withId(R.id.task_detail_description)).check(matches(withText(TASK_DESCRIPTION)));
 
         // Check delete menu item is displayed and is unique
         onView(withId(R.id.menu_delete)).check(matches(isDisplayed()));

@@ -33,6 +33,8 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
+    public static final int REQUEST_ADD_TASK = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +50,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
+        String taskId = null;
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                String taskId = getIntent().getStringExtra(
+                taskId = getIntent().getStringExtra(
                         AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
@@ -68,7 +71,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         // Create the presenter
         new AddEditTaskPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), addEditTaskFragment);
+                taskId,
+                Injection.provideTasksRepository(getApplicationContext()),
+                addEditTaskFragment);
     }
 
     @Override

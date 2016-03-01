@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -55,9 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksFragment extends Fragment implements TasksContract.View {
 
-    private static final int REQUEST_ADD_TASK = 1;
-
-    private TasksContract.UserActionsListener mUserActionsListener;
+    private TasksContract.Presenter mPresenter;
 
     private TasksAdapter mListAdapter;
 
@@ -90,26 +87,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mUserActionsListener.loadTasks(false);
+        mPresenter.start();
     }
 
     @Override
-    public void setActionListener(@NonNull TasksContract.UserActionsListener listener) {
-        mUserActionsListener = checkNotNull(listener);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If a task was successfully added, show snackbar
-        if (REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
-            Snackbar.make(getView(), getString(R.string.successfully_saved_task_message),
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -144,7 +132,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mUserActionsListener.addNewTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -154,14 +142,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
-                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
+                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
+        );
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadTasks(true);
+                mPresenter.loadTasks(false);
             }
         });
 
@@ -174,16 +163,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mUserActionsListener.clearCompletedTasks();
-                return true;
+                mPresenter.clearCompletedTasks();
+                break;
             case R.id.menu_filter:
-                showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
-                return true;
+                showFilteringPopUpMenu();
+                break;
             case R.id.menu_refresh:
-                loadTasks(true);
-                return true;
+                mPresenter.loadTasks(true);
+                break;
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -192,24 +181,25 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void showFilteringPopUpMenu(View viewToAttachPopUpMenu) {
-        PopupMenu popup = new PopupMenu(getContext(), viewToAttachPopUpMenu);
+    @Override
+    public void showFilteringPopUpMenu() {
+        PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mUserActionsListener.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mUserActionsListener.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mUserActionsListener.setFiltering(TasksFilterType.ALL_TASKS);
+                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mUserActionsListener.loadTasks(false);
+                mPresenter.loadTasks(false);
                 return true;
             }
         });
@@ -223,22 +213,22 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mUserActionsListener.openTaskDetails(clickedTask);
+            mPresenter.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mUserActionsListener.completeTask(completedTask);
+            mPresenter.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mUserActionsListener.activateTask(activatedTask);
+            mPresenter.activateTask(activatedTask);
         }
     };
 
     @Override
-    public void setProgressIndicator(final boolean active) {
+    public void setLoadingIndicator(final boolean active) {
 
         if (getView() == null) {
             return;
@@ -265,9 +255,11 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showNoActiveTasks() {
-        showNoTasksViews(getResources().getString(R.string.no_tasks_active),
+        showNoTasksViews(
+                getResources().getString(R.string.no_tasks_active),
                 R.drawable.ic_check_circle_24dp,
-                false);
+                false
+        );
     }
 
     @Override
@@ -275,7 +267,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false);
+                false
+        );
     }
 
     @Override
@@ -283,7 +276,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_completed),
                 R.drawable.ic_verified_user_24dp,
-                false);
+                false
+        );
+    }
+
+    @Override
+    public void showSuccessfullySavedMessage() {
+        showMessage(getString(R.string.successfully_saved_task_message));
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
@@ -313,7 +312,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showAddTask() {
         Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, REQUEST_ADD_TASK);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
     }
 
     @Override
@@ -327,38 +326,31 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.task_marked_complete));
     }
 
     @Override
     public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.task_marked_active));
     }
 
     @Override
     public void showCompletedTasksCleared() {
-        Snackbar.make(getView(), getString(R.string.completed_tasks_cleared), Snackbar.LENGTH_LONG)
-                .show();
-        loadTasks(false);
+        showMessage(getString(R.string.completed_tasks_cleared));
     }
 
     @Override
     public void showLoadingTasksError() {
-        Snackbar.make(getView(), getString(R.string.loading_tasks_error), Snackbar.LENGTH_LONG)
-                .show();
+        showMessage(getString(R.string.loading_tasks_error));
+    }
+
+    private void showMessage(String message) {
+        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public boolean isActive() {
         return isAdded();
-    }
-
-    private void loadTasks(boolean forceUpdate) {
-        mUserActionsListener.loadTasks(forceUpdate);
     }
 
     private static class TasksAdapter extends BaseAdapter {
