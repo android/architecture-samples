@@ -135,6 +135,7 @@ public class TaskDetailScreenTest {
 
         TestUtils.rotateOrientation(mTaskDetailActivityTestRule);
 
+        // Check that the task is shown
         onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));
         onView(withId(R.id.task_detail_description)).check(matches(withText(TASK_DESCRIPTION)));
 

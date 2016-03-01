@@ -64,10 +64,6 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void start() {
-        openTask();
-    }
-
-    private void openTask() {
         mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 
