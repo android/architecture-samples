@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.*;
-
 /**
  * Unit tests for the implementation of {@link TaskDetailPresenter}
  */

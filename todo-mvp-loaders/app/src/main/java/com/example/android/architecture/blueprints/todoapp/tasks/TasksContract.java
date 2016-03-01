@@ -82,10 +82,6 @@ public interface TasksContract {
 
         void setFiltering(TasksFilterType requestType);
 
-        void optionsItemSelected(int itemId);
-
-        void popupItemSelected(int itemId);
-
         TasksFilterType getFiltering();
     }
 }

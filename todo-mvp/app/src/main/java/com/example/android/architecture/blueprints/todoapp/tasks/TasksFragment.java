@@ -161,7 +161,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mPresenter.optionsItemSelected(item.getItemId());
+        switch (item.getItemId()) {
+            case R.id.menu_clear:
+                mPresenter.clearCompletedTasks();
+                break;
+            case R.id.menu_filter:
+                showFilteringPopUpMenu();
+                break;
+            case R.id.menu_refresh:
+                mPresenter.loadTasks(true);
+                break;
+        }
         return true;
     }
 
@@ -178,7 +188,18 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
-                mPresenter.popupItemSelected(item.getItemId());
+                switch (item.getItemId()) {
+                    case R.id.active:
+                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        break;
+                    case R.id.completed:
+                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        break;
+                    default:
+                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        break;
+                }
+                mPresenter.loadTasks(false);
                 return true;
             }
         });

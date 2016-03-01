@@ -230,37 +230,6 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void optionsItemSelected(int itemId) {
-        switch (itemId) {
-            case R.id.menu_clear:
-                clearCompletedTasks();
-                break;
-            case R.id.menu_filter:
-                mTasksView.showFilteringPopUpMenu();
-                break;
-            case R.id.menu_refresh:
-                loadTasks(true);
-                break;
-        }
-    }
-
-    @Override
-    public void popupItemSelected(int itemId) {
-        switch (itemId) {
-            case R.id.active:
-                setFiltering(TasksFilterType.ACTIVE_TASKS);
-                break;
-            case R.id.completed:
-                setFiltering(TasksFilterType.COMPLETED_TASKS);
-                break;
-            default:
-                setFiltering(TasksFilterType.ALL_TASKS);
-                break;
-        }
-        loadTasks(false);
-    }
-
-    @Override
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
     }
