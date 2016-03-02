@@ -29,6 +29,8 @@ framework.
   * todo-mvp-rxjava/ - Based in todo-mvp, uses RxJava to handle load and observe
 data
   * todo-databinding/ - Uses the Data Binding Library to display data
+  * todo-mvp-contentproviders/ - Based in todo-mvp, uses Loaders and Content Providers
+  * todo-mvp-clean/ - Based in todo-mvp, uses Clean Architecture.
 
 ## Why a to-do application?
 
