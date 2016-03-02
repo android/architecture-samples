@@ -39,8 +39,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/Toolbar" />
+                android:theme="@style/Toolbar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
         </android.support.design.widget.AppBarLayout>
 
         <android.support.design.widget.CoordinatorLayout
@@ -51,7 +51,7 @@
             <FrameLayout
                 android:id="@+id/contentFrame"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_add_task"
@@ -61,7 +61,7 @@
                 android:src="@drawable/ic_add"
                 app:fabSize="normal"
                 app:layout_anchor="@id/coordinatorLayout"
-                app:layout_anchorGravity="bottom|right|end" />
+                app:layout_anchorGravity="bottom|right|end"/>
         </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>
@@ -74,7 +74,7 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_actions" />
+        app:menu="@menu/drawer_actions"/>
 
 
 </android.support.v4.widget.DrawerLayout>

@@ -188,9 +188,8 @@ public class TasksRepository implements TasksDataSource {
         }
         mCachedTasks.put(task.getId(), task);
 
-        // Mark the cache as dirty to make sure we are keeping the sync between in memory cache and
-        // persisted + server data
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     @Override
@@ -207,9 +206,8 @@ public class TasksRepository implements TasksDataSource {
         }
         mCachedTasks.put(task.getId(), completedTask);
 
-        // Mark the cache as dirty to make sure we are keeping the sync between in memory cache and
-        // persisted + server data
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     @Override
@@ -232,9 +230,8 @@ public class TasksRepository implements TasksDataSource {
         }
         mCachedTasks.put(task.getId(), activeTask);
 
-        // Mark the cache as dirty to make sure we are keeping the sync between in memory cache and
-        // persisted + server data
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     @Override
@@ -260,9 +257,8 @@ public class TasksRepository implements TasksDataSource {
             }
         }
 
-        // Mark the cache as dirty to make sure we are keeping the sync between in memory cache and
-        // server data
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     /**
@@ -315,7 +311,8 @@ public class TasksRepository implements TasksDataSource {
         }
         mCachedTasks.clear();
 
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     @Override
@@ -325,7 +322,8 @@ public class TasksRepository implements TasksDataSource {
 
         mCachedTasks.remove(taskId);
 
-        refreshTasks();
+        // Update the UI
+        notifyContentObserver();
     }
 
     public interface TasksRepositoryObserver {

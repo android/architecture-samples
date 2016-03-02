@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -199,7 +198,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
-        loadTasks(false);
+        loadTasks(false, false);
     }
 
     @Override
@@ -207,14 +206,14 @@ public class TasksPresenter implements TasksContract.Presenter {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
-        loadTasks(false);
+        loadTasks(false, false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
-        loadTasks(false);
+        loadTasks(false, false);
     }
 
     /**

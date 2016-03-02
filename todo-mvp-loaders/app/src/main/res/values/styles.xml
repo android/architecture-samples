@@ -17,9 +17,9 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Base.AppTheme" />
+    <style name="AppTheme" parent="Base.AppTheme"/>
 
-    <style name="AppTheme.OverlapSystemBar" parent="Base.AppTheme" />
+    <style name="AppTheme.OverlapSystemBar" parent="Base.AppTheme"/>
 
     <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -28,7 +28,5 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:textColorPrimary">@android:color/white</item>
-    </style>
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 </resources>

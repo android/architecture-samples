@@ -48,7 +48,7 @@
             <ListView
                 android:id="@+id/tasks_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +63,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_assignment_turned_in_24dp" />
+                android:src="@drawable/ic_assignment_turned_in_24dp"/>
 
             <TextView
                 android:id="@+id/noTasksMain"
@@ -81,7 +81,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/touch_feedback"
                 android:gravity="center"
-                android:text="@string/no_tasks_add" />
+                android:text="@string/no_tasks_add"/>
 
         </LinearLayout>
     </RelativeLayout>
