@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -32,13 +33,6 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    interface LoadTasksCallback {
-
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
     interface GetTaskCallback {
 
         void onTaskLoaded(Task task);
@@ -46,9 +40,11 @@ public interface TasksDataSource {
         void onDataNotAvailable();
     }
 
-    void getTasks(@NonNull LoadTasksCallback callback);
+    @Nullable
+    List<Task> getTasks();
 
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+    @Nullable
+    Task getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 

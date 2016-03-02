@@ -31,8 +31,6 @@ public interface StatisticsContract {
         void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks);
 
         void showLoadingStatisticsError();
-
-        boolean isActive();
     }
 
     interface Presenter extends BasePresenter {

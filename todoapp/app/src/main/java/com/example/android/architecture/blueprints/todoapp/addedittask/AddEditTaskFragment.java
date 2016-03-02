@@ -84,6 +84,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
                             mDescription.getText().toString());
                 } else {
                     mPresenter.updateTask(
+                            mEditedTaskId,
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 }
@@ -124,11 +125,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void setDescription(String description) {
         mDescription.setText(description);
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
     }
 
     private void setTaskIdIfAny() {

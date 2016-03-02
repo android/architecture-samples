@@ -16,21 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TaskDetailPresenter}
@@ -51,14 +51,13 @@ public class TaskDetailPresenterTest {
     private TasksRepository mTasksRepository;
 
     @Mock
-    private TaskDetailContract.View mTaskDetailView;
+    private TaskDetailContract.View mTaskDetailFragment;
 
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+    @Mock
+    private TaskLoader mTaskLoader;
+
+    @Mock
+    private LoaderManager mLoaderManager;
 
     private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -67,133 +66,109 @@ public class TaskDetailPresenterTest {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
-
-        // The presenter won't update the view unless it's active.
-        when(mTaskDetailView.isActive()).thenReturn(true);
     }
 
     @Test
     public void getActiveTaskFromRepositoryAndLoadIntoView() {
-        // When tasks presenter is asked to open a task
+        // When tasks presenter is asked to open an ACTIVE_TASK
+
+        // Get a reference to the class under test
         mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
-
-        // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(mTasksRepository).getTask(eq(ACTIVE_TASK.getId()), mGetTaskCallbackCaptor.capture());
-        verify(mTaskDetailView).setLoadingIndicator(true);
-
-        // When task is finally loaded
-        mGetTaskCallbackCaptor.getValue().onTaskLoaded(ACTIVE_TASK); // Trigger callback
+                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader,
+                mLoaderManager);
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), ACTIVE_TASK);
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailView).setLoadingIndicator(false);
-        verify(mTaskDetailView).showTitle(TITLE_TEST);
-        verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
-        verify(mTaskDetailView).showCompletionStatus(false);
+        verify(mTaskDetailFragment).setLoadingIndicator(false);
+        verify(mTaskDetailFragment).showTitle(TITLE_TEST);
+        verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
     }
 
     @Test
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
-
-        // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(mTasksRepository).getTask(
-                eq(COMPLETED_TASK.getId()), mGetTaskCallbackCaptor.capture());
-        verify(mTaskDetailView).setLoadingIndicator(true);
-
-        // When task is finally loaded
-        mGetTaskCallbackCaptor.getValue().onTaskLoaded(COMPLETED_TASK); // Trigger callback
+        // When tasks presenter is asked to open a completed task
+        mTaskDetailPresenter = new TaskDetailPresenter(COMPLETED_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), COMPLETED_TASK);
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
-        verify(mTaskDetailView).setLoadingIndicator(false);
-        verify(mTaskDetailView).showTitle(TITLE_TEST);
-        verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
-        verify(mTaskDetailView).showCompletionStatus(true);
+        verify(mTaskDetailFragment).setLoadingIndicator(false);
+        verify(mTaskDetailFragment).showTitle(TITLE_TEST);
+        verify(mTaskDetailFragment).showDescription(DESCRIPTION_TEST);
+        verify(mTaskDetailFragment).showCompletionStatus(true);
     }
 
     @Test
     public void getUnknownTaskFromRepositoryAndLoadIntoView() {
-        // When loading of a task is requested with an invalid task ID.
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
-        verify(mTaskDetailView).showMissingTask();
+        // When loading of an ACTIVE_TASK is requested with an invalid task
+        mTaskDetailPresenter = new TaskDetailPresenter(INVALID_TASK_ID, mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), null);
+
+        // Then progress indicator is hidden and missing ACTIVE_TASK UI is shown
+        verify(mTaskDetailFragment).showMissingTask();
     }
 
     @Test
     public void deleteTask() {
-        // Given an initialized TaskDetailPresenter with stubbed task
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
-
-        // When the deletion of a task is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
+        // When the deletion of an ACTIVE_TASK is requested
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.deleteTask();
 
         // Then the repository and the view are notified
-        verify(mTasksRepository).deleteTask(task.getId());
-        verify(mTaskDetailView).showTaskDeleted();
+        verify(mTasksRepository).deleteTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskDeleted();
     }
 
     @Test
     public void completeTask() {
-        // Given an initialized presenter with an active task
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
-
-        // When the presenter is asked to complete the task
+        // When the presenter is asked to complete the ACTIVE_TASK
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.completeTask();
 
-        // Then a request is sent to the task repository and the UI is updated
-        verify(mTasksRepository).completeTask(task.getId());
-        verify(mTaskDetailView).showTaskMarkedComplete();
+        // Then a request is sent to the repository and the UI is updated
+        verify(mTasksRepository).completeTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskMarkedComplete();
     }
 
     @Test
     public void activateTask() {
-        // Given an initialized presenter with a completed task
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
-
-        // When the presenter is asked to activate the task
+        // When the presenter is asked to activate the ACTIVE_TASK
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.activateTask();
 
-        // Then a request is sent to the task repository and the UI is updated
-        verify(mTasksRepository).activateTask(task.getId());
-        verify(mTaskDetailView).showTaskMarkedActive();
+        // Then a request is sent to the repository and the UI is updated
+        verify(mTasksRepository).activateTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showTaskMarkedActive();
     }
 
     @Test
     public void activeTaskIsShownWhenEditing() {
         // When the edit of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.editTask();
 
         // Then the view is notified
-        verify(mTaskDetailView).showEditTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showEditTask(ACTIVE_TASK.getId());
     }
 
     @Test
     public void invalidTaskIsNotShownWhenEditing() {
         // When the edit of an invalid task id is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = new TaskDetailPresenter(INVALID_TASK_ID, mTasksRepository,
+                mTaskDetailFragment, mTaskLoader, mLoaderManager);
         mTaskDetailPresenter.editTask();
 
         // Then the edit mode is never started
-        verify(mTaskDetailView, never()).showEditTask(INVALID_TASK_ID);
+        verify(mTaskDetailFragment, never()).showEditTask(INVALID_TASK_ID);
         // instead, the error is shown.
-        verify(mTaskDetailView).showMissingTask();
+        verify(mTaskDetailFragment).showMissingTask();
     }
 
 }

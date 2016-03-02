@@ -32,12 +32,13 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -67,16 +68,6 @@ public class TasksRepositoryTest {
     @Mock
     private TasksDataSource.GetTaskCallback mGetTaskCallback;
 
-    @Mock
-    private TasksDataSource.LoadTasksCallback mLoadTasksCallback;
-
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mTasksCallbackCaptor;
-
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -104,37 +95,39 @@ public class TasksRepositoryTest {
     public void getTasks_repositoryCachesAfterFirstApiCall() {
         // Given a setup Captor to capture callbacks
         // When two calls are issued to the tasks repository
-        twoTasksLoadCallsToRepository(mLoadTasksCallback);
+        twoTasksLoadCallsToRepository();
 
         // Then tasks were only requested once from Service API
-        verify(mTasksRemoteDataSource).getTasks(any(TasksDataSource.LoadTasksCallback.class));
+        verify(mTasksRemoteDataSource).getTasks();
     }
 
     @Test
     public void getTasks_requestsAllTasksFromLocalDataSource() {
         // When tasks are requested from the tasks repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
+        mTasksRepository.getTasks();
 
         // Then tasks are loaded from the local data source
-        verify(mTasksLocalDataSource).getTasks(any(TasksDataSource.LoadTasksCallback.class));
+        verify(mTasksLocalDataSource).getTasks();
     }
 
     @Test
-    public void saveTask_savesTaskToServiceAPI() {
+    public void saveTask_savesTaskToServiceAPIAndMarkedForRefreshFromAPI() {
         // Given a stub task with title and description
         Task newTask = new Task(TASK_TITLE, "Some Task Description");
 
         // When a task is saved to the tasks repository
         mTasksRepository.saveTask(newTask);
 
-        // Then the service API and persistent repository are called and the cache is updated
+        // Then the service API and persistent repository are called and the cache for tasks is
+        // marked for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).saveTask(newTask);
         verify(mTasksLocalDataSource).saveTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
     }
 
     @Test
-    public void completeTask_completesTaskToServiceAPIUpdatesCache() {
+    public void completeTask_completesTaskToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given a stub active task with title and description added in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description");
         mTasksRepository.saveTask(newTask);
@@ -142,15 +135,17 @@ public class TasksRepositoryTest {
         // When a task is completed to the tasks repository
         mTasksRepository.completeTask(newTask);
 
-        // Then the service API and persistent repository are called and the cache is updated
+        //  Then the service API and persistent repository are called, the cache for tasks is marked
+        // for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
+        assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isCompleted());
     }
 
     @Test
-    public void completeTaskId_completesTaskToServiceAPIUpdatesCache() {
+    public void completeTaskId_completesTaskToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given a stub active task with title and description added in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description");
         mTasksRepository.saveTask(newTask);
@@ -158,15 +153,17 @@ public class TasksRepositoryTest {
         // When a task is completed using its id to the tasks repository
         mTasksRepository.completeTask(newTask.getId());
 
-        // Then the service API and persistent repository are called and the cache is updated
+        // Then the service API is called, the cache for tasks is marked for
+        // server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
+        assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isCompleted());
     }
 
     @Test
-    public void activateTask_activatesTaskToServiceAPIUpdatesCache() {
+    public void activateTask_activatesTaskToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given a stub completed task with title and description in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
         mTasksRepository.saveTask(newTask);
@@ -174,15 +171,17 @@ public class TasksRepositoryTest {
         // When a completed task is activated to the tasks repository
         mTasksRepository.activateTask(newTask);
 
-        // Then the service API and persistent repository are called and the cache is updated
+        //  Then the service API and persistent repository are called, the cache for tasks is marked
+        // for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
+        assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive());
     }
 
     @Test
-    public void activateTaskId_activatesTaskToServiceAPIUpdatesCache() {
+    public void activateTaskId_activatesTaskToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given a stub completed task with title and description in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
         mTasksRepository.saveTask(newTask);
@@ -190,25 +189,26 @@ public class TasksRepositoryTest {
         // When a completed task is activated with its id to the tasks repository
         mTasksRepository.activateTask(newTask.getId());
 
-        // Then the service API and persistent repository are called and the cache is updated
+        // Then the service API is called, the cache for tasks is marked for
+        // server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
+        assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive());
     }
 
     @Test
     public void getTask_requestsSingleTaskFromLocalDataSource() {
         // When a task is requested from the tasks repository
-        mTasksRepository.getTask(TASK_TITLE, mGetTaskCallback);
+        mTasksRepository.getTask(TASK_TITLE);
 
         // Then the task is loaded from the database
-        verify(mTasksLocalDataSource).getTask(eq(TASK_TITLE), any(
-                TasksDataSource.GetTaskCallback.class));
+        verify(mTasksLocalDataSource).getTask(eq(TASK_TITLE));
     }
 
     @Test
-    public void deleteCompletedTasks_deleteCompletedTasksToServiceAPIUpdatesCache() {
+    public void deleteCompletedTasks_deleteCompletedTasksToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given 2 stub completed tasks and 1 stub active tasks in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
         mTasksRepository.saveTask(newTask);
@@ -220,18 +220,19 @@ public class TasksRepositoryTest {
         // When a completed tasks are cleared to the tasks repository
         mTasksRepository.clearCompletedTasks();
 
-
-        // Then the service API and persistent repository are called and the cache is updated
+        // Then the service API is called, the cache for tasks is marked for
+        // server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).clearCompletedTasks();
         verify(mTasksLocalDataSource).clearCompletedTasks();
 
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask2.getId()).isActive());
         assertThat(mTasksRepository.mCachedTasks.get(newTask2.getId()).getTitle(), is(TASK_TITLE2));
     }
 
     @Test
-    public void deleteAllTasks_deleteTasksToServiceAPIUpdatesCache() {
+    public void deleteAllTasks_deleteTasksToServiceAPIUpdatesCacheAndMarkedForRefreshFromAPI() {
         // Given 2 stub completed tasks and 1 stub active tasks in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
         mTasksRepository.saveTask(newTask);
@@ -247,7 +248,8 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).deleteAllTasks();
         verify(mTasksLocalDataSource).deleteAllTasks();
 
-        assertThat(mTasksRepository.mCachedTasks.size(), is(0));
+        assertTrue(mTasksRepository.mCacheIsDirty);
+        assertTrue(mTasksRepository.mCachedTasks.size() == 0);
     }
 
     @Test
@@ -269,47 +271,29 @@ public class TasksRepositoryTest {
     }
 
     @Test
-    public void getTasksWithDirtyCache_tasksAreRetrievedFromRemote() {
-        // When calling getTasks in the repository with dirty cache
-        mTasksRepository.mCacheIsDirty = true;
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the remote data source has data available
-        setTasksAvailable(mTasksRemoteDataSource, TASKS);
-
-        // Verify the tasks from the remote data source are returned, not the local
-        verify(mTasksLocalDataSource, never()).getTasks(mLoadTasksCallback);
-        verify(mLoadTasksCallback).onTasksLoaded(TASKS);
-    }
-
-    @Test
     public void getTasksWithLocalDataSourceUnavailable_tasksAreRetrievedFromRemote() {
-        // When calling getTasks in the repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the local data source has no data available
+        /// Given unavailable tasks in local data source and available tasks in remote data source
         setTasksNotAvailable(mTasksLocalDataSource);
-
-        // And the remote data source has data available
         setTasksAvailable(mTasksRemoteDataSource, TASKS);
 
-        // Verify the tasks from the local data source are returned
-        verify(mLoadTasksCallback).onTasksLoaded(TASKS);
+        // When calling getTasks in the repository
+        List<Task> returnedTasks = mTasksRepository.getTasks();
+
+        // Then the tasks from the local data source are returned
+        assertThat(TASKS, is(returnedTasks));
     }
 
     @Test
-    public void getTasksWithBothDataSourcesUnavailable_firesOnDataUnavailable() {
-        // When calling getTasks in the repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the local data source has no data available
+    public void getTasksWithBothDataSourcesUnavailable_returnsNull() {
+        /// Given unavailable tasks in both data sources
         setTasksNotAvailable(mTasksLocalDataSource);
-
-        // And the remote data source has no data available
         setTasksNotAvailable(mTasksRemoteDataSource);
 
-        // Verify no data is returned
-        verify(mLoadTasksCallback).onDataNotAvailable();
+        // When calling getTasks in the repository
+        List<Task> returnedTasks = mTasksRepository.getTasks();
+
+        // Then the returned tasks are null
+        assertNull(returnedTasks);
     }
 
     @Test
@@ -317,8 +301,6 @@ public class TasksRepositoryTest {
         // Given a task id
         final String taskId = "123";
 
-        // When calling getTask in the repository
-        mTasksRepository.getTask(taskId, mGetTaskCallback);
 
         // And the local data source has no data available
         setTaskNotAvailable(mTasksLocalDataSource, taskId);
@@ -326,50 +308,48 @@ public class TasksRepositoryTest {
         // And the remote data source has no data available
         setTaskNotAvailable(mTasksRemoteDataSource, taskId);
 
+        // When calling getTask in the repository
+        Task task = mTasksRepository.getTask(taskId);
+
         // Verify no data is returned
-        verify(mGetTaskCallback).onDataNotAvailable();
+        assertThat(task, is(nullValue()));
     }
 
     /**
-     * Convenience method that issues two calls to the tasks repository
-     */
-    private void twoTasksLoadCallsToRepository(TasksDataSource.LoadTasksCallback callback) {
+    * Convenience method that issues two calls to the tasks repository
+    */
+    private void twoTasksLoadCallsToRepository() {
+        // Given a local data source with no data
+        when(mTasksLocalDataSource.getTasks()).thenReturn(null);
+
+        // and a remote data source with no data
+        when(mTasksRemoteDataSource.getTasks()).thenReturn(TASKS);
+
         // When tasks are requested from repository
-        mTasksRepository.getTasks(callback); // First call to API
+        mTasksRepository.getTasks(); // First call to API
 
-        // Use the Mockito Captor to capture the callback
-        verify(mTasksLocalDataSource).getTasks(mTasksCallbackCaptor.capture());
+        // Then the local data source is called
+        verify(mTasksLocalDataSource).getTasks();
 
-        // Local data source doesn't have data yet
-        mTasksCallbackCaptor.getValue().onDataNotAvailable();
+        // Then the remote data source is called
+        verify(mTasksRemoteDataSource).getTasks();
 
-
-        // Verify the remote data source is queried
-        verify(mTasksRemoteDataSource).getTasks(mTasksCallbackCaptor.capture());
-
-        // Trigger callback so tasks are cached
-        mTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
-
-        mTasksRepository.getTasks(callback); // Second call to API
+        mTasksRepository.getTasks(); // Second call to API
     }
 
     private void setTasksNotAvailable(TasksDataSource dataSource) {
-        verify(dataSource).getTasks(mTasksCallbackCaptor.capture());
-        mTasksCallbackCaptor.getValue().onDataNotAvailable();
+        when(dataSource.getTasks()).thenReturn(null);
     }
 
     private void setTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
-        verify(dataSource).getTasks(mTasksCallbackCaptor.capture());
-        mTasksCallbackCaptor.getValue().onTasksLoaded(tasks);
+        when(dataSource.getTasks()).thenReturn(tasks);
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-        verify(dataSource).getTask(eq(taskId), mTaskCallbackCaptor.capture());
-        mTaskCallbackCaptor.getValue().onDataNotAvailable();
+        when(dataSource.getTask(taskId)).thenReturn(null);
     }
 
     private void setTaskAvailable(TasksDataSource dataSource, Task task) {
-        verify(dataSource).getTask(eq(task.getId()), mTaskCallbackCaptor.capture());
-        mTaskCallbackCaptor.getValue().onTaskLoaded(task);
+        when(dataSource.getTask(task.getId())).thenReturn(task);
     }
- }
+}

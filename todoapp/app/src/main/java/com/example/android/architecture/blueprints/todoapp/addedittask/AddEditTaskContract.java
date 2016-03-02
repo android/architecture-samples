@@ -33,16 +33,12 @@ public interface AddEditTaskContract {
         void setTitle(String title);
 
         void setDescription(String description);
-
-        boolean isActive();
     }
 
     interface Presenter extends BasePresenter {
 
         void createTask(String title, String description);
 
-        void updateTask( String title, String description);
-
-        void populateTask();
+        void updateTask(String taskId, String title, String description);
     }
 }

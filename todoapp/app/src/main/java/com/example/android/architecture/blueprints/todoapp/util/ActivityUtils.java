@@ -42,4 +42,18 @@ public class ActivityUtils {
         transaction.commit();
     }
 
+    /**
+     * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
+     * performed by the {@code fragmentManager}.
+     *
+     */
+    public static void addNonUIFragmentToActivity (@NonNull FragmentManager fragmentManager,
+                                              @NonNull Fragment nonUIFragment, String fragmentTag) {
+        checkNotNull(fragmentManager);
+        checkNotNull(nonUIFragment);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(nonUIFragment, fragmentTag);
+        transaction.commit();
+    }
+
 }

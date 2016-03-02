@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -25,6 +24,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,21 +59,14 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 
-    /**
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is never fired. In a real remote data
-     * source implementation, this would be fired if the server can't be contacted or the server
-     * returns an error.
-     */
     @Override
-    public void getTasks(final @NonNull LoadTasksCallback callback) {
-        // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
-            }
-        }, SERVICE_LATENCY_IN_MILLIS);
+    public List<Task> getTasks() {
+        // Simulate network
+        try {
+            Thread.sleep(SERVICE_LATENCY_IN_MILLIS);
+        } catch (InterruptedException e) {
+        }
+        return Lists.newArrayList(TASKS_SERVICE_DATA.values());
     }
 
     /**
@@ -82,17 +75,16 @@ public class TasksRemoteDataSource implements TasksDataSource {
      * returns an error.
      */
     @Override
-    public void getTask(@NonNull String taskId, final @NonNull GetTaskCallback callback) {
+    public Task getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
 
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callback.onTaskLoaded(task);
-            }
-        }, SERVICE_LATENCY_IN_MILLIS);
+        try {
+            Thread.sleep(SERVICE_LATENCY_IN_MILLIS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return task;
     }
 
     @Override

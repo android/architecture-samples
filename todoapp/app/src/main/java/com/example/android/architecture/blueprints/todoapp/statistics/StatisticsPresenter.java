@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 
 import java.util.List;
 
@@ -31,70 +32,67 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter {
+public class StatisticsPresenter implements StatisticsContract.Presenter, LoaderManager.LoaderCallbacks<List<Task>> {
 
-    private final TasksRepository mTasksRepository;
+    private static final int TASK_QUERY = 3;
 
-    private final StatisticsContract.View mStatisticsView;
+    private StatisticsContract.View mStatisticsView;
 
-    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
-                               @NonNull StatisticsContract.View statisticsView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
+    private TasksLoader mTasksLoader;
+
+    private LoaderManager mLoaderManager;
+
+    public StatisticsPresenter(@NonNull StatisticsContract.View statisticsView,
+                               @NonNull TasksLoader tasksLoader,
+                               @NonNull LoaderManager loaderManager) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
+        mTasksLoader = checkNotNull(tasksLoader, "tasksLoader cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mStatisticsView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        loadStatistics();
+        mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 
-    private void loadStatistics() {
+    @Override
+    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
         mStatisticsView.setProgressIndicator(true);
-
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
-
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
-                    }
-                }
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.setProgressIndicator(false);
-
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
-            }
-        });
+        return mTasksLoader;
     }
+
+    @Override
+    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+        loadStatistics(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Task>> loader) {
+
+    }
+
+    private void loadStatistics(List<Task> tasks) {
+        if (tasks == null) {
+            mStatisticsView.showLoadingStatisticsError();
+        } else {
+            int activeTasks = 0;
+            int completedTasks = 0;
+
+            // Calculate number of active and completed tasks
+            for (Task task : tasks) {
+                if (task.isCompleted()) {
+                    completedTasks += 1;
+                } else {
+                    activeTasks += 1;
+                }
+            }
+
+            mStatisticsView.setProgressIndicator(false);
+
+            mStatisticsView.showStatistics(activeTasks, completedTasks);
+        }
+    }
+
 }

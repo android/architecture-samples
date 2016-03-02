@@ -87,9 +87,4 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public void showLoadingStatisticsError() {
         mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
     }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
 }

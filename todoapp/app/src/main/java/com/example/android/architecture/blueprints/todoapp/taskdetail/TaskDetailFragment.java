@@ -200,9 +200,4 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mDetailTitle.setText("");
         mDetailDescription.setText(getString(R.string.no_data));
     }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
 }

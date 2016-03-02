@@ -16,10 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,38 +33,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the UI as required.
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        TasksDataSource.GetTaskCallback {
+        LoaderManager.LoaderCallbacks<Task> {
+
+    private static final int TASK_QUERY = 2;
 
     @NonNull
-    private final TasksDataSource mTasksRepository;
+    private TasksDataSource mTasksRepository;
 
     @NonNull
-    private final AddEditTaskContract.View mAddTaskView;
+    private AddEditTaskContract.View mAddTaskView;
 
     @Nullable
     private String mTaskId;
 
-    /**
-     * Creates a presenter for the add/edit view.
-     *
-     * @param taskId ID of the task to edit or null for a new task
-     * @param tasksRepository a repository of data for tasks
-     * @param addTaskView the add/edit view
-     */
+    private TaskLoader mTaskLoader;
+
+    private final LoaderManager mLoaderManager;
+
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+            @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
+            @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
+        mTaskLoader = checkNotNull(taskLoader);
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mAddTaskView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        if (mTaskId != null) {
-            populateTask();
-        }
+        mLoaderManager.initLoader(TASK_QUERY, null, this);
     }
 
     @Override
@@ -75,36 +79,32 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void updateTask(String title, String description) {
-        if (mTaskId == null) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+    public void updateTask(String taskId, String title, String description) {
+        mTasksRepository.saveTask(new Task(title, description, taskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
     @Override
-    public void populateTask() {
+    public Loader<Task> onCreateLoader(int id, Bundle args) {
         if (mTaskId == null) {
-            throw new RuntimeException("populateTask() was called but task is new.");
+            return null;
         }
-        mTasksRepository.getTask(mTaskId, this);
+        return mTaskLoader;
     }
 
     @Override
-    public void onTaskLoaded(Task task) {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.setTitle(task.getTitle());
-            mAddTaskView.setDescription(task.getDescription());
+    public void onLoadFinished(Loader<Task> loader, Task data) {
+
+        if (data != null) {
+            mAddTaskView.setDescription(data.getDescription());
+            mAddTaskView.setTitle(data.getTitle());
+        } else {
+            // NO-OP, add mode.
         }
     }
 
     @Override
-    public void onDataNotAvailable() {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.showEmptyTaskError();
-        }
+    public void onLoaderReset(Loader<Task> loader) {
+
     }
 }

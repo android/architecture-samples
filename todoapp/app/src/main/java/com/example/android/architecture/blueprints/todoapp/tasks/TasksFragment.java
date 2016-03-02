@@ -142,8 +142,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
-                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
-        );
+                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
 
@@ -346,11 +345,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private void showMessage(String message) {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
     }
 
     private static class TasksAdapter extends BaseAdapter {

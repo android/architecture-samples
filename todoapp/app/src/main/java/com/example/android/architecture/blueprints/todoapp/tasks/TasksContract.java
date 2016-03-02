@@ -61,8 +61,6 @@ public interface TasksContract {
 
         void showSuccessfullySavedMessage();
 
-        boolean isActive();
-
         void showFilteringPopUpMenu();
     }
 
