@@ -17,7 +17,7 @@
 
 <resources>
 
-    <style name="AppTheme" parent="Base.AppTheme"/>
+    <style name="AppTheme" parent="Base.AppTheme" />
 
     <style name="AppTheme.OverlapSystemBar" parent="Base.AppTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
