@@ -22,8 +22,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/list_item_padding"
-    android:paddingTop="@dimen/list_item_padding"
-    >
+    android:paddingTop="@dimen/list_item_padding">
 
     <CheckBox
         android:id="@+id/complete"
