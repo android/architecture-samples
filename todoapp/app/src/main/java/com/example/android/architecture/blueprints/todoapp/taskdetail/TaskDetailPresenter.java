@@ -16,58 +16,60 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.inject.Inject;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
- */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter {
+ * <p />
+ * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
+ * create an instance of the TaskDetailPresenter (if it fails, it emits a compiler error). It uses
+ * {@link TaskDetailPresenterModule} to do so, and the constructed instance is available in
+ * {@link TaskDetailFragmentComponent}.
+ * <p />
+ * Dagger generated code doesn't require public access to the constructor or class, and
+ * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
+ * it's good practice minimise the visibility of the class/constructor as much as possible.
+ **/
+final class TaskDetailPresenter implements TaskDetailContract.UserActionsListener {
 
     private final TasksRepository mTasksRepository;
 
     private final TaskDetailContract.View mTaskDetailView;
 
-    @Nullable
-    private String mTaskId;
-
-    public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
-        this.mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
-        mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-
-        mTaskDetailView.setPresenter(this);
+    /**
+     * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
+     * with {@code @Nullable} values.
+     */
+    @Inject
+    TaskDetailPresenter(TasksRepository tasksRepository,
+            TaskDetailContract.View taskDetailView) {
+        mTasksRepository = tasksRepository;
+        mTaskDetailView = taskDetailView;
     }
 
     @Override
-    public void start() {
-        openTask();
-    }
-
-    private void openTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+    public void openTask(@Nullable String taskId) {
+        if (null == taskId || taskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
 
-        mTaskDetailView.setLoadingIndicator(true);
-        mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
+        mTaskDetailView.setProgressIndicator(true);
+        mTasksRepository.getTask(taskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
-                // The view may not be able to handle UI updates anymore
-                if (!mTaskDetailView.isActive()) {
+                if (mTaskDetailView.isInactive()) {
                     return;
                 }
-                mTaskDetailView.setLoadingIndicator(false);
+
+                mTaskDetailView.setProgressIndicator(false);
                 if (null == task) {
                     mTaskDetailView.showMissingTask();
                 } else {
@@ -77,47 +79,46 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
             @Override
             public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mTaskDetailView.isActive()) {
+                if (mTaskDetailView.isInactive()) {
                     return;
                 }
+
                 mTaskDetailView.showMissingTask();
             }
         });
     }
 
     @Override
-    public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+    public void editTask(@Nullable String taskId) {
+        if (null == taskId || taskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        mTaskDetailView.showEditTask(taskId);
     }
 
     @Override
-    public void deleteTask() {
-        mTasksRepository.deleteTask(mTaskId);
+    public void deleteTask(@Nullable String taskId) {
+        mTasksRepository.deleteTask(taskId);
         mTaskDetailView.showTaskDeleted();
     }
 
-    @Override
-    public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+    public void completeTask(@Nullable String taskId) {
+        if (null == taskId || taskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(mTaskId);
+        mTasksRepository.completeTask(taskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
-    public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+    public void activateTask(@Nullable String taskId) {
+        if (null == taskId || taskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(mTaskId);
+        mTasksRepository.activateTask(taskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 

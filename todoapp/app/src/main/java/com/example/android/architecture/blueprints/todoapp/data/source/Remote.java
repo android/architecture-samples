@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.example.android.architecture.blueprints.todoapp.data.source;
 
-package com.example.android.architecture.blueprints.todoapp;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-public interface BasePresenter {
+import javax.inject.Qualifier;
 
-    void start();
+@Qualifier
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Remote {
 
 }

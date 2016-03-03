@@ -27,6 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -35,10 +38,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
+ * <p />
+ * By marking the constructor with {@code @Inject} and the class with {@code @Singleton}, Dagger
+ * injects the dependencies required to create an instance of the TasksRespository (if it fails, it
+ * emits a compiler error). It uses {@link TasksRepositoryModule} to do so, and the constructed
+ * instance is available in {@link TasksRepositoryComponent}.
+ * <p />
+ * Dagger generated code doesn't require public access to the constructor or class, and
+ * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
+ * it's good practice minimise the visibility of the class/constructor as much as possible.
  */
+@Singleton
 public class TasksRepository implements TasksDataSource {
-
-    private static TasksRepository INSTANCE = null;
 
     private final TasksDataSource mTasksRemoteDataSource;
 
@@ -50,39 +61,29 @@ public class TasksRepository implements TasksDataSource {
     Map<String, Task> mCachedTasks;
 
     /**
-     * Marks the cache as invalid, to force an update the next time data is requested. This variable
+     * Marks the cache as invalid, to force an update the next time data is requested. This
+     * variable
      * has package local visibility so it can be accessed from tests.
      */
     boolean mCacheIsDirty;
 
-    // Prevent direct instantiation.
-    private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource) {
-        mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
-        mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
-    }
-
     /**
-     * Returns the single instance of this class, creating it if necessary.
-     *
-     * @param tasksRemoteDataSource the backend data source
-     * @param tasksLocalDataSource  the device storage data source
-     * @return the {@link TasksRepository} instance
+     * By marking the constructor with {@code @Inject}, Dagger will try to inject the dependencies
+     * required to create an instance of the TasksRepository. Because {@link TasksDataSource} is an
+     * interface, we must provide to Dagger a way to build those arguments, this is done in
+     * {@link TasksRepositoryModule}.
+     * <P>
+     * When two arguments or more have the same type, we must provide to Dagger a way to
+     * differentiate them. This is done using a qualifier.
+     * <p>
+     * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
+     * with {@code @Nullable} values.
      */
-    public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
-                                              TasksDataSource tasksLocalDataSource) {
-        if (INSTANCE == null) {
-            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
-        }
-        return INSTANCE;
-    }
-
-    /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new instance
-     * next time it's called.
-     */
-    public static void destroyInstance() {
-        INSTANCE = null;
+    @Inject
+    TasksRepository(@Remote TasksDataSource tasksRemoteDataSource,
+            @Local TasksDataSource tasksLocalDataSource) {
+        mTasksRemoteDataSource = tasksRemoteDataSource;
+        mTasksLocalDataSource = tasksLocalDataSource;
     }
 
     /**

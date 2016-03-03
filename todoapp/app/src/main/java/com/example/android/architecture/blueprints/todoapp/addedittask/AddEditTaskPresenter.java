@@ -17,50 +17,54 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.inject.Inject;
 
 /**
- * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
+ * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
+ * updates
  * the UI as required.
+ * <p />
+ * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
+ * create an instance of the AddEditTaskPresenter (if it fails, it emits a compiler error). It uses
+ * {@link AddEditTaskPresenterModule} to do so, and the constructed instance is available in
+ * {@link AddEditTaskFragmentComponent}.
+ * <p/>
+ * Dagger generated code doesn't require public access to the constructor or class, and
+ * therefore, to ensure the developer doesn't instantiate the class manually bypassing Dagger,
+ * it's good practice minimise the visibility of the class/constructor as much as possible.
  */
-public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
+final class AddEditTaskPresenter implements AddEditTaskContract.UserActionsListener,
         TasksDataSource.GetTaskCallback {
 
     @NonNull
-    private final TasksDataSource mTasksRepository;
+    private final TasksRepository mTasksRepository;
 
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
-    @Nullable
-    private String mTaskId;
-
     /**
-     * Creates a presenter for the add/edit view.
-     *
-     * @param taskId ID of the task to edit or null for a new task
-     * @param tasksRepository a repository of data for tasks
-     * @param addTaskView the add/edit view
+     * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
+     * with {@code @Nullable} values.
      */
-    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
-        mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
-        mAddTaskView = checkNotNull(addTaskView);
-
-        mAddTaskView.setPresenter(this);
+    @Inject
+    AddEditTaskPresenter(TasksRepository tasksRepository,
+            AddEditTaskContract.View addTaskView) {
+        mTasksRepository = tasksRepository;
+        mAddTaskView = addTaskView;
     }
 
-    @Override
-    public void start() {
-        if (mTaskId != null) {
-            populateTask();
-        }
+    /**
+     * Method injection is used here to safely reference {@code this} after the object is created.
+     * For more information, see Java Concurrency in Practice.
+     */
+    @Inject
+    void setupListeners() {
+        mAddTaskView.setUserActionListener(this);
     }
 
     @Override
@@ -75,36 +79,24 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void updateTask(String title, String description) {
-        if (mTaskId == null) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+    public void updateTask(String taskId, String title, String description) {
+        mTasksRepository.saveTask(new Task(title, description, taskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
     @Override
-    public void populateTask() {
-        if (mTaskId == null) {
-            throw new RuntimeException("populateTask() was called but task is new.");
-        }
-        mTasksRepository.getTask(mTaskId, this);
+    public void populateTask(String taskId) {
+        mTasksRepository.getTask(taskId, this);
     }
 
     @Override
     public void onTaskLoaded(Task task) {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.setTitle(task.getTitle());
-            mAddTaskView.setDescription(task.getDescription());
-        }
+        mAddTaskView.setTitle(task.getTitle());
+        mAddTaskView.setDescription(task.getDescription());
     }
 
     @Override
     public void onDataNotAvailable() {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.showEmptyTaskError();
-        }
+        mAddTaskView.showEmptyTaskError();
     }
 }

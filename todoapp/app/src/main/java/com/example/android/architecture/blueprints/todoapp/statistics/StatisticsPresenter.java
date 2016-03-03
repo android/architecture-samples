@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.support.annotation.NonNull;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -25,32 +23,40 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.inject.Inject;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
- */
-public class StatisticsPresenter implements StatisticsContract.Presenter {
+ * <p />
+ * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
+ * create an instance of the StatisticsPresenter (if it fails, it emits a compiler error). It uses
+ * {@link StatisticsPresenterModule} to do so, and the constructed instance is available in
+ * {@link StatisticsFragmentComponent}.
+ * <p />
+ * Dagger generated code doesn't require public access to the constructor or class, and
+ * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
+ * it's good practice minimise the visibility of the class/constructor as much as possible.
+ **/
+final class StatisticsPresenter implements StatisticsContract.UserActionsListener {
 
     private final TasksRepository mTasksRepository;
 
     private final StatisticsContract.View mStatisticsView;
 
-    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
-                               @NonNull StatisticsContract.View statisticsView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
-        mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-
-        mStatisticsView.setPresenter(this);
+    /**
+     * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
+     * with {@code @Nullable} values.
+     */
+    @Inject
+    StatisticsPresenter(TasksRepository tasksRepository,
+                               StatisticsContract.View statisticsView) {
+        mTasksRepository = tasksRepository;
+        mStatisticsView = statisticsView;
     }
 
     @Override
-    public void start() {
-        loadStatistics();
-    }
-
-    private void loadStatistics() {
+    public void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows
@@ -78,21 +84,22 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                         activeTasks += 1;
                     }
                 }
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
+
+                if (mStatisticsView.isInactive()) {
                     return;
                 }
+
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
+                mStatisticsView.displayStatistics(activeTasks, completedTasks);
             }
 
             @Override
             public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
+                if (mStatisticsView.isInactive()) {
                     return;
                 }
+
                 mStatisticsView.showLoadingStatisticsError();
             }
         });

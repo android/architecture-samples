@@ -24,7 +24,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name="com.example.android.architecture.blueprints.todoapp.ToDoApplication">
         <activity
                 android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
                 android:theme="@style/AppTheme.OverlapSystemBar">

@@ -16,17 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
-import com.example.android.architecture.blueprints.todoapp.BaseView;
+import android.support.annotation.Nullable;
 
 /**
  * This specifies the contract between the view and the presenter.
  */
 public interface TaskDetailContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View {
 
-        void setLoadingIndicator(boolean active);
+        void setProgressIndicator(boolean active);
 
         void showMissingTask();
 
@@ -48,17 +47,19 @@ public interface TaskDetailContract {
 
         void showTaskMarkedActive();
 
-        boolean isActive();
+        boolean isInactive();
     }
 
-    interface Presenter extends BasePresenter {
+    interface UserActionsListener {
 
-        void editTask();
+        void openTask(@Nullable String taskId);
 
-        void deleteTask();
+        void editTask(@Nullable String taskId);
 
-        void completeTask();
+        void deleteTask(@Nullable String taskId);
 
-        void activateTask();
+        void completeTask(@Nullable String taskId);
+
+        void activateTask(@Nullable String taskId);
     }
 }

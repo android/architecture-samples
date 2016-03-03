@@ -24,9 +24,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
 import org.hamcrest.Description;
@@ -88,8 +88,9 @@ public class TasksScreenTest {
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
-                    Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                        .deleteAllTasks();
+                    ((ToDoApplication) InstrumentationRegistry.getTargetContext()
+                            .getApplicationContext()).getTasksRepositoryComponent()
+                            .getTasksRepository().deleteAllTasks();
                 }
             };
 

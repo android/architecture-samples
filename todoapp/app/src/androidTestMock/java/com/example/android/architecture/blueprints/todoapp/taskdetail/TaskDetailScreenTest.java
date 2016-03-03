@@ -26,7 +26,6 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,8 +96,7 @@ public class TaskDetailScreenTest {
      */
     private void startActivityWithWithStubbedTask(Task task) {
         // Add a task stub to the fake service api layer.
-        TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(task);
+        new FakeTasksRemoteDataSource().addTasks(task);
 
         // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         Intent startIntent = new Intent();

@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -32,8 +31,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  * Displays an add or edit task screen.
  */
 public class AddEditTaskActivity extends AppCompatActivity {
-
-    public static final int REQUEST_ADD_TASK = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,33 +44,24 @@ public class AddEditTaskActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment =
-                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
-
-        String taskId = null;
-        if (addEditTaskFragment == null) {
-            addEditTaskFragment = AddEditTaskFragment.newInstance();
-
+        if (null == savedInstanceState) {
+            // If there's a Task ID in the Bundle, this is an edit. Otherwise it's a new task.
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                taskId = getIntent().getStringExtra(
+                String taskId = getIntent().getStringExtra(
                         AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
+                AddEditTaskFragment addEditTaskFragment = AddEditTaskFragment.newInstance();
                 Bundle bundle = new Bundle();
                 bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
                 addEditTaskFragment.setArguments(bundle);
+                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                        addEditTaskFragment, R.id.contentFrame);
             } else {
                 actionBar.setTitle(R.string.add_task);
+                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                        AddEditTaskFragment.newInstance(), R.id.contentFrame);
             }
-
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    addEditTaskFragment, R.id.contentFrame);
         }
-
-        // Create the presenter
-        new AddEditTaskPresenter(
-                taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
     }
 
     @Override
