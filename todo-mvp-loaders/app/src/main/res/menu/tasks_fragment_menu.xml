@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +15,18 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_filter"
         android:title="@string/menu_filter"
         android:icon="@drawable/ic_filter_list"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
     <item
         android:id="@+id/menu_clear"
         android:title="@string/menu_clear"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/menu_refresh"
         android:title="@string/refresh"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>
