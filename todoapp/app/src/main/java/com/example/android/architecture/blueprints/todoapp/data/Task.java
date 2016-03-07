@@ -35,7 +35,7 @@ public final class Task {
     @Nullable
     private final String mDescription;
 
-    private final boolean mCompleted;
+    private boolean mCompleted;
     /**
      * Use this constructor to create a new active Task.
      *
@@ -119,6 +119,10 @@ public final class Task {
 
     public boolean isCompleted() {
         return mCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        mCompleted = completed;
     }
 
     public boolean isActive() {

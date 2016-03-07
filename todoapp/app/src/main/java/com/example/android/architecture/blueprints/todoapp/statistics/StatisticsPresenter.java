@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -24,8 +26,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
@@ -41,8 +41,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                                @NonNull StatisticsContract.View statisticsView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-
-        mStatisticsView.setPresenter(this);
     }
 
     @Override
@@ -50,7 +48,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         loadStatistics();
     }
 
-    private void loadStatistics() {
+    @Override
+    public void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows
@@ -60,8 +59,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
 
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
@@ -69,30 +66,13 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                 if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                     EspressoIdlingResource.decrement(); // Set app as idle.
                 }
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
-                    }
-                }
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
+                mStatisticsView.displayStatistics(tasks);
             }
 
             @Override
             public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
                 mStatisticsView.showLoadingStatisticsError();
             }
         });

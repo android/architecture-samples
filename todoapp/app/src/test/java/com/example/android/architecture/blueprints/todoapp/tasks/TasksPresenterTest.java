@@ -16,6 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -30,11 +35,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for the implementation of {@link TasksPresenter}
  */
@@ -46,7 +46,7 @@ public class TasksPresenterTest {
     private TasksRepository mTasksRepository;
 
     @Mock
-    private TasksContract.View mTasksView;
+    private TasksFragment mTasksView;
 
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
@@ -57,6 +57,7 @@ public class TasksPresenterTest {
 
     private TasksPresenter mTasksPresenter;
 
+
     @Before
     public void setupTasksPresenter() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
@@ -66,12 +67,12 @@ public class TasksPresenterTest {
         // Get a reference to the class under test
         mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
 
-        // The presenter won't update the view unless it's active.
-        when(mTasksView.isActive()).thenReturn(true);
-
-        // We start the tasks to 3, with one active and two completed
+        // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+
+        // The presenter won't update the view unless it's active.
+        when(mTasksView.isActive()).thenReturn(true);
     }
 
     @Test
@@ -85,9 +86,8 @@ public class TasksPresenterTest {
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
-        // Then progress indicator is shown
-        verify(mTasksView).setLoadingIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
+        verify(mTasksView).setLoadingIndicator(true);
         verify(mTasksView).setLoadingIndicator(false);
         ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
@@ -168,6 +168,7 @@ public class TasksPresenterTest {
     public void activateTask_ShowsTaskMarkedActive() {
         // Given a stubbed completed task
         Task task = new Task("Details Requested", "For this task", true);
+        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
         mTasksPresenter.loadTasks(true);
 
         // When task is marked as activated
@@ -191,4 +192,16 @@ public class TasksPresenterTest {
         // Then an error message is shown
         verify(mTasksView).showLoadingTasksError();
     }
+
+
+    @Test
+    public void clearCompletedTasks_ClearsTasks() {
+        // When completed tasks are cleared
+        mTasksPresenter.clearCompletedTasks();
+
+        // Then repository is called and the view is notified
+        verify(mTasksRepository).clearCompletedTasks();
+        verify(mTasksView).showCompletedTasksCleared();
+    }
+
 }

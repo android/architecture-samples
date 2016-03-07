@@ -13,8 +13,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="stats"
+            type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
+    </data>
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -24,10 +34,40 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@{stats.status}"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="@{stats.showStatus ? View.VISIBLE : View.GONE}" />
+
+    <LinearLayout
         android:id="@+id/statistics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Medium Text"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:orientation="vertical"
+        android:visibility="@{stats.showStatus ? View.GONE : View.VISIBLE}">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/statistics_no_tasks"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{stats.numberOfActiveTasks}"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{stats.numberOfCompletedTasks}"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+
+    </LinearLayout>
 </LinearLayout>
+</layout>

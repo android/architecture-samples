@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.todomvp"
+        applicationId "com.example.android.architecture.blueprints.tododatabinding"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -26,9 +27,7 @@ android {
         mock {
             applicationIdSuffix = ".mock"
         }
-        prod {
-
-        }
+        prod
     }
 
     // Remove mockRelease as it's not needed.
@@ -44,6 +43,10 @@ android {
         testLogging {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
+    }
+
+    dataBinding {
+        enabled = true
     }
 }
 

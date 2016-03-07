@@ -68,8 +68,14 @@ public class StatisticsActivity extends AppCompatActivity {
                     statisticsFragment, R.id.contentFrame);
         }
 
-        new StatisticsPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), statisticsFragment);
+        StatisticsViewModel statisticsViewModel = new StatisticsViewModel(getApplicationContext());
+
+        statisticsFragment.setViewModel(statisticsViewModel);
+
+        StatisticsPresenter statisticsPresenter = new StatisticsPresenter(
+                Injection.provideTasksRepository(getApplicationContext()), statisticsViewModel);
+
+        statisticsFragment.setPresenter(statisticsPresenter);
     }
 
     @Override
@@ -92,8 +98,6 @@ public class StatisticsActivity extends AppCompatActivity {
                             case R.id.list_navigation_menu_item:
                                 Intent intent =
                                         new Intent(StatisticsActivity.this, TasksActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             case R.id.statistics_navigation_menu_item:

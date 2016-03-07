@@ -17,13 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
@@ -31,47 +28,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
-    private final TasksRepository mTasksRepository;
-
     private final TaskDetailContract.View mTaskDetailView;
 
-    @Nullable
+    private TasksRepository mRepository;
+
+    @NonNull
     private String mTaskId;
 
-    public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
-        this.mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
-        mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
+    public TaskDetailPresenter(@NonNull String taskId, TasksRepository repository,
+            @NonNull TaskDetailContract.View view) {
+        mRepository = repository;
+        mTaskDetailView = view;
+        mTaskId = taskId;
 
         mTaskDetailView.setPresenter(this);
     }
 
+
     @Override
     public void start() {
-        openTask();
+        getTask();
     }
 
-    private void openTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            mTaskDetailView.showMissingTask();
-            return;
-        }
-
-        mTaskDetailView.setLoadingIndicator(true);
-        mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
+    @Override
+    public void getTask() {
+        mRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
                 // The view may not be able to handle UI updates anymore
                 if (!mTaskDetailView.isActive()) {
                     return;
                 }
-                mTaskDetailView.setLoadingIndicator(false);
-                if (null == task) {
-                    mTaskDetailView.showMissingTask();
+                if (task != null) {
+                    mTaskDetailView.showTask(task);
                 } else {
-                    showTask(task);
+                    mTaskDetailView.showError();
                 }
             }
 
@@ -81,61 +72,29 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                 if (!mTaskDetailView.isActive()) {
                     return;
                 }
-                mTaskDetailView.showMissingTask();
+                mTaskDetailView.showError();
             }
         });
     }
 
     @Override
-    public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            mTaskDetailView.showMissingTask();
-            return;
-        }
-        mTaskDetailView.showEditTask(mTaskId);
-    }
-
-    @Override
     public void deleteTask() {
-        mTasksRepository.deleteTask(mTaskId);
+        mRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
+    /**
+     * Called by the Data Binding library.
+     */
     @Override
-    public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            mTaskDetailView.showMissingTask();
-            return;
-        }
-        mTasksRepository.completeTask(mTaskId);
-        mTaskDetailView.showTaskMarkedComplete();
-    }
-
-    @Override
-    public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            mTaskDetailView.showMissingTask();
-            return;
-        }
-        mTasksRepository.activateTask(mTaskId);
-        mTaskDetailView.showTaskMarkedActive();
-    }
-
-    private void showTask(Task task) {
-        String title = task.getTitle();
-        String description = task.getDescription();
-
-        if (title != null && title.isEmpty()) {
-            mTaskDetailView.hideTitle();
+    public void completeChanged(Task task, boolean isChecked) {
+        task.setCompleted(isChecked);
+        if (isChecked) {
+            mRepository.completeTask(task);
+            mTaskDetailView.showTaskMarkedComplete();
         } else {
-            mTaskDetailView.showTitle(title);
+            mRepository.activateTask(task);
+            mTaskDetailView.showTaskMarkedActive();
         }
-
-        if (description != null && description.isEmpty()) {
-            mTaskDetailView.hideDescription();
-        } else {
-            mTaskDetailView.showDescription(description);
-        }
-        mTaskDetailView.showCompletionStatus(task.isCompleted());
     }
 }

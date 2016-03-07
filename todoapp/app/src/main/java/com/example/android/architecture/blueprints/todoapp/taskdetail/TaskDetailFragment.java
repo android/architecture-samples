@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -30,14 +29,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
@@ -48,13 +46,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     public static final int REQUEST_EDIT_TASK = 1;
 
+    private TaskdetailFragBinding mViewDataBinding;
+
     private TaskDetailContract.Presenter mPresenter;
-
-    private TextView mDetailTitle;
-
-    private TextView mDetailDescription;
-
-    private CheckBox mDetailCompleteStatus;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -62,6 +56,19 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
+    }
+
+
+    @Override
+    public void setPresenter(TaskDetailContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewDataBinding.setPresenter(mPresenter);
     }
 
     @Override
@@ -74,11 +81,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
+
+        View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
+
+        mViewDataBinding = TaskdetailFragBinding.bind(view);
+
         setHasOptionsMenu(true);
-        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
-        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+
+        setRetainInstance(true);
 
         // Set up floating action button
         FloatingActionButton fab =
@@ -87,22 +97,21 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.editTask();
+                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
+                Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
+                intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+                startActivityForResult(intent, REQUEST_EDIT_TASK);
             }
         });
 
-        return root;
-    }
-
-    @Override
-    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+        return view;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
+                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
                 mPresenter.deleteTask();
                 return true;
         }
@@ -113,68 +122,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void setLoadingIndicator(boolean active) {
-        if (active) {
-            mDetailTitle.setText("");
-            mDetailDescription.setText(getString(R.string.loading));
-        }
-    }
-
-    @Override
-    public void hideDescription() {
-        mDetailDescription.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void hideTitle() {
-        mDetailTitle.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void showDescription(String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
-    }
-
-    @Override
-    public void showCompletionStatus(final boolean complete) {
-        mDetailCompleteStatus.setChecked(complete);
-        mDetailCompleteStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (complete) {
-                    mPresenter.activateTask();
-                } else {
-                    mPresenter.completeTask();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void showEditTask(String taskId) {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-        startActivityForResult(intent, REQUEST_EDIT_TASK);
-    }
-
-    @Override
-    public void showTaskDeleted() {
-        getActivity().finish();
-    }
-
-    public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    @Override
-    public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
     }
 
     @Override
@@ -190,15 +137,32 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void showTitle(String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
-        mDetailTitle.setText(title);
+    public void showTask(Task task) {
+        mViewDataBinding.setTask(task);
     }
 
     @Override
-    public void showMissingTask() {
-        mDetailTitle.setText("");
-        mDetailDescription.setText(getString(R.string.no_data));
+    public void showError() {
+        // If an error occurred, simply show an empty task.
+        Task emptyTask = new Task("", getString(R.string.no_data));
+        mViewDataBinding.setTask(emptyTask);
+    }
+
+    @Override
+    public void showTaskDeleted() {
+        getActivity().finish();
+    }
+
+    @Override
+    public void showTaskMarkedComplete() {
+        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
+                .show();
+    }
+
+    @Override
+    public void showTaskMarkedActive() {
+        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
+                .show();
     }
 
     @Override

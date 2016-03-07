@@ -47,23 +47,9 @@ public interface TasksContract {
 
         void showLoadingTasksError();
 
-        void showNoTasks();
-
-        void showActiveFilterLabel();
-
-        void showCompletedFilterLabel();
-
-        void showAllFilterLabel();
-
-        void showNoActiveTasks();
-
-        void showNoCompletedTasks();
-
         void showSuccessfullySavedMessage();
 
         boolean isActive();
-
-        void showFilteringPopUpMenu();
     }
 
     interface Presenter extends BasePresenter {

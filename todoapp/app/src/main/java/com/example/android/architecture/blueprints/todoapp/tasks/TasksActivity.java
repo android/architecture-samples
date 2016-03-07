@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright 2016, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,13 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        mTasksPresenter = new TasksPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+        mTasksPresenter = new TasksPresenter(Injection.provideTasksRepository(
+                getApplicationContext()), tasksFragment);
+
+        TasksViewModel tasksViewModel =
+                new TasksViewModel(getApplicationContext(), mTasksPresenter);
+
+        tasksFragment.setViewModel(tasksViewModel);
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
