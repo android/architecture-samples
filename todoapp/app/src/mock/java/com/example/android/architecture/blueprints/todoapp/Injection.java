@@ -25,6 +25,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 
 /**
  * Enables injection of mock implementations for
@@ -37,5 +39,9 @@ public class Injection {
         checkNotNull(context);
         return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
                 TasksLocalDataSource.getInstance(context));
+    }
+
+    public static GetTasks provideGetTasks(@NonNull Context context) {
+        return new GetTasks(provideTasksRepository(context), new FilterFactory());
     }
 }
