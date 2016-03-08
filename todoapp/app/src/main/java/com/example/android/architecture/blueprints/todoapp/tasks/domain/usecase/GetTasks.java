@@ -16,7 +16,6 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
     private final TasksRepository mTasksRepository;
     private final FilterFactory mFilterFactory;
 
-    //The use case handler should be out :) You don't need it now inside this class
     public GetTasks(TasksRepository tasksRepository, FilterFactory filterFactory) {
         mTasksRepository = tasksRepository;
         mFilterFactory = filterFactory;
@@ -24,6 +23,10 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
 
     @Override
     protected void executeUseCase(final RequestValues values) {
+        if (values.isForceUpdate()) {
+            mTasksRepository.refreshTasks();
+        }
+
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {

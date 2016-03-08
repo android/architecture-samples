@@ -16,26 +16,36 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
+ * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
+ * updates
  * the UI as required.
  */
-public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        TasksDataSource.GetTaskCallback {
+public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
-    @NonNull
-    private final TasksDataSource mTasksRepository;
 
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
+
+    @NonNull
+    private final GetTask mGetTask;
+
+    @NonNull
+    private final SaveTask mSaveTask;
+
+    @NonNull
+    private final UseCaseHandler mUseCaseHandler;
 
     @Nullable
     private String mTaskId;
@@ -43,15 +53,17 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     /**
      * Creates a presenter for the add/edit view.
      *
-     * @param taskId ID of the task to edit or null for a new task
-     * @param tasksRepository a repository of data for tasks
+     * @param taskId      ID of the task to edit or null for a new task
      * @param addTaskView the add/edit view
      */
-    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+    public AddEditTaskPresenter(@NonNull UseCaseHandler useCaseHandler, @Nullable String taskId,
+            @NonNull AddEditTaskContract.View addTaskView, @NonNull GetTask getTask,
+            @NonNull SaveTask saveTask) {
+        mUseCaseHandler = useCaseHandler;
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
+        mGetTask = checkNotNull(getTask);
+        mSaveTask = checkNotNull(saveTask);
 
         mAddTaskView.setPresenter(this);
     }
@@ -69,8 +81,18 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
-            mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                    new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                        @Override
+                        public void onSuccess(SaveTask.ResponseValue response) {
+                            mAddTaskView.showTasksList();
+                        }
+
+                        @Override
+                        public void onError(Error error) {
+                            showSaveError();
+                        }
+                    });
         }
     }
 
@@ -79,8 +101,20 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mTaskId == null) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        Task newTask = new Task(title, description, mTaskId);
+        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(SaveTask.ResponseValue response) {
+                        // After an edit, go back to the list.
+                        mAddTaskView.showTasksList();
+                    }
+
+                    @Override
+                    public void onError(Error error) {
+                        showSaveError();
+                    }
+                });
     }
 
     @Override
@@ -88,11 +122,22 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mTaskId == null) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        mTasksRepository.getTask(mTaskId, this);
+
+        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(GetTask.ResponseValue response) {
+                        showTask(response.getTask());
+                    }
+
+                    @Override
+                    public void onError(Error error) {
+                        showEmptyTaskError();
+                    }
+                });
     }
 
-    @Override
-    public void onTaskLoaded(Task task) {
+    private void showTask(Task task) {
         // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.setTitle(task.getTitle());
@@ -100,8 +145,14 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         }
     }
 
-    @Override
-    public void onDataNotAvailable() {
+    private void showSaveError() {
+        // The view may not be able to handle UI updates anymore
+        if (mAddTaskView.isActive()) {
+            mAddTaskView.showSaveError();
+        }
+    }
+
+    private void showEmptyTaskError() {
         // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();

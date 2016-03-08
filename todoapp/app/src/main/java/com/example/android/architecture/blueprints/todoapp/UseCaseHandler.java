@@ -7,6 +7,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 public class UseCaseHandler {
 
+    private static UseCaseHandler INSTANCE;
     private final UseCaseScheduler mUseCaseScheduler;
     private final Handler mHandler = new Handler();
 
@@ -81,5 +82,13 @@ public class UseCaseHandler {
         public void onError(Error error) {
             mUseCaseHandler.notifyError(error, mCallback);
         }
+    }
+
+
+    public static UseCaseHandler getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler());
+        }
+        return INSTANCE;
     }
 }

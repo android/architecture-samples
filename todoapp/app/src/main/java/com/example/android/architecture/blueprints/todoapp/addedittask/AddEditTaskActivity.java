@@ -48,7 +48,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
         actionBar.setDisplayShowHomeEnabled(true);
 
         AddEditTaskFragment addEditTaskFragment =
-                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(
+                        R.id.contentFrame);
 
         String taskId = null;
         if (addEditTaskFragment == null) {
@@ -70,10 +71,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        new AddEditTaskPresenter(
+        new AddEditTaskPresenter(Injection.provideUseCaseHandler(),
                 taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
+                addEditTaskFragment,
+                Injection.provideGetTask(getApplicationContext()),
+                Injection.provideSaveTask(getApplicationContext())
+        );
     }
 
     @Override
