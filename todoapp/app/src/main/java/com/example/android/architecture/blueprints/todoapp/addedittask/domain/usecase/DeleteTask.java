@@ -1,33 +1,31 @@
-package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase;
+package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
-public class CompleteTask extends UseCase<CompleteTask.RequestValues, CompleteTask.ResponseValue> {
+public class DeleteTask extends UseCase<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
-    public CompleteTask(TasksRepository tasksRepository) {
+    public DeleteTask(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
     }
 
     @Override
     protected void executeUseCase(final RequestValues values) {
-        String completedTask = values.getCompletedTask();
-        mTasksRepository.completeTask(completedTask);
+        mTasksRepository.deleteTask(values.getTaskId());
         getUseCaseCallback().onSuccess(new ResponseValue());
     }
 
     public static class RequestValues extends UseCase.RequestValues {
+        private final String mTaskId;
 
-        private final String mCompletedTask;
-
-        public RequestValues(String completedTask) {
-            mCompletedTask = completedTask;
+        public RequestValues(String taskId) {
+            mTaskId = taskId;
         }
 
-        public String getCompletedTask() {
-            return mCompletedTask;
+        public String getTaskId() {
+            return mTaskId;
         }
     }
 

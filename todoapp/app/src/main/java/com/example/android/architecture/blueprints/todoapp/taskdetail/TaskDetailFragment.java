@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,8 +38,6 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
@@ -204,5 +204,11 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public void showGenericError() {
+        Snackbar.make(getView(), getString(R.string.generic_error), Snackbar.LENGTH_LONG)
+                .show();
     }
 }

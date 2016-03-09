@@ -61,7 +61,8 @@ public class TasksPresenter implements TasksContract.Presenter {
         mGetTasks = checkNotNull(getTasks, "getTask cannot be null!");
         mCompleteTask = checkNotNull(completeTask, "completeTask cannot be null!");
         mActivateTask = checkNotNull(activateTask, "activateTask cannot be null!");
-        mClearCompleteTasks = checkNotNull(clearCompleteTasks, "clearCompleteTasks cannot be null!");
+        mClearCompleteTasks = checkNotNull(clearCompleteTasks,
+                "clearCompleteTasks cannot be null!");
 
 
         mTasksView.setPresenter(this);
@@ -181,7 +182,8 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(completedTask),
+        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
+                        completedTask.getId()),
                 new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
                     @Override
                     public void onSuccess(CompleteTask.ResponseValue response) {
@@ -199,7 +201,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
-        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask),
+        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
                 new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
                     @Override
                     public void onSuccess(ActivateTask.ResponseValue response) {

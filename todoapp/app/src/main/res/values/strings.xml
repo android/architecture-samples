@@ -37,6 +37,7 @@
     <string name="statistics_active_tasks">Active tasks:</string>
     <string name="statistics_completed_tasks">Completed tasks:</string>
     <string name="statistics_error">Error loading statistics.</string>
+    <string name="generic_error">Unexpected Error.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
 

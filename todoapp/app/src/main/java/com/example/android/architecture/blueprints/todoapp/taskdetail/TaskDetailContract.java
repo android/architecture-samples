@@ -49,6 +49,8 @@ public interface TaskDetailContract {
         void showTaskMarkedActive();
 
         boolean isActive();
+
+        void showGenericError();
     }
 
     interface Presenter extends BasePresenter {

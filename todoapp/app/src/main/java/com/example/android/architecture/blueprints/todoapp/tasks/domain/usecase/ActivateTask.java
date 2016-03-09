@@ -1,7 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
@@ -14,33 +13,24 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
 
     @Override
     protected void executeUseCase(final RequestValues values) {
-        Task activeTask = values.getCompletedTask();
+        String activeTask = values.getActivateTask();
         mTasksRepository.activateTask(activeTask);
-        getUseCaseCallback().onSuccess(new ResponseValue(activeTask));
+        getUseCaseCallback().onSuccess(new ResponseValue());
     }
 
     public static class RequestValues extends UseCase.RequestValues {
 
-        private final Task mCompletedTask;
+        private final String mActivateTask;
 
-        public RequestValues(Task completedTask) {
-            mCompletedTask = completedTask;
+        public RequestValues(String activateTask) {
+            mActivateTask = activateTask;
         }
 
-        public Task getCompletedTask() {
-            return mCompletedTask;
+        public String getActivateTask() {
+            return mActivateTask;
         }
     }
 
     public class ResponseValue extends UseCase.ResponseValue {
-        private Task mTask;
-
-        public ResponseValue(Task task) {
-            mTask = task;
-        }
-
-        public Task getTask() {
-            return mTask;
-        }
     }
 }

@@ -16,16 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
@@ -33,14 +34,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class StatisticsPresenter implements StatisticsContract.Presenter {
 
-    private final TasksRepository mTasksRepository;
-
     private final StatisticsContract.View mStatisticsView;
+    private final UseCaseHandler mUseCaseHandler;
+    private final GetTasks mGetTasks;
 
-    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
-                               @NonNull StatisticsContract.View statisticsView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
+    public StatisticsPresenter(
+            @NonNull UseCaseHandler useCaseHandler,
+            @NonNull StatisticsContract.View statisticsView,
+            @NonNull GetTasks getTasks) {
+        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
+        mGetTasks = checkNotNull(getTasks,"getTasks cannot be null!");
 
         mStatisticsView.setPresenter(this);
     }
@@ -53,22 +57,15 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+        mUseCaseHandler.execute(mGetTasks, new GetTasks.RequestValues(false,
+                TasksFilterType.ALL_TASKS), new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
             @Override
-            public void onTasksLoaded(List<Task> tasks) {
+            public void onSuccess(GetTasks.ResponseValue response) {
                 int activeTasks = 0;
                 int completedTasks = 0;
 
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
+                List<Task> tasks = response.getTasks();
 
                 // We calculate number of active and completed tasks
                 for (Task task : tasks) {
@@ -88,7 +85,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onError(Error error) {
                 // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;

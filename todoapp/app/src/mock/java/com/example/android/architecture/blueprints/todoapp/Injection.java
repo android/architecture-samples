@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
@@ -72,5 +73,9 @@ public class Injection {
 
     public static ClearCompleteTasks provideClearCompleteTasks(Context context) {
         return new ClearCompleteTasks(Injection.provideTasksRepository(context));
+    }
+
+    public static DeleteTask provideDeleteTask(Context context) {
+        return new DeleteTask(Injection.provideTasksRepository(context));
     }
 }
