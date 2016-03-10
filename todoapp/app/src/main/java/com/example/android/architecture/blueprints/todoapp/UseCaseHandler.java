@@ -1,15 +1,12 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 
-import android.os.Handler;
-
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 public class UseCaseHandler {
 
     private static UseCaseHandler INSTANCE;
     private final UseCaseScheduler mUseCaseScheduler;
-    private final Handler mHandler = new Handler();
 
     public UseCaseHandler(UseCaseScheduler useCaseScheduler) {
         this.mUseCaseScheduler = useCaseScheduler;
@@ -43,22 +40,12 @@ public class UseCaseHandler {
 
     public <R extends UseCase.ResponseValue> void notifyResponse(final R response,
             final UseCase.UseCaseCallback<R> useCaseCallback) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                useCaseCallback.onSuccess(response);
-            }
-        });
+        mUseCaseScheduler.notifyResponse(response,useCaseCallback);
     }
 
     private <R extends UseCase.ResponseValue> void notifyError(final Error error,
             final UseCase.UseCaseCallback<R> useCaseCallback) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                useCaseCallback.onError(error);
-            }
-        });
+        mUseCaseScheduler.onError(error, useCaseCallback);
     }
 
     private class UiCallbackWrapper<R extends UseCase.ResponseValue> implements

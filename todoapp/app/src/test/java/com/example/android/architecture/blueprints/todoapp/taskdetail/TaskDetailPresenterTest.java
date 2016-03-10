@@ -16,9 +16,20 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,11 +37,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TaskDetailPresenter}
@@ -75,8 +81,7 @@ public class TaskDetailPresenterTest {
     @Test
     public void getActiveTaskFromRepositoryAndLoadIntoView() {
         // When tasks presenter is asked to open a task
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(ACTIVE_TASK.getId());
         mTaskDetailPresenter.start();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
@@ -96,8 +101,7 @@ public class TaskDetailPresenterTest {
 
     @Test
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(COMPLETED_TASK.getId());
         mTaskDetailPresenter.start();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
@@ -119,8 +123,7 @@ public class TaskDetailPresenterTest {
     @Test
     public void getUnknownTaskFromRepositoryAndLoadIntoView() {
         // When loading of a task is requested with an invalid task ID.
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(INVALID_TASK_ID);
         mTaskDetailPresenter.start();
         verify(mTaskDetailView).showMissingTask();
     }
@@ -131,8 +134,7 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
 
         // When the deletion of a task is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(task.getId());
         mTaskDetailPresenter.deleteTask();
 
         // Then the repository and the view are notified
@@ -144,8 +146,7 @@ public class TaskDetailPresenterTest {
     public void completeTask() {
         // Given an initialized presenter with an active task
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(task.getId());
         mTaskDetailPresenter.start();
 
         // When the presenter is asked to complete the task
@@ -160,8 +161,7 @@ public class TaskDetailPresenterTest {
     public void activateTask() {
         // Given an initialized presenter with a completed task
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                task.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(task.getId());
         mTaskDetailPresenter.start();
 
         // When the presenter is asked to activate the task
@@ -175,8 +175,7 @@ public class TaskDetailPresenterTest {
     @Test
     public void activeTaskIsShownWhenEditing() {
         // When the edit of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(ACTIVE_TASK.getId());
         mTaskDetailPresenter.editTask();
 
         // Then the view is notified
@@ -186,14 +185,24 @@ public class TaskDetailPresenterTest {
     @Test
     public void invalidTaskIsNotShownWhenEditing() {
         // When the edit of an invalid task id is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(
-                INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
+        mTaskDetailPresenter = givenTaskDetailPresenter(INVALID_TASK_ID);
         mTaskDetailPresenter.editTask();
 
         // Then the edit mode is never started
         verify(mTaskDetailView, never()).showEditTask(INVALID_TASK_ID);
         // instead, the error is shown.
         verify(mTaskDetailView).showMissingTask();
+    }
+
+    private TaskDetailPresenter givenTaskDetailPresenter(String id) {
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        GetTask getTask = new GetTask(mTasksRepository);
+        CompleteTask completeTask = new CompleteTask(mTasksRepository);
+        ActivateTask activateTask = new ActivateTask(mTasksRepository);
+        DeleteTask deleteTask = new DeleteTask(mTasksRepository);
+
+        return new TaskDetailPresenter(useCaseHandler, id, mTaskDetailView,
+                getTask, completeTask, activateTask, deleteTask);
     }
 
 }
