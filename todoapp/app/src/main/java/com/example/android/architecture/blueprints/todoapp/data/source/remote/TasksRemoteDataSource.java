@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -67,7 +68,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public void getTasks(final @NonNull LoadTasksCallback callback) {
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

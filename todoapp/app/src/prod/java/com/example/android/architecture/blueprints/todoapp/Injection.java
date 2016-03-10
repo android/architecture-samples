@@ -16,15 +16,23 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ClearCompleteTasks;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 
 /**
  * Enables injection of production implementations for
@@ -36,5 +44,37 @@ public class Injection {
         checkNotNull(context);
         return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
                 TasksLocalDataSource.getInstance(context));
+    }
+
+    public static GetTasks provideGetTasks(@NonNull Context context) {
+        return new GetTasks(provideTasksRepository(context), new FilterFactory());
+    }
+
+    public static UseCaseHandler provideUseCaseHandler() {
+        return UseCaseHandler.getInstance();
+    }
+
+    public static GetTask provideGetTask(Context context) {
+        return new GetTask(Injection.provideTasksRepository(context));
+    }
+
+    public static SaveTask provideSaveTask(Context context) {
+        return new SaveTask(Injection.provideTasksRepository(context));
+    }
+
+    public static CompleteTask provideCompleteTasks(Context context) {
+        return new CompleteTask(Injection.provideTasksRepository(context));
+    }
+
+    public static ActivateTask provideActivateTask(Context context) {
+        return new ActivateTask(Injection.provideTasksRepository(context));
+    }
+
+    public static ClearCompleteTasks provideClearCompleteTasks(Context context) {
+        return new ClearCompleteTasks(Injection.provideTasksRepository(context));
+    }
+
+    public static DeleteTask provideDeleteTask(Context context) {
+        return new DeleteTask(Injection.provideTasksRepository(context));
     }
 }
