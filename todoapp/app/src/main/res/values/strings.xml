@@ -29,7 +29,6 @@
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your TO-DO here.</string>
     <string name="empty_task_message">TO DOs cannot be empty</string>
-    <string name="save_error">Error saving task.</string>
     <string name="successfully_saved_task_message">TO-DO saved</string>
     <string name="list_title">TO-DO List</string>
     <string name="statistics_title">Statistics</string>
@@ -37,7 +36,6 @@
     <string name="statistics_active_tasks">Active tasks:</string>
     <string name="statistics_completed_tasks">Completed tasks:</string>
     <string name="statistics_error">Error loading statistics.</string>
-    <string name="generic_error">Unexpected Error.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
 

@@ -1,11 +1,31 @@
+/*
+ * Copyright 2016, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.android.architecture.blueprints.todoapp;
 
 
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+/**
+ * TODO: Javadoc
+ */
 public class UseCaseHandler {
 
     private static UseCaseHandler INSTANCE;
+
     private final UseCaseScheduler mUseCaseScheduler;
 
     public UseCaseHandler(UseCaseScheduler useCaseScheduler) {
@@ -13,9 +33,7 @@ public class UseCaseHandler {
     }
 
     public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> void execute(
-            final UseCase<T, R> useCase,
-            T values,
-            UseCase.UseCaseCallback<R> callback) {
+            final UseCase<T, R> useCase, T values, UseCase.UseCaseCallback<R> callback) {
         useCase.setRequestValues(values);
         useCase.setUseCaseCallback(new UiCallbackWrapper(callback, this));
         mUseCaseScheduler.execute(new Runnable() {
@@ -38,30 +56,29 @@ public class UseCaseHandler {
         });
     }
 
-    public <R extends UseCase.ResponseValue> void notifyResponse(final R response,
-            final UseCase.UseCaseCallback<R> useCaseCallback) {
-        mUseCaseScheduler.notifyResponse(response,useCaseCallback);
+    public <V extends UseCase.ResponseValue> void notifyResponse(final V response,
+            final UseCase.UseCaseCallback<V> useCaseCallback) {
+        mUseCaseScheduler.notifyResponse(response, useCaseCallback);
     }
 
-    private <R extends UseCase.ResponseValue> void notifyError(final Error error,
-            final UseCase.UseCaseCallback<R> useCaseCallback) {
+    private <V extends UseCase.ResponseValue> void notifyError(final Error error,
+            final UseCase.UseCaseCallback<V> useCaseCallback) {
         mUseCaseScheduler.onError(error, useCaseCallback);
     }
 
-    private class UiCallbackWrapper<R extends UseCase.ResponseValue> implements
-            UseCase.UseCaseCallback<R> {
-        private final UseCase.UseCaseCallback<R> mCallback;
+    private class UiCallbackWrapper<V extends UseCase.ResponseValue> implements
+            UseCase.UseCaseCallback<V> {
+        private final UseCase.UseCaseCallback<V> mCallback;
         private final UseCaseHandler mUseCaseHandler;
 
-        public UiCallbackWrapper(
-                UseCase.UseCaseCallback<R> callback,
+        public UiCallbackWrapper(UseCase.UseCaseCallback<V> callback,
                 UseCaseHandler useCaseHandler) {
             mCallback = callback;
             mUseCaseHandler = useCaseHandler;
         }
 
         @Override
-        public void onSuccess(R response) {
+        public void onSuccess(V response) {
             mUseCaseHandler.notifyResponse(response, mCallback);
         }
 
@@ -71,9 +88,8 @@ public class UseCaseHandler {
         }
     }
 
-
     public static UseCaseHandler getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler());
         }
         return INSTANCE;

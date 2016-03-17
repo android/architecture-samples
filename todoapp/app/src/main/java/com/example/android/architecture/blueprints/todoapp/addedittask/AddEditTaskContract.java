@@ -35,8 +35,6 @@ public interface AddEditTaskContract {
         void setDescription(String description);
 
         boolean isActive();
-
-        void showSaveError();
     }
 
     interface Presenter extends BasePresenter {

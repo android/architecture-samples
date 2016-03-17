@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright 2016, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,11 +204,5 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public boolean isActive() {
         return isAdded();
-    }
-
-    @Override
-    public void showGenericError() {
-        Snackbar.make(getView(), getString(R.string.generic_error), Snackbar.LENGTH_LONG)
-                .show();
     }
 }

@@ -146,10 +146,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     }
 
     private void showSaveError() {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.showSaveError();
-        }
+        // Show error, log, etc.
     }
 
     private void showEmptyTaskError() {

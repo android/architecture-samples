@@ -124,7 +124,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
                     @Override
                     public void onError(Error error) {
-                        mTaskDetailView.showGenericError();
+                        // Show error, log, etc.
                     }
                 });
     }
@@ -145,7 +145,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
                     @Override
                     public void onError(Error error) {
-                        mTaskDetailView.showGenericError();
+                        // Show error, log, etc.
                     }
                 });
     }
@@ -165,7 +165,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
                     @Override
                     public void onError(Error error) {
-                        mTaskDetailView.showGenericError();
+                        // Show error, log, etc.
                     }
                 });
     }
