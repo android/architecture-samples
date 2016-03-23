@@ -16,10 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -31,26 +31,22 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Concrete implementation of a data source as a db.
- * <P>
+ * <p/>
  * Note: this is a singleton and we are opening the database once and not closing it. The framework
  * cleans up the resources when the application closes so we don't need to close the db.
  */
 public class TasksLocalDataSource implements TasksDataSource {
 
     private static TasksLocalDataSource INSTANCE;
-
-    private TasksDbHelper mDbHelper;
-
-    private SQLiteDatabase mDb;
+    private ContentResolver mContentResolver;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
-        mDbHelper = new TasksDbHelper(context);
-        mDb = mDbHelper.getWritableDatabase();
+
+        mContentResolver = context.getContentResolver();
     }
 
     public static TasksLocalDataSource getInstance(@NonNull Context context) {
@@ -63,17 +59,12 @@ public class TasksLocalDataSource implements TasksDataSource {
     @Override
     public List<Task> getTasks() {
         List<Task> tasks = new ArrayList<Task>();
+
         try {
-
-            String[] projection = {
-                    TaskEntry.COLUMN_NAME_ENTRY_ID,
-                    TaskEntry.COLUMN_NAME_TITLE,
-                    TaskEntry.COLUMN_NAME_DESCRIPTION,
-                    TaskEntry.COLUMN_NAME_COMPLETED
-            };
-
-            Cursor c = mDb.query(
-                    TaskEntry.TABLE_NAME, projection, null, null, null, null, null);
+            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                                              TaskEntry.TASKS_COLUMNS,
+                                              null, null, null, null
+            );
 
             if (c != null && c.getCount() > 0) {
                 while (c.moveToNext()) {
@@ -106,18 +97,13 @@ public class TasksLocalDataSource implements TasksDataSource {
     @Override
     public Task getTask(@NonNull String taskId) {
         try {
-            String[] projection = {
-                    TaskEntry.COLUMN_NAME_ENTRY_ID,
-                    TaskEntry.COLUMN_NAME_TITLE,
-                    TaskEntry.COLUMN_NAME_DESCRIPTION,
-                    TaskEntry.COLUMN_NAME_COMPLETED
-            };
-
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 
-            Cursor c = mDb.query(
-                    TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                                              TaskEntry.TASKS_COLUMNS,
+                                              selection, selectionArgs, null, null
+            );
 
             Task task = null;
 
@@ -154,7 +140,8 @@ public class TasksLocalDataSource implements TasksDataSource {
             values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
             values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
 
-            mDb.insert(TaskEntry.TABLE_NAME, null, values);
+            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
+
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -169,7 +156,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mDb.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -191,7 +178,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mDb.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -208,8 +195,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         try {
             String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
             String[] selectionArgs = {"1"};
-
-            mDb.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -224,7 +210,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     @Override
     public void deleteAllTasks() {
         try {
-            mDb.delete(TaskEntry.TABLE_NAME, null, null);
+            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), null, null);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -236,7 +222,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 
-            mDb.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }

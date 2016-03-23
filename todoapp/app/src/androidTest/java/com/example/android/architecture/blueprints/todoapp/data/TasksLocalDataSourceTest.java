@@ -23,26 +23,22 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 /**
- * Integration test for the {@link TasksDataSource}, which uses the {@link TasksDbHelper}.
+ * Integration test for the {@link TasksDataSource}, which uses the {@link com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider}.
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
