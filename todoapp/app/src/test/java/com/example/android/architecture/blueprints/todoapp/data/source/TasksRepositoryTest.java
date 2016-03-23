@@ -122,7 +122,6 @@ public class TasksRepositoryTest {
         // marked for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).saveTask(newTask);
         verify(mTasksLocalDataSource).saveTask(newTask);
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
     }
 
@@ -139,7 +138,6 @@ public class TasksRepositoryTest {
         // for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isCompleted());
     }
@@ -157,7 +155,6 @@ public class TasksRepositoryTest {
         // server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isCompleted());
     }
@@ -175,7 +172,6 @@ public class TasksRepositoryTest {
         // for server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive());
     }
@@ -193,7 +189,6 @@ public class TasksRepositoryTest {
         // server refresh on next call and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive());
     }
@@ -225,7 +220,6 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).clearCompletedTasks();
         verify(mTasksLocalDataSource).clearCompletedTasks();
 
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 1);
         assertTrue(mTasksRepository.mCachedTasks.get(newTask2.getId()).isActive());
         assertThat(mTasksRepository.mCachedTasks.get(newTask2.getId()).getTitle(), is(TASK_TITLE2));
@@ -248,7 +242,6 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).deleteAllTasks();
         verify(mTasksLocalDataSource).deleteAllTasks();
 
-        assertTrue(mTasksRepository.mCacheIsDirty);
         assertTrue(mTasksRepository.mCachedTasks.size() == 0);
     }
 
