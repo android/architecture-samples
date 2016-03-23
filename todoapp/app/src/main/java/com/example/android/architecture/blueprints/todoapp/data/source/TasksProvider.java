@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
+import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -33,24 +34,24 @@ public class TasksProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case TASK:
                 retCursor = mTasksDbHelper.getReadableDatabase().query(
-                    TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    sortOrder
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
                 );
                 break;
             case TASK_ITEM:
                 retCursor = mTasksDbHelper.getReadableDatabase().query(
-                    TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                    projection,
-                    TasksPersistenceContract.TaskEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
-                    null,
-                    null,
-                    null,
-                    sortOrder
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        TasksPersistenceContract.TaskEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        null,
+                        null,
+                        null,
+                        sortOrder
                 );
                 break;
             default:
@@ -84,19 +85,19 @@ public class TasksProvider extends ContentProvider {
         switch (match) {
             case TASK:
                 Cursor exists = db.query(
-                    TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                    new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
-                    TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
-                    new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)},
-                    null,
-                    null,
-                    null
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                        new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
+                        TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                        new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)},
+                        null,
+                        null,
+                        null
                 );
                 if (exists.moveToLast()) {
                     long _id = db.update(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME, values,
-                        TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
-                                         new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)}
+                            TasksPersistenceContract.TaskEntry.TABLE_NAME, values,
+                            TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                            new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)}
                     );
                     if (_id > 0) {
                         returnUri = TasksPersistenceContract.TaskEntry.buildTasksUriWith(_id);
@@ -130,7 +131,7 @@ public class TasksProvider extends ContentProvider {
         switch (match) {
             case TASK:
                 rowsDeleted = db.delete(
-                    TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -171,6 +172,15 @@ public class TasksProvider extends ContentProvider {
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
 
         return matcher;
+    }
+
+    // This is a method specifically to assist the testing framework in running smoothly.
+    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        mTasksDbHelper.close();
+        super.shutdown();
     }
 
 }
