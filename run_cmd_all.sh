@@ -20,7 +20,7 @@ set -e  # Exit immediately if a command exits with a non-zero status.
 for p in $(cat projects.conf); do
    echo
    echo
-   echo Running unit and Android tests in $p
+   echo Running "$@" in $p
    echo "====================================================================="
 
    pushd $p > /dev/null  # Silent pushd
