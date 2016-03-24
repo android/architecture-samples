@@ -1,6 +1,9 @@
 # How to become a contributor and submit your own code
 
-To contribute with a small fix, simply create a pull request. If you want to add a new sample or plan to request a big change, contact us first.
+To contribute with a small fix, simply create a pull request. Before starting work on new sample intended for submission, please open an issue to discuss it with the team. This will allow us to review the architecture and frameworks used to determine if a spec-compatible app is likely to be accepted.
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/googlesamples/android-architecture/blob/master/code-of-conduct.md). By participating in this project you agree to abide by its terms.
+
 
 ## Code style and structure
 
