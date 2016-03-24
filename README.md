@@ -60,5 +60,5 @@ compact you like your codebase, etc.
 This project is made by the [community](https://github.com/googlesamples/android-architecture/graphs/contributors) and curated by Google and core maintainers. Each sample has a group of owners
 that look after it keeping it up to date and handling issues and pull requests. 
 
-Want to be part of it? [Read on](https://github.com/googlesamples/android-architecture/wiki/Contributions).
+Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
 
