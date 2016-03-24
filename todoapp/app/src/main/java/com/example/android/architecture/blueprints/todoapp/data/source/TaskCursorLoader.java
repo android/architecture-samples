@@ -11,7 +11,7 @@ public class TaskCursorLoader extends CursorLoader {
     //new String[]{Story.FILTER.ask.name()},
 
     public TaskCursorLoader(Context context, long id) {
-        super(context, TasksPersistenceContract.TaskEntry.buildTasksUriWith(id), TasksPersistenceContract.TaskEntry.TASKS_SQL_COLUMNS, null, null, null);
+        super(context, TasksPersistenceContract.TaskEntry.buildTasksUriWith(id), TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, null, null, null);
     }
 
     @Override

@@ -20,7 +20,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -28,9 +29,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the implementation of {@link TaskDetailPresenter}
@@ -54,7 +53,7 @@ public class TaskDetailPresenterTest {
     private TaskDetailContract.View mTaskDetailFragment;
 
     @Mock
-    private TaskLoader mTaskLoader;
+    private TaskCursorLoader mTaskLoader;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -76,7 +75,7 @@ public class TaskDetailPresenterTest {
         mTaskDetailPresenter = new TaskDetailPresenter(
                 ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailFragment, mTaskLoader,
                 mLoaderManager);
-        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), ACTIVE_TASK);
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), TaskCursor.from(ACTIVE_TASK));
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
@@ -90,7 +89,7 @@ public class TaskDetailPresenterTest {
         // When tasks presenter is asked to open a completed task
         mTaskDetailPresenter = new TaskDetailPresenter(COMPLETED_TASK.getId(), mTasksRepository,
                 mTaskDetailFragment, mTaskLoader, mLoaderManager);
-        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), COMPLETED_TASK);
+        mTaskDetailPresenter.onLoadFinished(mock(Loader.class), TaskCursor.from(COMPLETED_TASK));
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
