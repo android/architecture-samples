@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,7 +24,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the UI as required.
  */
 public class TaskDetailPresenter implements TaskDetailContract.Presenter,
-        LoaderManager.LoaderCallbacks<Task> {
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int TASK_QUERY = 3;
 
@@ -41,7 +43,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     private TaskDetailContract.View mTaskDetailView;
 
-    private TaskLoader mTaskLoader;
+    private TaskCursorLoader mTaskLoader;
 
     private LoaderManager mLoaderManager;
 
@@ -51,7 +53,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskLoader taskLoader,
+                               @NonNull TaskCursorLoader taskLoader,
                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
@@ -101,7 +103,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    private void showTask(Task task) {
+    private void showTask(Cursor data) {
+        Task task = TaskCursor.to(data);
+
         String title = task.getTitle();
         String description = task.getDescription();
 
@@ -121,7 +125,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     @Override
-    public Loader<Task> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (mTaskId == null) {
             return null;
         }
@@ -130,7 +134,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     @Override
-    public void onLoadFinished(Loader<Task> loader, Task data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
             showTask(data);
         } else {
@@ -139,7 +143,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     @Override
-    public void onLoaderReset(Loader<Task> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         // no-op
     }
 
