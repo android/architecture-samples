@@ -12,7 +12,7 @@ public class TaskCursor {
      *
      * @return
      */
-    public static Cursor from(Task task) {
+    public static MatrixCursor from(Task task) {
         MatrixCursor taskCursor = new MatrixCursor(TasksPersistenceContract.TaskEntry.TASKS_COLUMNS);
         taskCursor.addRow(new Object[]{task.getId(), task.getTitle(), task.getDescription(), task.isCompleted()});
         return taskCursor;
@@ -23,12 +23,12 @@ public class TaskCursor {
      *
      * @return
      */
-    public static Task to(Cursor cursor) {
+    public static Task from(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 0;
-        return new Task(id, title, description, completed);
+        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, id, completed);
     }
 
 }
