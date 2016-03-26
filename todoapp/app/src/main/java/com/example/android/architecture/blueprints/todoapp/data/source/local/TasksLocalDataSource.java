@@ -62,7 +62,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
         try {
             Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_COLUMNS,
+                                              TaskEntry.TASKS_SQL_COLUMNS,
                                               null, null, null, null
             );
 
@@ -101,7 +101,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String[] selectionArgs = {taskId};
 
             Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_COLUMNS,
+                                              TaskEntry.TASKS_SQL_COLUMNS,
                                               selection, selectionArgs, null, null
             );
 

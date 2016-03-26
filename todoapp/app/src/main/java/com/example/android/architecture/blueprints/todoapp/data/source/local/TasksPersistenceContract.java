@@ -40,6 +40,12 @@ public final class TasksPersistenceContract {
     public static abstract class TaskEntry implements BaseColumns {
 
         public static String[] TASKS_COLUMNS = new String[]{
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED};
+
+        public static String[] TASKS_SQL_COLUMNS = new String[]{
                 TasksPersistenceContract.TaskEntry._ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
