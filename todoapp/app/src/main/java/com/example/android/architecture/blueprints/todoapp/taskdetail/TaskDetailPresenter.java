@@ -104,7 +104,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     private void showTask(Cursor data) {
-        Task task = TaskCursor.to(data);
+        Task task = TaskCursor.from(data);
 
         String title = task.getTitle();
         String description = task.getDescription();
