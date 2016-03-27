@@ -74,7 +74,17 @@ public class TasksInteractor implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull String taskId) {
+        try {
+            ContentValues values = new ContentValues();
+            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, false);
 
+            String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+            String[] selectionArgs = {taskId};
+
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
+        } catch (IllegalStateException e) {
+            // Send to analytics, log etc
+        }
     }
 
     @Override
