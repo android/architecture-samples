@@ -19,14 +19,12 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,36 +56,9 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public List<Task> getTasks() {
-        List<Task> tasks = new ArrayList<Task>();
-
-        try {
-            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_SQL_COLUMNS,
-                                              null, null, null, null
-            );
-
-            if (c != null && c.getCount() > 0) {
-                while (c.moveToNext()) {
-                    String itemId = c
-                            .getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-                    String title = c
-                            .getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-                    String description =
-                            c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-                    boolean completed =
-                            c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-                    Task task = new Task(title, description, itemId, completed);
-                    tasks.add(task);
-                }
-            }
-            if (c != null) {
-                c.close();
-            }
-
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-        return tasks;
+        // we don't need this since the CursorLoader talks to the
+        // ContentResolver directly
+        return null;
     }
 
     /**
@@ -96,36 +67,8 @@ public class TasksLocalDataSource implements TasksDataSource {
      */
     @Override
     public Task getTask(@NonNull String taskId) {
-        try {
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
-
-            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_SQL_COLUMNS,
-                                              selection, selectionArgs, null, null
-            );
-
-            Task task = null;
-
-            if (c != null && c.getCount() > 0) {
-                c.moveToFirst();
-                String itemId = c
-                        .getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-                String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-                String description =
-                        c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-                boolean completed =
-                        c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-                task = new Task(title, description, itemId, completed);
-            }
-            if (c != null) {
-                c.close();
-            }
-
-            return task;
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
+        // we don't need this since the CursorLoader talks to the
+        // ContentResolver directly
         return null;
     }
 
@@ -140,7 +83,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
             values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
 
-            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
+            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values);
 
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
@@ -156,7 +99,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -178,7 +121,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -222,7 +165,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 
-            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
+            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(taskId)), selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }

@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
@@ -40,12 +38,4 @@ public class Injection {
                 TasksLocalDataSource.getInstance(context));
     }
 
-    public static TasksDataSource provideRemoteDataSource(){
-        return TasksRemoteDataSource.getInstance();
-    }
-
-    public static TasksInteractor provideTasksInteractor(@NonNull ContentResolver contentResolver) {
-        checkNotNull(contentResolver);
-        return new TasksInteractor(contentResolver);
-    }
 }
