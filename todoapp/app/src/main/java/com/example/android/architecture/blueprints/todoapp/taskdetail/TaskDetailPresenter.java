@@ -41,7 +41,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     private TaskDetailContract.View mTaskDetailView;
 
-    private TaskCursorLoader mTaskLoader;
+    private TaskCursorLoader mLoader;
 
     private LoaderManager mLoaderManager;
 
@@ -59,7 +59,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
+        mLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mTaskDetailView.setPresenter(this);
@@ -131,7 +131,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             return null;
         }
         mTaskDetailView.setLoadingIndicator(true);
-        return mTaskLoader;
+        return mLoader;
     }
 
     @Override

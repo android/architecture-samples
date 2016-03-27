@@ -7,7 +7,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 
 public class TasksCursorLoader extends CursorLoader {
 
-    public TasksCursorLoader(Context context, long id) {
+    public TasksCursorLoader(Context context) {
         super(context, TasksPersistenceContract.TaskEntry.buildTasksUri(), TasksPersistenceContract.TaskEntry.TASKS_SQL_COLUMNS, null, null, null);
     }
 

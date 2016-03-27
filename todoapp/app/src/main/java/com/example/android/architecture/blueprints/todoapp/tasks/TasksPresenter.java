@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -25,8 +26,8 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
 public class TasksPresenter implements TasksContract.Presenter,
-        LoaderManager.LoaderCallbacks<List<Task>> {
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int TASKS_QUERY = 1;
 
@@ -48,17 +49,15 @@ public class TasksPresenter implements TasksContract.Presenter,
 
     private final TasksContract.View mTasksView;
 
-    private final TasksLoader mLoader;
+    private final TasksCursorLoader mLoader;
 
     private final LoaderManager mLoaderManager;
-
-    private List<Task> mCurrentTasks;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull TasksLoader loader, @NonNull LoaderManager loaderManager,
+    public TasksPresenter(@NonNull TasksCursorLoader loader, @NonNull LoaderManager loaderManager,
                           @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mLoader = checkNotNull(loader, "loader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
@@ -82,53 +81,51 @@ public class TasksPresenter implements TasksContract.Presenter,
     }
 
     @Override
-    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         mTasksView.setLoadingIndicator(true);
         return mLoader;
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mTasksView.setLoadingIndicator(false);
-
-        mCurrentTasks = data;
-        if (mCurrentTasks == null) {
-            mTasksView.showLoadingTasksError();
-        } else {
+        if (data != null) {
             showFilteredTasks();
+        } else {
+            mTasksView.showLoadingTasksError();
         }
     }
 
     private void showFilteredTasks() {
         List<Task> tasksToDisplay = new ArrayList<>();
-        if (mCurrentTasks != null) {
-            for (Task task : mCurrentTasks) {
-                switch (mCurrentFiltering) {
-                    case ALL_TASKS:
-                        tasksToDisplay.add(task);
-                        break;
-                    case ACTIVE_TASKS:
-                        if (task.isActive()) {
-                            tasksToDisplay.add(task);
-                        }
-                        break;
-                    case COMPLETED_TASKS:
-                        if (task.isCompleted()) {
-                            tasksToDisplay.add(task);
-                        }
-                        break;
-                    default:
-                        tasksToDisplay.add(task);
-                        break;
-                }
-            }
-        }
+//        if (mCurrentTasks != null) {
+//            for (Task task : mCurrentTasks) {
+//                switch (mCurrentFiltering) {
+//                    case ALL_TASKS:
+//                        tasksToDisplay.add(task);
+//                        break;
+//                    case ACTIVE_TASKS:
+//                        if (task.isActive()) {
+//                            tasksToDisplay.add(task);
+//                        }
+//                        break;
+//                    case COMPLETED_TASKS:
+//                        if (task.isCompleted()) {
+//                            tasksToDisplay.add(task);
+//                        }
+//                        break;
+//                    default:
+//                        tasksToDisplay.add(task);
+//                        break;
+//                }
+//            }
+//        }
 
         processTasks(tasksToDisplay);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Task>> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         // no-op
     }
 

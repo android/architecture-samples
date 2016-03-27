@@ -18,17 +18,11 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.test.mock.MockCursor;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,8 +58,8 @@ public class TaskDetailPresenterTest {
     @Mock
     private TasksRepository mTasksRepository;
 
-    private TaskMockCursor mActiveTaskCursor;
-    private TaskMockCursor mCompletedTaskCursor;
+    private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
+    private MockCursorProvider.TaskMockCursor mCompletedTaskCursor;
 
     private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -75,30 +69,8 @@ public class TaskDetailPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        initActiveTaskCursor();
-        initCompletedTaskCursor();
-    }
-
-    private void initActiveTaskCursor() {
-        List<Map<Integer, Object>> entryList = new ArrayList<>();
-        Map<Integer, Object> m = new HashMap<>();
-        m.put(0, "1");
-        m.put(1, TITLE_TEST);
-        m.put(2, DESCRIPTION_TEST);
-        m.put(3, 0);
-        entryList.add(m);
-        mActiveTaskCursor = new TaskMockCursor(entryList);
-    }
-
-    private void initCompletedTaskCursor() {
-        List<Map<Integer, Object>> entryList = new ArrayList<>();
-        Map<Integer, Object> m = new HashMap<>();
-        m.put(0, "2");
-        m.put(1, TITLE_TEST);
-        m.put(2, DESCRIPTION_TEST);
-        m.put(3, 1);
-        entryList.add(m);
-        mCompletedTaskCursor = new TaskMockCursor(entryList);
+        mActiveTaskCursor = MockCursorProvider.createActiveTaskCursor();
+        mCompletedTaskCursor = MockCursorProvider.createCompletedTaskCursor();
     }
 
     @Test
@@ -212,71 +184,6 @@ public class TaskDetailPresenterTest {
         verify(mTaskDetailFragment).showMissingTask();
     }
 
-    public class TaskMockCursor extends MockCursor {
-
-        Map<Integer, Object> entry;
-        List<Map<Integer, Object>> entryList;
-        Map<String, Integer> columnIndexes;
-
-        {
-            columnIndexes = new HashMap<>();
-            columnIndexes.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, 0);
-            columnIndexes.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, 1);
-            columnIndexes.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, 2);
-            columnIndexes.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, 3);
-        }
-
-        public TaskMockCursor(List<Map<Integer, Object>> entryList) {
-            this.entryList = entryList;
-        }
-
-        @Override
-        public String getString(int columnIndex) {
-            return getValueString(columnIndex);
-        }
-
-        @Override
-        public float getFloat(int columnIndex) {
-            return Float.parseFloat(getValueString(columnIndex));
-        }
-
-        @Override
-        public int getInt(int columnIndex) {
-            return getValueInt(columnIndex);
-        }
-
-        private String getValueString(int columnIndex) {
-            entry = entryList.get(0);
-            String value = (String) entry.get(columnIndex);
-            return value;
-        }
-
-        private int getValueInt(int columnIndex) {
-            entry = entryList.get(0);
-            int value = (int) entry.get(columnIndex);
-            return value;
-        }
-
-        @Override
-        public int getColumnIndex(String columnName) {
-            return Integer.valueOf(columnIndexes.get(columnName));
-        }
-
-        @Override
-        public int getColumnIndexOrThrow(String columnName) {
-            return Integer.valueOf(columnIndexes.get(columnName));
-        }
-
-        @Override
-        public boolean moveToFirst() {
-            return true;
-        }
-
-        @Override
-        public boolean moveToNext() {
-            return false;
-        }
-    }
 }
 
 
