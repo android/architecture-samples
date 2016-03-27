@@ -83,7 +83,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
             values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
 
-            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values);
+            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
 
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
@@ -99,7 +99,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -121,7 +121,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};
 
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(task.getId())), values, selection, selectionArgs);
+            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
@@ -165,7 +165,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 
-            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUriWith(Long.valueOf(taskId)), selection, selectionArgs);
+            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
         }
