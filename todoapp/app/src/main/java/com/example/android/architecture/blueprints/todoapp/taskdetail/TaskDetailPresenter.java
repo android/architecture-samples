@@ -26,7 +26,7 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,8 +39,6 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     private static final int TASK_QUERY = 3;
 
-    private TasksRepository mTasksRepository;
-
     private TaskDetailContract.View mTaskDetailView;
 
     private TaskCursorLoader mTaskLoader;
@@ -50,13 +48,16 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    @NonNull
+    private final TasksInteractor mTasksInteractor;
+
     public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
+                               @NonNull TasksInteractor tasksInteractor,
                                @NonNull TaskDetailContract.View taskDetailView,
                                @NonNull TaskCursorLoader taskLoader,
                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
+        mTasksInteractor = checkNotNull(tasksInteractor, "tasksResolver cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
@@ -80,7 +81,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void deleteTask() {
-        mTasksRepository.deleteTask(mTaskId);
+        mTasksInteractor.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
@@ -89,7 +90,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(mTaskId);
+        mTasksInteractor.completeTask(mTaskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -99,7 +100,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(mTaskId);
+        mTasksInteractor.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
