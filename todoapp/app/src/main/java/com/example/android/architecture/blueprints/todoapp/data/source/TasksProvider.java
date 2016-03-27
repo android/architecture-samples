@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
@@ -21,9 +22,12 @@ public class TasksProvider extends ContentProvider {
     private static final int TASK = 100;
     private static final int TASK_ITEM = 101;
 
+    private TasksDataSource mTasksRemoteDataSource;
+
     @Override
     public boolean onCreate() {
         mTasksDbHelper = new TasksDbHelper(getContext());
+        mTasksRemoteDataSource = Injection.provideRemoteDataSource();
         return true;
     }
 

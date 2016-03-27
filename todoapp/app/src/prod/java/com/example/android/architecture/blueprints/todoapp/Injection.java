@@ -40,6 +40,10 @@ public class Injection {
                 TasksLocalDataSource.getInstance(context));
     }
 
+    public static TasksDataSource provideRemoteDataSource(){
+        return TasksRemoteDataSource.getInstance();
+    }
+
     public static TasksInteractor provideTasksInteractor(@NonNull ContentResolver contentResolver) {
         checkNotNull(contentResolver);
         return new TasksInteractor(contentResolver);

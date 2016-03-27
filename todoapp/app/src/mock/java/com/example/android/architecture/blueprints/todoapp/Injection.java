@@ -43,6 +43,10 @@ public class Injection {
         );
     }
 
+    public static TasksDataSource provideRemoteDataSource() {
+        return FakeTasksRemoteDataSource.getInstance();
+    }
+
     public static TasksInteractor provideTasksInteractor(@NonNull ContentResolver contentResolver) {
         checkNotNull(contentResolver);
         return new TasksInteractor(contentResolver);
