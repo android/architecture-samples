@@ -64,9 +64,6 @@ public class TaskLoader extends AsyncTaskLoader<Task>
             deliverResult(mRepository.getCachedTask(mTaskId));
         }
 
-        // Begin monitoring the underlying data source.
-        mRepository.addContentObserver(this);
-
         if (takeContentChanged() || !mRepository.cachedTasksAvailable()) {
             // When a change has  been delivered or the repository cache isn't available, we force
             // a load.
@@ -77,7 +74,6 @@ public class TaskLoader extends AsyncTaskLoader<Task>
     @Override
     protected void onReset() {
         onStopLoading();
-        mRepository.removeContentObserver(this);
     }
 
     @Override

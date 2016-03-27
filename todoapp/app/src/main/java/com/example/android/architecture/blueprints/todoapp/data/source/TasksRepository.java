@@ -44,8 +44,6 @@ public class TasksRepository implements TasksDataSource {
 
     private final TasksDataSource mTasksLocalDataSource;
 
-    private List<TasksRepositoryObserver> mObservers = new ArrayList<TasksRepositoryObserver>();
-
     /**
      * This variable has package local visibility so it can be accessed from tests.
      */
@@ -85,24 +83,6 @@ public class TasksRepository implements TasksDataSource {
                             @NonNull TasksDataSource tasksLocalDataSource) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
-    }
-
-    public void addContentObserver(TasksRepositoryObserver observer) {
-        if (!mObservers.contains(observer)) {
-            mObservers.add(observer);
-        }
-    }
-
-    public void removeContentObserver(TasksRepositoryObserver observer) {
-        if (mObservers.contains(observer)) {
-            mObservers.remove(observer);
-        }
-    }
-
-    private void notifyContentObserver() {
-        for (TasksRepositoryObserver observer : mObservers) {
-            observer.onTasksChanged();
-        }
     }
 
     /**
@@ -187,9 +167,6 @@ public class TasksRepository implements TasksDataSource {
             mCachedTasks = new LinkedHashMap<>();
         }
         mCachedTasks.put(task.getId(), task);
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     @Override
@@ -205,9 +182,6 @@ public class TasksRepository implements TasksDataSource {
             mCachedTasks = new LinkedHashMap<>();
         }
         mCachedTasks.put(task.getId(), completedTask);
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     @Override
@@ -229,9 +203,6 @@ public class TasksRepository implements TasksDataSource {
             mCachedTasks = new LinkedHashMap<>();
         }
         mCachedTasks.put(task.getId(), activeTask);
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     @Override
@@ -256,9 +227,6 @@ public class TasksRepository implements TasksDataSource {
                 it.remove();
             }
         }
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     /**
@@ -298,7 +266,6 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void refreshTasks() {
         mCacheIsDirty = true;
-        notifyContentObserver();
     }
 
     @Override
@@ -310,9 +277,6 @@ public class TasksRepository implements TasksDataSource {
             mCachedTasks = new LinkedHashMap<>();
         }
         mCachedTasks.clear();
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     @Override
@@ -321,9 +285,6 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
 
         mCachedTasks.remove(taskId);
-
-        // Update the UI
-        notifyContentObserver();
     }
 
     public interface TasksRepositoryObserver {
