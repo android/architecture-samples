@@ -24,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -105,7 +104,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     private void showTask(Cursor data) {
-        Task task = TaskCursor.from(data);
+        Task task = Task.from(data);
 
         String title = task.getTitle();
         String description = task.getDescription();

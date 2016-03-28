@@ -19,12 +19,14 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,9 +58,28 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public List<Task> getTasks() {
-        // we don't need this since the CursorLoader talks to the
-        // ContentResolver directly
-        return null;
+        List<Task> tasks = new ArrayList<>();
+
+        try {
+            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                                              TaskEntry.TASKS_COLUMNS,
+                                              null, null, null, null
+            );
+
+            if (c != null && c.getCount() > 0) {
+                while (c.moveToNext()) {
+                    Task task = Task.from(c);
+                    tasks.add(task);
+                }
+            }
+            if (c != null) {
+                c.close();
+            }
+
+        } catch (IllegalStateException e) {
+            // Send to analytics, log etc
+        }
+        return tasks;
     }
 
     /**
@@ -67,8 +88,31 @@ public class TasksLocalDataSource implements TasksDataSource {
      */
     @Override
     public Task getTask(@NonNull String taskId) {
-        // we don't need this since the CursorLoader talks to the
-        // ContentResolver directly
+        // This is only used for testing.
+        // We don't need this since the CursorLoader talks to the ContentResolver directly.
+
+        try {
+            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+            String[] selectionArgs = {taskId};
+
+            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                                              TaskEntry.TASKS_COLUMNS,
+                                              selection, selectionArgs, null, null
+            );
+
+            if (c != null && c.getCount() > 0) {
+                c.moveToFirst();
+                Task task = Task.from(c);
+                return task;
+            }
+            if (c != null) {
+                c.close();
+            }
+
+            return null;
+        } catch (IllegalStateException e) {
+            // Send to analytics, log etc
+        }
         return null;
     }
 
@@ -81,7 +125,7 @@ public class TasksLocalDataSource implements TasksDataSource {
             values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
             values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
             values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
+            values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted() ? 1 : 0);
 
             mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
 

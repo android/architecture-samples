@@ -96,8 +96,8 @@ public class TasksPresenter implements TasksContract.Presenter,
         }
     }
 
-    private void showData(Cursor data){
-        if (data.getCount() > 0) {
+    private void showData(Cursor data) {
+        if (data != null && data.getCount() > 0) {
             // Show the list of tasks
             mTasksView.showTasks(data);
             // Set the filter label's text.

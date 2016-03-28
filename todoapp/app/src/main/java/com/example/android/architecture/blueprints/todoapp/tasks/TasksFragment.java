@@ -45,7 +45,6 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.List;
@@ -455,7 +454,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-            final Task task = TaskCursor.from(cursor);
+            final Task task = Task.from(cursor);
             viewHolder.titleTV.setText(task.getTitleForList());
 
             // Active/completed task UI

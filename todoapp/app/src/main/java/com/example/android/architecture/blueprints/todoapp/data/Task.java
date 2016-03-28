@@ -97,7 +97,7 @@ public final class Task {
     }
 
     /**
-     * Use this constructor to return a Cursor from a Task
+     * Use this constructor to return a Task from a Cursor
      *
      * @return
      */
