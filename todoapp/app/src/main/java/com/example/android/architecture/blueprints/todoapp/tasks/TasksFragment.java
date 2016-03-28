@@ -16,7 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +26,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
@@ -42,9 +45,9 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.TaskCursor;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,7 +59,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private TasksContract.Presenter mPresenter;
 
-    private TasksAdapter mListAdapter;
+    private TasksCursorAdapter mListAdapter;
 
     private View mNoTasksView;
 
@@ -81,7 +84,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mItemListener);
+        mListAdapter = new TasksCursorAdapter(getActivity(), mItemListener);
     }
 
     @Override
@@ -245,8 +248,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void showTasks(List<Task> tasks) {
-        mListAdapter.replaceData(tasks);
+    public void showTasks(Cursor tasks) {
+        mListAdapter.swapCursor(tasks);
 
         mTasksView.setVisibility(View.VISIBLE);
         mNoTasksView.setVisibility(View.GONE);
@@ -425,6 +428,76 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             });
 
             return rowView;
+        }
+    }
+
+    private static class TasksCursorAdapter extends CursorAdapter{
+
+        private final TaskItemListener mItemListener;
+
+        public TasksCursorAdapter(Context context, TaskItemListener taskItemListener) {
+            super(context, null, 0);
+            this.mItemListener = taskItemListener;
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
+
+            ViewHolder viewHolder = new ViewHolder(view);
+            view.setTag(viewHolder);
+
+            return view;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+
+            final Task task = TaskCursor.from(cursor);
+            viewHolder.titleTV.setText(task.getTitleForList());
+
+            // Active/completed task UI
+            viewHolder.completeCB.setChecked(task.isCompleted());
+            viewHolder.completeCB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!task.isCompleted()) {
+                        mItemListener.onCompleteTaskClick(task);
+                    } else {
+                        mItemListener.onActivateTaskClick(task);
+                    }
+                }
+            });
+
+            if (task.isCompleted()) {
+                viewHolder.rowView.setBackgroundDrawable(context
+                                                      .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+            } else {
+                viewHolder.rowView.setBackgroundDrawable(context
+                                                      .getResources().getDrawable(R.drawable.touch_feedback));
+            }
+
+            viewHolder.rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mItemListener.onTaskClick(task);
+                }
+            });
+
+        }
+
+        public static class ViewHolder {
+            public final View rowView;
+            public final TextView titleTV;
+            public final CheckBox completeCB;
+
+            public ViewHolder(View view) {
+                rowView = view;
+                titleTV = (TextView) view.findViewById(R.id.title);
+                completeCB = (CheckBox) view.findViewById(R.id.complete);
+            }
         }
     }
 
