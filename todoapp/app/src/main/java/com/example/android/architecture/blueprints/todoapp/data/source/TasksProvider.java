@@ -47,7 +47,8 @@ public class TasksProvider extends ContentProvider {
                 retCursor = mTasksDbHelper.getReadableDatabase().query(
                         TasksPersistenceContract.TaskEntry.TABLE_NAME,
                         projection,
-                        TasksPersistenceContract.TaskEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID +
+                                " = '" + ContentUris.parseId(uri) + "'",
                         null,
                         null,
                         null,
@@ -170,6 +171,8 @@ public class TasksProvider extends ContentProvider {
 
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/#", TASK_ITEM);
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/task/#", TASK_ITEM);
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/#/#", TASK_ITEM);
 
         return matcher;
     }

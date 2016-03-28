@@ -62,7 +62,8 @@ public final class TasksPersistenceContract {
         }
 
         public static Uri buildTasksUriWith(String id) {
-            return CONTENT_TASK_URI.buildUpon().appendPath(id).build();
+            Uri uri = CONTENT_TASK_URI.buildUpon().appendPath(id).build();
+            return uri;
         }
 
         public static Uri buildTasksUri() {

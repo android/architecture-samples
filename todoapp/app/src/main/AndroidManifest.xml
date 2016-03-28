@@ -31,7 +31,16 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity" />
+    <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity">
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <data android:mimeType="vnd.android.cursor.item/vnd.${packageName}.task" />
+      </intent-filter>
+    </activity>
+
     <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
     <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
 

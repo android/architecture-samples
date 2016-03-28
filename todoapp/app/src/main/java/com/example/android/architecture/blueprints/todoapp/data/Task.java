@@ -102,7 +102,6 @@ public final class Task {
      * @return
      */
     public static Task from(Cursor cursor) {
-        int id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry._ID));
         String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
