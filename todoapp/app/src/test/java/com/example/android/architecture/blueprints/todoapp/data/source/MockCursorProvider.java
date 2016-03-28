@@ -37,7 +37,7 @@ public class MockCursorProvider {
         return new TaskMockCursor(entryList);
     }
 
-    public static TaskMockCursor createSampleTasksCursor() {
+    public static TaskMockCursor createCompletedTasksCursor() {
         List<Map<Integer, Object>> entryList = new ArrayList<>();
         Map<Integer, Object> task1 = new HashMap<>();
         task1.put(0, "1");
@@ -63,6 +63,65 @@ public class MockCursorProvider {
         return new TaskMockCursor(entryList);
     }
 
+    public static TaskMockCursor createActiveTasksCursor() {
+        List<Map<Integer, Object>> entryList = new ArrayList<>();
+        Map<Integer, Object> task4 = new HashMap<>();
+        task4.put(0, "4");
+        task4.put(1, "Title4");
+        task4.put(2, "Description4");
+        task4.put(3, 0);
+        entryList.add(task4);
+
+        Map<Integer, Object> task5 = new HashMap<>();
+        task5.put(0, "5");
+        task5.put(1, "Title5");
+        task5.put(2, "Description5");
+        task5.put(3, 0);
+        entryList.add(task5);
+
+        return new TaskMockCursor(entryList);
+    }
+
+    public static TaskMockCursor createAllTasksCursor() {
+        List<Map<Integer, Object>> entryList = new ArrayList<>();
+        Map<Integer, Object> task1 = new HashMap<>();
+        task1.put(0, "1");
+        task1.put(1, "Title1");
+        task1.put(2, "Description1");
+        task1.put(3, 1);
+        entryList.add(task1);
+
+        Map<Integer, Object> task2 = new HashMap<>();
+        task1.put(0, "2");
+        task1.put(1, "Title2");
+        task1.put(2, "Description2");
+        task1.put(3, 1);
+        entryList.add(task2);
+
+        Map<Integer, Object> task3 = new HashMap<>();
+        task1.put(0, "3");
+        task1.put(1, "Title3");
+        task1.put(2, "Description3");
+        task1.put(3, 1);
+        entryList.add(task3);
+
+        Map<Integer, Object> task4 = new HashMap<>();
+        task1.put(0, "4");
+        task1.put(1, "Title4");
+        task1.put(2, "Description4");
+        task1.put(3, 0);
+        entryList.add(task4);
+
+        Map<Integer, Object> task5 = new HashMap<>();
+        task1.put(0, "5");
+        task1.put(1, "Title5");
+        task1.put(2, "Description5");
+        task1.put(3, 0);
+        entryList.add(task4);
+
+        return new TaskMockCursor(entryList);
+    }
+
     public static class TaskMockCursor extends MockCursor {
         Map<Integer, Object> entry;
         int cursorIndex;
@@ -79,6 +138,11 @@ public class MockCursorProvider {
 
         public TaskMockCursor(List<Map<Integer, Object>> entryList) {
             this.entryList = entryList;
+        }
+
+        @Override
+        public int getCount() {
+            return entryList.size();
         }
 
         @Override

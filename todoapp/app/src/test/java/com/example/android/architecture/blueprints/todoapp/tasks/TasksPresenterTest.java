@@ -25,8 +25,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.MockCurso
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,8 +42,6 @@ import static org.mockito.Mockito.verify;
  * Unit tests for the implementation of {@link TasksPresenter}.
  */
 public class TasksPresenterTest {
-
-    private static List<Task> TASKS;
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -66,7 +62,9 @@ public class TasksPresenterTest {
     @Mock
     private LoaderManager mLoaderManager;
 
-    private MockCursorProvider.TaskMockCursor mSampleTaskCursor;
+    private MockCursorProvider.TaskMockCursor mCompletedTasksCursor;
+    private MockCursorProvider.TaskMockCursor mActiveTasksCursor;
+    private MockCursorProvider.TaskMockCursor mAllTasksCursor;
 
     private TasksPresenter mTasksPresenter;
 
@@ -80,43 +78,45 @@ public class TasksPresenterTest {
         mTasksPresenter = new TasksPresenter(
                 mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
 
-        mSampleTaskCursor = MockCursorProvider.createSampleTasksCursor();
+        mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
+        mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
+        mAllTasksCursor = MockCursorProvider.createAllTasksCursor();
     }
 
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mSampleTaskCursor);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mAllTasksCursor);
 
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
-        verify(mTasksView).showTasks(mSampleTaskCursor);
-        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(3));
+        verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(5));
     }
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to active
         mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mSampleTaskCursor);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mActiveTasksCursor);
 
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(1));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(2));
     }
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to completed
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mSampleTaskCursor);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mCompletedTasksCursor);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(2));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(3));
     }
 
     @Test
