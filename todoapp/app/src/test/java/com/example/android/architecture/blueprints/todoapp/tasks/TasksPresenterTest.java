@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
@@ -57,7 +58,7 @@ public class TasksPresenterTest {
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<List> mShowTasksArgumentCaptor;
+    private ArgumentCaptor<Cursor> mShowTasksArgumentCaptor;
 
     @Mock
     private TasksCursorLoader mTasksLoader;
@@ -90,8 +91,8 @@ public class TasksPresenterTest {
 
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
-        verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(3));
+        verify(mTasksView).showTasks(mSampleTaskCursor);
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(3));
     }
 
     @Test
@@ -103,7 +104,7 @@ public class TasksPresenterTest {
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(1));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(1));
     }
 
     @Test
@@ -115,7 +116,7 @@ public class TasksPresenterTest {
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(2));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(2));
     }
 
     @Test

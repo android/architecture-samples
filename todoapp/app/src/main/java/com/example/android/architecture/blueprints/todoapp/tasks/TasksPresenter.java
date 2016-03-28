@@ -90,9 +90,21 @@ public class TasksPresenter implements TasksContract.Presenter,
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mTasksView.setLoadingIndicator(false);
         if (data != null) {
-            showFilteredTasks();
+            showData(data);
         } else {
             mTasksView.showLoadingTasksError();
+        }
+    }
+
+    private void showData(Cursor data){
+        if (data.getCount() > 0) {
+            // Show the list of tasks
+            mTasksView.showTasks(data);
+            // Set the filter label's text.
+            showFilterLabel();
+        } else {
+            // Show a message indicating there are no tasks for that filter type.
+            processEmptyTasks();
         }
     }
 
@@ -142,15 +154,15 @@ public class TasksPresenter implements TasksContract.Presenter,
     }
 
     private void processTasks(List<Task> tasks) {
-        if (tasks.isEmpty()) {
-            // Show a message indicating there are no tasks for that filter type.
-            processEmptyTasks();
-        } else {
-            // Show the list of tasks
-            mTasksView.showTasks(tasks);
-            // Set the filter label's text.
-            showFilterLabel();
-        }
+//        if (tasks.isEmpty()) {
+//            // Show a message indicating there are no tasks for that filter type.
+//            processEmptyTasks();
+//        } else {
+//            // Show the list of tasks
+//            mTasksView.showTasks(tasks);
+//            // Set the filter label's text.
+//            showFilterLabel();
+//        }
     }
 
     private void showFilterLabel() {
