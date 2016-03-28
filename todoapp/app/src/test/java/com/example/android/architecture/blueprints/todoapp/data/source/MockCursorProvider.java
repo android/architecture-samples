@@ -17,21 +17,21 @@ public class MockCursorProvider {
 
     private static Map<Integer, Object> createActiveTaskCursorEntry(){
         Map<Integer, Object> entry = new HashMap<>();
-        entry.put(0, Math.random());
-        entry.put(0, UUID.randomUUID().toString());
-        entry.put(1, TITLE_TEST);
-        entry.put(2, DESCRIPTION_TEST);
-        entry.put(3, 0);
+        entry.put(0, 0);
+        entry.put(1, UUID.randomUUID().toString());
+        entry.put(2, TITLE_TEST);
+        entry.put(3, DESCRIPTION_TEST);
+        entry.put(4, 0);
         return entry;
     }
 
     private static Map<Integer, Object> createCompletedTaskCursorEntry() {
         Map<Integer, Object> entry = new HashMap<>();
-        entry.put(0, Math.random());
-        entry.put(0, UUID.randomUUID().toString());
-        entry.put(1, TITLE_TEST);
-        entry.put(2, DESCRIPTION_TEST);
-        entry.put(3, 1);
+        entry.put(0, 0);
+        entry.put(1, UUID.randomUUID().toString());
+        entry.put(2, TITLE_TEST);
+        entry.put(3, DESCRIPTION_TEST);
+        entry.put(4, 1);
         return entry;
     }
 

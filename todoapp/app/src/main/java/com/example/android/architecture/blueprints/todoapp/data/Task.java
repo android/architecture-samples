@@ -102,11 +102,12 @@ public final class Task {
      * @return
      */
     public static Task from(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry._ID));
+        String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 0;
-        return new Task(id, title, description, completed);
+        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, entryId, completed);
     }
 
     public String getId() {

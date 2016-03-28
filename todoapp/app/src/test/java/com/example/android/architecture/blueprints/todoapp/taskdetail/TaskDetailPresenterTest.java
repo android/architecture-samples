@@ -36,9 +36,9 @@ import static org.mockito.Mockito.*;
  */
 public class TaskDetailPresenterTest {
 
-    public static final String TITLE_TEST = "title";
+    public static final String TITLE_TEST = "Title";
 
-    public static final String DESCRIPTION_TEST = "description";
+    public static final String DESCRIPTION_TEST = "Description";
 
     public static final String INVALID_TASK_ID = "";
 
