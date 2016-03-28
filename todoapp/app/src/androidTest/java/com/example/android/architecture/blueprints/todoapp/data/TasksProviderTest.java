@@ -5,28 +5,20 @@ import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.ProviderTestCase2;
+import android.test.AndroidTestCase;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class TasksProviderTest extends ProviderTestCase2<TasksProvider> {
+public class TasksProviderTest extends AndroidTestCase {
 
-    /**
-     * Constructor.
-     *
-     * @param providerClass     The class name of the provider under test
-     * @param providerAuthority The provider's authority string
-     */
-    public TasksProviderTest(Class<TasksProvider> providerClass, String providerAuthority) {
-        super(providerClass, providerAuthority);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         setContext(InstrumentationRegistry.getTargetContext());
         super.setUp();
     }
@@ -34,6 +26,7 @@ public class TasksProviderTest extends ProviderTestCase2<TasksProvider> {
     /*
     This test checks to make sure that the content provider is registered correctly.
     */
+    @Test
     public void testProviderRegistry() {
         PackageManager pm = mContext.getPackageManager();
 
@@ -60,6 +53,7 @@ public class TasksProviderTest extends ProviderTestCase2<TasksProvider> {
          This test doesn't touch the database.  It verifies that the ContentProvider returns
          the correct type for each type of URI that it can handle.
       */
+    @Test
     public void testGetType() {
         // content://com.example.android.architecture.blueprints.todoapp/task
         String type = mContext.getContentResolver().getType(TasksPersistenceContract.TaskEntry.buildTasksUri());

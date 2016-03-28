@@ -20,12 +20,14 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.example.android.architecture.blueprints.todoapp.BuildConfig;
+
 /**
  * The contract used for the db to save the tasks locally.
  */
 public final class TasksPersistenceContract {
 
-    public static final String CONTENT_AUTHORITY = "com.example.android.architecture.blueprints.todoapp";
+    public static final String CONTENT_AUTHORITY = BuildConfig.APPLICATION_ID;
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String CONTENT_TASK_TYPE = "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + TaskEntry.TABLE_NAME;
@@ -57,6 +59,10 @@ public final class TasksPersistenceContract {
 
         public static Uri buildTasksUriWith(long id) {
             return ContentUris.withAppendedId(CONTENT_TASK_URI, id);
+        }
+
+        public static Uri buildTasksUriWith(String id) {
+            return CONTENT_TASK_URI.buildUpon().appendPath(id).build();
         }
 
         public static Uri buildTasksUri() {

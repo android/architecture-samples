@@ -37,7 +37,7 @@
 
     <provider
       android:name="com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider"
-      android:authorities="com.example.android.architecture.blueprints.todoapp"
+      android:authorities="${packageName}"
       android:exported="false" />
   </application>
 

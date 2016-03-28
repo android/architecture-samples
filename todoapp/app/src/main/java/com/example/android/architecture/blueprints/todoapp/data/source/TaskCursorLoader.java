@@ -7,10 +7,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 
 public class TaskCursorLoader extends CursorLoader {
 
-    //  HNewsContract.StoryEntry.FILTER + " = ?",
-    //new String[]{Story.FILTER.ask.name()},
-
-    public TaskCursorLoader(Context context, long id) {
+    public TaskCursorLoader(Context context, String id) {
         super(context, TasksPersistenceContract.TaskEntry.buildTasksUriWith(id), TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, null, null, null);
     }
 

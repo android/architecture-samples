@@ -59,7 +59,8 @@ public class TaskDetailActivity extends AppCompatActivity {
             taskDetailFragment = taskDetailFragment.newInstance(taskId);
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    taskDetailFragment, R.id.contentFrame);
+                                                taskDetailFragment, R.id.contentFrame
+            );
         }
 
         // Create the presenter
@@ -67,8 +68,9 @@ public class TaskDetailActivity extends AppCompatActivity {
                 taskId,
                 Injection.provideTasksRepository(this),
                 taskDetailFragment,
-                new TaskCursorLoader(getApplicationContext(), Long.valueOf(taskId)),
-                getSupportLoaderManager());
+                new TaskCursorLoader(getApplicationContext(), taskId),
+                getSupportLoaderManager()
+        );
     }
 
     @Override
