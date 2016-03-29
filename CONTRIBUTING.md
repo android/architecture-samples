@@ -1,6 +1,8 @@
 # How to become a contributor and submit your own code
 
-To contribute with a small fix, simply create a pull request. Before starting work on new sample intended for submission, please open an issue to discuss it with the team. This will allow us to review the architecture and frameworks used to determine if a spec-compatible app is likely to be accepted.
+To contribute with a small fix, simply create a pull request against the appropriate development branch (`dev-{sample}`). This branch is usually [dev-todo-mvp](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp) unless the change is related to a variant's implementation. See [Development branches](https://github.com/googlesamples/android-architecture/wiki/Development-branches) for more information or create an [issue](https://github.com/googlesamples/android-architecture/issues) if you're not sure what branch to target.
+
+Before starting work on new sample intended for submission, please open an issue to discuss it with the team. This will allow us to review the architecture and frameworks used to determine if a spec-compatible app is likely to be accepted.
 
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/googlesamples/android-architecture/blob/master/code-of-conduct.md). By participating in this project you agree to abide by its terms.
 
