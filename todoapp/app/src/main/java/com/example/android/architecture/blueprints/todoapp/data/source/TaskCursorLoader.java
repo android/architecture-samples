@@ -7,11 +7,11 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 
 public class TaskCursorLoader extends CursorLoader {
 
-    public TaskCursorLoader(Context context, String id) {
+    public TaskCursorLoader(Context context, int id) {
         super(context, TasksPersistenceContract.TaskEntry.buildTasksUri(),
               TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
-              TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE '" + id + "'",
-              null, null);
+              TasksPersistenceContract.TaskEntry._ID + " = ?",
+              new String[]{String.valueOf(id)}, null);
     }
 
     @Override

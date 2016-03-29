@@ -170,9 +170,7 @@ public class TasksProvider extends ContentProvider {
         final String authority = TasksPersistenceContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/#", TASK_ITEM);
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/task/#", TASK_ITEM);
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/#/#", TASK_ITEM);
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
 
         return matcher;
     }
