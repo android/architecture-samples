@@ -10,7 +10,7 @@ public class TaskCursorLoader extends CursorLoader {
     public TaskCursorLoader(Context context, int id) {
         super(context, TasksPersistenceContract.TaskEntry.buildTasksUri(),
               TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
-              TasksPersistenceContract.TaskEntry._ID + " = ?",
+              TasksPersistenceContract.TaskEntry._ID + " = ? ",
               new String[]{String.valueOf(id)}, null);
     }
 

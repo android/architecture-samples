@@ -135,7 +135,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.getCount() > 0) {
+        if (data != null && data.moveToLast()) {
             showTask(data);
         } else {
             mTaskDetailView.showMissingTask();

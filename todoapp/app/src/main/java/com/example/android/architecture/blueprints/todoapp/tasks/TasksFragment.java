@@ -227,7 +227,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void setLoadingIndicator(final boolean active) {
-
         if (getView() == null) {
             return;
         }
