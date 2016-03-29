@@ -16,14 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,21 +35,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter, LoaderManager.LoaderCallbacks<List<Task>> {
+public class StatisticsPresenter implements StatisticsContract.Presenter, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int TASK_QUERY = 3;
 
     private StatisticsContract.View mStatisticsView;
 
-    private TasksLoader mTasksLoader;
+    private TaskLoaderProvider mTasksLoaderProvider;
 
     private LoaderManager mLoaderManager;
 
     public StatisticsPresenter(@NonNull StatisticsContract.View statisticsView,
-                               @NonNull TasksLoader tasksLoader,
+                               @NonNull TaskLoaderProvider taskLoaderProvider,
                                @NonNull LoaderManager loaderManager) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mTasksLoader = checkNotNull(tasksLoader, "tasksLoader cannot be null!");
+        mTasksLoaderProvider = checkNotNull(taskLoaderProvider, "taskLoaderProvider cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mStatisticsView.setPresenter(this);
@@ -58,27 +61,27 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
     }
 
     @Override
-    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         mStatisticsView.setProgressIndicator(true);
-        return mTasksLoader;
+        return mTasksLoaderProvider.createFilteredLoader(TasksFilterType.ALL_TASKS);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         loadStatistics(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Task>> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
 
     }
 
-    private void loadStatistics(List<Task> tasks) {
-        if (tasks == null) {
-            mStatisticsView.showLoadingStatisticsError();
-        } else {
+    private void loadStatistics(Cursor data) {
+        if (data != null) {
             int activeTasks = 0;
             int completedTasks = 0;
+
+            List<Task> tasks = convertCursorToTasks(data);
 
             // Calculate number of active and completed tasks
             for (Task task : tasks) {
@@ -89,10 +92,23 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
                 }
             }
 
-            mStatisticsView.setProgressIndicator(false);
-
             mStatisticsView.showStatistics(activeTasks, completedTasks);
+        } else {
+            mStatisticsView.showLoadingStatisticsError();
         }
+        mStatisticsView.setProgressIndicator(false);
     }
 
+    private List<Task> convertCursorToTasks(Cursor data){
+        List<Task> tasks = new ArrayList<>();
+
+        if (data.moveToFirst()) {
+            do {
+                Task task = Task.from(data);
+                tasks.add(task);
+            } while (data.moveToNext());
+        }
+
+        return tasks;
+    }
 }

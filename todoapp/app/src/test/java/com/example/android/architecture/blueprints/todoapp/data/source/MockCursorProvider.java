@@ -72,6 +72,11 @@ public class MockCursorProvider {
         return new TaskMockCursor(entryList);
     }
 
+    public static TaskMockCursor createEmptyTasksCursor() {
+        List<Map<Integer, Object>> entryList = new ArrayList<>();
+        return new TaskMockCursor(entryList);
+    }
+
     public static class TaskMockCursor extends MockCursor {
         Map<Integer, Object> entry;
         int cursorIndex;
@@ -135,7 +140,7 @@ public class MockCursorProvider {
 
         @Override
         public boolean moveToFirst() {
-            return true;
+            return entryList.size() > 0;
         }
 
         @Override
@@ -146,7 +151,12 @@ public class MockCursorProvider {
         @Override
         public boolean moveToNext() {
             cursorIndex++;
-            return false;
+            return cursorIndex < entryList.size();
+        }
+
+        @Override
+        public boolean isAfterLast() {
+            return super.isAfterLast();
         }
     }
 }

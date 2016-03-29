@@ -88,7 +88,7 @@ public class TasksRepository implements TasksDataSource {
     /**
      *
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
-     * available first. This is done synchronously because it's used by the {@link TasksLoader},
+     * available first,
      * which implements the async mechanism.
      */
     @Nullable

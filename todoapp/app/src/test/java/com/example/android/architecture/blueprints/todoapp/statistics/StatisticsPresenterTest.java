@@ -19,11 +19,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
-import com.google.common.collect.Lists;
-
-import java.util.List;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,16 +35,17 @@ import static org.mockito.Mockito.verify;
  */
 public class StatisticsPresenterTest {
 
-    private static List<Task> TASKS;
-
     @Mock
     private StatisticsContract.View mStatisticsView;
 
     @Mock
-    private TasksLoader mTasksLoader;
+    private TaskLoaderProvider mTasksLoaderProvider;
 
     @Mock
     private LoaderManager mLoaderManager;
+
+    private MockCursorProvider.TaskMockCursor mAllTasksCursor;
+    private MockCursorProvider.TaskMockCursor mEmptyTasksCursor;
 
     private StatisticsPresenter mStatisticsPresenter;
 
@@ -57,20 +55,17 @@ public class StatisticsPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        mAllTasksCursor = MockCursorProvider.createAllTasksCursor();
+        mEmptyTasksCursor = MockCursorProvider.createEmptyTasksCursor();
+
         // Get a reference to the class under test
         mStatisticsPresenter = new StatisticsPresenter(
-                mStatisticsView, mTasksLoader, mLoaderManager);
-
-        // We initialise the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+                mStatisticsView, mTasksLoaderProvider, mLoaderManager);
     }
 
     @Test
     public void loadEmptyTasksFromRepository_CallViewToDisplay() {
-        // When the loader finishes with no tasks
-        TASKS.clear();
-        mStatisticsPresenter.onLoadFinished(mock(Loader.class), TASKS);
+        mStatisticsPresenter.onLoadFinished(mock(Loader.class), mEmptyTasksCursor);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -80,11 +75,11 @@ public class StatisticsPresenterTest {
     @Test
     public void loadNonEmptyTasksFromRepository_CallViewToDisplay() {
         // When the loader finishes with tasks
-        mStatisticsPresenter.onLoadFinished(mock(Loader.class), TASKS);
+        mStatisticsPresenter.onLoadFinished(mock(Loader.class), mAllTasksCursor);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
-        verify(mStatisticsView).showStatistics(1, 2);
+        verify(mStatisticsView).showStatistics(2, 3);
     }
 
     @Test
