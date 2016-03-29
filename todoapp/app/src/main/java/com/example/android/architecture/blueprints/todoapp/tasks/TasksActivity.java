@@ -31,7 +31,6 @@ import android.view.MenuItem;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksCursorLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -76,9 +75,9 @@ public class TasksActivity extends AppCompatActivity {
 
         // Create the presenter
         TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
-        TasksLoader tasksLoader = new TasksLoader(getApplicationContext(), repository);
 
         mTasksPresenter = new TasksPresenter(
+                getApplicationContext(),
                 new TasksCursorLoader(getApplicationContext()),
                 getSupportLoaderManager(),
                 repository,

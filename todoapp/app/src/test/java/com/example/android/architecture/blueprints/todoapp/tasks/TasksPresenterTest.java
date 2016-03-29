@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -41,6 +42,9 @@ import static org.mockito.Mockito.verify;
  * Unit tests for the implementation of {@link TasksPresenter}.
  */
 public class TasksPresenterTest {
+
+    @Mock
+    private Context mContext;
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -75,7 +79,7 @@ public class TasksPresenterTest {
 
         // Get a reference to the class under test
         mTasksPresenter = new TasksPresenter(
-                mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
+                mContext, mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
