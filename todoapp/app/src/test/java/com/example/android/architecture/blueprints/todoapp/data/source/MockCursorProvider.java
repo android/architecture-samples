@@ -139,6 +139,11 @@ public class MockCursorProvider {
         }
 
         @Override
+        public boolean moveToLast() {
+            return cursorIndex < entryList.size();
+        }
+
+        @Override
         public boolean moveToNext() {
             cursorIndex++;
             return false;
