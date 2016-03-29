@@ -1,8 +1,10 @@
-# TODO-MVP-Loaders
+# TODO-MVP-ContentProvider
 
-It is based on the [TODO-MVP](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp) sample and uses Loaders to get the data from the tasks repository. 
+It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data to the repository.
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-loaders.png" alt="Diagram"/>
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
+
+//TODO finish README
 
 The advantages of Loaders, from the [Loaders documentation page](http://developer.android.com/guide/components/loaders.html), are:
 
