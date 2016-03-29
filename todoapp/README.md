@@ -46,7 +46,7 @@ and the library will take care of displaying it, as defined by the layout (<code
 
 
 ```
-        &lt;TextView
+        <TextView
             android:id="@+id/task_detail_description"
             ...
             android:text="@{task.description}" />
@@ -60,7 +60,7 @@ In this CheckBox from <code>[taskdetail\_frag.xml](https://github.com/googlesamp
 
 
 ```
-    &lt;CheckBox
+    <CheckBox
     android:id="@+id/task_detail_complete"
     ...
     android:checked="@{task.completed}"
