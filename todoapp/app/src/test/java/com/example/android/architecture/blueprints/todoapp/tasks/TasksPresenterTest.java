@@ -16,14 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksCursorLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -43,15 +42,6 @@ import static org.mockito.Mockito.verify;
  */
 public class TasksPresenterTest {
 
-    @Mock
-    private Context mContext;
-
-    @Mock
-    private TasksRepository mTasksRepository;
-
-    @Mock
-    private TasksContract.View mTasksView;
-
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -60,7 +50,13 @@ public class TasksPresenterTest {
     private ArgumentCaptor<Cursor> mShowTasksArgumentCaptor;
 
     @Mock
-    private TasksCursorLoader mTasksLoader;
+    private TaskLoaderProvider mTaskLoaderProvider;
+
+    @Mock
+    private TasksRepository mTasksRepository;
+
+    @Mock
+    private TasksContract.View mTasksView;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -79,7 +75,7 @@ public class TasksPresenterTest {
 
         // Get a reference to the class under test
         mTasksPresenter = new TasksPresenter(
-                mContext, mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
+                mTaskLoaderProvider, mLoaderManager, mTasksRepository, mTasksView);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();

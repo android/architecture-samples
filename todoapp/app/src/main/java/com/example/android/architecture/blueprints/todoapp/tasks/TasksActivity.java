@@ -30,6 +30,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -74,9 +75,10 @@ public class TasksActivity extends AppCompatActivity {
 
         // Create the presenter
         TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
+        TaskLoaderProvider taskLoaderProvider = new TaskLoaderProvider(getApplicationContext());
 
         mTasksPresenter = new TasksPresenter(
-                getApplicationContext(),
+                taskLoaderProvider,
                 getSupportLoaderManager(),
                 repository,
                 tasksFragment
@@ -121,7 +123,7 @@ public class TasksActivity extends AppCompatActivity {
                                 Intent intent =
                                         new Intent(TasksActivity.this, StatisticsActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             default:

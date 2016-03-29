@@ -17,20 +17,18 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,15 +48,15 @@ public class TasksPresenter implements TasksContract.Presenter,
 
     private final LoaderManager mLoaderManager;
 
-    private final Context mContext;
+    private final TaskLoaderProvider mTaskLoaderProvider;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull Context context, @NonNull LoaderManager loaderManager,
+    public TasksPresenter(@NonNull TaskLoaderProvider taskLoaderProvider, @NonNull LoaderManager loaderManager,
                           @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
-        mContext = checkNotNull(context, "context cannot be null");
+        mTaskLoaderProvider = checkNotNull(taskLoaderProvider, "task loader provider cannot be null");
         mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
@@ -82,33 +80,7 @@ public class TasksPresenter implements TasksContract.Presenter,
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         mTasksView.setLoadingIndicator(true);
-        return createFilteredLoader();
-    }
-
-    private Loader<Cursor> createFilteredLoader() {
-        String selection = null;
-        String[] selectionArgs = null;
-
-        switch (mCurrentFiltering) {
-            case ALL_TASKS:
-                selection = null;
-                selectionArgs = null;
-                break;
-            case ACTIVE_TASKS:
-                selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " = ? ";
-                selectionArgs = new String[]{String.valueOf(0)};
-                break;
-            case COMPLETED_TASKS:
-                selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " = ? ";
-                selectionArgs = new String[]{String.valueOf(1)};
-                break;
-        }
-
-        return new CursorLoader(
-                mContext,
-                TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
-        );
+        return mTaskLoaderProvider.createFilteredLoader(mCurrentFiltering);
     }
 
     @Override
