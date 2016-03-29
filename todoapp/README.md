@@ -1,6 +1,6 @@
 # TODO-DataBinding
 
-It is based on the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp) sample and uses the Data Binding library (currently in beta) to display data
+It is based on the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) sample and uses the Data Binding library (currently in beta) to display data
 and bind UI elements to actions. 
 
 It's doesn't follow a strict Model-View-ViewModel or a Model-View-Presenter
@@ -17,7 +17,7 @@ data model.
 
 ### Data binding
 
-In the todo-mvp sample, a Task description is set in the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java):
+In the todo-mvp sample, a Task description is set in the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/todo-mvp/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java):
 
 
 ```
@@ -33,7 +33,7 @@ root.findViewById(R.id.task_detail_description);
         mDetailDescription.setText(description);
     }
 ```
-In this sample, the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/master/todo-databinding/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java) simply passes the Task to the data binding:
+In this sample, the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java) simply passes the Task to the data binding:
 
 
 ```
@@ -42,7 +42,7 @@ In this sample, the [TaskDetailFragment](https://github.com/googlesamples/androi
         mViewDataBinding.setTask(task);
     }
 ```
-and the library will take care of displaying it, as defined by the layout (<code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/master/todo-databinding/app/src/main/res/layout/taskdetail_frag.xml)</code>)
+and the library will take care of displaying it, as defined by the layout (<code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/res/layout/taskdetail_frag.xml)</code>)
 
 
 ```
@@ -56,7 +56,7 @@ and the library will take care of displaying it, as defined by the layout (<code
 
 Data binding eliminates the need to call <code>findViewById() </code>and event binding can also help minimizing <code>setOnClickListener()</code>. 
 
-In this CheckBox from <code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/master/todo-databinding/app/src/main/res/layout/taskdetail_frag.xml)</code>, the presenter is called directly when the user taps on it:
+In this CheckBox from <code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/res/layout/taskdetail_frag.xml)</code>, the presenter is called directly when the user taps on it:
 
 
 ```
@@ -70,7 +70,7 @@ presenter.completeChanged(task, isChecked)}" />
 ### Observing data
 
 The view that shows the list of tasks (TasksFragment) only needs to know if the
-list is empty to show the appropriate message in that case. It uses [TasksViewModel](https://github.com/googlesamples/android-architecture/blob/master/todo-databinding/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksViewModel.java) to provide that information to the layout. When the list size is set, only the
+list is empty to show the appropriate message in that case. It uses [TasksViewModel](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksViewModel.java) to provide that information to the layout. When the list size is set, only the
 relevant properties are notified and the UI elements bound to those properties
 are updated.
 
@@ -95,10 +95,10 @@ this sample is:
   * Fragment: interaction with framework components (options menu, Snackbar, FAB,
 Adapter for list…)
   * Presenter: receives user actions and retrieves the data from the repository. If
-it doesn't do data loading, it's calling an action handler (See [TasksItemActionHandler](https://github.com/googlesamples/android-architecture/blob/master/todo-databinding/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksItemActionHandler.java))
+it doesn't do data loading, it's calling an action handler (See [TasksItemActionHandler](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksItemActionHandler.java))
   * ViewModel: Exposes data for a particular view
 
-Some features don't have a ViewModel ([TaskDetail](https://github.com/googlesamples/android-architecture/tree/master/todo-databinding/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail), [AddEditTask](https://github.com/googlesamples/android-architecture/tree/master/todo-databinding/app/src/main/java/com/example/android/architecture/blueprints/todoapp/addedittask)) as they use the Task model directly.
+Some features don't have a ViewModel ([TaskDetail](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail), [AddEditTask](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/addedittask)) as they use the Task model directly.
 
 ## Additional dependencies
 
