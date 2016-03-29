@@ -20,6 +20,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -60,6 +61,8 @@ public class AddEditTaskPresenterTest {
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
+    private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
+
     private AddEditTaskPresenter mAddEditTaskPresenter;
 
     @Before
@@ -68,9 +71,12 @@ public class AddEditTaskPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        mActiveTaskCursor = MockCursorProvider.createActiveTaskCursor();
+
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,
                 mTaskLoader, mLoaderManager);
+
     }
 
     @Test
@@ -104,13 +110,13 @@ public class AddEditTaskPresenterTest {
 
     @Test
     public void populateTask_callsRepoAndUpdatesView() {
-        Task testTask = new Task("TITLE", "DESCRIPTION");
+        Task testTask = new Task("Title", "Description");
 
         when(mTasksRepository.getTask(testTask.getId())).thenReturn(testTask);
 
 
         // When the presenter is asked to populate an existing task
-        mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), testTask);
+        mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), mActiveTaskCursor);
 
         // Then the task repository is queried and the view updated
         //verify(mTasksRepository).getTask(eq(testTask.getId()));

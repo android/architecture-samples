@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the UI as required.
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        LoaderManager.LoaderCallbacks<Task> {
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int TASK_QUERY = 2;
 
@@ -85,7 +86,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public Loader<Task> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (mTaskId == null) {
             return null;
         }
@@ -93,18 +94,18 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void onLoadFinished(Loader<Task> loader, Task data) {
-
-        if (data != null) {
-            mAddTaskView.setDescription(data.getDescription());
-            mAddTaskView.setTitle(data.getTitle());
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null && data.moveToLast()) {
+            Task task = Task.from(data);
+            mAddTaskView.setDescription(task.getDescription());
+            mAddTaskView.setTitle(task.getTitle());
         } else {
             // NO-OP, add mode.
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Task> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
 
     }
 }

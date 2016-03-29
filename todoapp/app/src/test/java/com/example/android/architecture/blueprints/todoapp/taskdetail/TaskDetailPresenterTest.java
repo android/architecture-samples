@@ -21,7 +21,7 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class TaskDetailPresenterTest {
     private TaskDetailContract.View mTaskDetailFragment;
 
     @Mock
-    private TaskCursorLoader mTaskLoader;
+    private TaskLoader mTaskLoader;
 
     @Mock
     private LoaderManager mLoaderManager;

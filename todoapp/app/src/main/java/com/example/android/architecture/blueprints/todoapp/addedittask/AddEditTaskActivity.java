@@ -52,15 +52,17 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 .findFragmentById(R.id.contentFrame);
 
         String taskId = null;
+        int internalTaskId = 0;
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                taskId = getIntent().getStringExtra(
-                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+                taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+                internalTaskId = getIntent().getIntExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_INTERNAL_ID, 0);
                 actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
                 bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+                bundle.putInt(AddEditTaskFragment.ARGUMENT_EDIT_TASK_INTERNAL_ID, internalTaskId);
                 addEditTaskFragment.setArguments(bundle);
             } else {
                 actionBar.setTitle(R.string.add_task);
@@ -70,13 +72,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
                     addEditTaskFragment, R.id.contentFrame);
         }
 
-        // Create the loader and presenter
-        TaskLoader taskLoader = new TaskLoader(taskId, getApplicationContext());
+        // Create the presenter
         new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 addEditTaskFragment,
-                taskLoader,
+                new TaskLoader(getApplicationContext(), internalTaskId),
                 getSupportLoaderManager());
     }
 

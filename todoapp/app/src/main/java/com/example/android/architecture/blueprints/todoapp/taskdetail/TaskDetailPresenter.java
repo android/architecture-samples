@@ -24,7 +24,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskCursorLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,7 +40,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     private TaskDetailContract.View mTaskDetailView;
 
-    private TaskCursorLoader mLoader;
+    private TaskLoader mLoader;
 
     private LoaderManager mLoaderManager;
 
@@ -53,7 +53,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskCursorLoader taskLoader,
+                               @NonNull TaskLoader taskLoader,
                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
