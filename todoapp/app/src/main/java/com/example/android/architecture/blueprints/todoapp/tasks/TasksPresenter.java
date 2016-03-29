@@ -28,13 +28,9 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksCursorLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,28 +42,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TasksPresenter implements TasksContract.Presenter,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
     private final static int TASKS_QUERY = 1;
 
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
 
-    private final TasksCursorLoader mLoader;
-
     private final LoaderManager mLoaderManager;
-    @NonNull
-    private final Context context;
+
+    private final Context mContext;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull Context context, @NonNull TasksCursorLoader loader, @NonNull LoaderManager loaderManager,
+    public TasksPresenter(@NonNull Context context, @NonNull LoaderManager loaderManager,
                           @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
-        this.context = context;
-        mLoader = checkNotNull(loader, "loader cannot be null!");
+        mContext = checkNotNull(context, "context cannot be null");
         mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
@@ -91,10 +82,10 @@ public class TasksPresenter implements TasksContract.Presenter,
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         mTasksView.setLoadingIndicator(true);
-        return createFilterLoader();
+        return createFilteredLoader();
     }
 
-    private Loader<Cursor> createFilterLoader() {
+    private Loader<Cursor> createFilteredLoader() {
         String selection = null;
         String[] selectionArgs = null;
 
@@ -113,9 +104,10 @@ public class TasksPresenter implements TasksContract.Presenter,
                 break;
         }
 
-        return new CursorLoader(context,
-                                TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
+        return new CursorLoader(
+                mContext,
+                TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
         );
     }
 
@@ -141,34 +133,6 @@ public class TasksPresenter implements TasksContract.Presenter,
         }
     }
 
-    private void showFilteredTasks() {
-        List<Task> tasksToDisplay = new ArrayList<>();
-//        if (mCurrentTasks != null) {
-//            for (Task task : mCurrentTasks) {
-//                switch (mCurrentFiltering) {
-//                    case ALL_TASKS:
-//                        tasksToDisplay.add(task);
-//                        break;
-//                    case ACTIVE_TASKS:
-//                        if (task.isActive()) {
-//                            tasksToDisplay.add(task);
-//                        }
-//                        break;
-//                    case COMPLETED_TASKS:
-//                        if (task.isCompleted()) {
-//                            tasksToDisplay.add(task);
-//                        }
-//                        break;
-//                    default:
-//                        tasksToDisplay.add(task);
-//                        break;
-//                }
-//            }
-//        }
-
-        processTasks(tasksToDisplay);
-    }
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         // no-op
@@ -181,21 +145,7 @@ public class TasksPresenter implements TasksContract.Presenter,
         if (forceUpdate || mFirstLoad) {
             mFirstLoad = false;
             mTasksRepository.refreshTasks();
-        } else {
-            showFilteredTasks();
         }
-    }
-
-    private void processTasks(List<Task> tasks) {
-//        if (tasks.isEmpty()) {
-//            // Show a message indicating there are no tasks for that filter type.
-//            processEmptyTasks();
-//        } else {
-//            // Show the list of tasks
-//            mTasksView.showTasks(tasks);
-//            // Set the filter label's text.
-//            showFilterLabel();
-//        }
     }
 
     private void showFilterLabel() {
