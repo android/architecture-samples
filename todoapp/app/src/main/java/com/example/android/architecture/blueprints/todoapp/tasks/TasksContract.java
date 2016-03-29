@@ -36,7 +36,7 @@ public interface TasksContract {
 
         void showAddTask();
 
-        void showTaskDetailsUi(String taskId);
+        void showTaskDetailsUi(Task task);
 
         void showTaskMarkedComplete();
 

@@ -34,7 +34,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -137,7 +136,7 @@ public class TasksPresenterTest {
         mTasksPresenter.openTaskDetails(requestedTask);
 
         // Then task detail UI is shown
-        verify(mTasksView).showTaskDetailsUi(any(String.class));
+        verify(mTasksView).showTaskDetailsUi(requestedTask);
     }
 
     @Test

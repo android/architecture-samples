@@ -35,6 +35,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
+    public static final String EXTRA_TASK_INTERNAL_ID = "TASK_INTERNAL_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,9 @@ public class TaskDetailActivity extends AppCompatActivity {
         ab.setDisplayShowHomeEnabled(true);
 
         // Get the requested task id
-        int taskId = getIntent().getIntExtra(EXTRA_TASK_ID, 0);
+        int internalTaskId = getIntent().getIntExtra(EXTRA_TASK_INTERNAL_ID, 0);
+        String taskId = getIntent().getStringExtra(EXTRA_TASK_INTERNAL_ID);
+
         TaskDetailFragment taskDetailFragment = (TaskDetailFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.contentFrame);
 
@@ -67,7 +70,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                 taskId,
                 Injection.provideTasksRepository(this),
                 taskDetailFragment,
-                new TaskCursorLoader(getApplicationContext(), taskId),
+                new TaskCursorLoader(getApplicationContext(), internalTaskId),
                 getSupportLoaderManager()
         );
     }
