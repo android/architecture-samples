@@ -22,12 +22,12 @@ initial number of variants low before the stable release.
 
 ## Samples
 
-All projects are released in the master branch. Check each project's README for
+All projects are released in their own branch. Check each project's README for
 more information.
 
-  * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp) - Basic Model-View-Presenter architecture.
-  * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) - Based on todo-mvp, fetches data using Loaders.
-  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/master/todo-databinding) - Bases on todo-mvp, uses the Data Binding Library.
+  * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) - Basic Model-View-Presenter architecture.
+  * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/todoapp) - Based on todo-mvp, fetches data using Loaders.
+  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/todoapp) - Bases on todo-mvp, uses the Data Binding Library.
 
 In progress:
 
