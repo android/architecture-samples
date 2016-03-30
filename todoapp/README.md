@@ -24,7 +24,7 @@ In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-a
 
 ```
     @Override
-    public List&lt;Task> loadInBackground() {
+    public List<Task> loadInBackground() {
         return mRepository.getTasks();
     }
 ```
@@ -35,7 +35,7 @@ In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/b
 
 ```
     @Override
-    public void onLoadFinished(Loader&lt;List&lt;Task>> loader, List&lt;Task>
+    public void onLoadFinished(Loader<List<Task>> loader, List<Task>
 data) {
         mTasksView.setLoadingIndicator(false);
 
