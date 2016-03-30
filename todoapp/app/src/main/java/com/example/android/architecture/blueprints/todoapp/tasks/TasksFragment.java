@@ -93,10 +93,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
         tasksFragBinding.setActionHandler(mPresenter);
 
-        View root = tasksFragBinding.getRoot();
-
         // Set up tasks view
-        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
+        ListView listView = tasksFragBinding.tasksList;
 
         mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mPresenter);
         listView.setAdapter(mListAdapter);
@@ -114,8 +112,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         });
 
         // Set up progress indicator
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
-                (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+        final ScrollChildSwipeRefreshLayout swipeRefreshLayout = tasksFragBinding.refreshLayout;
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
@@ -125,6 +122,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setScrollUpChild(listView);
 
         setHasOptionsMenu(true);
+
+        View root = tasksFragBinding.getRoot();
 
         return root;
     }
