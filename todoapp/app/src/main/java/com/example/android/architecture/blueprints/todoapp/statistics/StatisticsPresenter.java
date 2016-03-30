@@ -77,6 +77,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
     }
 
     private void loadStatistics(Cursor data) {
+        mStatisticsView.setProgressIndicator(false);
         if (data != null) {
             int activeTasks = 0;
             int completedTasks = 0;
@@ -96,7 +97,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
         } else {
             mStatisticsView.showLoadingStatisticsError();
         }
-        mStatisticsView.setProgressIndicator(false);
     }
 
     private List<Task> convertCursorToTasks(Cursor data){
