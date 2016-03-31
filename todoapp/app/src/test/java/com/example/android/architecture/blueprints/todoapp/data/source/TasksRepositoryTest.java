@@ -16,21 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.google.common.collect.Lists;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +31,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.List;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
