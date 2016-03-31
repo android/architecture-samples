@@ -120,16 +120,8 @@ public class TasksRepository implements TasksDataSource {
 
     }
 
-    public boolean cachedTasksAvailable() {
-        return mCachedTasks != null && !mCacheIsDirty;
-    }
-
     public List<Task> getCachedTasks() {
         return mCachedTasks == null ? null : new ArrayList<>(mCachedTasks.values());
-    }
-
-    public Task getCachedTask(String taskId) {
-        return mCachedTasks.get(taskId);
     }
 
     private void saveTasksInLocalDataSource(List<Task> tasks) {
@@ -287,9 +279,4 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.remove(taskId);
     }
 
-    public interface TasksRepositoryObserver {
-
-        void onTasksChanged();
-
-    }
 }
