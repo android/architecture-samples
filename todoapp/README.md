@@ -1,7 +1,7 @@
 # TODO-DataBinding
 
 It is based on the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) sample and uses the Data Binding library (currently in beta) to display data
-and bind UI elements to actions. 
+and bind UI elements to actions.
 
 It's doesn't follow a strict Model-View-ViewModel or a Model-View-Presenter
 pattern, as it uses both View Models and Presenters.
@@ -20,52 +20,51 @@ data model.
 In the todo-mvp sample, a Task description is set in the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/todo-mvp/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java):
 
 
-```
-    public void onCreateView(...) {
-        ...
-        mDetailDescription = (TextView)
+```java
+public void onCreateView(...) {
+    ...
+    mDetailDescription = (TextView)
 root.findViewById(R.id.task_detail_description);
-    }
+}
 
-    @Override
-    public void showDescription(String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
-    }
+@Override
+public void showDescription(String description) {
+    mDetailDescription.setVisibility(View.VISIBLE);
+    mDetailDescription.setText(description);
+}
 ```
 In this sample, the [TaskDetailFragment](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailFragment.java) simply passes the Task to the data binding:
 
 
-```
-    @Override
-    public void showTask(Task task) {
-        mViewDataBinding.setTask(task);
-    }
+```java
+@Override
+public void showTask(Task task) {
+    mViewDataBinding.setTask(task);
+}
 ```
 and the library will take care of displaying it, as defined by the layout (<code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/res/layout/taskdetail_frag.xml)</code>)
 
 
-```
-        <TextView
-            android:id="@+id/task_detail_description"
-            ...
-            android:text="@{task.description}" />
-
+```xml
+<TextView
+    android:id="@+id/task_detail_description"
+    ...
+    android:text="@{task.description}" />
 ```
 ### Event binding
 
-Data binding eliminates the need to call <code>findViewById() </code>and event binding can also help minimizing <code>setOnClickListener()</code>. 
+Data binding eliminates the need to call <code>findViewById() </code>and event binding can also help minimizing <code>setOnClickListener()</code>.
 
 In this CheckBox from <code>[taskdetail\_frag.xml](https://github.com/googlesamples/android-architecture/blob/todo-databinding/todoapp/app/src/main/res/layout/taskdetail_frag.xml)</code>, the presenter is called directly when the user taps on it:
 
 
-```
-    <CheckBox
+```xml
+<CheckBox
     android:id="@+id/task_detail_complete"
     ...
     android:checked="@{task.completed}"
     android:onCheckedChanged="@{(cb, isChecked) ->
-presenter.completeChanged(task, isChecked)}" />
+    presenter.completeChanged(task, isChecked)}" />
 ```
 ### Observing data
 
@@ -75,15 +74,15 @@ relevant properties are notified and the UI elements bound to those properties
 are updated.
 
 
-```
-    public void setTaskListSize(int taskListSize) {
-        mTaskListSize = taskListSize;
-        notifyPropertyChanged(BR.noTaskIconRes);
-        notifyPropertyChanged(BR.noTasksLabel);
-        notifyPropertyChanged(BR.currentFilteringLabel);
-        notifyPropertyChanged(BR.notEmpty);
-        notifyPropertyChanged(BR.tasksAddViewVisible);
-    }
+```java
+public void setTaskListSize(int taskListSize) {
+    mTaskListSize = taskListSize;
+    notifyPropertyChanged(BR.noTaskIconRes);
+    notifyPropertyChanged(BR.noTasksLabel);
+    notifyPropertyChanged(BR.currentFilteringLabel);
+    notifyPropertyChanged(BR.notEmpty);
+    notifyPropertyChanged(BR.tasksAddViewVisible);
+}
 ```
 ## Feature components
 
