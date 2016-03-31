@@ -1,6 +1,6 @@
 # TODO-MVP-Loaders
 
-It is based on the [TODO-MVP](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) sample and uses Loaders to get the data from the tasks repository. 
+It is based on the [TODO-MVP](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) sample and uses Loaders to get the data from the tasks repository.
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-loaders.png" alt="Diagram"/>
 
@@ -17,45 +17,45 @@ configuration change.
 
 ### Asynchronous loading
 
-The Loaders ([TaskLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java) and [TasksLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java)) are responsible for fetching the data and extend AsyncTaskLoader. 
+The Loaders ([TaskLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java) and [TasksLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java)) are responsible for fetching the data and extend AsyncTaskLoader.
 
 In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
 
 
-```
-    @Override
-    public List<Task> loadInBackground() {
-        return mRepository.getTasks();
-    }
+```java
+@Override
+public List<Task> loadInBackground() {
+    return mRepository.getTasks();
+}
 ```
 The results are received in the UI Thread, handled by the presenter.
 
 In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
 
 
-```
-    @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task>
+```java
+@Override
+public void onLoadFinished(Loader<List<Task>> loader, List<Task>
 data) {
-        mTasksView.setLoadingIndicator(false);
+    mTasksView.setLoadingIndicator(false);
 
-        mCurrentTasks = data;
-        if (mCurrentTasks == null) {
-            mTasksView.showLoadingTasksError();
-        } else {
-            showFilteredTasks();
-        }
+    mCurrentTasks = data;
+    if (mCurrentTasks == null) {
+        mTasksView.showLoadingTasksError();
+    } else {
+        showFilteredTasks();
     }
+}
 ```
 The presenter also triggers the loading the data, like in the MVP sample but in
 this case it does it through the LoaderManager:
 
 
-```
-    @Override
-    public void start() {
-        mLoaderManager.initLoader(TASKS_QUERY, null, this);
-    }
+```java
+@Override
+public void start() {
+    mLoaderManager.initLoader(TASKS_QUERY, null, this);
+}
 ```
 ### Content observer
 
@@ -64,30 +64,30 @@ After every content change in the repository, <code>notifyContentObserver()</cod
 In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java):
 
 
-```
-    @Override
-    public void deleteTask(@NonNull String taskId) {
-        mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
-        mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
+```java
+@Override
+public void deleteTask(@NonNull String taskId) {
+    mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
+    mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
 
-        mCachedTasks.remove(taskId);
+    mCachedTasks.remove(taskId);
 
-        // Update the UI
-       notifyContentObserver();
-    }
+    // Update the UI
+   notifyContentObserver();
+}
 ```
 This notifies the Loader which in this case simply forces a reload of data.
 
 In [TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
 
 
-```
-    @Override
-    public void onTasksChanged() {
-        if (isStarted()) {
-            forceLoad();
-        }
+```java
+@Override
+public void onTasksChanged() {
+    if (isStarted()) {
+        forceLoad();
     }
+}
 ```
 ## Additional dependencies
 
@@ -98,11 +98,11 @@ This project uses the Loaders framework available from Android 3.0 (API Level
 
 ### Complexity - understandability
 
-#### Use of architectural frameworks/libraries/tools: 
+#### Use of architectural frameworks/libraries/tools:
 
-No external frameworks. 
+No external frameworks.
 
-#### Conceptual complexity 
+#### Conceptual complexity
 
 Developers need to be familiar with the Loaders framework, which is not
 trivial.
@@ -121,7 +121,7 @@ No difference with MVP.
 ### Code metrics
 
 Compared to MVP, the only new classes are TaskLoader and TasksLoader. Parts of
-the code are simpler as Loaders take care of the asynchronous work. 
+the code are simpler as Loaders take care of the asynchronous work.
 
 
 ```
