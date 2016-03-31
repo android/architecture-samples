@@ -19,25 +19,25 @@ configuration change.
 
 ### Asynchronous loading
 
-The Loaders ([TaskLoader](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java) and [TasksLoader](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java)) are responsible for fetching the data and extend AsyncTaskLoader. 
+The Loaders ([TaskLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java) and [TasksLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java)) are responsible for fetching the data and extend AsyncTaskLoader.
 
-In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
+In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
 
 
 ```
     @Override
-    public List&lt;Task> loadInBackground() {
+    public List<Task> loadInBackground() {
         return mRepository.getTasks();
     }
 ```
 The results are received in the UI Thread, handled by the presenter.
 
-In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
+In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
 
 
 ```
     @Override
-    public void onLoadFinished(Loader&lt;List&lt;Task>> loader, List&lt;Task>
+    public void onLoadFinished(Loader<List<Task>> loader, List<Task>
 data) {
         mTasksView.setLoadingIndicator(false);
 
@@ -63,7 +63,7 @@ this case it does it through the LoaderManager:
 
 After every content change in the repository, <code>notifyContentObserver()</code> is called.
 
-In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java):
+In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java):
 
 
 ```
@@ -80,7 +80,7 @@ In [src/data/source/TasksRepository.java](https://github.com/googlesamples/andro
 ```
 This notifies the Loader which in this case simply forces a reload of data.
 
-In [TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/master/todo-mvp-loaders/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
+In [TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
 
 
 ```
