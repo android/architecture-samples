@@ -57,8 +57,21 @@ compact you like your codebase, etc.
 
 ## Who is behind this project?
 
-This project is made by the [community](https://github.com/googlesamples/android-architecture/graphs/contributors) and curated by Google and core maintainers. Each sample has a group of owners
-that look after it keeping it up to date and handling issues and pull requests. 
+This project is **built by the community** and curated by Google and core maintainers.
+
+### External contributors 
+
+[David González](http://github.com/malmstein) - Core developer
+
+[Karumi](http://github.com/Karumi) - Developers
+
+### Googlers
+
+[Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
+
+[Natalie Masse](http://github.com/freewheelnat) - Core developer
+
+[Stephan Linzner](http://github.com/slinzner) - Core developer
 
 Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
 
