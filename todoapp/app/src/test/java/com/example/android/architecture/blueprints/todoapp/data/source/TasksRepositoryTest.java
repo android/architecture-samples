@@ -16,6 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -30,15 +41,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -306,6 +308,21 @@ public class TasksRepositoryTest {
 
         // Verify no data is returned
         assertThat(task, is(nullValue()));
+    }
+
+    @Test
+    public void getTasks_refreshesLocalDataSource() {
+        // Mark cache as dirty to force a reload of data from remote data source.
+        mTasksRepository.refreshTasks();
+
+        // Make the remote data source return data
+        setTasksAvailable(mTasksRemoteDataSource, TASKS);
+
+        // When calling getTasks in the repository
+        mTasksRepository.getTasks();
+
+        // Verify that the data fetched from the remote data source was saved in local.
+        verify(mTasksLocalDataSource, times(TASKS.size())).saveTask(any(Task.class));
     }
 
     /**
