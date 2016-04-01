@@ -1,5 +1,7 @@
 # Android Architecture Blueprints [beta]
 
+[![Join the chat at https://gitter.im/googlesamples/android-architecture](https://badges.gitter.im/googlesamples/android-architecture.svg)](https://gitter.im/googlesamples/android-architecture?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The Android framework offers a lot of flexibility when it comes to defining how
 to organize and <em>architect</em> an Android app. This freedom, whilst very valuable, can also result in apps
 with large classes, inconsistent naming and architectures (or lack of) that can
