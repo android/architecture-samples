@@ -30,7 +30,8 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -75,10 +76,12 @@ public class TasksActivity extends AppCompatActivity {
 
         // Create the presenter
         TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
-        TaskLoaderProvider taskLoaderProvider = new TaskLoaderProvider(getApplicationContext());
+        LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
+        TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager());
 
         mTasksPresenter = new TasksPresenter(
-                taskLoaderProvider,
+                tasksOperations,
+                loaderProvider,
                 getSupportLoaderManager(),
                 repository,
                 tasksFragment
@@ -95,7 +98,6 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
-
         super.onSaveInstanceState(outState);
     }
 

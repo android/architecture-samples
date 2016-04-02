@@ -20,7 +20,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class StatisticsPresenterTest {
     private StatisticsContract.View mStatisticsView;
 
     @Mock
-    private TaskLoaderProvider mTasksLoaderProvider;
+    private LoaderProvider mTasksLoaderProvider;
 
     @Mock
     private LoaderManager mLoaderManager;

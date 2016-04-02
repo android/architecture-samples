@@ -24,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,7 +39,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     private TaskDetailContract.View mTaskDetailView;
 
-    private TaskLoader mLoader;
+    private Loader<Cursor> mLoaderProvider;
 
     private LoaderManager mLoaderManager;
 
@@ -53,12 +52,12 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskLoader taskLoader,
+                               @NonNull Loader<Cursor> loaderProvider,
                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
+        mLoaderProvider = checkNotNull(loaderProvider, "loader provider cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mTaskDetailView.setPresenter(this);
@@ -130,7 +129,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             return null;
         }
         mTaskDetailView.setLoadingIndicator(true);
-        return mLoader;
+        return mLoaderProvider;
     }
 
     @Override

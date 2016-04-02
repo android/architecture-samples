@@ -318,7 +318,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         // to show some Intent stubbing.
         Intent intent = new Intent(getContext(), TaskDetailActivity.class);
         intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, task.getId());
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_INTERNAL_ID, task.getInternalId());
         startActivity(intent);
     }
 

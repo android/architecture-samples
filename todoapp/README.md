@@ -4,31 +4,33 @@ It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-a
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
 
-//TODO finish README
+The advantages of Content Providers, from the [Content Provider documentation page](http://developer.android.com/guide/topics/providers/content-providers.html), are:
+
+  * Manage access to a structured set of data
+  * Content providers are the standard interface that connects data in one process with code running in another process
 
 The advantages of Loaders, from the [Loaders documentation page](http://developer.android.com/guide/components/loaders.html), are:
 
-  * They provide asynchronous loading of data, removing the need for callbacks in
-the repository.
-  * They monitor the source of their data and deliver new results when the content
-changes, in our case, the repository.
-  * They automatically reconnect to the last loader when being recreated after a
-configuration change.
+  * They provide asynchronous loading of data, removing the need for callbacks in the repository.
+  * They monitor the source of their data and deliver new results when the content changes, in our case, the repository.
+  * They automatically reconnect to the last loader when being recreated after a configuration change.
 
 ## Code
 
 ### Asynchronous loading
 
-The Loaders ([TaskLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java) and [TasksLoader](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java)) are responsible for fetching the data and extend AsyncTaskLoader.
+The data is fetched by [Cursor Loaders](http://developer.android.com/reference/android/support/v4/content/CursorLoader.html) and delivered to the Presenters.
 
-In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
+
+In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproloaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
 
 
 ```
-    @Override
-    public List<Task> loadInBackground() {
-        return mRepository.getTasks();
-    }
+  return new CursorLoader(
+                 mContext,
+                 TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                 TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
+         );
 ```
 The results are received in the UI Thread, handled by the presenter.
 
@@ -59,7 +61,7 @@ this case it does it through the LoaderManager:
         mLoaderManager.initLoader(TASKS_QUERY, null, this);
     }
 ```
-### Content observer
+### Content Provider
 
 After every content change in the repository, <code>notifyContentObserver()</code> is called.
 

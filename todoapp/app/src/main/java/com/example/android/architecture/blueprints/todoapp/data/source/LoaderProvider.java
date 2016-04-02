@@ -11,16 +11,16 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class TaskLoaderProvider {
+public class LoaderProvider {
 
     @NonNull
     private final Context mContext;
 
-    public TaskLoaderProvider(@NonNull Context context) {
+    public LoaderProvider(@NonNull Context context) {
         mContext = checkNotNull(context, "context cannot be null");
     }
 
-    public Loader<Cursor> createFilteredLoader(TasksFilterType filterType) {
+    public Loader<Cursor> createFilteredTasksLoader(TasksFilterType filterType) {
         String selection = null;
         String[] selectionArgs = null;
 
@@ -43,6 +43,14 @@ public class TaskLoaderProvider {
                 mContext,
                 TasksPersistenceContract.TaskEntry.buildTasksUri(),
                 TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
+        );
+    }
+
+    public Loader<Cursor> createTaskLoader(String taskId) {
+        return new CursorLoader(mContext, TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ? ",
+                                new String[]{String.valueOf(taskId)}, null
         );
     }
 }

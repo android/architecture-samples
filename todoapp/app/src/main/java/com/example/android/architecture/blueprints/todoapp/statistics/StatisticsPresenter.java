@@ -23,7 +23,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
 import java.util.ArrayList;
@@ -41,15 +41,15 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
 
     private StatisticsContract.View mStatisticsView;
 
-    private TaskLoaderProvider mTasksLoaderProvider;
+    private LoaderProvider mTasksLoaderProvider;
 
     private LoaderManager mLoaderManager;
 
     public StatisticsPresenter(@NonNull StatisticsContract.View statisticsView,
-                               @NonNull TaskLoaderProvider taskLoaderProvider,
+                               @NonNull LoaderProvider loaderProvider,
                                @NonNull LoaderManager loaderManager) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mTasksLoaderProvider = checkNotNull(taskLoaderProvider, "taskLoaderProvider cannot be null!");
+        mTasksLoaderProvider = checkNotNull(loaderProvider, "taskLoaderProvider cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mStatisticsView.setPresenter(this);
@@ -63,7 +63,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, Loader
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         mStatisticsView.setProgressIndicator(true);
-        return mTasksLoaderProvider.createFilteredLoader(TasksFilterType.ALL_TASKS);
+        return mTasksLoaderProvider.createFilteredTasksLoader(TasksFilterType.ALL_TASKS);
     }
 
     @Override

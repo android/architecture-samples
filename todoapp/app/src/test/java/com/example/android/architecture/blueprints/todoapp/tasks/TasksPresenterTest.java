@@ -22,7 +22,7 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class TasksPresenterTest {
     private ArgumentCaptor<Cursor> mShowTasksArgumentCaptor;
 
     @Mock
-    private TaskLoaderProvider mTaskLoaderProvider;
+    private LoaderProvider mLoaderProvider;
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -75,7 +75,7 @@ public class TasksPresenterTest {
 
         // Get a reference to the class under test
         mTasksPresenter = new TasksPresenter(
-                mTaskLoaderProvider, mLoaderManager, mTasksRepository, mTasksView);
+                mLoaderProvider, mLoaderManager, mTasksRepository, mTasksView);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();

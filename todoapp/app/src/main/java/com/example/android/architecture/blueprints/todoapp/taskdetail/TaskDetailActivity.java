@@ -16,16 +16,18 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -35,7 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
-    public static final String EXTRA_TASK_INTERNAL_ID = "TASK_INTERNAL_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,6 @@ public class TaskDetailActivity extends AppCompatActivity {
         ab.setDisplayShowHomeEnabled(true);
 
         // Get the requested task id
-        int internalTaskId = getIntent().getIntExtra(EXTRA_TASK_INTERNAL_ID, 0);
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
         TaskDetailFragment taskDetailFragment = (TaskDetailFragment) getSupportFragmentManager()
@@ -65,12 +65,14 @@ public class TaskDetailActivity extends AppCompatActivity {
             );
         }
 
+        Loader<Cursor> taskLoader = new LoaderProvider(getApplicationContext()).createTaskLoader(taskId);
+
         // Create the presenter
         new TaskDetailPresenter(
                 taskId,
                 Injection.provideTasksRepository(this),
                 taskDetailFragment,
-                new TaskLoader(getApplicationContext(), internalTaskId),
+                taskLoader,
                 getSupportLoaderManager()
         );
     }
