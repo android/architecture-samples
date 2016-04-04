@@ -1,1 +1,1 @@
-include ':app', ':guava_custom'
+include ':app'

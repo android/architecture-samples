@@ -30,6 +30,7 @@ ext {
 
     // App dependencies
     supportLibraryVersion = '23.1.1'
+    guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
