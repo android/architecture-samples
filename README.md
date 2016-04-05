@@ -29,7 +29,7 @@ more information.
 
   * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) - Basic Model-View-Presenter architecture.
   * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/todoapp) - Based on todo-mvp, fetches data using Loaders.
-  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/todoapp) - Bases on todo-mvp, uses the Data Binding Library.
+  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/todoapp) - Based on todo-mvp, uses the Data Binding Library.
 
 In progress:
 
