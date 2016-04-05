@@ -44,8 +44,10 @@ public class AddEditTaskActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
 
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
@@ -57,12 +59,14 @@ public class AddEditTaskActivity extends AppCompatActivity {
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
                 taskId = getIntent().getStringExtra(
                         AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
-                actionBar.setTitle(R.string.edit_task);
+                if (actionBar != null)
+                    actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
                 bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
                 addEditTaskFragment.setArguments(bundle);
             } else {
-                actionBar.setTitle(R.string.add_task);
+                if (actionBar != null)
+                    actionBar.setTitle(R.string.add_task);
             }
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
