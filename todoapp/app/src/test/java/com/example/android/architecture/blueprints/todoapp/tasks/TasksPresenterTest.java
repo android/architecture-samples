@@ -18,11 +18,11 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -34,7 +34,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -59,6 +58,9 @@ public class TasksPresenterTest {
     private TasksContract.View mTasksView;
 
     @Mock
+    private TasksOperations mTasksOperations;
+
+    @Mock
     private LoaderManager mLoaderManager;
 
     private MockCursorProvider.TaskMockCursor mCompletedTasksCursor;
@@ -74,8 +76,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(
-                mLoaderProvider, mLoaderManager, mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksOperations, mTasksRepository, mTasksView);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
@@ -86,7 +87,7 @@ public class TasksPresenterTest {
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mAllTasksCursor);
+        mTasksPresenter.onTasksLoaded(mAllTasksCursor);
 
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -98,7 +99,7 @@ public class TasksPresenterTest {
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to active
         mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mActiveTasksCursor);
+        mTasksPresenter.onTasksLoaded(mActiveTasksCursor);
 
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -110,7 +111,7 @@ public class TasksPresenterTest {
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to completed
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), mCompletedTasksCursor);
+        mTasksPresenter.onTasksLoaded(mCompletedTasksCursor);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -169,7 +170,7 @@ public class TasksPresenterTest {
     public void unavailableTasks_ShowsError() {
         // When the loader finishes with error
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), null);
+        mTasksPresenter.onTasksLoaded(null);
 
         // Then an error message is shown
         verify(mTasksView).showLoadingTasksError();
