@@ -27,15 +27,15 @@ initial number of variants low before the stable release.
 All projects are released in their own branch. Check each project's README for
 more information.
 
-  * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) - Basic Model-View-Presenter architecture.
-  * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/todoapp) - Based on todo-mvp, fetches data using Loaders.
-  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/todoapp) - Based on todo-mvp, uses the Data Binding Library.
+  * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) - Basic Model-View-Presenter architecture.
+  * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) - Based on todo-mvp, fetches data using Loaders.
+  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) - Based on todo-mvp, uses the Data Binding Library.
 
 In progress:
 
-  * <strong>todo-mvp-contentproviders</strong> - Based on todo-mvp-loaders, uses Content Providers
-  * <strong>todo-mvp-clean</strong> - Based on todo-mvp, uses concepts from Clean Architecture.
-  * <strong>todo-mvp-dagger</strong> - Based on todo-mvp, uses Dagger2 for Dependency Injection
+  * [dev-todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-contentproviders/) - Based on todo-mvp-loaders, uses Content Providers
+  * [dev-todo-mvp-clean/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-clean/) - Based on todo-mvp, uses concepts from Clean Architecture.
+  * [dev-todo-mvp-dagger/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-dagger/) - Based on todo-mvp, uses Dagger2 for Dependency Injection
 
 Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
 
