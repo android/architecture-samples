@@ -63,9 +63,11 @@ This project is **built by the community** and curated by Google and core mainta
 
 ### External contributors 
 
-[David González](http://github.com/malmstein) - Core developer
+[David González](http://github.com/malmstein) - Core developer (Content Providers sample)
 
-[Karumi](http://github.com/Karumi) - Developers
+[Karumi](http://github.com/Karumi) - Developers (MVP Clean architecture sample)
+
+[Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
 
 ### Googlers
 
@@ -74,6 +76,8 @@ This project is **built by the community** and curated by Google and core mainta
 [Natalie Masse](http://github.com/freewheelnat) - Core developer
 
 [Stephan Linzner](http://github.com/slinzner) - Core developer
+
+[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
 Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
 
