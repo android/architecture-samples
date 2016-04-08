@@ -17,17 +17,17 @@ android {
 
     buildTypes {
         debug {
-            // Run code coverage reports by default on debug builds.
-            // testCoverageEnabled = true
-            minifyEnabled true
+            // Disabled for now. TODO: fix proguard rules file.
+            minifyEnabled false
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker+
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         release {
-            minifyEnabled true
-            useProguard true
+            // Disabled for now. TODO: fix proguard rules file.
+            minifyEnabled false
+            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
