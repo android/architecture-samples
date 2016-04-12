@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: Javadoc
+ * Returns the completed tasks from a list of {@link Task}s.
  */
 class CompleteTaskFilter implements TaskFilter {
     @Override

@@ -23,7 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * TODO: Javadoc
+ * Retrieves a {@link Task} from the {@link TasksRepository}.
  */
 public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValue> {
 

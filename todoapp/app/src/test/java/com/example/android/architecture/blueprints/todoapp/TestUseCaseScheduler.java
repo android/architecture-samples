@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 /**
- * TODO: Javadoc
+ * A scheduler that executes synchronously, for testing purposes.
  */
 public class TestUseCaseScheduler implements UseCaseScheduler {
     @Override

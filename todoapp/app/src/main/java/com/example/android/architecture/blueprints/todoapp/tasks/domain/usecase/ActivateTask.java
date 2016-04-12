@@ -20,7 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * TODO: Javadoc
+ * Marks a task as active (not completed yet).
  */
 public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
 

@@ -17,7 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.base.domain.error;
 
 /**
- * TODO: Javadoc
+ * Error passed when data is not available from the
+ * {@link com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository}.
  */
 public class DataNotAvailableError extends Error {
 }

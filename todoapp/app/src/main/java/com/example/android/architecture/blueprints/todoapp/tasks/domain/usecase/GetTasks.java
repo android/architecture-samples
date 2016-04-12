@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.T
 import java.util.List;
 
 /**
- * TODO: Javadoc
+ * Fetches the list of tasks.
  */
 public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseValue> {
 
@@ -83,7 +83,7 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
         }
     }
 
-    public class ResponseValue extends UseCase.ResponseValue {
+    public static class ResponseValue extends UseCase.ResponseValue {
         private List<Task> mTasks;
 
         public ResponseValue(List<Task> tasks) {

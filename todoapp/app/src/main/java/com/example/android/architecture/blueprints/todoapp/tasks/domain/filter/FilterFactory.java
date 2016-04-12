@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO: Javadoc
+ * Factory of {@link TaskFilter}s.
  */
 public class FilterFactory {
 

@@ -20,7 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * TODO: Javadoc
+ * Deletes tasks marked as completed.
  */
 public class ClearCompleteTasks
         extends UseCase<ClearCompleteTasks.RequestValues, ClearCompleteTasks.ResponseValue> {

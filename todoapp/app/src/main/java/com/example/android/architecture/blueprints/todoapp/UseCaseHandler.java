@@ -20,7 +20,7 @@ package com.example.android.architecture.blueprints.todoapp;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**
- * TODO: Javadoc
+ * Runs {@link UseCase}s using a {@link UseCaseScheduler}.
  */
 public class UseCaseHandler {
 

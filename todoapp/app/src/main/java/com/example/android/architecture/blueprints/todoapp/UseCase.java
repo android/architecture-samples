@@ -17,9 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 /**
- * TODO: Javadoc
- * @param <Q>
- * @param <P>
+ * Use cases are the entry points to the domain layer.
+ *
+ * @param <Q> the request type
+ * @param <P> the response type
  */
 public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> {
 
@@ -50,14 +51,14 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     protected abstract void executeUseCase(Q requestValues);
 
     /**
-     * TODO: Javadoc, why static and not response.
+     * Data passed to a request.
      */
     public static class RequestValues {  }
 
     /**
-     * TODO: Javadoc, why not static.
+     * Data received from a request.
      */
-    public class ResponseValue { }
+    public static class ResponseValue { }
 
     public interface UseCaseCallback<R> {
         void onSuccess(R response);
