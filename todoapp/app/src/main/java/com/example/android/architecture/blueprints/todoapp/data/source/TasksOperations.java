@@ -11,7 +11,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int TASKS_QUERY = 1;
-    private final String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
+    public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
 
     private final LoaderProvider mLoaderProvider;
     private final LoaderManager mLoaderManager;
@@ -22,12 +22,10 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         this.mLoaderManager = mLoaderManager;
     }
 
-    public void getTasks(TasksFilterType tasksFilterType, GetTasksCallback callback) {
+    public void getTasks(Bundle extras, GetTasksCallback callback) {
         this.callback = callback;
-        Bundle extras = new Bundle();
-        extras.putSerializable(KEY_TASK_FILTER, tasksFilterType);
 
-        if (mLoaderManager.getLoader(TASKS_QUERY) == null){
+        if (mLoaderManager.getLoader(TASKS_QUERY) == null) {
             mLoaderManager.initLoader(TASKS_QUERY, extras, this);
         } else {
             mLoaderManager.restartLoader(TASKS_QUERY, extras, this);
@@ -42,7 +40,11 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        callback.onTasksLoaded(data);
+        if (data != null) {
+            callback.onTasksLoaded(data);
+        } else {
+            callback.onDataNotAvailable();
+        }
     }
 
     @Override
@@ -52,5 +54,7 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public interface GetTasksCallback {
         void onTasksLoaded(Cursor data);
+
+        void onDataNotAvailable();
     }
 }

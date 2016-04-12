@@ -40,10 +40,11 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
+
     @NonNull
     private final TasksOperations mTasksOperations;
 
-    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
+    private TaskFilter mCurrentFiltering;
 
     private boolean mFirstLoad;
 
@@ -52,7 +53,6 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
         mTasksOperations = checkNotNull(tasksOperations, "taskOperations provider cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-
         mTasksView.setPresenter(this);
     }
 
@@ -67,26 +67,26 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     @Override
     public void start() {
         mTasksView.setLoadingIndicator(true);
-        mTasksOperations.getTasks(mCurrentFiltering, this);
+        mTasksOperations.getTasks(mCurrentFiltering.getFilterExtras(), this);
     }
 
     @Override
     public void onTasksLoaded(Cursor data) {
         mTasksView.setLoadingIndicator(false);
-        if (null != data) {
-            if (data.getCount() > 0) {
-                // Show the list of tasks
-                mTasksView.showTasks(data);
-                // Set the filter label's text.
-                showFilterLabel();
-            } else {
-                // Show a message indicating there are no tasks for that filter type.
-                processEmptyTasks();
-            }
+        if ((null == data) || (data.getCount() > 0)) {
+            // Show the list of tasks
+            mTasksView.showTasks(data);
+            // Set the filter label's text.
+            showFilterLabel();
         } else {
-            mTasksView.showLoadingTasksError();
+            // Show a message indicating there are no tasks for that filter type.
+            processEmptyTasks();
         }
+    }
 
+    @Override
+    public void onDataNotAvailable() {
+        mTasksView.showLoadingTasksError();
     }
 
     /**
@@ -100,7 +100,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     }
 
     private void showFilterLabel() {
-        switch (mCurrentFiltering) {
+        switch (mCurrentFiltering.getTasksFilterType()) {
             case ACTIVE_TASKS:
                 mTasksView.showActiveFilterLabel();
                 break;
@@ -114,7 +114,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     }
 
     private void processEmptyTasks() {
-        switch (mCurrentFiltering) {
+        switch (mCurrentFiltering.getTasksFilterType()) {
             case ACTIVE_TASKS:
                 mTasksView.showNoActiveTasks();
                 break;
@@ -164,18 +164,18 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     /**
      * Sets the current task filtering type.
      *
-     * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
+     * @param taskFilter Can be {@link TasksFilterType#ALL_TASKS},
      *                    {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
-    public void setFiltering(TasksFilterType requestType) {
-        mCurrentFiltering = requestType;
-        mTasksOperations.getTasks(requestType, this);
+    public void setFiltering(TaskFilter taskFilter) {
+        mCurrentFiltering = taskFilter;
+        mTasksOperations.getTasks(taskFilter.getFilterExtras(), this);
     }
 
     @Override
     public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
+        return mCurrentFiltering.getTasksFilterType();
     }
 
 }

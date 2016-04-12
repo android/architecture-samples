@@ -79,7 +79,7 @@ public interface TasksContract {
 
         void clearCompletedTasks();
 
-        void setFiltering(TasksFilterType requestType);
+        void setFiltering(TaskFilter requestType);
 
         TasksFilterType getFiltering();
     }

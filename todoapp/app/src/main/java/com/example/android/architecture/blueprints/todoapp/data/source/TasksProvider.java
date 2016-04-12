@@ -33,9 +33,6 @@ public class TasksProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case TASK:
-
-
-
                 retCursor = mTasksDbHelper.getReadableDatabase().query(
                         TasksPersistenceContract.TaskEntry.TABLE_NAME,
                         projection,

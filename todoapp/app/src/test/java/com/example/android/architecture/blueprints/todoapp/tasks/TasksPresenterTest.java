@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -35,6 +36,7 @@ import org.mockito.MockitoAnnotations;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksPresenter}.
@@ -63,6 +65,9 @@ public class TasksPresenterTest {
     @Mock
     private LoaderManager mLoaderManager;
 
+    @Mock
+    private Bundle mBundle;
+
     private MockCursorProvider.TaskMockCursor mCompletedTasksCursor;
     private MockCursorProvider.TaskMockCursor mActiveTasksCursor;
     private MockCursorProvider.TaskMockCursor mAllTasksCursor;
@@ -86,7 +91,10 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        mTasksPresenter.setFiltering(taskFilter);
         mTasksPresenter.onTasksLoaded(mAllTasksCursor);
 
         // Then progress indicator is hidden and all tasks are shown in UI
@@ -97,8 +105,11 @@ public class TasksPresenterTest {
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
+        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // When the loader finishes with tasks and filter is set to active
-        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+        mTasksPresenter.setFiltering(taskFilter);
         mTasksPresenter.onTasksLoaded(mActiveTasksCursor);
 
         // Then progress indicator is hidden and active tasks are shown in UI
@@ -109,8 +120,11 @@ public class TasksPresenterTest {
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
+        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // When the loader finishes with tasks and filter is set to completed
-        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+        mTasksPresenter.setFiltering(taskFilter);
         mTasksPresenter.onTasksLoaded(mCompletedTasksCursor);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
@@ -168,9 +182,12 @@ public class TasksPresenterTest {
 
     @Test
     public void unavailableTasks_ShowsError() {
+        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // When the loader finishes with error
-        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onTasksLoaded(null);
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onDataNotAvailable();
 
         // Then an error message is shown
         verify(mTasksView).showLoadingTasksError();

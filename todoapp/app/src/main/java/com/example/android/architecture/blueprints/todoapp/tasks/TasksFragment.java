@@ -188,13 +188,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mPresenter.setFiltering(TaskFilter.from(TasksFilterType.ACTIVE_TASKS));
                         break;
                     case R.id.completed:
-                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mPresenter.setFiltering(TaskFilter.from(TasksFilterType.COMPLETED_TASKS));
                         break;
                     default:
-                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mPresenter.setFiltering(TaskFilter.from(TasksFilterType.ALL_TASKS));
                         break;
                 }
                 mPresenter.loadTasks(false);
