@@ -79,20 +79,20 @@ public class TasksActivity extends AppCompatActivity {
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
         TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager());
 
+        // Load previously saved state, if available.
+        TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
+        if (savedInstanceState != null) {
+            TasksFilterType currentFiltering =
+                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            taskFilter = TaskFilter.from(currentFiltering);
+        }
+
         mTasksPresenter = new TasksPresenter(
                 tasksOperations,
                 repository,
                 tasksFragment,
-                TaskFilter.from(TasksFilterType.ALL_TASKS)
+                taskFilter
         );
-
-        // Load previously saved state, if available.
-        if (savedInstanceState != null) {
-            TasksFilterType currentFiltering =
-                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            TaskFilter taskFilter = TaskFilter.from(currentFiltering);
-            mTasksPresenter.setFiltering(taskFilter);
-        }
     }
 
     @Override
