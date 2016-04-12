@@ -57,7 +57,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-
         mUseCaseHandler.execute(mGetTasks, new GetTasks.RequestValues(false,
                 TasksFilterType.ALL_TASKS), new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
             @Override
