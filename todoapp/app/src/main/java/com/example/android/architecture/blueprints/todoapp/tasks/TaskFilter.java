@@ -9,7 +9,7 @@ public class TaskFilter {
     private TasksFilterType tasksFilterType = TasksFilterType.ALL_TASKS;
     private Bundle filterExtras;
 
-    private TaskFilter(Bundle extras) {
+    protected TaskFilter(Bundle extras) {
         this.filterExtras = extras;
         this.tasksFilterType = (TasksFilterType) extras.getSerializable(TasksOperations.KEY_TASK_FILTER);
     }
