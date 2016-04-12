@@ -80,8 +80,12 @@ public class TasksPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        // Given a task filter
+        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksOperations, mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksOperations, mTasksRepository, mTasksView, taskFilter);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();

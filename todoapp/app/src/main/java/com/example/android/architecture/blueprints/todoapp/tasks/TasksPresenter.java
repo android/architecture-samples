@@ -49,10 +49,11 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     private boolean mFirstLoad;
 
     public TasksPresenter(@NonNull TasksOperations tasksOperations, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView) {
+                          @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
         mTasksOperations = checkNotNull(tasksOperations, "taskOperations provider cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mCurrentFiltering = checkNotNull(taskFilter, "taskFilter cannot be null!");
         mTasksView.setPresenter(this);
     }
 
@@ -73,7 +74,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     @Override
     public void onTasksLoaded(Cursor data) {
         mTasksView.setLoadingIndicator(false);
-        if ((null == data) || (data.getCount() > 0)) {
+        if (data.getCount() > 0) {
             // Show the list of tasks
             mTasksView.showTasks(data);
             // Set the filter label's text.
@@ -165,7 +166,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
      * Sets the current task filtering type.
      *
      * @param taskFilter Can be {@link TasksFilterType#ALL_TASKS},
-     *                    {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
+     *                   {@link TasksFilterType#COMPLETED_TASKS}, or {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
     public void setFiltering(TaskFilter taskFilter) {

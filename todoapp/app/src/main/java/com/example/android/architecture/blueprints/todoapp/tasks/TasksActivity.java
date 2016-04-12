@@ -82,7 +82,8 @@ public class TasksActivity extends AppCompatActivity {
         mTasksPresenter = new TasksPresenter(
                 tasksOperations,
                 repository,
-                tasksFragment
+                tasksFragment,
+                TaskFilter.from(TasksFilterType.ALL_TASKS)
         );
 
         // Load previously saved state, if available.
