@@ -21,7 +21,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * TODO: Javadoc
+ * Updates or creates a new {@link Task} in the {@link TasksRepository}.
  */
 public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseValue> {
 

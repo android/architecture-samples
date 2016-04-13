@@ -19,6 +19,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
+/**
+ * Marks a task as completed.
+ */
 public class CompleteTask extends UseCase<CompleteTask.RequestValues, CompleteTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;

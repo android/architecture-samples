@@ -17,10 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * TODO: Javadoc
+ * Deletes a {@link Task} from the {@link TasksRepository}.
  */
 public class DeleteTask extends UseCase<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
 

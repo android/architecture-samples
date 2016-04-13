@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 /**
- * TODO: Javadoc
+ * Interface for schedulers, see {@link UseCaseThreadPoolScheduler}.
  */
 public interface UseCaseScheduler {
 

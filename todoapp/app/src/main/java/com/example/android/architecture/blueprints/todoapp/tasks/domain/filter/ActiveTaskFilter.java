@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: Javadoc
+ * Returns the active tasks from a list of {@link Task}s.
  */
 class ActiveTaskFilter implements TaskFilter {
     @Override

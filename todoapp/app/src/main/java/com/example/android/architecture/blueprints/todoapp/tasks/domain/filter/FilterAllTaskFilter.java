@@ -18,14 +18,15 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.filter;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: Javadoc
+ * Returns all the tasks from a list of {@link Task}s.
  */
 class FilterAllTaskFilter implements TaskFilter {
     @Override
     public List<Task> filter(List<Task> tasks) {
-        return tasks;
+        return new ArrayList<>(tasks);
     }
 }

@@ -19,11 +19,15 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.os.Handler;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Javadoc
+ * Executes asynchronous tasks using a {@link ThreadPoolExecutor}.
+ * <p>
+ * See also {@link Executors} for a list of factory methods to create common
+ * {@link java.util.concurrent.ExecutorService}s for different scenarios.
  */
 public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
 
