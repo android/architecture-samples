@@ -5,7 +5,7 @@ Project owner: Jorge J. Barroso ([Karumi](http://github.com/Karumi))
 ### Summary
 This sample stands on the principles of [Clean Architecture](https://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
-It's based on the [MVP sample](https://github.com/googlesamples/android-architecture/blob/todo-mvp), adding a domain layer between the presentation layer and repositories, splitting the app in three layers:
+It's based on the [MVP sample](https://github.com/googlesamples/android-architecture/tree/todo-mvp), adding a domain layer between the presentation layer and repositories, splitting the app in three layers:
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-clean.png" alt="Diagram"/>
 
