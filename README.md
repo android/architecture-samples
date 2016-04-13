@@ -31,7 +31,7 @@ We recommend using different models from View, domain and API layers, but in thi
   
 ### Testability
 
-With this approach, all domain code is tested with unit tests. This can be extended with *social unit tests*, that cover from Use Cases to the boundaries of the view and repository.
+With this approach, all domain code is tested with unit tests. This can be extended with integration tests, that cover from Use Cases to the boundaries of the view and repository.
 
 ### Dependencies
 
