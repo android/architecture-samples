@@ -346,6 +346,55 @@ public class TasksScreenTest {
     }
 
     @Test
+    public void markTaskAsAcompleteAndActiveOnDetailScreen_taskIsActiveInList() {
+        viewAllTasks();
+
+        // Add 1 active task
+        createTask(TITLE1, DESCRIPTION);
+
+        // Click on the task on the list
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the checkbox in task details screen
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click again to restore it to original state
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription("Navigate up")).perform(click());
+
+        // Check that the task is marked as active
+        onView(allOf(withId(R.id.complete),
+                hasSibling(withText(TITLE1)))).check(matches(not(isChecked())));
+    }
+
+    @Test
+    public void markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
+        viewAllTasks();
+
+        // Add 1 completed task
+        createTask(TITLE1, DESCRIPTION);
+        clickCheckBoxForTask(TITLE1);
+
+        // Click on the task on the list
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the checkbox in task details screen
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click again to restore it to original state
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription("Navigate up")).perform(click());
+
+        // Check that the task is marked as active
+        onView(allOf(withId(R.id.complete),
+                hasSibling(withText(TITLE1)))).check(matches(isChecked()));
+    }
+
+    @Test
     public void orientationChange_FilterActivePersists() {
 
         // Add a completed task
