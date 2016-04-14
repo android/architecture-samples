@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -142,16 +143,17 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void showCompletionStatus(final boolean complete) {
         mDetailCompleteStatus.setChecked(complete);
-        mDetailCompleteStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (complete) {
-                    mPresenter.activateTask();
-                } else {
-                    mPresenter.completeTask();
-                }
-            }
-        });
+        mDetailCompleteStatus.setOnCheckedChangeListener(
+                new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            mPresenter.completeTask();
+                        } else {
+                            mPresenter.activateTask();
+                        }
+                    }
+                });
     }
 
     @Override
