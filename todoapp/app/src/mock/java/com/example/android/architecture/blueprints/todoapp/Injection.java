@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,12 +32,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Injection {
 
-    public static TasksRepository provideTasksRepository(@NonNull Context context) {
+    public static TasksDataSource provideRemoteDataSource(){
+        return FakeTasksRemoteDataSource.getInstance();
+    }
+
+    public static TasksLocalDataSource provideLocalDataSource(@NonNull Context context){
         checkNotNull(context);
-        return TasksRepository.getInstance(
-                FakeTasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context)
-        );
+        return TasksLocalDataSource.getInstance(context);
     }
 
 }

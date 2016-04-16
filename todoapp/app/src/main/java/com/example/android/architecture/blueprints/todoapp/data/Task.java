@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 
@@ -40,6 +41,7 @@ public final class Task {
     private final String mDescription;
 
     private final boolean mCompleted;
+
     /**
      * Use this constructor to create a new active Task.
      *
@@ -59,7 +61,7 @@ public final class Task {
      *
      * @param title
      * @param description
-     * @param id of the class
+     * @param id          of the class
      */
     public Task(@Nullable String title, @Nullable String description, String id) {
         mId = id;
@@ -130,6 +132,15 @@ public final class Task {
         return new Task(internalId, title, description, entryId, completed);
     }
 
+    public static Task from(ContentValues values) {
+        String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
+        String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
+        String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
+        boolean completed = values.getAsInteger(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED) == 1 ? true : false;
+
+        return new Task(title, description, entryId, completed);
+    }
+
     public int getInternalId() {
         return mInternalId;
     }
@@ -172,8 +183,12 @@ public final class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Task task = (Task) o;
         return Objects.equal(mId, task.mId) &&
                 Objects.equal(mTitle, task.mTitle) &&

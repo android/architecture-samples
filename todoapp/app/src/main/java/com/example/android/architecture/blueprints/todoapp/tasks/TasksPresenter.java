@@ -26,7 +26,6 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,8 +36,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksPresenter implements TasksContract.Presenter, TasksOperations.GetTasksCallback {
 
-    private final TasksRepository mTasksRepository;
-
     private final TasksContract.View mTasksView;
 
     @NonNull
@@ -48,10 +45,8 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
 
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull TasksOperations tasksOperations, @NonNull TasksRepository tasksRepository,
-                          @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
+    public TasksPresenter(@NonNull TasksOperations tasksOperations, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
         mTasksOperations = checkNotNull(tasksOperations, "taskOperations provider cannot be null");
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mCurrentFiltering = checkNotNull(taskFilter, "taskFilter cannot be null!");
         mTasksView.setPresenter(this);
@@ -67,8 +62,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
 
     @Override
     public void start() {
-        mTasksView.setLoadingIndicator(true);
-        mTasksOperations.getTasks(mCurrentFiltering.getFilterExtras(), this);
+        loadTasks(true);
     }
 
     @Override
@@ -96,8 +90,10 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     public void loadTasks(boolean forceUpdate) {
         if (forceUpdate || mFirstLoad) {
             mFirstLoad = false;
-            mTasksRepository.refreshTasks();
         }
+
+        mTasksView.setLoadingIndicator(true);
+        mTasksOperations.getTasks(mCurrentFiltering.getFilterExtras(), this);
     }
 
     private void showFilterLabel() {
@@ -142,7 +138,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
-        mTasksRepository.completeTask(completedTask);
+        mTasksOperations.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
         loadTasks(false);
     }
@@ -150,14 +146,14 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     @Override
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
-        mTasksRepository.activateTask(activeTask);
+        mTasksOperations.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
         loadTasks(false);
     }
 
     @Override
     public void clearCompletedTasks() {
-        mTasksRepository.clearCompletedTasks();
+        mTasksOperations.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
         loadTasks(false);
     }

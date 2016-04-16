@@ -16,18 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,16 +34,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Note: this is a singleton and we are opening the database once and not closing it. The framework
  * cleans up the resources when the application closes so we don't need to close the db.
  */
-public class TasksLocalDataSource implements TasksDataSource {
+public class TasksLocalDataSource {
 
     private static TasksLocalDataSource INSTANCE;
-    private ContentResolver mContentResolver;
+    private TasksDbHelper mTasksDbHelper;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
-
-        mContentResolver = context.getContentResolver();
+        mTasksDbHelper = new TasksDbHelper(context);
     }
 
     public static TasksLocalDataSource getInstance(@NonNull Context context) {
@@ -56,162 +52,102 @@ public class TasksLocalDataSource implements TasksDataSource {
         return INSTANCE;
     }
 
-    @Override
-    public List<Task> getTasks() {
-        List<Task> tasks = new ArrayList<>();
+    public Cursor getTasks(String selection, String[] selectionArgs) {
+        Cursor retCursor = mTasksDbHelper.getReadableDatabase().query(
+                TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+        return retCursor;
+    }
 
-        try {
-            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_COLUMNS,
-                                              null, null, null, null
+    public Cursor getTask(@NonNull String taskId) {
+        Cursor retCursor = mTasksDbHelper.getReadableDatabase().query(
+                TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID +
+                        " = '" + taskId + "'",
+                null,
+                null,
+                null,
+                null
+        );
+        return retCursor;
+    }
+
+    public Uri saveTask(@NonNull Task task) {
+        ContentValues values = new ContentValues();
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted() ? 1 : 0);
+
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
+        Uri returnUri;
+
+        Cursor exists = db.query(
+                TasksPersistenceContract.TaskEntry.TABLE_NAME,
+                new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                new String[]{task.getId()},
+                null,
+                null,
+                null
+        );
+        if (exists.moveToLast()) {
+            long _id = db.update(
+                    TasksPersistenceContract.TaskEntry.TABLE_NAME, values,
+                    TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                    new String[]{task.getId()}
             );
-
-            if (c != null && c.getCount() > 0) {
-                while (c.moveToNext()) {
-                    Task task = Task.from(c);
-                    tasks.add(task);
-                }
+            if (_id > 0) {
+                returnUri = TasksPersistenceContract.TaskEntry.buildTasksUriWith(_id);
+            } else {
+                throw new android.database.SQLException("Failed to insert row ");
             }
-            if (c != null) {
-                c.close();
+        } else {
+            long _id = db.insert(TasksPersistenceContract.TaskEntry.TABLE_NAME, null, values);
+            if (_id > 0) {
+                returnUri = TasksPersistenceContract.TaskEntry.buildTasksUriWith(_id);
+            } else {
+                throw new android.database.SQLException("Failed to insert row");
             }
-
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
         }
-        return tasks;
+        exists.close();
+        return returnUri;
     }
 
-    /**
-     * Note: {@link GetTaskCallback#onDataNotAvailable()} is fired if the {@link Task} isn't
-     * found.
-     */
-    @Override
-    public Task getTask(@NonNull String taskId) {
-        // This is only used for testing.
-        // We don't need this since the CursorLoader talks to the ContentResolver directly.
+    public int updateTask(@NonNull ContentValues task, String[] selectionArgs) {
+        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
 
-        try {
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
+        int rowsUpdated = db.update(TasksPersistenceContract.TaskEntry.TABLE_NAME, task, selection,
+                                    selectionArgs
+        );
 
-            Cursor c = mContentResolver.query(TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                              TaskEntry.TASKS_COLUMNS,
-                                              selection, selectionArgs, null, null
-            );
-
-            if (c != null && c.getCount() > 0) {
-                c.moveToFirst();
-                Task task = Task.from(c);
-                return task;
-            }
-            if (c != null) {
-                c.close();
-            }
-
-            return null;
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-        return null;
+        return rowsUpdated;
     }
 
-    @Override
-    public void saveTask(@NonNull Task task) {
-        try {
-            checkNotNull(task);
+    public int clearCompletedTasks(String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
 
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
-            values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
-            values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted() ? 1 : 0);
+        int rowsDeleted = db.delete(
+                TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
 
-            mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
-
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
+        return rowsDeleted;
     }
 
-    @Override
-    public void completeTask(@NonNull Task task) {
-        try {
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
+    public int deleteAllTasks() {
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
 
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {task.getId()};
+        int rowsDeleted = db.delete(
+                TasksPersistenceContract.TaskEntry.TABLE_NAME, null, null);
 
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-
+        return rowsDeleted;
     }
 
-    @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
-    @Override
-    public void activateTask(@NonNull Task task) {
-        try {
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
-
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {task.getId()};
-
-            mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-    }
-
-    @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
-    @Override
-    public void clearCompletedTasks() {
-        try {
-            String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
-            String[] selectionArgs = {"1"};
-            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-    }
-
-    @Override
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
-    }
-
-    @Override
-    public void deleteAllTasks() {
-        try {
-            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), null, null);
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-    }
-
-    @Override
-    public void deleteTask(@NonNull String taskId) {
-        try {
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
-
-            mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
-        } catch (IllegalStateException e) {
-            // Send to analytics, log etc
-        }
-    }
 }

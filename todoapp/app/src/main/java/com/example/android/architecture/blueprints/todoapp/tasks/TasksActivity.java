@@ -28,11 +28,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -75,9 +73,8 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager());
+        TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
         // Load previously saved state, if available.
         TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
@@ -89,7 +86,6 @@ public class TasksActivity extends AppCompatActivity {
 
         mTasksPresenter = new TasksPresenter(
                 tasksOperations,
-                repository,
                 tasksFragment,
                 taskFilter
         );

@@ -1,65 +1,89 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import android.annotation.TargetApi;
 import android.content.ContentProvider;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
+import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TasksProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private TasksDbHelper mTasksDbHelper;
+
+    private TasksDataSource mTasksRemoteDataSource;
+    private TasksLocalDataSource mTasksLocalDataSource;
 
     private static final int TASK = 100;
     private static final int TASK_ITEM = 101;
 
+    /**
+     * This variable has package local visibility so it can be accessed from tests.
+     */
+    Map<String, Task> mCachedTasks;
+
     @Override
     public boolean onCreate() {
-        mTasksDbHelper = new TasksDbHelper(getContext());
+        mTasksRemoteDataSource = Injection.provideRemoteDataSource();
+        mTasksLocalDataSource = Injection.provideLocalDataSource(getContext());
         return true;
     }
 
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Cursor retCursor;
-        switch (sUriMatcher.match(uri)) {
-            case TASK:
-                retCursor = mTasksDbHelper.getReadableDatabase().query(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case TASK_ITEM:
-                retCursor = mTasksDbHelper.getReadableDatabase().query(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID +
-                                " = '" + ContentUris.parseId(uri) + "'",
-                        null,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        Cursor tasks;
+        if (mCachedTasks != null) {
+            tasks = getCachedTasks();
+        } else {
+            tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+            if (null == tasks || tasks.getCount() == 0) {
+                List<Task> taskList = mTasksRemoteDataSource.getTasks();
+                saveTasksInLocalDataSource(taskList);
+            }
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
-        return retCursor;
+        tasks.setNotificationUri(getContext().getContentResolver(), uri);
+        return tasks;
+    }
+
+    private MatrixCursor getCachedTasks() {
+        MatrixCursor matrixCursor = new MatrixCursor(TasksPersistenceContract.TaskEntry.TASKS_COLUMNS);
+
+        if (mCachedTasks == null) {
+            return matrixCursor;
+        } else {
+            for (int i = 0; i < mCachedTasks.size(); i++) {
+                matrixCursor.addRow(new Object[]{
+                        mCachedTasks.get(i).getInternalId(),
+                        mCachedTasks.get(i).getId(),
+                        mCachedTasks.get(i).getTitle(),
+                        mCachedTasks.get(i).getDescription(),
+                        mCachedTasks.get(i).isCompleted()
+                });
+
+            }
+        }
+        return matrixCursor;
+
+    }
+
+    private void saveTasksInLocalDataSource(List<Task> tasks) {
+        if (tasks != null) {
+            for (Task task : tasks) {
+                mTasksLocalDataSource.saveTask(task);
+            }
+        }
     }
 
     @Nullable
@@ -79,86 +103,58 @@ public class TasksProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        Uri returnUri;
-
-        switch (match) {
-            case TASK:
-                Cursor exists = db.query(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                        new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
-                        TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
-                        new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)},
-                        null,
-                        null,
-                        null
-                );
-                if (exists.moveToLast()) {
-                    long _id = db.update(
-                            TasksPersistenceContract.TaskEntry.TABLE_NAME, values,
-                            TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
-                            new String[]{values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)}
-                    );
-                    if (_id > 0) {
-                        returnUri = TasksPersistenceContract.TaskEntry.buildTasksUriWith(_id);
-                    } else {
-                        throw new android.database.SQLException("Failed to insert row into " + uri);
-                    }
-                } else {
-                    long _id = db.insert(TasksPersistenceContract.TaskEntry.TABLE_NAME, null, values);
-                    if (_id > 0) {
-                        returnUri = TasksPersistenceContract.TaskEntry.buildTasksUriWith(_id);
-                    } else {
-                        throw new android.database.SQLException("Failed to insert row into " + uri);
-                    }
-                }
-                exists.close();
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
+        Task newTask = Task.from(values);
+        mTasksRemoteDataSource.saveTask(newTask);
+        Uri returnUri = mTasksLocalDataSource.saveTask(newTask);
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
-
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
         int rowsDeleted;
 
-        switch (match) {
-            case TASK:
-                rowsDeleted = db.delete(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        if (selectionArgs.equals("1")) {
+            mTasksRemoteDataSource.clearCompletedTasks();
+            rowsDeleted = mTasksLocalDataSource.clearCompletedTasks(selection, selectionArgs);
+            // Do in memory cache update to keep the app UI up to date
+            if (mCachedTasks == null) {
+                mCachedTasks = new LinkedHashMap<>();
+            }
+            Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Task> entry = it.next();
+                if (entry.getValue().isCompleted()) {
+                    it.remove();
+                }
+            }
+        } else {
+            mTasksRemoteDataSource.deleteAllTasks();
+            rowsDeleted = mTasksLocalDataSource.deleteAllTasks();
+
+            if (mCachedTasks == null) {
+                mCachedTasks = new LinkedHashMap<>();
+            }
+            mCachedTasks.clear();
         }
+
         if (selection == null || rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;
-
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        int rowsUpdated;
-
-        switch (match) {
-            case TASK:
-                rowsUpdated = db.update(TasksPersistenceContract.TaskEntry.TABLE_NAME, values, selection,
-                                        selectionArgs
-                );
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        Task newTask = Task.from(values);
+        if (newTask.isCompleted()) {
+            mTasksRemoteDataSource.completeTask(newTask);
+        } else {
+            mTasksRemoteDataSource.activateTask(newTask);
         }
+
+        int rowsUpdated = mTasksLocalDataSource.updateTask(values, selectionArgs);
+
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
@@ -173,15 +169,6 @@ public class TasksProvider extends ContentProvider {
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
 
         return matcher;
-    }
-
-    // This is a method specifically to assist the testing framework in running smoothly.
-    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
-    @Override
-    @TargetApi(11)
-    public void shutdown() {
-        mTasksDbHelper.close();
-        super.shutdown();
     }
 
 }
