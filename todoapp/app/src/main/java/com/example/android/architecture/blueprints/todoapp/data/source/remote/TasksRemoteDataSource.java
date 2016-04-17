@@ -25,7 +25,11 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
 
 /**
  * Implementation of the data source that adds a latency simulating network.
@@ -59,40 +63,22 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 
-    /**
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is never fired. In a real remote data
-     * source implementation, this would be fired if the server can't be contacted or the server
-     * returns an error.
-     */
     @Override
-    public void getTasks(final @NonNull LoadTasksCallback callback) {
-        // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
-            }
-        }, SERVICE_LATENCY_IN_MILLIS);
+    public Observable<List<Task>> getTasks() {
+        return Observable
+                .from(TASKS_SERVICE_DATA.values())
+                .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
+                .toList();
     }
 
-    /**
-     * Note: {@link GetTaskCallback#onDataNotAvailable()} is never fired. In a real remote data
-     * source implementation, this would be fired if the server can't be contacted or the server
-     * returns an error.
-     */
     @Override
-    public void getTask(@NonNull String taskId, final @NonNull GetTaskCallback callback) {
+    public Observable<Task> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
-
-        // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callback.onTaskLoaded(task);
-            }
-        }, SERVICE_LATENCY_IN_MILLIS);
+        if(task != null) {
+            return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+        } else {
+            return Observable.empty();
+        }
     }
 
     @Override

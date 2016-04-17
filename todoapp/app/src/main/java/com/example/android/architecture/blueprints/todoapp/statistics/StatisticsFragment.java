@@ -59,7 +59,13 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Override

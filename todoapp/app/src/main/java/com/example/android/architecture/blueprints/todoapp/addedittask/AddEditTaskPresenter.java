@@ -28,8 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        TasksDataSource.GetTaskCallback {
+public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     @NonNull
     private final TasksDataSource mTasksRepository;
@@ -57,10 +56,15 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void start() {
+    public void subscribe() {
         if (mTaskId != null) {
             populateTask();
         }
+    }
+
+    @Override
+    public void unsubscribe() {
+
     }
 
     @Override
@@ -88,10 +92,10 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mTaskId == null) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        mTasksRepository.getTask(mTaskId, this);
+        mTasksRepository.getTask(mTaskId);
     }
 
-    @Override
+/*    @Override
     public void onTaskLoaded(Task task) {
         // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
@@ -106,5 +110,5 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
-    }
+    }*/
 }

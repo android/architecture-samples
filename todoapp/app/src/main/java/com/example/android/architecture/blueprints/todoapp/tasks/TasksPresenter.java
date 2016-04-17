@@ -25,8 +25,15 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,17 +50,23 @@ public class TasksPresenter implements TasksContract.Presenter {
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad = true;
+    private CompositeSubscription mSubscriptions;
 
     public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-
+        mSubscriptions = new CompositeSubscription();
         mTasksView.setPresenter(this);
     }
 
     @Override
-    public void start() {
+    public void subscribe() {
         loadTasks(false);
+    }
+
+    @Override
+    public void unsubscribe() {
+        mSubscriptions.clear();
     }
 
     @Override
@@ -87,59 +100,49 @@ public class TasksPresenter implements TasksContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<Task>();
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We filter the tasks based on the requestType
-                for (Task task : tasks) {
-                    switch (mCurrentFiltering) {
-                        case ALL_TASKS:
-                            tasksToShow.add(task);
-                            break;
-                        case ACTIVE_TASKS:
-                            if (task.isActive()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
-                        case COMPLETED_TASKS:
-                            if (task.isCompleted()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
-                        default:
-                            tasksToShow.add(task);
-                            break;
+        mSubscriptions.clear();
+        Subscription subscription = mTasksRepository
+                .getTasks()
+                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
                     }
-                }
-                // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
-                    return;
-                }
-                if (showLoadingUI) {
-                    mTasksView.setLoadingIndicator(false);
-                }
+                })
+                .filter(new Func1<Task, Boolean>() {
+                    @Override
+                    public Boolean call(Task task) {
+                        switch (mCurrentFiltering) {
+                            case ACTIVE_TASKS:
+                                return task.isActive();
+                            case COMPLETED_TASKS:
+                                return task.isCompleted();
+                            case ALL_TASKS:
+                            default:
+                                return true;
+                        }
+                    }
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Task>>() {
+                    @Override
+                    public void onCompleted() {
+                        mTasksView.setLoadingIndicator(false);
+                    }
 
-                processTasks(tasksToShow);
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        mTasksView.showLoadingTasksError();
+                    }
 
-            @Override
-            public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
-                    return;
-                }
-                mTasksView.showLoadingTasksError();
-            }
-        });
+                    @Override
+                    public void onNext(List<Task> tasks) {
+                        processTasks(tasks);
+                    }
+                });
+        mSubscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {

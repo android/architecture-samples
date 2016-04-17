@@ -73,7 +73,7 @@ public class StatisticsScreenTest {
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
 
-        // Lazily start the Activity from the ActivityTestRule
+        // Lazily subscribe the Activity from the ActivityTestRule
         Intent startIntent = new Intent();
         mStatisticsActivityTestRule.launchActivity(startIntent);
     }

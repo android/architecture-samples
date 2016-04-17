@@ -22,33 +22,17 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import java.util.List;
 
+import rx.Observable;
+
 /**
  * Main entry point for accessing tasks data.
  * <p>
- * For simplicity, only getTasks() and getTask() have callbacks. Consider adding callbacks to other
- * methods to inform the user of network/database errors or successful operations.
- * For example, when a new task is created, it's synchronously stored in cache but usually every
- * operation on database or network should be executed in a different thread.
  */
 public interface TasksDataSource {
 
-    interface LoadTasksCallback {
+    Observable<List<Task>> getTasks();
 
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
-    }
-
-    void getTasks(@NonNull LoadTasksCallback callback);
-
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+    Observable<Task> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 

@@ -20,11 +20,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
+import rx.Observable;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -36,7 +39,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
 
     // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {}
+    private FakeTasksRemoteDataSource() {
+    }
 
     public static FakeTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
@@ -46,41 +50,46 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void getTasks(@NonNull LoadTasksCallback callback) {
-        callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
+    public Observable<List<Task>> getTasks() {
+        Collection<Task> values = TASKS_SERVICE_DATA.values();
+        return Observable.from(values).toList();
     }
 
     @Override
-    public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
+    public Observable<Task> getTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        callback.onTaskLoaded(task);
+        return Observable.just(task);
     }
 
     @Override
-    public void saveTask(Task task) {
+    public void saveTask(@NonNull Task task) {
         TASKS_SERVICE_DATA.put(task.getId(), task);
     }
 
     @Override
-    public void completeTask(Task task) {
+    public void completeTask(@NonNull Task task) {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task task = TASKS_SERVICE_DATA.get(taskId);
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        TASKS_SERVICE_DATA.put(taskId, completedTask);
     }
 
     @Override
-    public void activateTask(Task task) {
+    public void activateTask(@NonNull Task task) {
         Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task task = TASKS_SERVICE_DATA.get(taskId);
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        TASKS_SERVICE_DATA.put(taskId, activeTask);
     }
 
     @Override
@@ -100,7 +109,7 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteTask(String taskId) {
+    public void deleteTask(@NonNull String taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }
 

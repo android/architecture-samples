@@ -17,13 +17,23 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.List;
+
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,18 +46,24 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final StatisticsContract.View mStatisticsView;
+    private CompositeSubscription mSubscriptions;
 
     public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
                                @NonNull StatisticsContract.View statisticsView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-
+        mSubscriptions = new CompositeSubscription();
         mStatisticsView.setPresenter(this);
     }
 
     @Override
-    public void start() {
+    public void subscribe() {
         loadStatistics();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mSubscriptions.clear();
     }
 
     private void loadStatistics() {
@@ -57,44 +73,51 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
+        Observable<Task> tasks = mTasksRepository
+                .getTasks()
+                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return null;
                     }
-                }
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.setProgressIndicator(false);
-
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
-            }
-
+                });
+        Observable<Integer> completedTasks = tasks.filter(new Func1<Task, Boolean>() {
             @Override
-            public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
+            public Boolean call(Task task) {
+                return task.isCompleted();
             }
-        });
+        }).count();
+        Observable<Integer> activeTasks = tasks.filter(new Func1<Task, Boolean>() {
+            @Override
+            public Boolean call(Task task) {
+                return task.isActive();
+            }
+        }).count();
+        Subscription subscription = Observable
+                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, Pair<Integer, Integer>>() {
+                    @Override
+                    public Pair<Integer, Integer> call(Integer completed, Integer active) {
+                        return Pair.create(completed, active);
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Pair<Integer, Integer>>() {
+                    @Override
+                    public void call(Pair<Integer, Integer> stats) {
+                        mStatisticsView.showStatistics(stats.first, stats.second);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mStatisticsView.showLoadingStatisticsError();
+                    }
+                }, new Action0() {
+                    @Override
+                    public void call() {
+                        mStatisticsView.setProgressIndicator(false);
+                    }
+                });
+        mSubscriptions.add(subscription);
     }
 }

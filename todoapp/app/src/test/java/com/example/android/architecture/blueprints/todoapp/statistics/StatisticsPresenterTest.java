@@ -50,8 +50,8 @@ public class StatisticsPresenterTest {
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mLoadTasksCallbackCaptor;
+//    @Captor
+//    private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mLoadTasksCallbackCaptor;
 
 
     private StatisticsPresenter mStatisticsPresenter;
@@ -68,7 +68,7 @@ public class StatisticsPresenterTest {
         // The presenter won't update the view unless it's active.
         when(mStatisticsView.isActive()).thenReturn(true);
 
-        // We start the tasks to 3, with one active and two completed
+        // We subscribe the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
     }
@@ -79,14 +79,14 @@ public class StatisticsPresenterTest {
         TASKS.clear();
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.subscribe();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -98,14 +98,14 @@ public class StatisticsPresenterTest {
         // Given an initialized StatisticsPresenter with 1 active and 2 completed tasks
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.subscribe();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -115,11 +115,11 @@ public class StatisticsPresenterTest {
     @Test
     public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         // When statistics are loaded
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.subscribe();
 
         // And tasks data isn't available
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
         verify(mStatisticsView).showLoadingStatisticsError();

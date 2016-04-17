@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
+//import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.collect.Lists;
 
@@ -52,8 +52,8 @@ public class TasksPresenterTest {
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
-    @Captor
-    private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
+//    @Captor
+//    private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
 
     private TasksPresenter mTasksPresenter;
 
@@ -69,7 +69,7 @@ public class TasksPresenterTest {
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
 
-        // We start the tasks to 3, with one active and two completed
+        // We subscribe the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
     }
@@ -82,8 +82,8 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is shown
         verify(mTasksView).setLoadingIndicator(true);
@@ -102,8 +102,8 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -120,8 +120,8 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -185,8 +185,8 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // And the tasks aren't available in the repository
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
+        verify(mTasksRepository).getTasks();
+//        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
         verify(mTasksView).showLoadingTasksError();

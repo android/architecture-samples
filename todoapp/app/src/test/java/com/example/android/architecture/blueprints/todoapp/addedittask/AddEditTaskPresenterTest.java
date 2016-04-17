@@ -47,8 +47,8 @@ public class AddEditTaskPresenterTest {
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+//    @Captor
+//    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
     private AddEditTaskPresenter mAddEditTaskPresenter;
 
@@ -111,10 +111,10 @@ public class AddEditTaskPresenterTest {
         mAddEditTaskPresenter.populateTask();
 
         // Then the task repository is queried and the view updated
-        verify(mTasksRepository).getTask(eq(testTask.getId()), mGetTaskCallbackCaptor.capture());
+        verify(mTasksRepository).getTask(eq(testTask.getId()));
 
         // Simulate callback
-        mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
+//        mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
 
         verify(mAddEditTaskView).setTitle(testTask.getTitle());
         verify(mAddEditTaskView).setDescription(testTask.getDescription());

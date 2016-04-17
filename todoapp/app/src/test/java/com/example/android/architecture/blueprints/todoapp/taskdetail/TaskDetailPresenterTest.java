@@ -57,8 +57,8 @@ public class TaskDetailPresenterTest {
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+//    @Captor
+//    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
     private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -77,14 +77,14 @@ public class TaskDetailPresenterTest {
         // When tasks presenter is asked to open a task
         mTaskDetailPresenter = new TaskDetailPresenter(
                 ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
+        mTaskDetailPresenter.subscribe();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(mTasksRepository).getTask(eq(ACTIVE_TASK.getId()), mGetTaskCallbackCaptor.capture());
+        verify(mTasksRepository).getTask(eq(ACTIVE_TASK.getId()));
         verify(mTaskDetailView).setLoadingIndicator(true);
 
         // When task is finally loaded
-        mGetTaskCallbackCaptor.getValue().onTaskLoaded(ACTIVE_TASK); // Trigger callback
+//        mGetTaskCallbackCaptor.getValue().onTaskLoaded(ACTIVE_TASK); // Trigger callback
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
@@ -98,15 +98,15 @@ public class TaskDetailPresenterTest {
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
         mTaskDetailPresenter = new TaskDetailPresenter(
                 COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
+        mTaskDetailPresenter.subscribe();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(mTasksRepository).getTask(
-                eq(COMPLETED_TASK.getId()), mGetTaskCallbackCaptor.capture());
+                eq(COMPLETED_TASK.getId()));
         verify(mTaskDetailView).setLoadingIndicator(true);
 
         // When task is finally loaded
-        mGetTaskCallbackCaptor.getValue().onTaskLoaded(COMPLETED_TASK); // Trigger callback
+//        mGetTaskCallbackCaptor.getValue().onTaskLoaded(COMPLETED_TASK); // Trigger callback
 
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
@@ -121,7 +121,7 @@ public class TaskDetailPresenterTest {
         // When loading of a task is requested with an invalid task ID.
         mTaskDetailPresenter = new TaskDetailPresenter(
                 INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
+        mTaskDetailPresenter.subscribe();
         verify(mTaskDetailView).showMissingTask();
     }
 
@@ -146,7 +146,7 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
         mTaskDetailPresenter = new TaskDetailPresenter(
                 task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
+        mTaskDetailPresenter.subscribe();
 
         // When the presenter is asked to complete the task
         mTaskDetailPresenter.completeTask();
@@ -162,7 +162,7 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
         mTaskDetailPresenter = new TaskDetailPresenter(
                 task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.start();
+        mTaskDetailPresenter.subscribe();
 
         // When the presenter is asked to activate the task
         mTaskDetailPresenter.activateTask();
