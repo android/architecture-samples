@@ -38,13 +38,17 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         }
     }
 
-    public void completeTask(Task completedTask) {
+    public void completeTask(Task task) {
+        completeTask(task.getId());
+    }
+
+    public void completeTask(String completedTaskId) {
         try {
             ContentValues values = new ContentValues();
             values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, true);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {completedTask.getId()};
+            String[] selectionArgs = {completedTaskId};
 
             mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
@@ -53,12 +57,16 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void activateTask(Task activeTask) {
+        activateTask(activeTask.getId());
+    }
+
+    public void activateTask(String taskId) {
         try {
             ContentValues values = new ContentValues();
             values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, false);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {activeTask.getId()};
+            String[] selectionArgs = {taskId};
 
             mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
@@ -106,6 +114,22 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public void saveTask(Task newTask) {
+        ContentValues values = new ContentValues();
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask.isCompleted() ? 1 : 0);
+        mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
+    }
+
+    public void deleteTask(String taskId) {
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String[] selectionArgs = {taskId};
+
+        mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 
     public interface GetTasksCallback {

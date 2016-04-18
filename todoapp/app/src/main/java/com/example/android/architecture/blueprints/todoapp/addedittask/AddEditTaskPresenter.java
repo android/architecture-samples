@@ -25,7 +25,7 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +39,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private static final int TASK_QUERY = 2;
 
     @NonNull
-    private TasksDataSource mTasksRepository;
+    private TasksOperations tasksOperations;
 
     @NonNull
     private AddEditTaskContract.View mAddTaskView;
@@ -51,11 +51,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     private final LoaderManager mLoaderManager;
 
-    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
-            @NonNull LoaderManager loaderManager) {
+    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksOperations tasksOperations,
+                                @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
+                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
+        tasksOperations = checkNotNull(tasksOperations);
         mAddTaskView = checkNotNull(addTaskView);
         mTaskLoader = checkNotNull(taskLoader);
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
@@ -74,14 +74,14 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
-            mTasksRepository.saveTask(newTask);
+            tasksOperations.saveTask(newTask);
             mAddTaskView.showTasksList();
         }
     }
 
     @Override
     public void updateTask(String taskId, String title, String description) {
-        mTasksRepository.saveTask(new Task(title, description, taskId));
+        tasksOperations.saveTask(new Task(title, description, taskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 

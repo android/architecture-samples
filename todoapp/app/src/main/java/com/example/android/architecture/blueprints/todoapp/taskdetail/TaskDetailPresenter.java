@@ -24,6 +24,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,15 +48,15 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     private String mTaskId;
 
     @NonNull
-    private final TasksRepository mTasksRepository;
+    private final TasksOperations mTasksOperations;
 
     public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
+                               @NonNull TasksOperations tasksOperations,
                                @NonNull TaskDetailContract.View taskDetailView,
                                @NonNull Loader<Cursor> loaderProvider,
                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
+        mTasksOperations = checkNotNull(tasksOperations, "tasksOperations cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mLoaderProvider = checkNotNull(loaderProvider, "loader provider cannot be null!");
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
@@ -79,7 +80,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void deleteTask() {
-        mTasksRepository.deleteTask(mTaskId);
+        mTasksOperations.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
@@ -88,7 +89,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(mTaskId);
+        mTasksOperations.completeTask(mTaskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -98,7 +99,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(mTaskId);
+        mTasksOperations.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
