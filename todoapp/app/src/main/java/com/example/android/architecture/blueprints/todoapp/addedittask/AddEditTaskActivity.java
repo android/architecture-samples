@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
@@ -76,7 +75,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        TasksOperations tasksOperations = TasksOperations.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
         // Create the presenter
         new AddEditTaskPresenter(

@@ -16,13 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -77,7 +81,7 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository
-        assertThat(mLocalDataSource.getTask(newTask.getId()), is(newTask));
+        assertThat(Task.from(mLocalDataSource.getTask(newTask.getId())), is(newTask));
     }
 
     @Test
@@ -86,27 +90,45 @@ public class TasksLocalDataSourceTest {
         TasksDataSource.GetTaskCallback callback = mock(TasksDataSource.GetTaskCallback.class);
         // Given a new task in the persistent repository
         final Task newTask = new Task(TITLE, "");
+
+        // And it's representative content values
+        ContentValues values = new ContentValues();
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask.isCompleted() ? 1 : 0);
+
+        String[] selectionArgs = {newTask.getId()};
+
         mLocalDataSource.saveTask(newTask);
 
         // When completed in the persistent repository
-        mLocalDataSource.completeTask(newTask);
+        mLocalDataSource.updateTask(values, selectionArgs);
 
-        // Then the task can be retrieved from the persistent repository and is complete
-
-        assertThat(mLocalDataSource.getTask(newTask.getId()), is(newTask));
-        assertThat(mLocalDataSource.getTask(newTask.getId()).isCompleted(), is(true));
+        // Then the task can be retrieved from the persistent repository and is completed
+        assertThat(Task.from(mLocalDataSource.getTask(newTask.getId())), is(newTask));
+        assertThat(Task.from(mLocalDataSource.getTask(newTask.getId())).isCompleted(), is(true));
     }
 
     @Test
     public void activateTask_retrievedTaskIsActive() {
-
         // Given a new completed task in the persistent repository
         final Task newTask = new Task(TITLE, "");
+
+        // And it's representative content values
+        ContentValues values = new ContentValues();
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask.isCompleted() ? 1 : 0);
+
+        String[] selectionArgs = {newTask.getId()};
+
         mLocalDataSource.saveTask(newTask);
-        mLocalDataSource.completeTask(newTask);
+        mLocalDataSource.updateTask(values, selectionArgs);
 
         // When activated in the persistent repository
-        mLocalDataSource.activateTask(newTask);
+        mLocalDataSource.updateTask(values, selectionArgs);
 
         // Then the task can be retrieved from the persistent repository and is active
         mLocalDataSource.getTask(newTask.getId());
@@ -118,16 +140,41 @@ public class TasksLocalDataSourceTest {
     public void clearCompletedTask_taskNotRetrievable() {
         // Given 2 new completed tasks and 1 active task in the persistent repository
         final Task newTask1 = new Task(TITLE, "");
-        mLocalDataSource.saveTask(newTask1);
-        mLocalDataSource.completeTask(newTask1);
+
+        // And it's representative content values
+        ContentValues task1Values = new ContentValues();
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask1.getId());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask1.getTitle());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask1.getDescription());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask1.isCompleted() ? 1 : 0);
+
+        String[] task1SelectionArgs = {newTask1.getId()};
+
         final Task newTask2 = new Task(TITLE2, "");
-        mLocalDataSource.saveTask(newTask2);
-        mLocalDataSource.completeTask(newTask2);
+        // And it's representative content values
+        ContentValues task2Values = new ContentValues();
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask2.getId());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask2.getTitle());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask2.getDescription());
+        task1Values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask2.isCompleted() ? 1 : 0);
+
+        String[] task2SelectionArgs = {newTask2.getId()};
+
         final Task newTask3 = new Task(TITLE3, "");
+
+        mLocalDataSource.saveTask(newTask1);
+        mLocalDataSource.updateTask(task1Values, task1SelectionArgs);
+
+        mLocalDataSource.saveTask(newTask2);
+        mLocalDataSource.updateTask(task2Values, task2SelectionArgs);
+
         mLocalDataSource.saveTask(newTask3);
 
         // When completed tasks are cleared in the repository
-        mLocalDataSource.clearCompletedTasks();
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
+        String[] selectionArgs = {"1"};
+
+        mLocalDataSource.clearCompletedTasks(selection, selectionArgs);
 
         // Then the completed tasks cannot be retrieved and the active one can
         assertThat(mLocalDataSource.getTask(newTask1.getId()), is(isNull()));
@@ -145,8 +192,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.deleteAllTasks();
 
         // Then the retrieved tasks is an empty list
-        List<Task> tasks = mLocalDataSource.getTasks();
-        assertEquals(tasks.size(), 0);
+        Cursor cursor = mLocalDataSource.getTasks(null, null);
+        assertNotNull(cursor);
+        assertEquals(cursor.getCount(), 0);
     }
 
     @Test
@@ -158,9 +206,17 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask2);
 
         // Then the tasks can be retrieved from the persistent repository
-        List<Task> tasks = mLocalDataSource.getTasks();
-        assertNotNull(tasks);
-        assertTrue(tasks.size() >= 2);
+        Cursor cursor = mLocalDataSource.getTasks(null, null);
+        assertNotNull(cursor);
+        assertTrue(cursor.getCount() >= 2);
+
+        List<Task> tasks = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                Task task = Task.from(cursor);
+                tasks.add(task);
+            } while (cursor.moveToNext());
+        }
 
         boolean newTask1IdFound = false;
         boolean newTask2IdFound = false;

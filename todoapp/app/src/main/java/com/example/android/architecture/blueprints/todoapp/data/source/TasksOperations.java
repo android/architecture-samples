@@ -14,6 +14,8 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 
 public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static TasksOperations INSTANCE;
+
     private final static int TASKS_QUERY = 1;
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
 
@@ -23,7 +25,14 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private GetTasksCallback callback;
 
-    public TasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver contentResolver) {
+    public static TasksOperations getInstance(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
+        if (INSTANCE == null) {
+            INSTANCE = new TasksOperations(mLoaderProvider, mLoaderManager, mContentResolver);
+        }
+        return INSTANCE;
+    }
+
+    private TasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver contentResolver) {
         this.mLoaderProvider = mLoaderProvider;
         this.mLoaderManager = mLoaderManager;
         this.mContentResolver = contentResolver;

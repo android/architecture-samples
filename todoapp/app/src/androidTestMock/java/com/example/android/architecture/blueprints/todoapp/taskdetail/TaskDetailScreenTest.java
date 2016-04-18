@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -78,8 +76,7 @@ public class TaskDetailScreenTest {
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
-                    Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                            .deleteAllTasks();
+
                 }
             };
 

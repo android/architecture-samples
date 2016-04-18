@@ -23,7 +23,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.Gravity;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -38,9 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.DrawerActions.open;
 import static android.support.test.espresso.contrib.DrawerMatchers.isClosed;
@@ -63,8 +60,8 @@ public class StatisticsScreenTest {
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.
      */
@@ -90,16 +87,15 @@ public class StatisticsScreenTest {
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
-                    Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                            .deleteAllTasks();
+
                 }
             };
 
     /**
      * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
      * a particular task id, which is then loaded from the service API.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * Note that this test runs hermetically and is fully isolated using a fake implementation of
      * the service API. This is a great way to make your tests more reliable and faster at the same
      * time, since they are isolated from any outside dependencies.

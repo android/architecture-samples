@@ -74,7 +74,7 @@ public class TasksActivity extends AppCompatActivity {
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksOperations tasksOperations = new TasksOperations(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        TasksOperations tasksOperations = TasksOperations.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
         // Load previously saved state, if available.
         TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
