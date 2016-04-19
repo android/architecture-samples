@@ -57,9 +57,9 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         bundle.putSerializable(TasksOperations.KEY_TASK_ID, taskId);
 
         if (mLoaderManager.getLoader(TASK_LOADER) == null) {
-            mLoaderManager.initLoader(TASK_LOADER, null, this);
+            mLoaderManager.initLoader(TASK_LOADER, bundle, this);
         } else {
-            mLoaderManager.restartLoader(TASK_LOADER, null, this);
+            mLoaderManager.restartLoader(TASK_LOADER, bundle, this);
         }
     }
 

@@ -136,7 +136,7 @@ public final class Task {
         String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
         String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
         String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
-        boolean completed = values.getAsInteger(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED) == 1 ? true : false;
+        boolean completed = values.getAsBoolean(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED);
 
         return new Task(title, description, entryId, completed);
     }
