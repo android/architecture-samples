@@ -39,7 +39,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.mock;
 
 /**
  * Integration test for the {@link TasksDataSource}, which uses the {@link com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider}.
@@ -86,8 +85,6 @@ public class TasksLocalDataSourceTest {
 
     @Test
     public void completeTask_retrievedTaskIsComplete() {
-        // Initialize mock for the callback.
-        TasksDataSource.GetTaskCallback callback = mock(TasksDataSource.GetTaskCallback.class);
         // Given a new task in the persistent repository
         final Task newTask = new Task(TITLE, "");
 
