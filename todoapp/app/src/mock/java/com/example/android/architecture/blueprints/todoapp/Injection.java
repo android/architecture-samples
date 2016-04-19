@@ -37,6 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Injection {
 
     public static TasksOperations provideTasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
+
         return TasksOperations.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
     }
 
