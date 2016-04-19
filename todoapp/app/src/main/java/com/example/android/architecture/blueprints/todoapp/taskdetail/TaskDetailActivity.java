@@ -71,7 +71,6 @@ public class TaskDetailActivity extends AppCompatActivity {
         new TaskDetailPresenter(
                 taskId,
                 tasksOperations,
-                loaderProvider,
                 taskDetailFragment
         );
     }

@@ -20,7 +20,6 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,7 +31,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksOperations.GetTasksCallback {
 
     private TaskDetailContract.View mTaskDetailView;
-    private LoaderProvider mLoaderProvider;
 
     private Task mTask;
     private String mTaskId;
@@ -42,11 +40,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
 
     public TaskDetailPresenter(@NonNull String taskId,
                                @NonNull TasksOperations tasksOperations,
-                               @NonNull LoaderProvider loaderProvider,
                                @NonNull TaskDetailContract.View taskDetailView) {
         mTaskId = checkNotNull(taskId, "taskId cannot be null!");
         mTasksOperations = checkNotNull(tasksOperations, "tasksOperations cannot be null!");
-        mLoaderProvider = checkNotNull(loaderProvider, "loader provider cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskDetailView.setPresenter(this);
     }
@@ -59,35 +55,35 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
 
     @Override
     public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        mTaskDetailView.showEditTask(mTask.getId());
     }
 
     @Override
     public void deleteTask() {
-        mTasksOperations.deleteTask(mTaskId);
+        mTasksOperations.deleteTask(mTask);
         mTaskDetailView.showTaskDeleted();
     }
 
     public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksOperations.completeTask(mTaskId);
+        mTasksOperations.completeTask(mTask);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
     public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksOperations.activateTask(mTaskId);
+        mTasksOperations.activateTask(mTask);
         mTaskDetailView.showTaskMarkedActive();
     }
 

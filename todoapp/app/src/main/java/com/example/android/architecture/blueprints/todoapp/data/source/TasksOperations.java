@@ -64,19 +64,12 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void completeTask(Task task) {
-        completeTask(task.getId());
-    }
-
-    public void completeTask(String completedTaskId) {
         try {
-            ContentValues values = new ContentValues();
-            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
-            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
-            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
+            ContentValues values = TaskValues.from(task);
             values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, true);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {completedTaskId};
+            String[] selectionArgs = {task.getId()};
 
             mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
@@ -85,16 +78,12 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void activateTask(Task activeTask) {
-        activateTask(activeTask.getId());
-    }
-
-    public void activateTask(String taskId) {
         try {
-            ContentValues values = new ContentValues();
+            ContentValues values = TaskValues.from(activeTask);
             values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, false);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
+            String[] selectionArgs = {activeTask.getId()};
 
             mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
         } catch (IllegalStateException e) {
@@ -106,6 +95,7 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         try {
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
             String[] selectionArgs = {"1"};
+
             mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
         } catch (IllegalStateException e) {
             // Send to analytics, log etc
@@ -121,17 +111,13 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void saveTask(Task newTask) {
-        ContentValues values = new ContentValues();
-        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
-        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
-        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
-        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, newTask.isCompleted() ? 1 : 0);
+        ContentValues values = TaskValues.from(newTask);
         mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
     }
 
-    public void deleteTask(String taskId) {
+    public void deleteTask(Task deletedTask) {
         String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
+        String[] selectionArgs = {deletedTask.getId()};
 
         mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
@@ -142,11 +128,11 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
             case TASKS_LOADER:
                 TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
                 return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
-            break;
             case TASK_LOADER:
                 String taskId = args.getString(KEY_TASK_ID);
                 return mLoaderProvider.createTaskLoader(taskId);
-            break;
+            default:
+                throw new IllegalArgumentException("Loader Id not recognised");
         }
 
     }
@@ -167,6 +153,8 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public interface GetTasksCallback {
         void onDataLoaded(Cursor data);
+
         void onDataNotAvailable();
     }
+
 }
