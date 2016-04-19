@@ -150,4 +150,13 @@ public class TasksLocalDataSource {
         return rowsDeleted;
     }
 
+    public int deleteTask(String[] selectionArgs) {
+        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
+        int rowsUpdated = db.delete(TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
+
+        return rowsUpdated;
+    }
+
 }

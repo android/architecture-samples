@@ -26,7 +26,6 @@ public class TasksProvider extends ContentProvider {
     private TasksLocalDataSource mTasksLocalDataSource;
 
     private static final int TASK = 100;
-    private static final int TASK_ITEM = 101;
 
     /**
      * This variable has package local visibility so it can be accessed from tests.
@@ -44,38 +43,43 @@ public class TasksProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor tasks;
-        if (mCachedTasks != null) {
-            tasks = getCachedTasks();
-        } else {
+//        if (mCachedTasks != null) {
+//            tasks = getCachedTasks();
+//        } else {
             tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
             if (null == tasks || tasks.getCount() == 0) {
                 List<Task> taskList = mTasksRemoteDataSource.getTasks();
                 saveTasksInLocalDataSource(taskList);
             }
-        }
+//        }
         tasks.setNotificationUri(getContext().getContentResolver(), uri);
         return tasks;
     }
 
     private MatrixCursor getCachedTasks() {
-        MatrixCursor matrixCursor = new MatrixCursor(TasksPersistenceContract.TaskEntry.TASKS_COLUMNS);
+        MatrixCursor matrixCursor = new MatrixCursor(new String[]{
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED});
 
         if (mCachedTasks == null) {
             return matrixCursor;
         } else {
-            for (int i = 0; i < mCachedTasks.size(); i++) {
+            Iterator it = mCachedTasks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Task cachedTask = (Task) pair.getValue();
                 matrixCursor.addRow(new Object[]{
-                        mCachedTasks.get(i).getInternalId(),
-                        mCachedTasks.get(i).getId(),
-                        mCachedTasks.get(i).getTitle(),
-                        mCachedTasks.get(i).getDescription(),
-                        mCachedTasks.get(i).isCompleted()
+                        cachedTask.getId(),
+                        cachedTask.getTitle(),
+                        cachedTask.getDescription(),
+                        cachedTask.isCompleted()
                 });
-
+                it.remove(); // avoids a ConcurrentModificationException
             }
+            return matrixCursor;
         }
-        return matrixCursor;
-
     }
 
     private void saveTasksInLocalDataSource(List<Task> tasks) {
@@ -93,8 +97,6 @@ public class TasksProvider extends ContentProvider {
         switch (match) {
             case TASK:
                 return TasksPersistenceContract.CONTENT_TASK_TYPE;
-            case TASK_ITEM:
-                return TasksPersistenceContract.CONTENT_TASK_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -106,6 +108,12 @@ public class TasksProvider extends ContentProvider {
         Task newTask = Task.from(values);
         mTasksRemoteDataSource.saveTask(newTask);
         Uri returnUri = mTasksLocalDataSource.saveTask(newTask);
+
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        mCachedTasks.put(newTask.getId(), newTask);
+
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
@@ -117,10 +125,7 @@ public class TasksProvider extends ContentProvider {
         if (selectionArgs.equals("1")) {
             mTasksRemoteDataSource.clearCompletedTasks();
             rowsDeleted = mTasksLocalDataSource.clearCompletedTasks(selection, selectionArgs);
-            // Do in memory cache update to keep the app UI up to date
-            if (mCachedTasks == null) {
-                mCachedTasks = new LinkedHashMap<>();
-            }
+
             Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, Task> entry = it.next();
@@ -128,13 +133,23 @@ public class TasksProvider extends ContentProvider {
                     it.remove();
                 }
             }
+        } else if (selectionArgs.length == 1) {
+            String taskId = selectionArgs[0];
+            mTasksRemoteDataSource.deleteTask(taskId);
+            rowsDeleted = mTasksLocalDataSource.deleteTask(selectionArgs);
+
+            Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Task> entry = it.next();
+                if (entry.getValue().getId().equals(taskId)) {
+                    it.remove();
+                }
+            }
+
         } else {
             mTasksRemoteDataSource.deleteAllTasks();
             rowsDeleted = mTasksLocalDataSource.deleteAllTasks();
 
-            if (mCachedTasks == null) {
-                mCachedTasks = new LinkedHashMap<>();
-            }
             mCachedTasks.clear();
         }
 
@@ -166,7 +181,6 @@ public class TasksProvider extends ContentProvider {
         final String authority = TasksPersistenceContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
 
         return matcher;
     }
