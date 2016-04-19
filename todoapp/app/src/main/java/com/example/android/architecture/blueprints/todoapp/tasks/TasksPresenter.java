@@ -140,7 +140,6 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksOperations.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
-        loadTasks(false);
     }
 
     @Override
@@ -148,14 +147,12 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksOperations.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
-        loadTasks(false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksOperations.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
-        loadTasks(false);
     }
 
     /**
