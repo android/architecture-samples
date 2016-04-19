@@ -22,7 +22,6 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
 
 import org.junit.Before;
@@ -33,7 +32,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -57,7 +57,7 @@ public class AddEditTaskPresenterTest {
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+    private ArgumentCaptor<TasksOperations.GetTasksCallback> mGetTaskCallbackCaptor;
 
     private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
 
@@ -109,9 +109,6 @@ public class AddEditTaskPresenterTest {
     @Test
     public void populateTask_callsRepoAndUpdatesView() {
         Task testTask = new Task("Title", "Description");
-
-        when(mTasksOperations.getTask(testTask.getId())).thenReturn(testTask);
-
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), mActiveTaskCursor);

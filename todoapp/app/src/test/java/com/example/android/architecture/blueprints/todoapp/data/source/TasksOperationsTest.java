@@ -59,7 +59,7 @@ public class TasksOperationsTest {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
-        mTasksOperations = new TasksOperations(mLoaderProvider, mLoaderManager, mContentResolver);
+        mTasksOperations = TasksOperations.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
     }
 
     @After

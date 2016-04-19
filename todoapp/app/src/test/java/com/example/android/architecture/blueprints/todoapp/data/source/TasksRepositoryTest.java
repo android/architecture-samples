@@ -64,14 +64,14 @@ public class TasksRepositoryTest {
     private Context mContext;
 
     @Mock
-    private TasksDataSource.GetTaskCallback mGetTaskCallback;
+    private TasksOperations.GetTasksCallback mGetTaskCallback;
 
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mTaskCallbackCaptor;
+    private ArgumentCaptor<TasksOperations.GetTasksCallback> mTaskCallbackCaptor;
 
     @Before
     public void setupTasksRepository() {

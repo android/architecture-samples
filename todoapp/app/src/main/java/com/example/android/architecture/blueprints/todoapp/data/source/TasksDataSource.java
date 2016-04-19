@@ -33,13 +33,6 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
-    }
-
     @Nullable
     List<Task> getTasks();
 
