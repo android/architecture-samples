@@ -95,7 +95,7 @@ public class TasksPresenterTest {
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
-        mTasksPresenter.onTasksLoaded(mAllTasksCursor);
+        mTasksPresenter.onDataLoaded(mAllTasksCursor);
 
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -110,7 +110,7 @@ public class TasksPresenterTest {
 
         // When the loader finishes with tasks and filter is set to active
         mTasksPresenter.setFiltering(taskFilter);
-        mTasksPresenter.onTasksLoaded(mActiveTasksCursor);
+        mTasksPresenter.onDataLoaded(mActiveTasksCursor);
 
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
@@ -125,7 +125,7 @@ public class TasksPresenterTest {
 
         // When the loader finishes with tasks and filter is set to completed
         mTasksPresenter.setFiltering(taskFilter);
-        mTasksPresenter.onTasksLoaded(mCompletedTasksCursor);
+        mTasksPresenter.onDataLoaded(mCompletedTasksCursor);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);

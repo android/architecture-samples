@@ -16,11 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -67,16 +65,14 @@ public class TaskDetailActivity extends AppCompatActivity {
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        Loader<Cursor> taskLoader = loaderProvider.createTaskLoader(taskId);
         TasksOperations tasksOperations = TasksOperations.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
         // Create the presenter
         new TaskDetailPresenter(
                 taskId,
                 tasksOperations,
-                taskDetailFragment,
-                taskLoader,
-                getSupportLoaderManager()
+                loaderProvider,
+                taskDetailFragment
         );
     }
 

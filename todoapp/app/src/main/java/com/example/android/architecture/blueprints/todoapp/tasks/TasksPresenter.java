@@ -66,7 +66,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksOperations.
     }
 
     @Override
-    public void onTasksLoaded(Cursor data) {
+    public void onDataLoaded(Cursor data) {
         mTasksView.setLoadingIndicator(false);
         if (data.getCount() > 0) {
             // Show the list of tasks

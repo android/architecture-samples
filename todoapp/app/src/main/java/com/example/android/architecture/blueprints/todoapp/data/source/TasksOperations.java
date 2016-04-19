@@ -16,8 +16,11 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static TasksOperations INSTANCE;
 
-    private final static int TASKS_QUERY = 1;
+    private final static int TASKS_LOADER = 1;
+    private final static int TASK_LOADER = 2;
+
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
+    public final static String KEY_TASK_ID = BuildConfig.APPLICATION_ID + "TASK_ID";
 
     private final LoaderProvider mLoaderProvider;
     private final LoaderManager mLoaderManager;
@@ -40,10 +43,23 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public void getTasks(Bundle extras, GetTasksCallback callback) {
         this.callback = callback;
-        if (mLoaderManager.getLoader(TASKS_QUERY) == null) {
-            mLoaderManager.initLoader(TASKS_QUERY, extras, this);
+        if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
+            mLoaderManager.initLoader(TASKS_LOADER, extras, this);
         } else {
-            mLoaderManager.restartLoader(TASKS_QUERY, extras, this);
+            mLoaderManager.restartLoader(TASKS_LOADER, extras, this);
+        }
+    }
+
+    public void getTask(String taskId, GetTasksCallback callback) {
+        this.callback = callback;
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(TasksOperations.KEY_TASK_ID, taskId);
+
+        if (mLoaderManager.getLoader(TASK_LOADER) == null) {
+            mLoaderManager.initLoader(TASK_LOADER, null, this);
+        } else {
+            mLoaderManager.restartLoader(TASK_LOADER, null, this);
         }
     }
 
@@ -54,6 +70,9 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     public void completeTask(String completedTaskId) {
         try {
             ContentValues values = new ContentValues();
+            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
+            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE, newTask.getTitle());
+            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION, newTask.getDescription());
             values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, true);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
@@ -101,30 +120,6 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         }
     }
 
-    public Task getTask(String id) {
-        return null;
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
-        return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null) {
-            callback.onTasksLoaded(data);
-        } else {
-            callback.onDataNotAvailable();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
     public void saveTask(Task newTask) {
         ContentValues values = new ContentValues();
         values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID, newTask.getId());
@@ -141,9 +136,37 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 
-    public interface GetTasksCallback {
-        void onTasksLoaded(Cursor data);
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case TASKS_LOADER:
+                TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
+                return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
+            break;
+            case TASK_LOADER:
+                String taskId = args.getString(KEY_TASK_ID);
+                return mLoaderProvider.createTaskLoader(taskId);
+            break;
+        }
 
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            callback.onDataLoaded(data);
+        } else {
+            callback.onDataNotAvailable();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    public interface GetTasksCallback {
+        void onDataLoaded(Cursor data);
         void onDataNotAvailable();
     }
 }

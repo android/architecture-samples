@@ -39,7 +39,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private static final int TASK_QUERY = 2;
 
     @NonNull
-    private TasksOperations tasksOperations;
+    private TasksOperations mTasksOperations;
 
     @NonNull
     private AddEditTaskContract.View mAddTaskView;
@@ -55,7 +55,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
                                 @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
                                 @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
-        tasksOperations = checkNotNull(tasksOperations);
+        mTasksOperations = checkNotNull(tasksOperations);
         mAddTaskView = checkNotNull(addTaskView);
         mTaskLoader = checkNotNull(taskLoader);
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
@@ -74,14 +74,14 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
-            tasksOperations.saveTask(newTask);
+            mTasksOperations.saveTask(newTask);
             mAddTaskView.showTasksList();
         }
     }
 
     @Override
     public void updateTask(String taskId, String title, String description) {
-        tasksOperations.saveTask(new Task(title, description, taskId));
+        mTasksOperations.saveTask(new Task(title, description, taskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
