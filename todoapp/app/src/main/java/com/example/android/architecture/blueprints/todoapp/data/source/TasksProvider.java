@@ -43,15 +43,15 @@ public class TasksProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor tasks;
-//        if (mCachedTasks != null) {
-//            tasks = getCachedTasks();
-//        } else {
+        if (mCachedTasks != null) {
+            tasks = getCachedTasks();
+        } else {
             tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
             if (null == tasks || tasks.getCount() == 0) {
                 List<Task> taskList = mTasksRemoteDataSource.getTasks();
                 saveTasksInLocalDataSource(taskList);
             }
-//        }
+        }
         tasks.setNotificationUri(getContext().getContentResolver(), uri);
         return tasks;
     }
