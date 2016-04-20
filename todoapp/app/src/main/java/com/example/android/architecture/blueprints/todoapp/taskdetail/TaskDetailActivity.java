@@ -50,12 +50,21 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
-        // Add fragment to activity unless there is a saved state (orientation change), in which
-        // case the system will recreate the Fragment automatically
-        if (savedInstanceState == null) {
+        TaskDetailFragment taskDetailFragment = (TaskDetailFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+
+        if (taskDetailFragment == null) {
+            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
+
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TaskDetailFragment.newInstance(taskId), R.id.contentFrame);
+                    taskDetailFragment, R.id.contentFrame);
         }
+
+        // Create the presenter
+        new TaskDetailPresenter(
+                taskId,
+                TasksRepository.getInstance(getApplicationContext()),
+                taskDetailFragment);
     }
 
     @Override

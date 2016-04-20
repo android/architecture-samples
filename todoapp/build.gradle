@@ -41,5 +41,5 @@ ext {
     runnerVersion = '0.4.1'
     rulesVersion = '0.4.1'
     espressoVersion = '2.2.1'
-    daggerVersion = '2.0'
+    daggerVersion = '2.2'
 }
