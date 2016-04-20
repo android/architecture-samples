@@ -29,13 +29,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 public class TasksActivity extends AppCompatActivity {
 
+    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+
     private DrawerLayout mDrawerLayout;
+
+    private TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +62,34 @@ public class TasksActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
-
-        if (null == savedInstanceState) {
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TasksFragment.newInstance(), R.id.contentFrame);
+        TasksFragment tasksFragment =
+                (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (tasksFragment == null) {
+            // Create the fragment
+            tasksFragment = TasksFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
+
+        // Create the presenter
+        mTasksPresenter = DaggerTasksComponent.builder()
+                .tasksRepositoryComponent(((ToDoApplication) getApplication())
+                        .getTasksRepositoryComponent())
+                .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build().getTasksPresenter();
+
+        // Load previously saved state, if available.
+        if (savedInstanceState != null) {
+            TasksFilterType currentFiltering =
+                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            mTasksPresenter.setFiltering(currentFiltering);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override

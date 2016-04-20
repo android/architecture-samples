@@ -18,7 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 
@@ -27,9 +29,9 @@ import java.util.List;
  */
 public interface TasksContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
-        void setProgressIndicator(boolean active);
+        void setLoadingIndicator(boolean active);
 
         void showTasks(List<Task> tasks);
 
@@ -45,16 +47,30 @@ public interface TasksContract {
 
         void showLoadingTasksError();
 
-        boolean isInactive();
+        void showNoTasks();
+
+        void showActiveFilterLabel();
+
+        void showCompletedFilterLabel();
+
+        void showAllFilterLabel();
+
+        void showNoActiveTasks();
+
+        void showNoCompletedTasks();
+
+        void showSuccessfullySavedMessage();
+
+        boolean isActive();
+
+        void showFilteringPopUpMenu();
     }
 
-    interface UserActionsListener {
+    interface Presenter extends BasePresenter {
 
-        void loadAllTasks(boolean forceUpdate);
+        void result(int requestCode, int resultCode);
 
-        void loadActiveTasks(boolean forceUpdate);
-
-        void loadCompletedTasks(boolean forceUpdate);
+        void loadTasks(boolean forceUpdate);
 
         void addNewTask();
 
@@ -65,5 +81,9 @@ public interface TasksContract {
         void activateTask(@NonNull Task activeTask);
 
         void clearCompletedTasks();
+
+        void setFiltering(TasksFilterType requestType);
+
+        TasksFilterType getFiltering();
     }
 }
