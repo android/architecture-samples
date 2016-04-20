@@ -37,7 +37,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
 
-    private final static Map<String, Task> TASKS_SERVICE_DATA;
+    private static final Map<String, Task> TASKS_SERVICE_DATA;
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);

@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
+import android.support.annotation.NonNull;
 import android.support.test.espresso.IdlingResource;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,7 +46,7 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
      *
      * @param resourceName the resource name this resource should report to Espresso.
      */
-    public SimpleCountingIdlingResource(String resourceName) {
+    public SimpleCountingIdlingResource(@NonNull String resourceName) {
         mResourceName = checkNotNull(resourceName);
     }
 

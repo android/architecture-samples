@@ -16,11 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
+import android.support.annotation.NonNull;
+
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.base.domain.error.DataNotAvailableError;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Retrieves a {@link Task} from the {@link TasksRepository}.
@@ -29,8 +33,8 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
 
     private final TasksRepository mTasksRepository;
 
-    public GetTask(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public GetTask(@NonNull TasksRepository tasksRepository) {
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
@@ -49,11 +53,12 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
         });
     }
 
-    public static class RequestValues extends UseCase.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
+
         private final String mTaskId;
 
-        public RequestValues(String taskId) {
-            mTaskId = taskId;
+        public RequestValues(@NonNull String taskId) {
+            mTaskId = checkNotNull(taskId, "taskId cannot be null!");
         }
 
         public String getTaskId() {
@@ -61,11 +66,12 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
         }
     }
 
-    public class ResponseValue extends UseCase.ResponseValue {
+    public static final class ResponseValue implements UseCase.ResponseValue {
+
         private Task mTask;
 
-        public ResponseValue(Task task) {
-            mTask = task;
+        public ResponseValue(@NonNull Task task) {
+            mTask = checkNotNull(task, "task cannot be null!");
         }
 
         public Task getTask() {

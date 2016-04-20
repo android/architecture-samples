@@ -52,7 +52,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             @NonNull CompleteTask completeTask,
             @NonNull ActivateTask activateTask,
             @NonNull DeleteTask deleteTask) {
-        this.mTaskId = taskId;
+        mTaskId = taskId;
         mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");
@@ -68,7 +68,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     private void openTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (mTaskId == null || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -106,7 +106,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (mTaskId == null || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -131,7 +131,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (mTaskId == null || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -152,7 +152,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (mTaskId == null || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
         }

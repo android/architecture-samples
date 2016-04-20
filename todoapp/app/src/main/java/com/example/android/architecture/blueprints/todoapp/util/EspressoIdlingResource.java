@@ -25,18 +25,18 @@ public class EspressoIdlingResource {
 
     private static final String RESOURCE = "GLOBAL";
 
-    private static SimpleCountingIdlingResource mCountingIdlingResource =
+    private static final SimpleCountingIdlingResource DEFAULT_INSTANCE =
             new SimpleCountingIdlingResource(RESOURCE);
 
     public static void increment() {
-        mCountingIdlingResource.increment();
+        DEFAULT_INSTANCE.increment();
     }
 
     public static void decrement() {
-        mCountingIdlingResource.decrement();
+        DEFAULT_INSTANCE.decrement();
     }
 
     public static IdlingResource getIdlingResource() {
-        return mCountingIdlingResource;
+        return DEFAULT_INSTANCE;
     }
 }

@@ -45,11 +45,11 @@ import java.util.List;
  */
 public class TasksRepositoryTest {
 
-    private final static String TASK_TITLE = "title";
+    private static final String TASK_TITLE = "title";
 
-    private final static String TASK_TITLE2 = "title2";
+    private static final String TASK_TITLE2 = "title2";
 
-    private final static String TASK_TITLE3 = "title3";
+    private static final String TASK_TITLE3 = "title3";
 
     private static List<Task> TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
             new Task("Title2", "Description2"));

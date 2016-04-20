@@ -31,7 +31,6 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Concrete implementation of a data source as a db.
  */

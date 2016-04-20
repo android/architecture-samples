@@ -16,9 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
+import android.support.annotation.NonNull;
+
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Updates or creates a new {@link Task} in the {@link TasksRepository}.
@@ -27,8 +31,8 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
 
     private final TasksRepository mTasksRepository;
 
-    public SaveTask(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public SaveTask(@NonNull TasksRepository tasksRepository) {
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
@@ -39,11 +43,12 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
         getUseCaseCallback().onSuccess(new ResponseValue(task));
     }
 
-    public static class RequestValues extends UseCase.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
+
         private final Task mTask;
 
-        public RequestValues(Task task) {
-            mTask = task;
+        public RequestValues(@NonNull Task task) {
+            mTask = checkNotNull(task, "task cannot be null!");
         }
 
         public Task getTask() {
@@ -51,11 +56,12 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
         }
     }
 
-    public class ResponseValue extends UseCase.ResponseValue {
-        private Task mTask;
+    public static final class ResponseValue implements UseCase.ResponseValue {
 
-        public ResponseValue(Task task) {
-            mTask = task;
+        private final Task mTask;
+
+        public ResponseValue(@NonNull Task task) {
+            mTask = checkNotNull(task, "task cannot be null!");
         }
 
         public Task getTask() {

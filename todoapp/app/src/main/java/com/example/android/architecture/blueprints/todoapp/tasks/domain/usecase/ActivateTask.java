@@ -16,8 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase;
 
+import android.support.annotation.NonNull;
+
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Marks a task as active (not completed yet).
@@ -26,8 +30,8 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
 
     private final TasksRepository mTasksRepository;
 
-    public ActivateTask(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public ActivateTask(@NonNull TasksRepository tasksRepository) {
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
     }
 
     @Override
@@ -37,12 +41,12 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
         getUseCaseCallback().onSuccess(new ResponseValue());
     }
 
-    public static class RequestValues extends UseCase.RequestValues {
+    public static final class RequestValues implements UseCase.RequestValues {
 
         private final String mActivateTask;
 
-        public RequestValues(String activateTask) {
-            mActivateTask = activateTask;
+        public RequestValues(@NonNull String activateTask) {
+            mActivateTask = checkNotNull(activateTask, "activateTask cannot be null!");
         }
 
         public String getActivateTask() {
@@ -50,5 +54,5 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
         }
     }
 
-    public class ResponseValue extends UseCase.ResponseValue { }
+    public static final class ResponseValue implements UseCase.ResponseValue { }
 }
