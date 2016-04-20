@@ -15,7 +15,7 @@ import dagger.Component;
  */
 @FragmentScoped
 @Component(dependencies = TasksRepositoryComponent.class, modules = TaskDetailPresenterModule.class)
-public interface TaskDetailFragmentComponent {
+public interface TaskDetailComponent {
 
     TaskDetailPresenter getTaskDetailPresenter();
 }

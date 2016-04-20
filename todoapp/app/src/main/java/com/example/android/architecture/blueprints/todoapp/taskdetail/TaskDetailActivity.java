@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -60,11 +61,10 @@ public class TaskDetailActivity extends AppCompatActivity {
                     taskDetailFragment, R.id.contentFrame);
         }
 
-        // Create the presenter
-        new TaskDetailPresenter(
-                taskId,
-                TasksRepository.getInstance(getApplicationContext()),
-                taskDetailFragment);
+        DaggerTaskDetailComponent.builder()
+                .taskDetailPresenterModule(new TaskDetailPresenterModule(taskDetailFragment, taskId))
+                .tasksRepositoryComponent(((ToDoApplication) getApplication())
+                        .getTasksRepositoryComponent()).build().getTaskDetailPresenter();
     }
 
     @Override

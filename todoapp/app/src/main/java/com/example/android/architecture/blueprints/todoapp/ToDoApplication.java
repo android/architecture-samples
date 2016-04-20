@@ -7,7 +7,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTas
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragmentComponent;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragmentComponent;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailComponent;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragmentComponent;
 
 /**
@@ -21,7 +21,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragmentCo
  * {@link TasksFragmentComponent}: showing the list of to do items, including marking them as
  * completed<BR />
  * {@link AddEditTaskFragmentComponent}: adding or editing a to do item<BR />
- * {@link TaskDetailFragmentComponent}: viewing details about a to do item, inlcuding marking it as
+ * {@link TaskDetailComponent}: viewing details about a to do item, inlcuding marking it as
  * completed and deleting it<BR />
  * {@link StatisticsFragmentComponent}: viewing statistics about your to do items<BR />
  */
