@@ -23,7 +23,7 @@ The big difference with base MVP sample is the use of the Domain layer and *use 
 The execution of these *use cases* is done in a background thread using the [command pattern](http://www.oodesign.com/command-pattern.html). The domain layer is completely decoupled from the Android SDK or other third party libraries.
 
 ### Issues/notes
-*Use cases* run off the main thread, which is a good solution for Android apps.  This is done as soon as possible to avoid blocking the UI thread. We decided to use a command pattern and execute each use case with an thread pool, but we can implement the same with RxJava or Promises.
+*Use cases* run off the main thread, which is a good solution for Android apps.  This is done as soon as possible to avoid blocking the UI thread. We decided to use a command pattern and execute each use case with a thread pool, but we can implement the same with RxJava or Promises.
 
 We are using asynchronous repositories, but there's no need to do this any more because use cases execute off the main thread. This is kept to maintain the sample as similar as possible to the original one.
 
