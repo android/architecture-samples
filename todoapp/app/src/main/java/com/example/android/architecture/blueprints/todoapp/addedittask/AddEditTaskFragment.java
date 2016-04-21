@@ -103,7 +103,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
 
         setHasOptionsMenu(true);
-        setRetainInstance(true);
         return root;
     }
 

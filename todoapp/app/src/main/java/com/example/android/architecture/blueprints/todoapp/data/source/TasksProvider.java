@@ -43,17 +43,27 @@ public class TasksProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor tasks;
-        if (mCachedTasks != null) {
+        if (hasCachedTasks()) {
             tasks = getCachedTasks();
         } else {
             tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
             if (null == tasks || tasks.getCount() == 0) {
                 List<Task> taskList = mTasksRemoteDataSource.getTasks();
                 saveTasksInLocalDataSource(taskList);
+            } else {
+                saveToLocalCache(tasks);
             }
         }
         tasks.setNotificationUri(getContext().getContentResolver(), uri);
         return tasks;
+    }
+
+    private boolean hasCachedTasks() {
+        if (null == mCachedTasks) {
+            return false;
+        } else {
+            return mCachedTasks.size() > 0;
+        }
     }
 
     private MatrixCursor getCachedTasks() {
@@ -82,10 +92,24 @@ public class TasksProvider extends ContentProvider {
         }
     }
 
+    private void saveToLocalCache(Cursor tasks) {
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        while (tasks.moveToNext()) {
+            Task newTask = Task.from(tasks);
+            mCachedTasks.put(newTask.getId(), newTask);
+        }
+    }
+
     private void saveTasksInLocalDataSource(List<Task> tasks) {
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
         if (tasks != null) {
             for (Task task : tasks) {
                 mTasksLocalDataSource.saveTask(task);
+                mCachedTasks.put(task.getId(), task);
             }
         }
     }
@@ -108,11 +132,6 @@ public class TasksProvider extends ContentProvider {
         Task newTask = Task.from(values);
         mTasksRemoteDataSource.saveTask(newTask);
         Uri returnUri = mTasksLocalDataSource.saveTask(newTask);
-
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.put(newTask.getId(), newTask);
 
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
