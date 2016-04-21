@@ -47,7 +47,7 @@ data) {
     }
 }
 ```
-The presenter also triggers the loading the data, like in the MVP sample but in
+The presenter also triggers the loading of data, like in the MVP sample but in
 this case it does it through the LoaderManager:
 
 
