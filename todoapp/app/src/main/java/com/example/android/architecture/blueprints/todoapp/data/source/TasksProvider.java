@@ -66,8 +66,10 @@ public class TasksProvider extends ContentProvider {
         }
     }
 
+    //TODO add internal ID
     private MatrixCursor getCachedTasks() {
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{
+                TasksPersistenceContract.TaskEntry._ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
@@ -81,6 +83,7 @@ public class TasksProvider extends ContentProvider {
                 Map.Entry pair = (Map.Entry) it.next();
                 Task cachedTask = (Task) pair.getValue();
                 matrixCursor.addRow(new Object[]{
+                        cachedTask.getInternalId(),
                         cachedTask.getId(),
                         cachedTask.getTitle(),
                         cachedTask.getDescription(),

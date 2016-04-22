@@ -30,14 +30,10 @@ import java.util.UUID;
  */
 public final class Task {
 
+    private int mInternalId;
     private final String mId;
-
-    @Nullable
     private final String mTitle;
-
-    @Nullable
     private final String mDescription;
-
     private final boolean mCompleted;
 
     /**
@@ -109,6 +105,7 @@ public final class Task {
      * @param completed
      */
     public Task(int internalId, @Nullable String title, @Nullable String description, String id, boolean completed) {
+        mInternalId = internalId;
         mId = id;
         mTitle = title;
         mDescription = description;
@@ -121,20 +118,26 @@ public final class Task {
      * @return
      */
     public static Task from(Cursor cursor) {
+        int rowId = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry._ID));
         String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(title, description, entryId, completed);
+        boolean completed = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)).equals("true");
+        return new Task(rowId, title, description, entryId, completed);
     }
 
     public static Task from(ContentValues values) {
+        int rowId = values.getAsInteger(TasksPersistenceContract.TaskEntry._ID);
         String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
         String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
         String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
         boolean completed = values.getAsBoolean(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED);
 
-        return new Task(title, description, entryId, completed);
+        return new Task(rowId, title, description, entryId, completed);
+    }
+
+    public int getInternalId() {
+        return mInternalId;
     }
 
     public String getId() {
