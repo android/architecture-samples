@@ -171,7 +171,6 @@ public class TasksProvider extends ContentProvider {
         } else {
             mTasksRemoteDataSource.deleteAllTasks();
             rowsDeleted = mTasksLocalDataSource.deleteAllTasks();
-
             mCachedTasks.clear();
         }
 
@@ -191,10 +190,12 @@ public class TasksProvider extends ContentProvider {
         }
 
         int rowsUpdated = mTasksLocalDataSource.updateTask(values, selectionArgs);
+        mCachedTasks.put(newTask.getId(), newTask);
 
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+
         return rowsUpdated;
     }
 
