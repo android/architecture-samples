@@ -16,10 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -29,6 +25,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
+import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 /**
  * Show statistics for tasks.
@@ -59,8 +60,19 @@ public class StatisticsActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                StatisticsFragment.newInstance(), R.id.contentFrame);
+        StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+        if (statisticsFragment == null) {
+            statisticsFragment = StatisticsFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    statisticsFragment, R.id.contentFrame);
+        }
+
+        DaggerStatisticsFragmentComponent.builder()
+            .statisticsPresenterModule(new StatisticsPresenterModule(statisticsFragment))
+            .tasksRepositoryComponent(((ToDoApplication) getApplication())
+                    .getTasksRepositoryComponent())
+            .build().getStatisticsPresenter();
     }
 
     @Override

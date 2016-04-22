@@ -75,7 +75,8 @@ public class TasksActivity extends AppCompatActivity {
         mTasksPresenter = DaggerTasksComponent.builder()
                 .tasksRepositoryComponent(((ToDoApplication) getApplication())
                         .getTasksRepositoryComponent())
-                .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build().getTasksPresenter();
+                .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build()
+                .getTasksPresenter();
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {

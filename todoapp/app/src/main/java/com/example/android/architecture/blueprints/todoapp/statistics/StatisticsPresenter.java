@@ -55,12 +55,21 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
         mStatisticsView = statisticsView;
     }
 
+    /**
+     * Method injection is used here to safely reference {@code this} after the object is created.
+     * For more information, see Java Concurrency in Practice.
+     */
+    @Inject
+    void setupListeners() {
+        mStatisticsView.setPresenter(this);
+    }
+
     @Override
     public void start() {
         loadStatistics();
     }
 
-    public void loadStatistics() {
+    private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows

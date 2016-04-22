@@ -74,7 +74,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
         mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);

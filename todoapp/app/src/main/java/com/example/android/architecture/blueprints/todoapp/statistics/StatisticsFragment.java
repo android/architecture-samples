@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 
 /**
  * Main UI for the statistics screen.
@@ -44,16 +43,6 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mPresenter  = DaggerStatisticsFragmentComponent.builder()
-                .statisticsPresenterModule(new StatisticsPresenterModule(this))
-                .tasksRepositoryComponent(((ToDoApplication) getActivity().getApplication())
-                        .getTasksRepositoryComponent())
-                .build().getStatisticsPresenter();
-    }
-
-    @Override
     public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
@@ -61,7 +50,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
         return root;

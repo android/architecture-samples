@@ -58,15 +58,16 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTasksRepository = tasksRepository;
         mTaskDetailView = taskDetailView;
         mTaskId = taskId;
-
-        mTaskDetailView.setPresenter(this);
     }
 
-//
-//    TaskDetailPresenter(TaskDetailComponent component) {
-//        component.inject(this);
-//        mTaskDetailView.setPresenter(this);
-//    }
+    /**
+     * Method injection is used here to safely reference {@code this} after the object is created.
+     * For more information, see Java Concurrency in Practice.
+     */
+    @Inject
+    void setupListeners() {
+        mTaskDetailView.setPresenter(this);
+    }
 
     @Override
     public void start() {

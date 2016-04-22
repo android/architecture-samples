@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,6 +29,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -95,7 +95,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);

@@ -64,7 +64,14 @@ final class TasksPresenter implements TasksContract.Presenter {
     TasksPresenter(TasksRepository tasksRepository, TasksContract.View tasksView) {
         mTasksRepository = tasksRepository;
         mTasksView = tasksView;
+    }
 
+    /**
+     * Method injection is used here to safely reference {@code this} after the object is created.
+     * For more information, see Java Concurrency in Practice.
+     */
+    @Inject
+    void setupListeners() {
         mTasksView.setPresenter(this);
     }
 
