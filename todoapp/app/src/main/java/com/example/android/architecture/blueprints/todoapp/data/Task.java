@@ -122,7 +122,7 @@ public final class Task {
         String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)).equals("true");
+        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
         return new Task(rowId, title, description, entryId, completed);
     }
 
@@ -131,7 +131,7 @@ public final class Task {
         String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
         String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
         String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
-        boolean completed = values.getAsBoolean(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED);
+        boolean completed = values.getAsInteger(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED) == 1;
 
         return new Task(rowId, title, description, entryId, completed);
     }

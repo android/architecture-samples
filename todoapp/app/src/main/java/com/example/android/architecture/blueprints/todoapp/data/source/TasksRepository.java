@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
- * <p>
+ * <p/>
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
@@ -86,7 +86,6 @@ public class TasksRepository implements TasksDataSource {
     }
 
     /**
-     *
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first,
      * which implements the async mechanism.

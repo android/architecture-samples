@@ -37,9 +37,6 @@ public class TasksOperationsTest {
     private ContentResolver mContentResolver;
 
     @Mock
-    private ContentValues mContentValues;
-
-    @Mock
     private Bundle mBundle;
 
     @Mock
@@ -69,31 +66,33 @@ public class TasksOperationsTest {
 
     @Test
     public void getTasks_firstStartsLoader() {
-        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
         when(mLoaderManager.getLoader(anyInt())).thenReturn(null);
+
+        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
 
         verify(mLoaderManager).initLoader(any(Integer.class), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
     }
 
     @Test
     public void getTasks_restartsLoaderIfLoaderExists() {
-        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
         when(mLoaderManager.getLoader(anyInt())).thenReturn(null);
 
-        verify(mLoaderManager).restartLoader(any(Integer.class), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
+        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
 
+        verify(mLoaderManager).restartLoader(any(Integer.class), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
     }
 
     @Test
     public void completeTask_sendsArgumentsToContentResolver() {
         // Given a new task
-        final Task newTask = new Task(TITLE, "");
-        mTasksOperations.completeTask(newTask);
+        final Task task = new Task(TITLE, "");
+
+        mTasksOperations.completeTask(task);
 
         String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {newTask.getId()};
+        String[] selectionArgs = {task.getId()};
 
-        verify(mContentResolver).update(TasksPersistenceContract.TaskEntry.buildTasksUri(), mContentValues, selection, selectionArgs);
+        verify(mContentResolver).update(TasksPersistenceContract.TaskEntry.buildTasksUri(), any(ContentValues.class), selection, selectionArgs);
     }
 
 }

@@ -66,7 +66,7 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
     public void completeTask(Task task) {
         try {
             ContentValues values = TaskValues.from(task);
-            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, true);
+            values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, 1);
 
             String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {task.getId()};

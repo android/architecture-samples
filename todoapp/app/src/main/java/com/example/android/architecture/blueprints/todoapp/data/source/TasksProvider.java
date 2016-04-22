@@ -41,84 +41,6 @@ public class TasksProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Cursor tasks;
-        if (hasCachedTasks()) {
-            tasks = getCachedTasks();
-        } else {
-            tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
-            if (null == tasks || tasks.getCount() == 0) {
-                List<Task> taskList = mTasksRemoteDataSource.getTasks();
-                saveTasksInLocalDataSource(taskList);
-            } else {
-                saveToLocalCache(tasks);
-            }
-        }
-        tasks.setNotificationUri(getContext().getContentResolver(), uri);
-        return tasks;
-    }
-
-    private boolean hasCachedTasks() {
-        if (null == mCachedTasks) {
-            return false;
-        } else {
-            return mCachedTasks.size() > 0;
-        }
-    }
-
-    //TODO add internal ID
-    private MatrixCursor getCachedTasks() {
-        MatrixCursor matrixCursor = new MatrixCursor(new String[]{
-                TasksPersistenceContract.TaskEntry._ID,
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED});
-
-        if (mCachedTasks == null) {
-            return matrixCursor;
-        } else {
-            Iterator it = mCachedTasks.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                Task cachedTask = (Task) pair.getValue();
-                matrixCursor.addRow(new Object[]{
-                        cachedTask.getInternalId(),
-                        cachedTask.getId(),
-                        cachedTask.getTitle(),
-                        cachedTask.getDescription(),
-                        cachedTask.isCompleted()
-                });
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-            return matrixCursor;
-        }
-    }
-
-    private void saveToLocalCache(Cursor tasks) {
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        while (tasks.moveToNext()) {
-            Task newTask = Task.from(tasks);
-            mCachedTasks.put(newTask.getId(), newTask);
-        }
-    }
-
-    private void saveTasksInLocalDataSource(List<Task> tasks) {
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        if (tasks != null) {
-            for (Task task : tasks) {
-                mTasksLocalDataSource.saveTask(task);
-                mCachedTasks.put(task.getId(), task);
-            }
-        }
-    }
-
-    @Nullable
-    @Override
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -197,6 +119,108 @@ public class TasksProvider extends ContentProvider {
         }
 
         return rowsUpdated;
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Cursor tasks;
+
+        if (null != selection && selection.startsWith(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)) {
+            tasks = getCachedTask(selectionArgs);
+        } else {
+            if (hasCachedTasks()) {
+                tasks = getCachedTasks();
+            } else {
+                tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+                if (null == tasks || tasks.getCount() == 0) {
+                    List<Task> taskList = mTasksRemoteDataSource.getTasks();
+                    saveTasksInLocalDataSource(taskList);
+                } else {
+                    saveToLocalCache(tasks);
+                }
+            }
+        }
+
+        return tasks;
+    }
+
+    private boolean hasCachedTasks() {
+        if (null == mCachedTasks) {
+            return false;
+        } else {
+            return mCachedTasks.size() > 0;
+        }
+    }
+
+    private Cursor getCachedTask(String[] selectionArgs) {
+        MatrixCursor matrixCursor = new MatrixCursor(new String[]{
+                TasksPersistenceContract.TaskEntry._ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED});
+
+        Task cachedTask = mCachedTasks.get(selectionArgs[0]);
+        matrixCursor.addRow(new Object[]{
+                cachedTask.getInternalId(),
+                cachedTask.getId(),
+                cachedTask.getTitle(),
+                cachedTask.getDescription(),
+                cachedTask.isCompleted() ? 1 : 0});
+
+        return matrixCursor;
+    }
+
+    private MatrixCursor getCachedTasks() {
+
+        MatrixCursor matrixCursor = new MatrixCursor(new String[]{
+                TasksPersistenceContract.TaskEntry._ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED});
+
+        if (mCachedTasks == null) {
+            return matrixCursor;
+        } else {
+            Iterator it = mCachedTasks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Task cachedTask = (Task) pair.getValue();
+                matrixCursor.addRow(new Object[]{
+                        cachedTask.getInternalId(),
+                        cachedTask.getId(),
+                        cachedTask.getTitle(),
+                        cachedTask.getDescription(),
+                        cachedTask.isCompleted() ? 1 : 0
+                });
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+            return matrixCursor;
+        }
+    }
+
+    private void saveToLocalCache(Cursor tasks) {
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        while (tasks.moveToNext()) {
+            Task newTask = Task.from(tasks);
+            mCachedTasks.put(newTask.getId(), newTask);
+        }
+    }
+
+    private void saveTasksInLocalDataSource(List<Task> tasks) {
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        }
+        if (tasks != null) {
+            for (Task task : tasks) {
+                mTasksLocalDataSource.saveTask(task);
+                mCachedTasks.put(task.getId(), task);
+            }
+        }
     }
 
     private static UriMatcher buildUriMatcher() {
