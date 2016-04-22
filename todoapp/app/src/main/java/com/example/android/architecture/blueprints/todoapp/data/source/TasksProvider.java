@@ -130,7 +130,7 @@ public class TasksProvider extends ContentProvider {
             tasks = getCachedTask(selectionArgs);
         } else {
             if (hasCachedTasks()) {
-                tasks = getCachedTasks();
+                tasks = getCachedTasks(selection, selectionArgs);
             } else {
                 tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
                 if (null == tasks || tasks.getCount() == 0) {
@@ -172,8 +172,7 @@ public class TasksProvider extends ContentProvider {
         return matrixCursor;
     }
 
-    private MatrixCursor getCachedTasks() {
-
+    private MatrixCursor getCachedTasks(String selection, String[] selectionArgs) {
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{
                 TasksPersistenceContract.TaskEntry._ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
@@ -188,13 +187,28 @@ public class TasksProvider extends ContentProvider {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Task cachedTask = (Task) pair.getValue();
-                matrixCursor.addRow(new Object[]{
-                        cachedTask.getInternalId(),
-                        cachedTask.getId(),
-                        cachedTask.getTitle(),
-                        cachedTask.getDescription(),
-                        cachedTask.isCompleted() ? 1 : 0
-                });
+
+                if (selection != null){
+                    boolean taskStateFilter = selectionArgs[0].equals("1");
+                    if (cachedTask.isCompleted() == taskStateFilter){
+                        matrixCursor.addRow(new Object[]{
+                                cachedTask.getInternalId(),
+                                cachedTask.getId(),
+                                cachedTask.getTitle(),
+                                cachedTask.getDescription(),
+                                cachedTask.isCompleted() ? 1 : 0
+                        });
+                    }
+                } else {
+                    matrixCursor.addRow(new Object[]{
+                            cachedTask.getInternalId(),
+                            cachedTask.getId(),
+                            cachedTask.getTitle(),
+                            cachedTask.getDescription(),
+                            cachedTask.isCompleted() ? 1 : 0
+                    });
+                }
+
                 it.remove(); // avoids a ConcurrentModificationException
             }
             return matrixCursor;
