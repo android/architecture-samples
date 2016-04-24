@@ -57,8 +57,8 @@ public class TasksLocalDataSourceTest {
 
     @Before
     public void setup() {
-         mLocalDataSource = TasksLocalDataSource.getInstance(
-                 InstrumentationRegistry.getTargetContext());
+        mLocalDataSource = TasksLocalDataSource.getInstance(
+                InstrumentationRegistry.getTargetContext());
     }
 
     @After
@@ -80,7 +80,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository
-        assertThat(Task.from(mLocalDataSource.getTask(newTask.getId())), is(newTask));
+        Cursor savedTaskCursor = mLocalDataSource.getTask(newTask.getId());
+        Task savedTask = Task.from(savedTaskCursor);
+        assertThat(savedTask, is(newTask));
     }
 
     @Test
@@ -217,7 +219,7 @@ public class TasksLocalDataSourceTest {
 
         boolean newTask1IdFound = false;
         boolean newTask2IdFound = false;
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             if (task.getId().equals(newTask1.getId())) {
                 newTask1IdFound = true;
             }

@@ -126,7 +126,6 @@ public class TasksProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor tasks;
-
         switch (sUriMatcher.match(uri)) {
             case TASK:
                 tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
@@ -138,8 +137,8 @@ public class TasksProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
+        tasks.setNotificationUri(getContext().getContentResolver(), uri);
         return tasks;
-
 
 //            if (hasCachedTasks()) {
 //                tasks = getCachedTasks(selection, selectionArgs);
@@ -164,7 +163,7 @@ public class TasksProvider extends ContentProvider {
 
     private Cursor getCachedTask(String[] selectionArgs) {
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{
-                TasksPersistenceContract.TaskEntry._ID,
+
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
@@ -172,7 +171,7 @@ public class TasksProvider extends ContentProvider {
 
         Task cachedTask = mCachedTasks.get(selectionArgs[0]);
         matrixCursor.addRow(new Object[]{
-                cachedTask.getInternalId(),
+
                 cachedTask.getId(),
                 cachedTask.getTitle(),
                 cachedTask.getDescription(),
@@ -183,7 +182,7 @@ public class TasksProvider extends ContentProvider {
 
     private MatrixCursor getCachedTasks(String selection, String[] selectionArgs) {
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{
-                TasksPersistenceContract.TaskEntry._ID,
+
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE,
                 TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION,
@@ -201,7 +200,7 @@ public class TasksProvider extends ContentProvider {
                     boolean taskStateFilter = selectionArgs[0].equals("1");
                     if (cachedTask.isCompleted() == taskStateFilter) {
                         matrixCursor.addRow(new Object[]{
-                                cachedTask.getInternalId(),
+
                                 cachedTask.getId(),
                                 cachedTask.getTitle(),
                                 cachedTask.getDescription(),
@@ -210,7 +209,7 @@ public class TasksProvider extends ContentProvider {
                     }
                 } else {
                     matrixCursor.addRow(new Object[]{
-                            cachedTask.getInternalId(),
+
                             cachedTask.getId(),
                             cachedTask.getTitle(),
                             cachedTask.getDescription(),
@@ -246,7 +245,7 @@ public class TasksProvider extends ContentProvider {
         }
     }
 
-    private void clearCache(){
+    private void clearCache() {
         if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         } else {

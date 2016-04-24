@@ -110,7 +110,11 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksI
 
     @Override
     public void onDataLoaded(Cursor data) {
-        showTask(data);
+        if (data.moveToLast()) {
+            showTask(data);
+        } else {
+            mTaskDetailView.showMissingTask();
+        }
     }
 
     @Override

@@ -66,15 +66,17 @@ public class TasksLocalDataSource {
     }
 
     public Cursor getTask(@NonNull String taskId) {
+        String[] mSelectionArgs = {""};
+        mSelectionArgs[0] = taskId;
+
         Cursor retCursor = mTasksDbHelper.getReadableDatabase().query(
                 TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
-                new String[]{taskId},
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                mSelectionArgs,
                 null,
                 null,
-                null
-        );
+                null);
         return retCursor;
     }
 

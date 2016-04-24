@@ -95,49 +95,25 @@ public final class Task {
     }
 
     /**
-     * Use this constructor to specify a completed Task if the Task already has an id and it's retrieved from the Content Provider (copy of
-     * another Task).
-     *
-     * @param internalId
-     * @param title
-     * @param description
-     * @param id
-     * @param completed
-     */
-    public Task(int internalId, @Nullable String title, @Nullable String description, String id, boolean completed) {
-        mInternalId = internalId;
-        mId = id;
-        mTitle = title;
-        mDescription = description;
-        mCompleted = completed;
-    }
-
-    /**
      * Use this constructor to return a Task from a Cursor
      *
      * @return
      */
     public static Task from(Cursor cursor) {
-        int rowId = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry._ID));
         String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
         boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(rowId, title, description, entryId, completed);
+        return new Task(title, description, entryId, completed);
     }
 
     public static Task from(ContentValues values) {
-        int rowId = values.getAsInteger(TasksPersistenceContract.TaskEntry._ID);
         String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
         String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
         String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
         boolean completed = values.getAsInteger(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED) == 1;
 
-        return new Task(rowId, title, description, entryId, completed);
-    }
-
-    public int getInternalId() {
-        return mInternalId;
+        return new Task(title, description, entryId, completed);
     }
 
     public String getId() {
