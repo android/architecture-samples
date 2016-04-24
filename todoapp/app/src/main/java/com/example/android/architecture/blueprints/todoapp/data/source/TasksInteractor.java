@@ -147,7 +147,7 @@ public class TasksInteractor {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if (data != null && data.moveToFirst()) {
+            if (data != null) {
                 callback.onDataLoaded(data);
             } else {
                 callback.onDataNotAvailable();

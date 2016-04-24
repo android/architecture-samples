@@ -81,6 +81,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
 
     @Override
     public void onDataNotAvailable() {
+        mTasksView.setLoadingIndicator(false);
         mTasksView.showLoadingTasksError();
     }
 
