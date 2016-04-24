@@ -22,7 +22,7 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 public class AddEditTaskPresenterTest {
 
     @Mock
-    private TasksOperations mTasksOperations;
+    private TasksInteractor mTasksInteractor;
 
     @Mock
     private AddEditTaskContract.View mAddEditTaskView;
@@ -57,7 +57,7 @@ public class AddEditTaskPresenterTest {
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<TasksOperations.GetTasksCallback> mGetTaskCallbackCaptor;
+    private ArgumentCaptor<TasksInteractor.GetTasksCallback> mGetTaskCallbackCaptor;
 
     private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
 
@@ -72,8 +72,8 @@ public class AddEditTaskPresenterTest {
         mActiveTaskCursor = MockCursorProvider.createActiveTaskCursor();
 
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksOperations, mAddEditTaskView,
-                mTaskLoader, mLoaderManager);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksInteractor, mAddEditTaskView,
+                                                         mTaskLoader, mLoaderManager);
 
     }
 
@@ -83,7 +83,7 @@ public class AddEditTaskPresenterTest {
         mAddEditTaskPresenter.createTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
-        verify(mTasksOperations).saveTask(any(Task.class)); // saved to the model
+        verify(mTasksInteractor).saveTask(any(Task.class)); // saved to the model
         verify(mAddEditTaskView).showTasksList(); // shown in the UI
     }
 
@@ -102,7 +102,7 @@ public class AddEditTaskPresenterTest {
         mAddEditTaskPresenter.updateTask("1", "New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
-        verify(mTasksOperations).saveTask(any(Task.class)); // saved to the model
+        verify(mTasksInteractor).saveTask(any(Task.class)); // saved to the model
         verify(mAddEditTaskView).showTasksList(); // shown in the UI
     }
 

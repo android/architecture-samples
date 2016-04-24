@@ -20,7 +20,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksOperations.GetTasksCallback {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksInteractor.GetTasksCallback {
 
     private TaskDetailContract.View mTaskDetailView;
 
@@ -36,13 +36,13 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
     private String mTaskId;
 
     @NonNull
-    private final TasksOperations mTasksOperations;
+    private final TasksInteractor mTasksInteractor;
 
     public TaskDetailPresenter(@NonNull String taskId,
-                               @NonNull TasksOperations tasksOperations,
+                               @NonNull TasksInteractor tasksInteractor,
                                @NonNull TaskDetailContract.View taskDetailView) {
         mTaskId = checkNotNull(taskId, "taskId cannot be null!");
-        mTasksOperations = checkNotNull(tasksOperations, "tasksOperations cannot be null!");
+        mTasksInteractor = checkNotNull(tasksInteractor, "tasksOperations cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskDetailView.setPresenter(this);
     }
@@ -50,7 +50,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
     @Override
     public void start() {
         mTaskDetailView.setLoadingIndicator(true);
-        mTasksOperations.getTask(mTaskId, this);
+        mTasksInteractor.getTask(mTaskId, this);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
 
     @Override
     public void deleteTask() {
-        mTasksOperations.deleteTask(mTask);
+        mTasksInteractor.deleteTask(mTask);
         mTaskDetailView.showTaskDeleted();
     }
 
@@ -73,7 +73,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksOperations.completeTask(mTask);
+        mTasksInteractor.completeTask(mTask);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -83,7 +83,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksO
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksOperations.activateTask(mTask);
+        mTasksInteractor.activateTask(mTask);
         mTaskDetailView.showTaskMarkedActive();
     }
 

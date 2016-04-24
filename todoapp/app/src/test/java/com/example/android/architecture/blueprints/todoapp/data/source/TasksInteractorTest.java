@@ -23,9 +23,9 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class TasksOperationsTest {
+public class TasksInteractorTest {
 
-    private TasksOperations mTasksOperations;
+    private TasksInteractor mTasksInteractor;
 
     @Mock
     private LoaderProvider mLoaderProvider;
@@ -43,7 +43,7 @@ public class TasksOperationsTest {
     private Loader<Cursor> mLoader;
 
     @Captor
-    private ArgumentCaptor<TasksOperations.GetTasksCallback> mTaskCallbackCaptor;
+    private ArgumentCaptor<TasksInteractor.GetTasksCallback> mTaskCallbackCaptor;
 
     private final static String TITLE = "title";
 
@@ -56,7 +56,7 @@ public class TasksOperationsTest {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
-        mTasksOperations = TasksOperations.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
+        mTasksInteractor = TasksInteractor.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
     }
 
     @After
@@ -68,7 +68,7 @@ public class TasksOperationsTest {
     public void getTasks_firstStartsLoader() {
         when(mLoaderManager.getLoader(anyInt())).thenReturn(null);
 
-        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
+        mTasksInteractor.getTasks(mBundle, mTaskCallbackCaptor.capture());
 
         verify(mLoaderManager).initLoader(any(Integer.class), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
     }
@@ -77,7 +77,7 @@ public class TasksOperationsTest {
     public void getTasks_restartsLoaderIfLoaderExists() {
         when(mLoaderManager.getLoader(anyInt())).thenReturn(null);
 
-        mTasksOperations.getTasks(mBundle, mTaskCallbackCaptor.capture());
+        mTasksInteractor.getTasks(mBundle, mTaskCallbackCaptor.capture());
 
         verify(mLoaderManager).restartLoader(any(Integer.class), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
     }
@@ -87,7 +87,7 @@ public class TasksOperationsTest {
         // Given a new task
         final Task task = new Task(TITLE, "");
 
-        mTasksOperations.completeTask(task);
+        mTasksInteractor.completeTask(task);
 
         String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {task.getId()};

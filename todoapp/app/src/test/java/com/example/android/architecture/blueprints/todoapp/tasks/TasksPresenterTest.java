@@ -23,7 +23,7 @@ import android.support.v4.app.LoaderManager;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class TasksPresenterTest {
     private TasksContract.View mTasksView;
 
     @Mock
-    private TasksOperations mTasksOperations;
+    private TasksInteractor mTasksInteractor;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -77,11 +77,11 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Given a task filter
-        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksOperations, mTasksView, taskFilter);
+        mTasksPresenter = new TasksPresenter(mTasksInteractor, mTasksView, taskFilter);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
@@ -91,7 +91,7 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
@@ -105,7 +105,7 @@ public class TasksPresenterTest {
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
-        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with tasks and filter is set to active
@@ -120,7 +120,7 @@ public class TasksPresenterTest {
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
-        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with tasks and filter is set to completed
@@ -163,7 +163,7 @@ public class TasksPresenterTest {
         mTasksPresenter.completeTask(task);
 
         // Then repository is called and task marked complete UI is shown
-        verify(mTasksOperations).completeTask(task);
+        verify(mTasksInteractor).completeTask(task);
         verify(mTasksView).showTaskMarkedComplete();
     }
 
@@ -176,13 +176,13 @@ public class TasksPresenterTest {
         mTasksPresenter.activateTask(task);
 
         // Then repository is called and task marked active UI is shown
-        verify(mTasksOperations).activateTask(task);
+        verify(mTasksInteractor).activateTask(task);
         verify(mTasksView).showTaskMarkedActive();
     }
 
     @Test
     public void unavailableTasks_ShowsError() {
-        when(mBundle.getSerializable(TasksOperations.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with error

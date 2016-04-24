@@ -30,7 +30,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -74,7 +74,7 @@ public class TasksActivity extends AppCompatActivity {
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksOperations tasksOperations = TasksOperations.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        TasksInteractor tasksInteractor = TasksInteractor.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
         // Load previously saved state, if available.
         TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
@@ -85,7 +85,7 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         mTasksPresenter = new TasksPresenter(
-                tasksOperations,
+                tasksInteractor,
                 tasksFragment,
                 taskFilter
         );

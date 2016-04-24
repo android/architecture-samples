@@ -24,7 +24,7 @@ import android.support.v4.app.LoaderManager;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksOperations;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,9 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Injection {
 
-    public static TasksOperations provideTasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
+    public static TasksInteractor provideTasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
 
-        return TasksOperations.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
+        return TasksInteractor.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
     }
 
     public static TasksDataSource provideRemoteDataSource() {

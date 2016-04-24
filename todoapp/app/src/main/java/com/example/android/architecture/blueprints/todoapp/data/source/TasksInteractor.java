@@ -12,9 +12,9 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
-public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static TasksOperations INSTANCE;
+    private static TasksInteractor INSTANCE;
 
     private final static int TASKS_LOADER = 1;
     private final static int TASK_LOADER = 2;
@@ -28,25 +28,25 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private GetTasksCallback callback;
 
-    public static TasksOperations getInstance(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
+    public static TasksInteractor getInstance(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksOperations(mLoaderProvider, mLoaderManager, mContentResolver);
+            INSTANCE = new TasksInteractor(mLoaderProvider, mLoaderManager, mContentResolver);
         }
         return INSTANCE;
     }
 
-    private TasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver contentResolver) {
+    private TasksInteractor(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver contentResolver) {
         this.mLoaderProvider = mLoaderProvider;
         this.mLoaderManager = mLoaderManager;
         this.mContentResolver = contentResolver;
     }
 
-    public void getTasks(Bundle extras, GetTasksCallback callback) {
+    public void getTasks(final Bundle extras, final GetTasksCallback callback) {
         this.callback = callback;
         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
-            mLoaderManager.initLoader(TASKS_LOADER, extras, this);
+            mLoaderManager.initLoader(TASKS_LOADER, extras, new GetTasksLoaderCallback(callback));
         } else {
-            mLoaderManager.restartLoader(TASKS_LOADER, extras, this);
+            mLoaderManager.restartLoader(TASKS_LOADER, extras, new GetTasksLoaderCallback(callback));
         }
     }
 
@@ -54,7 +54,7 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         this.callback = callback;
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(TasksOperations.KEY_TASK_ID, taskId);
+        bundle.putSerializable(TasksInteractor.KEY_TASK_ID, taskId);
 
         if (mLoaderManager.getLoader(TASK_LOADER) == null) {
             mLoaderManager.initLoader(TASK_LOADER, bundle, this);
@@ -155,6 +155,34 @@ public class TasksOperations implements LoaderManager.LoaderCallbacks<Cursor> {
         void onDataLoaded(Cursor data);
 
         void onDataNotAvailable();
+    }
+
+    private class GetTasksLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
+        private final GetTasksCallback callback;
+
+        public GetTasksLoaderCallback(GetTasksCallback callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
+            return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if (data != null) {
+                callback.onDataLoaded(data);
+            } else {
+                callback.onDataNotAvailable();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
     }
 
 }
