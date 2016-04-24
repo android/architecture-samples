@@ -12,7 +12,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
-public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TasksInteractor {
 
     private static TasksInteractor INSTANCE;
 
@@ -25,8 +25,6 @@ public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
     private final LoaderProvider mLoaderProvider;
     private final LoaderManager mLoaderManager;
     private final ContentResolver mContentResolver;
-
-    private GetTasksCallback callback;
 
     public static TasksInteractor getInstance(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
         if (INSTANCE == null) {
@@ -42,24 +40,21 @@ public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     public void getTasks(final Bundle extras, final GetTasksCallback callback) {
-        this.callback = callback;
         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
-            mLoaderManager.initLoader(TASKS_LOADER, extras, new GetTasksLoaderCallback(callback));
+            mLoaderManager.initLoader(TASKS_LOADER, extras, new TasksCursorLoaderCallback(callback));
         } else {
-            mLoaderManager.restartLoader(TASKS_LOADER, extras, new GetTasksLoaderCallback(callback));
+            mLoaderManager.restartLoader(TASKS_LOADER, extras, new TasksCursorLoaderCallback(callback));
         }
     }
 
     public void getTask(String taskId, GetTasksCallback callback) {
-        this.callback = callback;
-
         Bundle bundle = new Bundle();
         bundle.putSerializable(TasksInteractor.KEY_TASK_ID, taskId);
 
         if (mLoaderManager.getLoader(TASK_LOADER) == null) {
-            mLoaderManager.initLoader(TASK_LOADER, bundle, this);
+            mLoaderManager.initLoader(TASK_LOADER, bundle, new TasksCursorLoaderCallback(callback));
         } else {
-            mLoaderManager.restartLoader(TASK_LOADER, bundle, this);
+            mLoaderManager.restartLoader(TASK_LOADER, bundle, new TasksCursorLoaderCallback(callback));
         }
     }
 
@@ -122,57 +117,37 @@ public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
         mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case TASKS_LOADER:
-                TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
-                return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
-            case TASK_LOADER:
-                String taskId = args.getString(KEY_TASK_ID);
-                return mLoaderProvider.createTaskLoader(taskId);
-            default:
-                throw new IllegalArgumentException("Loader Id not recognised");
-        }
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null) {
-            callback.onDataLoaded(data);
-        } else {
-            callback.onDataNotAvailable();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
     public interface GetTasksCallback {
         void onDataLoaded(Cursor data);
 
         void onDataNotAvailable();
     }
 
-    private class GetTasksLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
+    private class TasksCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
         private final GetTasksCallback callback;
 
-        public GetTasksLoaderCallback(GetTasksCallback callback) {
+        public TasksCursorLoaderCallback(GetTasksCallback callback) {
             this.callback = callback;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
-            return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
+            switch (id) {
+                case TASKS_LOADER:
+                    TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
+                    return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
+                case TASK_LOADER:
+                    String taskId = args.getString(KEY_TASK_ID);
+                    return mLoaderProvider.createTaskLoader(taskId);
+                default:
+                    throw new IllegalArgumentException("Loader Id not recognised");
+            }
+
         }
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if (data != null) {
+            if (data != null && data.moveToFirst()) {
                 callback.onDataLoaded(data);
             } else {
                 callback.onDataNotAvailable();
@@ -183,6 +158,7 @@ public class TasksInteractor implements LoaderManager.LoaderCallbacks<Cursor> {
         public void onLoaderReset(Loader<Cursor> loader) {
 
         }
+
     }
 
 }

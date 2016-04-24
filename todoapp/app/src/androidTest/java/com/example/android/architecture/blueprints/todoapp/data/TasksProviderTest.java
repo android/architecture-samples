@@ -3,12 +3,19 @@ package com.example.android.architecture.blueprints.todoapp.data;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
+import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
 
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,10 +24,31 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class TasksProviderTest extends AndroidTestCase {
 
+    TasksDataSource mTasksRemoteDataSource;
+    TasksLocalDataSource mTasksLocalDataSource;
+
+    private static List<Task> REMOTE_TASKS = Lists.newArrayList(
+            new Task("Title1", "Description1"),
+            new Task("Title2", "Description2")
+    );
+
     @Before
     public void setUp() throws Exception {
         setContext(InstrumentationRegistry.getTargetContext());
+        mTasksLocalDataSource = TasksLocalDataSource.getInstance(mContext);
+        mTasksRemoteDataSource = TasksRemoteDataSource.getInstance();
+
+        deleteAllTasks();
+
         super.setUp();
+    }
+
+    private void deleteAllTasks() {
+        mContext.getContentResolver().delete(
+                TasksPersistenceContract.BASE_CONTENT_URI,
+                null,
+                null
+        );
     }
 
     /*
@@ -70,6 +98,21 @@ public class TasksProviderTest extends AndroidTestCase {
         assertEquals("Error: the WeatherEntry CONTENT_URI with location should return TasksPersistenceContract.CONTENT_TASK_ITEM_TYPE",
                      TasksPersistenceContract.CONTENT_TASK_ITEM_TYPE, type
         );
+    }
+
+    @Test
+    public void getTasks_returnsEmptyWhenFirstQueried() {
+        Cursor tasksCursor = mContext.getContentResolver().query(
+                TasksPersistenceContract.BASE_CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // Make sure we get the correct cursor out of the database
+        ProviderUtilities.assertCursorEmpty(tasksCursor);
+
     }
 
 }

@@ -66,7 +66,12 @@ public class TasksProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int rowsDeleted;
 
-        if (selectionArgs.equals("1")) {
+        if (null == selection) {
+            mTasksRemoteDataSource.deleteAllTasks();
+            rowsDeleted = mTasksLocalDataSource.deleteAllTasks();
+            clearCache();
+
+        } else if (selectionArgs.equals("1")) {
             mTasksRemoteDataSource.clearCompletedTasks();
             rowsDeleted = mTasksLocalDataSource.clearCompletedTasks(selection, selectionArgs);
 
@@ -77,7 +82,7 @@ public class TasksProvider extends ContentProvider {
                     it.remove();
                 }
             }
-        } else if (selectionArgs.length == 1) {
+        } else {
             String taskId = selectionArgs[0];
             mTasksRemoteDataSource.deleteTask(taskId);
             rowsDeleted = mTasksLocalDataSource.deleteTask(selectionArgs);
@@ -89,11 +94,6 @@ public class TasksProvider extends ContentProvider {
                     it.remove();
                 }
             }
-
-        } else {
-            mTasksRemoteDataSource.deleteAllTasks();
-            rowsDeleted = mTasksLocalDataSource.deleteAllTasks();
-            mCachedTasks.clear();
         }
 
         if (selection == null || rowsDeleted != 0) {
@@ -188,9 +188,9 @@ public class TasksProvider extends ContentProvider {
                 Map.Entry pair = (Map.Entry) it.next();
                 Task cachedTask = (Task) pair.getValue();
 
-                if (selection != null){
+                if (selection != null) {
                     boolean taskStateFilter = selectionArgs[0].equals("1");
-                    if (cachedTask.isCompleted() == taskStateFilter){
+                    if (cachedTask.isCompleted() == taskStateFilter) {
                         matrixCursor.addRow(new Object[]{
                                 cachedTask.getInternalId(),
                                 cachedTask.getId(),
@@ -234,6 +234,14 @@ public class TasksProvider extends ContentProvider {
                 mTasksLocalDataSource.saveTask(task);
                 mCachedTasks.put(task.getId(), task);
             }
+        }
+    }
+
+    private void clearCache(){
+        if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
+        } else {
+            mCachedTasks.clear();
         }
     }
 
