@@ -77,6 +77,8 @@ public class MockCursorProvider {
         return new TaskMockCursor(entryList);
     }
 
+
+
     public static class TaskMockCursor extends MockCursor {
         Map<Integer, Object> entry;
         int cursorIndex;
