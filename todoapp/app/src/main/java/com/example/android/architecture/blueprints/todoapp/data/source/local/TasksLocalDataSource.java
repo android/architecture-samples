@@ -68,10 +68,9 @@ public class TasksLocalDataSource {
     public Cursor getTask(@NonNull String taskId) {
         Cursor retCursor = mTasksDbHelper.getReadableDatabase().query(
                 TasksPersistenceContract.TaskEntry.TABLE_NAME,
-                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
-                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID +
-                        " = '" + taskId + "'",
-                null,
+                new String[]{TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID},
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?",
+                new String[]{taskId},
                 null,
                 null,
                 null

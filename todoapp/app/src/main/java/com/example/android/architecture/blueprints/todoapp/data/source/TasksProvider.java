@@ -26,6 +26,7 @@ public class TasksProvider extends ContentProvider {
     private TasksLocalDataSource mTasksLocalDataSource;
 
     private static final int TASK = 100;
+    private static final int TASK_ITEM = 101;
 
     /**
      * This variable has package local visibility so it can be accessed from tests.
@@ -112,7 +113,7 @@ public class TasksProvider extends ContentProvider {
         }
 
         int rowsUpdated = mTasksLocalDataSource.updateTask(values, selectionArgs);
-        mCachedTasks.put(newTask.getId(), newTask);
+//        mCachedTasks.put(newTask.getId(), newTask);
 
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
@@ -126,12 +127,19 @@ public class TasksProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor tasks;
 
-        if (null != selection && selection.startsWith(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)) {
-            tasks = mTasksLocalDataSource.getTask(selectionArgs[0]);
-//            tasks = getCachedTask(selectionArgs);
-        } else {
+        switch (sUriMatcher.match(uri)) {
+            case TASK:
+                tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+                break;
+            case TASK_ITEM:
+                tasks = mTasksLocalDataSource.getTask(uri.getLastPathSegment());
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
 
-            tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+        return tasks;
+
 
 //            if (hasCachedTasks()) {
 //                tasks = getCachedTasks(selection, selectionArgs);
@@ -144,9 +152,6 @@ public class TasksProvider extends ContentProvider {
 //                    saveToLocalCache(tasks);
 //                }
 //            }
-        }
-
-        return tasks;
     }
 
     private boolean hasCachedTasks() {
@@ -254,6 +259,7 @@ public class TasksProvider extends ContentProvider {
         final String authority = TasksPersistenceContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
 
         return matcher;
     }
