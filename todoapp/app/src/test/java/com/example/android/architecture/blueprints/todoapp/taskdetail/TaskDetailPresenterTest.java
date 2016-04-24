@@ -37,14 +37,8 @@ import static org.mockito.Mockito.verify;
 public class TaskDetailPresenterTest {
 
     public static final String TITLE_TEST = "Title";
-
     public static final String DESCRIPTION_TEST = "Description";
-
     public static final String INVALID_TASK_ID = "";
-
-    public static final Task ACTIVE_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST);
-
-    public static final Task COMPLETED_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
 
     @Mock
     private TaskDetailContract.View mTaskDetailFragment;
@@ -60,6 +54,8 @@ public class TaskDetailPresenterTest {
 
     private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
     private MockCursorProvider.TaskMockCursor mCompletedTaskCursor;
+    private Task mActiveTask;
+    private Task mCompletedTask;
 
     private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -71,13 +67,16 @@ public class TaskDetailPresenterTest {
 
         mActiveTaskCursor = MockCursorProvider.createActiveTaskCursor();
         mCompletedTaskCursor = MockCursorProvider.createCompletedTaskCursor();
+
+        mActiveTask = Task.from(mActiveTaskCursor);
+        mCompletedTask = Task.from(mCompletedTaskCursor);
     }
 
     @Test
     public void getActiveTaskFromRepositoryAndLoadIntoView() {
         // Get a reference to the class under test
         mTaskDetailPresenter = new TaskDetailPresenter(
-                ACTIVE_TASK.getId(), mTasksInteractor, mTaskDetailFragment
+                mActiveTask.getId(), mTasksInteractor, mTaskDetailFragment
         );
 
         // When tasks presenter is asked to open an ACTIVE_TASK
@@ -93,7 +92,7 @@ public class TaskDetailPresenterTest {
     @Test
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
         // When tasks presenter is asked to open a completed task
-        mTaskDetailPresenter = new TaskDetailPresenter(COMPLETED_TASK.getId(), mTasksInteractor,
+        mTaskDetailPresenter = new TaskDetailPresenter(mCompletedTask.getId(), mTasksInteractor,
                                                        mTaskDetailFragment
         );
         mTaskDetailPresenter.onDataLoaded(mCompletedTaskCursor);
@@ -121,52 +120,65 @@ public class TaskDetailPresenterTest {
     @Test
     public void deleteTask() {
         // When the deletion of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksInteractor,
+        mTaskDetailPresenter = new TaskDetailPresenter(mActiveTask.getId(), mTasksInteractor,
                                                        mTaskDetailFragment
         );
+        mTaskDetailPresenter.onDataLoaded(mActiveTaskCursor);
+
         mTaskDetailPresenter.deleteTask();
 
         // Then the repository and the view are notified
-        verify(mTasksInteractor).deleteTask(ACTIVE_TASK);
+        verify(mTasksInteractor).deleteTask(mActiveTask);
         verify(mTaskDetailFragment).showTaskDeleted();
     }
 
     @Test
     public void completeTask() {
         // When the presenter is asked to complete the ACTIVE_TASK
-        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksInteractor,
-                                                       mTaskDetailFragment
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                mActiveTask.getId(), mTasksInteractor,
+                mTaskDetailFragment
         );
+        mTaskDetailPresenter.onDataLoaded(mActiveTaskCursor);
+
         mTaskDetailPresenter.completeTask();
 
         // Then a request is sent to the repository and the UI is updated
-        verify(mTasksInteractor).completeTask(ACTIVE_TASK);
+        verify(mTasksInteractor).completeTask(mActiveTask);
         verify(mTaskDetailFragment).showTaskMarkedComplete();
     }
 
     @Test
     public void activateTask() {
         // When the presenter is asked to activate the ACTIVE_TASK
-        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksInteractor,
-                                                       mTaskDetailFragment
+        Task completedTask = Task.from(mCompletedTaskCursor);
+
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                completedTask.getId(), mTasksInteractor,
+                mTaskDetailFragment
         );
+        mTaskDetailPresenter.onDataLoaded(mCompletedTaskCursor);
+
         mTaskDetailPresenter.activateTask();
 
         // Then a request is sent to the repository and the UI is updated
-        verify(mTasksInteractor).activateTask(ACTIVE_TASK);
+        verify(mTasksInteractor).activateTask(completedTask);
         verify(mTaskDetailFragment).showTaskMarkedActive();
     }
 
     @Test
     public void activeTaskIsShownWhenEditing() {
         // When the edit of an ACTIVE_TASK is requested
-        mTaskDetailPresenter = new TaskDetailPresenter(ACTIVE_TASK.getId(), mTasksInteractor,
+        mTaskDetailPresenter = new TaskDetailPresenter(
+                mActiveTask.getId(), mTasksInteractor,
                                                        mTaskDetailFragment
         );
+        mTaskDetailPresenter.onDataLoaded(mActiveTaskCursor);
+
         mTaskDetailPresenter.editTask();
 
         // Then the view is notified
-        verify(mTaskDetailFragment).showEditTask(ACTIVE_TASK.getId());
+        verify(mTaskDetailFragment).showEditTask(mActiveTask.getId());
     }
 
     @Test

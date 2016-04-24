@@ -127,19 +127,23 @@ public class TasksProvider extends ContentProvider {
         Cursor tasks;
 
         if (null != selection && selection.startsWith(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID)) {
-            tasks = getCachedTask(selectionArgs);
+            tasks = mTasksLocalDataSource.getTask(selectionArgs[0]);
+//            tasks = getCachedTask(selectionArgs);
         } else {
-            if (hasCachedTasks()) {
-                tasks = getCachedTasks(selection, selectionArgs);
-            } else {
-                tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
-                if (null == tasks || tasks.getCount() == 0) {
-                    List<Task> taskList = mTasksRemoteDataSource.getTasks();
-                    saveTasksInLocalDataSource(taskList);
-                } else {
-                    saveToLocalCache(tasks);
-                }
-            }
+
+            tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+
+//            if (hasCachedTasks()) {
+//                tasks = getCachedTasks(selection, selectionArgs);
+//            } else {
+//                tasks = mTasksLocalDataSource.getTasks(selection, selectionArgs);
+//                if (null == tasks || tasks.getCount() == 0) {
+//                    List<Task> taskList = mTasksRemoteDataSource.getTasks();
+//                    saveTasksInLocalDataSource(taskList);
+//                } else {
+//                    saveToLocalCache(tasks);
+//                }
+//            }
         }
 
         return tasks;
