@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class FilterFactory {
 
-    private final static Map<TasksFilterType, TaskFilter> mFilters = new HashMap<>();
+    private static final Map<TasksFilterType, TaskFilter> mFilters = new HashMap<>();
 
     public FilterFactory() {
         mFilters.put(TasksFilterType.ALL_TASKS, new FilterAllTaskFilter());

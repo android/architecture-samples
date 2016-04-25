@@ -34,17 +34,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
-
-    @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
-    @NonNull
     private final GetTask mGetTask;
 
-    @NonNull
     private final SaveTask mSaveTask;
 
-    @NonNull
     private final UseCaseHandler mUseCaseHandler;
 
     @Nullable
@@ -59,11 +54,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     public AddEditTaskPresenter(@NonNull UseCaseHandler useCaseHandler, @Nullable String taskId,
             @NonNull AddEditTaskContract.View addTaskView, @NonNull GetTask getTask,
             @NonNull SaveTask saveTask) {
-        mUseCaseHandler = useCaseHandler;
+        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskId = taskId;
-        mAddTaskView = checkNotNull(addTaskView);
-        mGetTask = checkNotNull(getTask);
-        mSaveTask = checkNotNull(saveTask);
+        mAddTaskView = checkNotNull(addTaskView, "addTaskView cannot be null!");
+        mGetTask = checkNotNull(getTask, "getTask cannot be null!");
+        mSaveTask = checkNotNull(saveTask, "saveTask cannot be null!");
 
         mAddTaskView.setPresenter(this);
     }

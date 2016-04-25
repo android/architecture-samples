@@ -48,11 +48,11 @@ import static org.mockito.Mockito.verify;
 @LargeTest
 public class TasksLocalDataSourceTest {
 
-    private final static String TITLE = "title";
+    private static final String TITLE = "title";
 
-    private final static String TITLE2 = "title2";
+    private static final String TITLE2 = "title2";
 
-    private final static String TITLE3 = "title3";
+    private static final String TITLE3 = "title3";
 
     private TasksLocalDataSource mLocalDataSource;
 

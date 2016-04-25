@@ -66,11 +66,11 @@ import org.junit.runner.RunWith;
 @LargeTest
 public class TasksScreenTest {
 
-    private final static String TITLE1 = "TITLE1";
+    private static final String TITLE1 = "TITLE1";
 
-    private final static String DESCRIPTION = "DESCR";
+    private static final String DESCRIPTION = "DESCR";
 
-    private final static String TITLE2 = "TITLE2";
+    private static final String TITLE2 = "TITLE2";
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.

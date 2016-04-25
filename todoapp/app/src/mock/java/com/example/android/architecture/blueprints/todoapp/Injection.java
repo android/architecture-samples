@@ -55,27 +55,27 @@ public class Injection {
         return UseCaseHandler.getInstance();
     }
 
-    public static GetTask provideGetTask(Context context) {
+    public static GetTask provideGetTask(@NonNull Context context) {
         return new GetTask(Injection.provideTasksRepository(context));
     }
 
-    public static SaveTask provideSaveTask(Context context) {
+    public static SaveTask provideSaveTask(@NonNull Context context) {
         return new SaveTask(Injection.provideTasksRepository(context));
     }
 
-    public static CompleteTask provideCompleteTasks(Context context) {
+    public static CompleteTask provideCompleteTasks(@NonNull Context context) {
         return new CompleteTask(Injection.provideTasksRepository(context));
     }
 
-    public static ActivateTask provideActivateTask(Context context) {
+    public static ActivateTask provideActivateTask(@NonNull Context context) {
         return new ActivateTask(Injection.provideTasksRepository(context));
     }
 
-    public static ClearCompleteTasks provideClearCompleteTasks(Context context) {
+    public static ClearCompleteTasks provideClearCompleteTasks(@NonNull Context context) {
         return new ClearCompleteTasks(Injection.provideTasksRepository(context));
     }
 
-    public static DeleteTask provideDeleteTask(Context context) {
+    public static DeleteTask provideDeleteTask(@NonNull Context context) {
         return new DeleteTask(Injection.provideTasksRepository(context));
     }
 }

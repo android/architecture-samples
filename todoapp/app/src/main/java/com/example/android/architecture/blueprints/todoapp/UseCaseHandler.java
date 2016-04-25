@@ -29,7 +29,7 @@ public class UseCaseHandler {
     private final UseCaseScheduler mUseCaseScheduler;
 
     public UseCaseHandler(UseCaseScheduler useCaseScheduler) {
-        this.mUseCaseScheduler = useCaseScheduler;
+        mUseCaseScheduler = useCaseScheduler;
     }
 
     public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> void execute(
@@ -67,7 +67,7 @@ public class UseCaseHandler {
         mUseCaseScheduler.onError(error, useCaseCallback);
     }
 
-    private class UiCallbackWrapper<V extends UseCase.ResponseValue> implements
+    private static final class UiCallbackWrapper<V extends UseCase.ResponseValue> implements
             UseCase.UseCaseCallback<V> {
         private final UseCase.UseCaseCallback<V> mCallback;
         private final UseCaseHandler mUseCaseHandler;
