@@ -84,7 +84,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
             }
 
             @Override
-            public void onError(Error error) {
+            public void onError() {
                 // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;
