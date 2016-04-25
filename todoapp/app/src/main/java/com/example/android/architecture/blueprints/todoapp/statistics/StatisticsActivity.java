@@ -28,6 +28,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -65,12 +66,15 @@ public class StatisticsActivity extends AppCompatActivity {
         if (statisticsFragment == null) {
             statisticsFragment = StatisticsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    statisticsFragment, R.id.contentFrame);
+                                                statisticsFragment, R.id.contentFrame
+            );
         }
 
+        // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
+        TasksInteractor tasksInteractor = TasksInteractor.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
 
-        new StatisticsPresenter(statisticsFragment, loaderProvider, getSupportLoaderManager());
+        new StatisticsPresenter(tasksInteractor, statisticsFragment);
     }
 
     @Override
@@ -94,7 +98,7 @@ public class StatisticsActivity extends AppCompatActivity {
                                 Intent intent =
                                         new Intent(StatisticsActivity.this, TasksActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             case R.id.statistics_navigation_menu_item:
