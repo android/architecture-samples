@@ -47,9 +47,9 @@ public class LoaderProvider {
     }
 
     public Loader<Cursor> createTaskLoader(String taskId) {
-        return new CursorLoader(mContext, TasksPersistenceContract.TaskEntry.buildTasksUri(),
-                                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
-                                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " = ? ",
+        return new CursorLoader(mContext, TasksPersistenceContract.TaskEntry.buildTasksUriWith(taskId),
+                                null,
+                                null,
                                 new String[]{String.valueOf(taskId)}, null
         );
     }

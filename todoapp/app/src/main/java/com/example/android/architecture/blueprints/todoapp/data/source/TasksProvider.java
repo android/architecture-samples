@@ -47,6 +47,8 @@ public class TasksProvider extends ContentProvider {
         switch (match) {
             case TASK:
                 return TasksPersistenceContract.CONTENT_TASK_TYPE;
+            case TASK_ITEM:
+                return TasksPersistenceContract.CONTENT_TASK_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -74,7 +76,7 @@ public class TasksProvider extends ContentProvider {
 
         } else if (selectionArgs.equals("1")) {
             mTasksRemoteDataSource.clearCompletedTasks();
-            rowsDeleted = mTasksLocalDataSource.clearCompletedTasks(selection, selectionArgs);
+            rowsDeleted = mTasksLocalDataSource.clearCompletedTasks();
 
             Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
             while (it.hasNext()) {
@@ -86,7 +88,7 @@ public class TasksProvider extends ContentProvider {
         } else {
             String taskId = selectionArgs[0];
             mTasksRemoteDataSource.deleteTask(taskId);
-            rowsDeleted = mTasksLocalDataSource.deleteTask(selectionArgs);
+            rowsDeleted = mTasksLocalDataSource.deleteTask(taskId);
 
             Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
             while (it.hasNext()) {
@@ -106,13 +108,15 @@ public class TasksProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Task newTask = Task.from(values);
+        int rowsUpdated;
         if (newTask.isCompleted()) {
             mTasksRemoteDataSource.completeTask(newTask);
+            rowsUpdated = mTasksLocalDataSource.completeTask(newTask);
         } else {
             mTasksRemoteDataSource.activateTask(newTask);
+            rowsUpdated = mTasksLocalDataSource.activateTask(newTask);
         }
 
-        int rowsUpdated = mTasksLocalDataSource.updateTask(values, selectionArgs);
 //        mCachedTasks.put(newTask.getId(), newTask);
 
         if (rowsUpdated != 0) {
