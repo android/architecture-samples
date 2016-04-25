@@ -27,7 +27,6 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 
@@ -103,7 +102,7 @@ public class StatisticsScreenTest {
     @Before
     public void intentWithStubbedTaskId() {
         // Given some tasks
-        TasksRepository.destroyInstance();
+
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
 
