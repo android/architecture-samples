@@ -32,8 +32,8 @@ public class TestUseCaseScheduler implements UseCaseScheduler {
     }
 
     @Override
-    public <R extends UseCase.ResponseValue> void onError(Error error,
+    public <R extends UseCase.ResponseValue> void onError(
             UseCase.UseCaseCallback<R> useCaseCallback) {
-        useCaseCallback.onError(error);
+        useCaseCallback.onError();
     }
 }

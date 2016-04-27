@@ -118,7 +118,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         // The view may not be able to handle UI updates anymore
                         if (!mTasksView.isActive()) {
                             return;
@@ -192,7 +192,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         mTasksView.showLoadingTasksError();
                     }
                 });
@@ -210,7 +210,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         mTasksView.showLoadingTasksError();
                     }
                 });
@@ -227,7 +227,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         mTasksView.showLoadingTasksError();
                     }
                 });

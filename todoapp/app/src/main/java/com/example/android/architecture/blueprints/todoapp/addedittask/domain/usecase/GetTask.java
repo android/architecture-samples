@@ -16,15 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.base.domain.error.DataNotAvailableError;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Retrieves a {@link Task} from the {@link TasksRepository}.
@@ -48,7 +47,7 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
 
             @Override
             public void onDataNotAvailable() {
-                getUseCaseCallback().onError(new DataNotAvailableError());
+                getUseCaseCallback().onError();
             }
         });
     }

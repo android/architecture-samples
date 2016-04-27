@@ -94,7 +94,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         // The view may not be able to handle UI updates anymore
                         if (!mTaskDetailView.isActive()) {
                             return;
@@ -123,7 +123,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         // Show error, log, etc.
                     }
                 });
@@ -144,7 +144,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         // Show error, log, etc.
                     }
                 });
@@ -164,7 +164,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         // Show error, log, etc.
                     }
                 });

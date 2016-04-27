@@ -84,7 +84,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                         }
 
                         @Override
-                        public void onError(Error error) {
+                        public void onError() {
                             showSaveError();
                         }
                     });
@@ -106,7 +106,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         showSaveError();
                     }
                 });
@@ -126,7 +126,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                     }
 
                     @Override
-                    public void onError(Error error) {
+                    public void onError() {
                         showEmptyTaskError();
                     }
                 });
