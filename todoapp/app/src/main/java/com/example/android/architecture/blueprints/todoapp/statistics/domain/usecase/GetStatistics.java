@@ -6,8 +6,7 @@ import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.TaskFilter;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.Statistics;
 
 import java.util.List;
 

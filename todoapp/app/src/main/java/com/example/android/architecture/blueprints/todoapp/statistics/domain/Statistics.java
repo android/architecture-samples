@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase;
+package com.example.android.architecture.blueprints.todoapp.statistics.domain;
 
 public class Statistics {
 
