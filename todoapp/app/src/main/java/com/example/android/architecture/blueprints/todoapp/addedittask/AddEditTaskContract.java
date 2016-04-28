@@ -16,30 +16,33 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
+import com.example.android.architecture.blueprints.todoapp.BaseView;
+
 /**
  * This specifies the contract between the view and the presenter.
  */
 public interface AddEditTaskContract {
 
-    interface View {
+    interface View extends BaseView<Presenter> {
 
         void showEmptyTaskError();
 
         void showTasksList();
 
-        void setUserActionListener(UserActionsListener listener);
-
         void setTitle(String title);
 
         void setDescription(String description);
+
+        boolean isActive();
     }
 
-    interface UserActionsListener {
+    interface Presenter extends BasePresenter {
 
         void createTask(String title, String description);
 
-        void updateTask(String taskId, String title, String description);
+        void updateTask( String title, String description);
 
-        void populateTask(String taskId);
+        void populateTask();
     }
 }

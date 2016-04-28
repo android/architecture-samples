@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -50,12 +51,20 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
-        // Add fragment to activity unless there is a saved state (orientation change), in which
-        // case the system will recreate the Fragment automatically
-        if (savedInstanceState == null) {
+        TaskDetailFragment taskDetailFragment = (TaskDetailFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+
+        if (taskDetailFragment == null) {
+            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
+
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TaskDetailFragment.newInstance(taskId), R.id.contentFrame);
+                    taskDetailFragment, R.id.contentFrame);
         }
+
+        DaggerTaskDetailComponent.builder()
+                .taskDetailPresenterModule(new TaskDetailPresenterModule(taskDetailFragment, taskId))
+                .tasksRepositoryComponent(((ToDoApplication) getApplication())
+                        .getTasksRepositoryComponent()).build().getTaskDetailPresenter();
     }
 
     @Override

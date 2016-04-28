@@ -16,7 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 
 /**
  * Main UI for the statistics screen.
@@ -34,26 +36,21 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.UserActionsListener mActionsListener;
+    private StatisticsContract.Presenter mPresenter;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mActionsListener = DaggerStatisticsFragmentComponent.builder()
-                .statisticsPresenterModule(new StatisticsPresenterModule(this))
-                .tasksRepositoryComponent(((ToDoApplication) getActivity().getApplication())
-                        .getTasksRepositoryComponent())
-                .build().getStatisticsPresenter();
+    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
         return root;
@@ -62,7 +59,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mActionsListener.loadStatistics();
+        mPresenter.start();
     }
 
     @Override
@@ -75,7 +72,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public void displayStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
+    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {
@@ -92,7 +89,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public boolean isInactive() {
-        return !isAdded();
+    public boolean isActive() {
+        return isAdded();
     }
 }

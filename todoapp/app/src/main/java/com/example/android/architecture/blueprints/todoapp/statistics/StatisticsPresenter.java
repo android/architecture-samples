@@ -38,7 +38,7 @@ import javax.inject.Inject;
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  **/
-final class StatisticsPresenter implements StatisticsContract.UserActionsListener {
+final class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
@@ -55,8 +55,21 @@ final class StatisticsPresenter implements StatisticsContract.UserActionsListene
         mStatisticsView = statisticsView;
     }
 
+    /**
+     * Method injection is used here to safely reference {@code this} after the object is created.
+     * For more information, see Java Concurrency in Practice.
+     */
+    @Inject
+    void setupListeners() {
+        mStatisticsView.setPresenter(this);
+    }
+
     @Override
-    public void loadStatistics() {
+    public void start() {
+        loadStatistics();
+    }
+
+    private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows
@@ -84,22 +97,21 @@ final class StatisticsPresenter implements StatisticsContract.UserActionsListene
                         activeTasks += 1;
                     }
                 }
-
-                if (mStatisticsView.isInactive()) {
+                // The view may not be able to handle UI updates anymore
+                if (!mStatisticsView.isActive()) {
                     return;
                 }
-
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.displayStatistics(activeTasks, completedTasks);
+                mStatisticsView.showStatistics(activeTasks, completedTasks);
             }
 
             @Override
             public void onDataNotAvailable() {
-                if (mStatisticsView.isInactive()) {
+                // The view may not be able to handle UI updates anymore
+                if (!mStatisticsView.isActive()) {
                     return;
                 }
-
                 mStatisticsView.showLoadingStatisticsError();
             }
         });

@@ -1,5 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.support.annotation.Nullable;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -12,12 +14,21 @@ public class AddEditTaskPresenterModule {
 
     private final AddEditTaskContract.View mView;
 
-    public AddEditTaskPresenterModule(AddEditTaskContract.View view) {
+    private String mTaskId;
+
+    public AddEditTaskPresenterModule(AddEditTaskContract.View view, @Nullable String taskId) {
         mView = view;
+        mTaskId = taskId;
     }
 
     @Provides
     AddEditTaskContract.View provideAddEditTaskContractView() {
         return mView;
+    }
+
+    @Provides
+    @Nullable
+    String provideTaskId() {
+        return mTaskId;
     }
 }

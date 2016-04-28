@@ -61,11 +61,10 @@ public class TasksRepository implements TasksDataSource {
     Map<String, Task> mCachedTasks;
 
     /**
-     * Marks the cache as invalid, to force an update the next time data is requested. This
-     * variable
+     * Marks the cache as invalid, to force an update the next time data is requested. This variable
      * has package local visibility so it can be accessed from tests.
      */
-    boolean mCacheIsDirty;
+    boolean mCacheIsDirty = false;
 
     /**
      * By marking the constructor with {@code @Inject}, Dagger will try to inject the dependencies
@@ -111,7 +110,8 @@ public class TasksRepository implements TasksDataSource {
             mTasksLocalDataSource.getTasks(new LoadTasksCallback() {
                 @Override
                 public void onTasksLoaded(List<Task> tasks) {
-                    processLoadedTasks(tasks, callback);
+                    refreshCache(tasks);
+                    callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
                 }
 
                 @Override
@@ -269,7 +269,9 @@ public class TasksRepository implements TasksDataSource {
         mTasksRemoteDataSource.getTasks(new LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                processLoadedTasks(tasks, callback);
+                refreshCache(tasks);
+                refreshLocalDataSource(tasks);
+                callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
             }
 
             @Override
@@ -279,7 +281,7 @@ public class TasksRepository implements TasksDataSource {
         });
     }
 
-    private void processLoadedTasks(List<Task> tasks, final LoadTasksCallback callback) {
+    private void refreshCache(List<Task> tasks) {
         if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         }
@@ -287,8 +289,14 @@ public class TasksRepository implements TasksDataSource {
         for (Task task : tasks) {
             mCachedTasks.put(task.getId(), task);
         }
-        callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
         mCacheIsDirty = false;
+    }
+
+    private void refreshLocalDataSource(List<Task> tasks) {
+        mTasksLocalDataSource.deleteAllTasks();
+        for (Task task : tasks) {
+            mTasksLocalDataSource.saveTask(task);
+        }
     }
 
     @Nullable

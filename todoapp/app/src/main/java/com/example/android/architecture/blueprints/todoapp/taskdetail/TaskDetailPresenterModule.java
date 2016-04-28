@@ -12,12 +12,20 @@ public class TaskDetailPresenterModule {
 
     private final TaskDetailContract.View mView;
 
-    public TaskDetailPresenterModule(TaskDetailContract.View view) {
+    private final String mTaskId;
+
+    public TaskDetailPresenterModule(TaskDetailContract.View view, String taskId) {
         mView = view;
+        mTaskId = taskId;
     }
 
     @Provides
     TaskDetailContract.View provideTaskDetailContractView() {
         return mView;
+    }
+
+    @Provides
+    String provideTaskId() {
+        return mTaskId;
     }
 }

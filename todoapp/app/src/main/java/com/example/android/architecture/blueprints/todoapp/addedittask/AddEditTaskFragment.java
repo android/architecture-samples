@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,7 +29,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -37,11 +39,13 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.UserActionsListener mActionListener;
+    private AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
     private TextView mDescription;
+
+    private String mEditedTaskId;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -54,21 +58,19 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        if (!isNewTask()) {
-            String taskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
-            mActionListener.populateTask(taskId);
-        }
+        mPresenter.start();
+    }
+
+    @Override
+    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        AddEditTaskFragmentComponent featureComponent = DaggerAddEditTaskFragmentComponent.builder()
-                .addEditTaskPresenterModule(new AddEditTaskPresenterModule(this))
-                .tasksRepositoryComponent(((ToDoApplication) getActivity().getApplication())
-                        .getTasksRepositoryComponent())
-                .build();
-        mActionListener = featureComponent.getAddEditTaskPresenter();
+
+        setTaskIdIfAny();
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
@@ -77,12 +79,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
             @Override
             public void onClick(View v) {
                 if (isNewTask()) {
-                    mActionListener.createTask(
+                    mPresenter.createTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 } else {
-                    mActionListener.updateTask(
-                            getArguments().getString(ARGUMENT_EDIT_TASK_ID),
+                    mPresenter.updateTask(
                             mTitle.getText().toString(),
                             mDescription.getText().toString());
                 }
@@ -94,7 +95,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
@@ -116,11 +117,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     }
 
     @Override
-    public void setUserActionListener(AddEditTaskContract.UserActionsListener listener) {
-        mActionListener = listener;
-    }
-
-    @Override
     public void setTitle(String title) {
         mTitle.setText(title);
     }
@@ -130,7 +126,18 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mDescription.setText(description);
     }
 
+    @Override
+    public boolean isActive() {
+        return isAdded();
+    }
+
+    private void setTaskIdIfAny() {
+        if (getArguments() != null && getArguments().containsKey(ARGUMENT_EDIT_TASK_ID)) {
+            mEditedTaskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
+        }
+    }
+
     private boolean isNewTask() {
-        return getArguments() == null || !getArguments().containsKey(ARGUMENT_EDIT_TASK_ID);
+        return mEditedTaskId == null;
     }
 }

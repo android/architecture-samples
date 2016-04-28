@@ -7,8 +7,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTas
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragmentComponent;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragmentComponent;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragmentComponent;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailComponent;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
 
 /**
  * Even though Dagger2 allows annotating a {@link dagger.Component} as a singleton, the code itself
@@ -18,10 +18,10 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragmentCo
  * <P>
  * The application is made of 5 Dagger components, as follows:<BR />
  * {@link TasksRepositoryComponent}: the data (it encapsulates a db and server data)<BR />
- * {@link TasksFragmentComponent}: showing the list of to do items, including marking them as
+ * {@link TasksComponent}: showing the list of to do items, including marking them as
  * completed<BR />
  * {@link AddEditTaskFragmentComponent}: adding or editing a to do item<BR />
- * {@link TaskDetailFragmentComponent}: viewing details about a to do item, inlcuding marking it as
+ * {@link TaskDetailComponent}: viewing details about a to do item, inlcuding marking it as
  * completed and deleting it<BR />
  * {@link StatisticsFragmentComponent}: viewing statistics about your to do items<BR />
  */
