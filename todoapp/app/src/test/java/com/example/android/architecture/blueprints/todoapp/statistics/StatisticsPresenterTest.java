@@ -24,6 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 import com.google.common.collect.Lists;
@@ -131,8 +132,8 @@ public class StatisticsPresenterTest {
 
     private StatisticsPresenter givenStatisticsPresenter() {
         UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
-        GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
+        GetStatistics getStatistics = new GetStatistics(mTasksRepository);
 
-        return new StatisticsPresenter(useCaseHandler, mStatisticsView, getTasks);
+        return new StatisticsPresenter(useCaseHandler, mStatisticsView, getStatistics);
     }
 }
