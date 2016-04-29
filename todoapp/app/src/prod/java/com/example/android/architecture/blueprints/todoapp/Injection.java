@@ -77,4 +77,8 @@ public class Injection {
     public static DeleteTask provideDeleteTask(Context context) {
         return new DeleteTask(Injection.provideTasksRepository(context));
     }
+
+    public static GetStatistics provideGetStatistics(Context context) {
+        return new GetStatistics(Injection.provideGetStatistics(context))
+    }
 }
