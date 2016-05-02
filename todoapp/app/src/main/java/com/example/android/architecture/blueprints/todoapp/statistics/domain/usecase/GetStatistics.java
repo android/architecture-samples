@@ -12,6 +12,9 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Calculate statistics of active and completed Tasks {@link Task} in the {@link TasksRepository}.
+ */
 public class GetStatistics extends UseCase<GetStatistics.RequestValues, GetStatistics.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
