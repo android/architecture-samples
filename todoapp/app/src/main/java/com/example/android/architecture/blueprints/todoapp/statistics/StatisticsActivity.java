@@ -73,7 +73,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         new StatisticsPresenter(Injection.provideUseCaseHandler(),
                 statisticsFragment,
-                Injection.provideGetTasks(getApplicationContext()));
+                Injection.provideGetStatistics(getApplicationContext()));
     }
 
     @Override
