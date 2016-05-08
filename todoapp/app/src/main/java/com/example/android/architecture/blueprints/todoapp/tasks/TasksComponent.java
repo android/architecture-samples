@@ -16,7 +16,6 @@ import dagger.Component;
 @FragmentScoped
 @Component(dependencies = TasksRepositoryComponent.class, modules = TasksPresenterModule.class)
 public interface TasksComponent {
-
-    TasksPresenter getTasksPresenter();
-
+	
+    void inject(TasksActivity activity);
 }

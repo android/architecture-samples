@@ -34,13 +34,15 @@ import com.example.android.architecture.blueprints.todoapp.statistics.Statistics
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import javax.inject.Inject;
+
 public class TasksActivity extends AppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksPresenter mTasksPresenter;
+    @Inject TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +74,10 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        mTasksPresenter = DaggerTasksComponent.builder()
-                .tasksRepositoryComponent(((ToDoApplication) getApplication())
-                        .getTasksRepositoryComponent())
+        DaggerTasksComponent.builder()
+                .tasksRepositoryComponent(((ToDoApplication) getApplication()).getTasksRepositoryComponent())
                 .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build()
-                .getTasksPresenter();
+                .inject(this);
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
