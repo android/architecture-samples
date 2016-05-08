@@ -28,12 +28,16 @@ import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import javax.inject.Inject;
+
 /**
  * Displays task details screen.
  */
 public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
+
+    @Inject TaskDetailPresenter mTaskDetailPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +65,12 @@ public class TaskDetailActivity extends AppCompatActivity {
                     taskDetailFragment, R.id.contentFrame);
         }
 
+        // Create the presenter
         DaggerTaskDetailComponent.builder()
                 .taskDetailPresenterModule(new TaskDetailPresenterModule(taskDetailFragment, taskId))
                 .tasksRepositoryComponent(((ToDoApplication) getApplication())
-                        .getTasksRepositoryComponent()).build().getTaskDetailPresenter();
+                .getTasksRepositoryComponent()).build()
+                .inject(this);
     }
 
     @Override
