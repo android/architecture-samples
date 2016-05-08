@@ -2,7 +2,7 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.app.Application;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragmentComponent;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;
@@ -20,7 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
  * {@link TasksRepositoryComponent}: the data (it encapsulates a db and server data)<BR />
  * {@link TasksComponent}: showing the list of to do items, including marking them as
  * completed<BR />
- * {@link AddEditTaskFragmentComponent}: adding or editing a to do item<BR />
+ * {@link AddEditTaskComponent}: adding or editing a to do item<BR />
  * {@link TaskDetailComponent}: viewing details about a to do item, inlcuding marking it as
  * completed and deleting it<BR />
  * {@link StatisticsComponent}: viewing statistics about your to do items<BR />

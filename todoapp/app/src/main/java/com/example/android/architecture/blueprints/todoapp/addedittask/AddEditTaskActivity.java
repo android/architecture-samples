@@ -74,7 +74,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        DaggerAddEditTaskFragmentComponent.builder()
+        DaggerAddEditTaskComponent.builder()
                 .addEditTaskPresenterModule(
                         new AddEditTaskPresenterModule(addEditTaskFragment, taskId))
                 .tasksRepositoryComponent(
