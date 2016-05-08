@@ -28,12 +28,16 @@ import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import javax.inject.Inject;
+
 /**
  * Displays an add or edit task screen.
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
+
+    @Inject AddEditTaskPresenter mAddEditTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +79,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
                         new AddEditTaskPresenterModule(addEditTaskFragment, taskId))
                 .tasksRepositoryComponent(
                         ((ToDoApplication) getApplication()).getTasksRepositoryComponent()).build()
-                .getAddEditTaskPresenter();
+                .inject(this);
     }
 
     @Override
