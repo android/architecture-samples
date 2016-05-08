@@ -17,5 +17,5 @@ import dagger.Component;
 @Component(dependencies = TasksRepositoryComponent.class, modules = StatisticsPresenterModule.class)
 public interface StatisticsFragmentComponent {
 
-    StatisticsPresenter getStatisticsPresenter();
+    void inject(StatisticsActivity statisticsActivity);
 }

@@ -31,12 +31,16 @@ import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
+import javax.inject.Inject;
+
 /**
  * Show statistics for tasks.
  */
 public class StatisticsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+
+    @Inject StatisticsPresenter mStatiticsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +75,8 @@ public class StatisticsActivity extends AppCompatActivity {
         DaggerStatisticsFragmentComponent.builder()
             .statisticsPresenterModule(new StatisticsPresenterModule(statisticsFragment))
             .tasksRepositoryComponent(((ToDoApplication) getApplication())
-                    .getTasksRepositoryComponent())
-            .build().getStatisticsPresenter();
+            .getTasksRepositoryComponent())
+            .build().inject(this);
     }
 
     @Override
