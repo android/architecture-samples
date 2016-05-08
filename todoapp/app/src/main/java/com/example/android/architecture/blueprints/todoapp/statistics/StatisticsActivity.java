@@ -72,7 +72,7 @@ public class StatisticsActivity extends AppCompatActivity {
                     statisticsFragment, R.id.contentFrame);
         }
 
-        DaggerStatisticsFragmentComponent.builder()
+        DaggerStatisticsComponent.builder()
             .statisticsPresenterModule(new StatisticsPresenterModule(statisticsFragment))
             .tasksRepositoryComponent(((ToDoApplication) getApplication())
             .getTasksRepositoryComponent())

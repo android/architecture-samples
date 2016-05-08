@@ -6,7 +6,7 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;
-import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragmentComponent;
+import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsComponent;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailComponent;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
 
@@ -23,7 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
  * {@link AddEditTaskFragmentComponent}: adding or editing a to do item<BR />
  * {@link TaskDetailComponent}: viewing details about a to do item, inlcuding marking it as
  * completed and deleting it<BR />
- * {@link StatisticsFragmentComponent}: viewing statistics about your to do items<BR />
+ * {@link StatisticsComponent}: viewing statistics about your to do items<BR />
  */
 public class ToDoApplication extends Application {
 

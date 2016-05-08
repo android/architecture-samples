@@ -15,7 +15,7 @@ import dagger.Component;
  */
 @FragmentScoped
 @Component(dependencies = TasksRepositoryComponent.class, modules = StatisticsPresenterModule.class)
-public interface StatisticsFragmentComponent {
+public interface StatisticsComponent {
 
     void inject(StatisticsActivity statisticsActivity);
 }
