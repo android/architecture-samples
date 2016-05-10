@@ -58,6 +58,16 @@ app, the size and experience of your team, the amount of maintenance that you
 foresee, whether you need a tablet layout or support multiple platforms, how
 compact you like your codebase, etc.
 
+## Importing the project in Android Studio
+
+In order to open the project in Android Studio, first checkout one of the feature branches (<code>master</code> won't compile), and then choose to import the <code>todoapp/</code> inner folder, NOT the parent <code>android-architecture/</code> folder.
+
+  * eg. <code>git clone git@github.com:googlesamples/android-architecture.git</code>
+  * inside the repository folder, checkout the branch of your interest, eg. 'todo-mvp' - <code>git checkout todo-mvp</code>
+  * <code>todoapp/</code> folder should appear, which is the project app's folder
+  * start Android Studio and choose 'Import project...'
+  * point at the <code>todoapp/</code> folder, NOT the parent <code>android-architecture/</code> folder
+
 ## Who is behind this project?
 
 This project is **built by the community** and curated by Google and core maintainers.
