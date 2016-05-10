@@ -34,6 +34,13 @@ That's a lot of work to replace a constructor call! The main advantage of doing 
 
 This sample is still using the mock/prod flavors from todo-mvp to generate different APKs. There is a [TasksRepositoryModule in prod/](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/prod/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryModule.java) which fetches data from the slow data source (simulating a backend API) and [another one in mock/](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/mock/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryModule.java), which provides fake data, ideal for automated testing. With this approach the app can be configured to use fake location coordinates, write and read from fake shared preferences, simulate network conditions, etc.
 
+##### Scopes
+
+Dagger2 scopes allow to keep instances depending the type of scope what are using, components dependent of [TaskRepositoryComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryComponent.java) (singleton) need a shorter scope in order to keep their dependencies as long as the scope exists.
+
+This is the case of [@FragmentedScope](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/util/FragmentScoped.java), which is used for keep dependencies that will live during the fragment lifecycle.
+
+
 ### Dependencies
  
  * Dagger2
