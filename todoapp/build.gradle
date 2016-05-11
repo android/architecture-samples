@@ -4,7 +4,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0-alpha5'
+        classpath 'com.android.tools.build:gradle:2.1.0'
 
         // Plugin to help with annotation processing
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
@@ -34,7 +34,7 @@ ext {
     buildToolsVersion = '23.0.2'
 
     // App dependencies
-    supportLibraryVersion = '23.1.1'
+    supportLibraryVersion = '23.2.1'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
