@@ -46,7 +46,6 @@ public class AddNotePresenter implements AddNoteContract.UserActionsListener {
                             @NonNull ImageFile imageFile) {
         mNotesRepository = checkNotNull(notesRepository);
         mAddNoteView = checkNotNull(addNoteView);
-        addNoteView.setUserActionListener(this);
         mImageFile = imageFile;
     }
 

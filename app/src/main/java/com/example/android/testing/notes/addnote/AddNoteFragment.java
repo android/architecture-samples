@@ -184,11 +184,6 @@ public class AddNoteFragment extends Fragment implements AddNoteContract.View {
     }
 
     @Override
-    public void setUserActionListener(AddNoteContract.UserActionsListener listener) {
-        mActionListener = listener;
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // If an image is received, display it on the ImageView.
         if (REQUEST_CODE_IMAGE_CAPTURE == requestCode && Activity.RESULT_OK == resultCode) {
