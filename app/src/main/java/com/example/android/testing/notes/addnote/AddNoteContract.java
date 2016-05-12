@@ -36,8 +36,6 @@ public interface AddNoteContract {
         void showImagePreview(@NonNull String uri);
 
         void showImageError();
-
-        void setUserActionListener(UserActionsListener listener);
     }
 
     interface UserActionsListener {
