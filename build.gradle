@@ -29,7 +29,7 @@ ext {
     buildToolsVersion = '23.0.3'
 
     // App dependencies
-    supportLibraryVersion = '23.3.0'
+    supportLibraryVersion = '23.4.0'
     guavaVersion = '18.0'
     glideVersion = '3.6.1'
     junitVersion = '4.12'
