@@ -23,6 +23,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 import org.junit.After;
 import org.junit.Before;

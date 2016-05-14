@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp.statistics.domain;
+package com.example.android.architecture.blueprints.todoapp.statistics.domain.model;
 
 public class Statistics {
 
