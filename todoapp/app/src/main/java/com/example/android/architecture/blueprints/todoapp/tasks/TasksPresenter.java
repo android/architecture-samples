@@ -17,16 +17,21 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
 import java.util.List;
 
@@ -38,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
-public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.GetTasksCallback, TasksDataSource.GetTasksCallback {
+public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.GetTasksCallback, TasksDataSource.GetTasksCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
     private final TasksContract.View mTasksView;
 
@@ -48,10 +53,18 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     @NonNull
     private final TasksInteractor mTasksInteractor;
 
+    @NonNull
+    private final LoaderManager mLoaderManager;
+
+    @NonNull
+    private final Context mContext;
+
     private TaskFilter mCurrentFiltering;
     private boolean mFirstLoad;
 
-    public TasksPresenter(@NonNull TasksInteractor tasksInteractor, @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
+    public TasksPresenter(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull TasksInteractor tasksInteractor, @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
+        mContext = checkNotNull(context, "context provider cannot be null");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager provider cannot be null");
         mTasksInteractor = checkNotNull(tasksInteractor, "tasksInteractor provider cannot be null");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository provider cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
@@ -81,7 +94,11 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
             mFirstLoad = false;
             mTasksRepository.getTasks(this);
         }
-        mTasksInteractor.getTasks(mCurrentFiltering.getFilterExtras(), this);
+        if (mLoaderManager.getLoader(TasksInteractor.TASKS_LOADER) == null) {
+            mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        } else {
+            mLoaderManager.restartLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        }
     }
 
     @Override
@@ -185,7 +202,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     @Override
     public void setFiltering(TaskFilter taskFilter) {
         mCurrentFiltering = taskFilter;
-        mTasksInteractor.getTasks(taskFilter.getFilterExtras(), this);
+        mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
     }
 
     @Override
@@ -194,4 +211,48 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     }
 
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String selection = null;
+        String[] selectionArgs = null;
+
+        switch (mCurrentFiltering.getTasksFilterType()) {
+            case ALL_TASKS:
+                selection = null;
+                selectionArgs = null;
+                break;
+            case ACTIVE_TASKS:
+                selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " = ? ";
+                selectionArgs = new String[]{String.valueOf(0)};
+                break;
+            case COMPLETED_TASKS:
+                selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " = ? ";
+                selectionArgs = new String[]{String.valueOf(1)};
+                break;
+        }
+
+        return new CursorLoader(
+                mContext,
+                TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            if (data.getCount() > 0) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
+        } else {
+            onDataNotAvailable();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        onDataReset();
+    }
 }

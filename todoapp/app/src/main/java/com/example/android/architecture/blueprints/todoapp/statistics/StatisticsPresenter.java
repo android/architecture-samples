@@ -19,6 +19,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter, TasksInteractor.GetTasksCallback {
+public class StatisticsPresenter implements StatisticsContract.Presenter, TasksInteractor.GetTasksCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
     private StatisticsContract.View mStatisticsView;
 
@@ -106,4 +108,18 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksI
         return tasks;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

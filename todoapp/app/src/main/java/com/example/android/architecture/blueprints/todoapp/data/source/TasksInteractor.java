@@ -16,7 +16,7 @@ public class TasksInteractor {
 
     private static TasksInteractor INSTANCE;
 
-    private final static int TASKS_LOADER = 1;
+    public final static int TASKS_LOADER = 1;
     private final static int TASK_LOADER = 2;
 
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
@@ -39,12 +39,8 @@ public class TasksInteractor {
         this.mContentResolver = contentResolver;
     }
 
-    public void getTasks(final Bundle extras, final GetTasksCallback callback) {
-        if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
-            mLoaderManager.initLoader(TASKS_LOADER, extras, new TasksCursorLoaderCallback(callback));
-        } else {
-            mLoaderManager.restartLoader(TASKS_LOADER, extras, new TasksCursorLoaderCallback(callback));
-        }
+    public void getTasks(final Bundle extras, LoaderManager.LoaderCallbacks<Cursor> callback) {
+        mLoaderManager.initLoader(TASKS_LOADER, extras, callback);
     }
 
     public void getTask(String taskId, GetTasksCallback callback) {

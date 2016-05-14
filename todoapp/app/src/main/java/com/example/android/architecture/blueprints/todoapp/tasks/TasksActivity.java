@@ -86,6 +86,8 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         mTasksPresenter = new TasksPresenter(
+                this,
+                getSupportLoaderManager(),
                 tasksInteractor,
                 Injection.provideTasksRepository(getApplicationContext()),
                 tasksFragment,
