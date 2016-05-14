@@ -17,9 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,9 +32,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksInteractor.GetTasksCallback {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter, LoaderManager.LoaderCallbacks<Cursor> {
 
     private TaskDetailContract.View mTaskDetailView;
+    private LoaderProvider mLoaderProvider;
 
     private Task mTask;
     private String mTaskId;
@@ -39,9 +44,11 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksI
     private final TasksInteractor mTasksInteractor;
 
     public TaskDetailPresenter(@NonNull String taskId,
+                               @NonNull LoaderProvider loaderProvider,
                                @NonNull TasksInteractor tasksInteractor,
                                @NonNull TaskDetailContract.View taskDetailView) {
         mTaskId = checkNotNull(taskId, "taskId cannot be null!");
+        mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider cannot be null!");
         mTasksInteractor = checkNotNull(tasksInteractor, "tasksOperations cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskDetailView.setPresenter(this);
@@ -108,23 +115,42 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksI
         mTaskDetailView.setLoadingIndicator(false);
     }
 
-    @Override
     public void onDataLoaded(Cursor data) {
         showTask(data);
     }
 
-    @Override
     public void onDataEmpty() {
         mTaskDetailView.showMissingTask();
     }
 
-    @Override
     public void onDataNotAvailable() {
         mTaskDetailView.showMissingTask();
     }
 
-    @Override
     public void onDataReset() {
+        showTask(null);
+    }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mLoaderProvider.createTaskLoader(mTaskId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            if (data.getCount() > 0) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
+        } else {
+            onDataNotAvailable();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        onDataReset();
     }
 }

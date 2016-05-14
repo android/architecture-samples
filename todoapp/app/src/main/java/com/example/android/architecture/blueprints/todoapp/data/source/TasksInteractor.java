@@ -22,35 +22,37 @@ public class TasksInteractor {
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
     public final static String KEY_TASK_ID = BuildConfig.APPLICATION_ID + "TASK_ID";
 
-    private final LoaderProvider mLoaderProvider;
     private final LoaderManager mLoaderManager;
     private final ContentResolver mContentResolver;
 
-    public static TasksInteractor getInstance(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
+    public static TasksInteractor getInstance(LoaderManager mLoaderManager, ContentResolver mContentResolver) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksInteractor(mLoaderProvider, mLoaderManager, mContentResolver);
+            INSTANCE = new TasksInteractor(mLoaderManager, mContentResolver);
         }
         return INSTANCE;
     }
 
-    private TasksInteractor(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver contentResolver) {
-        this.mLoaderProvider = mLoaderProvider;
+    private TasksInteractor(LoaderManager mLoaderManager, ContentResolver contentResolver) {
         this.mLoaderManager = mLoaderManager;
         this.mContentResolver = contentResolver;
     }
 
     public void getTasks(final Bundle extras, LoaderManager.LoaderCallbacks<Cursor> callback) {
-        mLoaderManager.initLoader(TASKS_LOADER, extras, callback);
+        if (mLoaderManager.getLoader(TasksInteractor.TASKS_LOADER) == null) {
+            mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, extras, callback);
+        } else {
+            mLoaderManager.restartLoader(TasksInteractor.TASKS_LOADER, extras, callback);
+        }
     }
 
-    public void getTask(String taskId, GetTasksCallback callback) {
+    public void getTask(String taskId, LoaderManager.LoaderCallbacks<Cursor> callback) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(TasksInteractor.KEY_TASK_ID, taskId);
 
         if (mLoaderManager.getLoader(TASK_LOADER) == null) {
-            mLoaderManager.initLoader(TASK_LOADER, bundle, new TasksCursorLoaderCallback(callback));
+            mLoaderManager.initLoader(TASK_LOADER, bundle, callback);
         } else {
-            mLoaderManager.restartLoader(TASK_LOADER, bundle, new TasksCursorLoaderCallback(callback));
+            mLoaderManager.restartLoader(TASK_LOADER, bundle, callback);
         }
     }
 
@@ -113,55 +115,5 @@ public class TasksInteractor {
         mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 
-    public interface GetTasksCallback {
-        void onDataLoaded(Cursor data);
-
-        void onDataEmpty();
-
-        void onDataNotAvailable();
-
-        void onDataReset();
-    }
-
-    private class TasksCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
-        private final GetTasksCallback callback;
-
-        public TasksCursorLoaderCallback(GetTasksCallback callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            switch (id) {
-                case TASKS_LOADER:
-                    TasksFilterType tasksFilterType = (TasksFilterType) args.getSerializable(KEY_TASK_FILTER);
-                    return mLoaderProvider.createFilteredTasksLoader(tasksFilterType);
-                case TASK_LOADER:
-                    String taskId = args.getString(KEY_TASK_ID);
-                    return mLoaderProvider.createTaskLoader(taskId);
-                default:
-                    throw new IllegalArgumentException("Loader Id not recognised");
-            }
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if (data != null) {
-                if (data.getCount() > 0) {
-                    callback.onDataLoaded(data);
-                } else {
-                    callback.onDataEmpty();
-                }
-            } else {
-                callback.onDataNotAvailable();
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            callback.onDataReset();
-        }
-
-    }
 
 }

@@ -65,11 +65,12 @@ public class TaskDetailActivity extends AppCompatActivity {
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksInteractor tasksInteractor = TasksInteractor.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        TasksInteractor tasksInteractor = TasksInteractor.getInstance(getSupportLoaderManager(), getContentResolver());
 
         // Create the presenter
         new TaskDetailPresenter(
                 taskId,
+                loaderProvider,
                 tasksInteractor,
                 taskDetailFragment
         );

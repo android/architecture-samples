@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -31,7 +32,7 @@ import java.util.Map;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
- * <p>
+ * <p/>
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
@@ -108,38 +109,26 @@ public class TasksRepository implements TasksDataSource {
     /**
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first.
-     * <p>
+     * <p/>
      * Note: {@link GetTasksCallback#onDataNotAvailable()} is fired if all data sources fail to
      * get the data.
      */
     @Override
     public void getTasks(@NonNull final GetTasksCallback callback) {
-        // Respond immediately with cache if available and not dirty
-        if (mCachedTasks != null && !mCacheIsDirty) {
-            callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-            return;
-        }
+        mTasksRemoteDataSource.getTasks(new GetTasksCallback() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                refreshCache(tasks);
+                refreshLocalDataSource(tasks);
+            }
 
-        if (mCacheIsDirty) {
-            // If the cache is dirty we need to fetch new data from the network.
-            getTasksFromRemoteDataSource(callback);
-        } else {
-            // Query the local storage if available. If not, query the network.
-            mTasksLocalDataSource.getTasks(new GetTasksCallback() {
-                @Override
-                public void onTasksLoaded(List<Task> tasks) {
-                    refreshCache(tasks);
-
-                    callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    getTasksFromRemoteDataSource(callback);
-                }
-            });
-        }
+            @Override
+            public void onDataNotAvailable() {
+                callback.onDataNotAvailable();
+            }
+        });
     }
+
     @Override
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
@@ -216,7 +205,7 @@ public class TasksRepository implements TasksDataSource {
     /**
      * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
      * uses the network data source. This is done to simplify the sample.
-     * <p>
+     * <p/>
      * Note: {@link GetTasksCallback#onDataNotAvailable()} is fired if both data sources fail to
      * get the data.
      */
@@ -321,4 +310,15 @@ public class TasksRepository implements TasksDataSource {
             return mCachedTasks.get(id);
         }
     }
+
+    public interface LoadDataCallback {
+        void onDataLoaded(Cursor data);
+
+        void onDataEmpty();
+
+        void onDataNotAvailable();
+
+        void onDataReset();
+    }
+
 }

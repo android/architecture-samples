@@ -71,8 +71,7 @@ public class StatisticsActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksInteractor tasksInteractor = TasksInteractor.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        TasksInteractor tasksInteractor = TasksInteractor.getInstance(getSupportLoaderManager(), getContentResolver());
 
         new StatisticsPresenter(tasksInteractor, statisticsFragment);
     }

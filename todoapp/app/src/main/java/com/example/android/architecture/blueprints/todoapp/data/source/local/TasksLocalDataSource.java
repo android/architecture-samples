@@ -51,40 +51,6 @@ public class TasksLocalDataSource implements TasksDataSource {
         return INSTANCE;
     }
 
-    public Cursor getTasks(String selection, String[] selectionArgs) {
-        String[] projection = {
-                TaskEntry._ID,
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
-        };
-
-        Cursor tasks = mDbHelper.getReadableDatabase().query(
-                TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-
-        return tasks;
-    }
-
-    public Cursor getTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String[] projection = {
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
-        };
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " = ?";
-        String[] selectionArgs = {taskId};
-
-        Cursor task = db.query(
-                TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-
-        return task;
-    }
-
     @Override
     public void getTasks(@NonNull GetTasksCallback callback) {
 

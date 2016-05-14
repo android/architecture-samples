@@ -36,12 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * a fake instance of the class to isolate the dependencies and run a test hermetically.
  */
 public class Injection {
-
-    public static TasksInteractor provideTasksOperations(LoaderProvider mLoaderProvider, LoaderManager mLoaderManager, ContentResolver mContentResolver) {
-
-        return TasksInteractor.getInstance(mLoaderProvider, mLoaderManager, mContentResolver);
-    }
-
+    
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
         checkNotNull(context);
         return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(), provideLocalDataSource(context));

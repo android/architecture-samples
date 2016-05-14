@@ -74,8 +74,7 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksInteractor tasksInteractor = TasksInteractor.getInstance(loaderProvider, getSupportLoaderManager(), getContentResolver());
+        LoaderProvider loaderProvider = new LoaderProvider(this);
 
         // Load previously saved state, if available.
         TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
@@ -86,9 +85,8 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         mTasksPresenter = new TasksPresenter(
-                this,
+                loaderProvider,
                 getSupportLoaderManager(),
-                tasksInteractor,
                 Injection.provideTasksRepository(getApplicationContext()),
                 tasksFragment,
                 taskFilter
@@ -125,7 +123,7 @@ public class TasksActivity extends AppCompatActivity {
                                 Intent intent =
                                         new Intent(TasksActivity.this, StatisticsActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             default:

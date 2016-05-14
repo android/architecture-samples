@@ -7,6 +7,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
+import com.example.android.architecture.blueprints.todoapp.tasks.TaskFilter;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -20,11 +21,11 @@ public class LoaderProvider {
         mContext = checkNotNull(context, "context cannot be null");
     }
 
-    public Loader<Cursor> createFilteredTasksLoader(TasksFilterType filterType) {
+    public Loader<Cursor> createFilteredTasksLoader(TaskFilter taskFilter) {
         String selection = null;
         String[] selectionArgs = null;
 
-        switch (filterType) {
+        switch (taskFilter.getTasksFilterType()) {
             case ALL_TASKS:
                 selection = null;
                 selectionArgs = null;
