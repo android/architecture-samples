@@ -123,6 +123,8 @@ public class TasksInteractor {
         void onDataEmpty();
 
         void onDataNotAvailable();
+
+        void onDataReset();
     }
 
     private class TasksCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -161,7 +163,7 @@ public class TasksInteractor {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            callback.onDataEmpty();
+            callback.onDataReset();
         }
 
     }

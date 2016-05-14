@@ -70,6 +70,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksI
         mStatisticsView.showLoadingStatisticsError();
     }
 
+    @Override
+    public void onDataReset() {
+
+    }
+
     private void loadStatistics(Cursor data) {
         mStatisticsView.setProgressIndicator(false);
         int activeTasks = 0;

@@ -78,12 +78,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mListAdapter = new TasksCursorAdapter(getActivity(), mItemListener);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mPresenter.start();
@@ -106,8 +100,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
+        mListAdapter = new TasksCursorAdapter(getActivity(), mItemListener);
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);
         listView.setAdapter(mListAdapter);
+
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
@@ -345,7 +341,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
-    private static class TasksCursorAdapter extends CursorAdapter{
+    private static class TasksCursorAdapter extends CursorAdapter {
 
         private final TaskItemListener mItemListener;
 
@@ -387,10 +383,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             if (task.isCompleted()) {
                 viewHolder.rowView.setBackgroundDrawable(context
-                                                      .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
             } else {
                 viewHolder.rowView.setBackgroundDrawable(context
-                                                      .getResources().getDrawable(R.drawable.touch_feedback));
+                        .getResources().getDrawable(R.drawable.touch_feedback));
             }
 
             viewHolder.rowView.setOnClickListener(new View.OnClickListener() {

@@ -52,30 +52,29 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description) {
         Task newTask = new Task(title, description);
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 
-    @Override
-    public List<Task> getTasks() {
+    public void getTasks(TasksDataSource.GetTasksCallback callback) {
         // Simulate network
         try {
             Thread.sleep(SERVICE_LATENCY_IN_MILLIS);
         } catch (InterruptedException e) {
         }
-        return Lists.newArrayList(TASKS_SERVICE_DATA.values());
+        callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
     }
 
     /**
-     * Note: {@link GetTaskCallback#onDataNotAvailable()} is never fired. In a real remote data
+     * Note: {@link TasksDataSource.GetTaskCallback#onDataNotAvailable()} is never fired. In a real remote data
      * source implementation, this would be fired if the server can't be contacted or the server
      * returns an error.
      */
-    @Override
-    public Task getTask(@NonNull String taskId) {
+    public void getTask(@NonNull String taskId, TasksDataSource.GetTaskCallback callback) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
 
         // Simulate network by delaying the execution.
@@ -84,15 +83,13 @@ public class TasksRemoteDataSource implements TasksDataSource {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return task;
+        callback.onTaskLoaded(task);
     }
 
-    @Override
     public void saveTask(Task task) {
         TASKS_SERVICE_DATA.put(task.getId(), task);
     }
 
-    @Override
     public void completeTask(Task task) {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
@@ -100,23 +97,19 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+
     }
 
     @Override
-    public void activateTask(Task task) {
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
-        TASKS_SERVICE_DATA.put(task.getId(), activeTask);
+    public void activateTask(@NonNull Task task) {
+
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+
     }
 
-    @Override
     public void clearCompletedTasks() {
         Iterator<Map.Entry<String, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
         while (it.hasNext()) {
@@ -128,17 +121,14 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
+    public void refreshTasks(GetTasksCallback callback) {
+
     }
 
-    @Override
     public void deleteAllTasks() {
         TASKS_SERVICE_DATA.clear();
     }
 
-    @Override
     public void deleteTask(String taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }

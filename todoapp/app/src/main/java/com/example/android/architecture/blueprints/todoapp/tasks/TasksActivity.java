@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
@@ -86,6 +87,7 @@ public class TasksActivity extends AppCompatActivity {
 
         mTasksPresenter = new TasksPresenter(
                 tasksInteractor,
+                Injection.provideTasksRepository(getApplicationContext()),
                 tasksFragment,
                 taskFilter
         );

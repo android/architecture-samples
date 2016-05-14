@@ -26,27 +26,34 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
-public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.GetTasksCallback {
+public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.GetTasksCallback, TasksDataSource.GetTasksCallback {
 
     private final TasksContract.View mTasksView;
+
+    @NonNull
+    private final TasksRepository mTasksRepository;
 
     @NonNull
     private final TasksInteractor mTasksInteractor;
 
     private TaskFilter mCurrentFiltering;
 
-    private boolean mFirstLoad;
-
-    public TasksPresenter(@NonNull TasksInteractor tasksInteractor, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
-        mTasksInteractor = checkNotNull(tasksInteractor, "taskOperations provider cannot be null");
+    public TasksPresenter(@NonNull TasksInteractor tasksInteractor, @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
+        mTasksInteractor = checkNotNull(tasksInteractor, "tasksInteractor provider cannot be null");
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository provider cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mCurrentFiltering = checkNotNull(taskFilter, "taskFilter cannot be null!");
         mTasksView.setPresenter(this);
@@ -63,6 +70,17 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     @Override
     public void start() {
         loadTasks(true);
+    }
+
+    /**
+     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
+     */
+    public void loadTasks(boolean forceUpdate) {
+        mTasksView.setLoadingIndicator(true);
+        if (forceUpdate){
+            mTasksRepository.getTasks(this);
+        }
+        mTasksInteractor.getTasks(mCurrentFiltering.getFilterExtras(), this);
     }
 
     @Override
@@ -83,21 +101,19 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     }
 
     @Override
+    public void onTasksLoaded(List<Task> tasks) {
+
+    }
+
+    @Override
     public void onDataNotAvailable() {
         mTasksView.setLoadingIndicator(false);
         mTasksView.showLoadingTasksError();
     }
 
-    /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
-     */
-    public void loadTasks(boolean forceUpdate) {
-        if (forceUpdate || mFirstLoad) {
-            mFirstLoad = false;
-        }
-
-        mTasksView.setLoadingIndicator(true);
-        mTasksInteractor.getTasks(mCurrentFiltering.getFilterExtras(), this);
+    @Override
+    public void onDataReset() {
+        mTasksView.showTasks(null);
     }
 
     private void showFilterLabel() {
@@ -175,5 +191,6 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     public TasksFilterType getFiltering() {
         return mCurrentFiltering.getTasksFilterType();
     }
+
 
 }

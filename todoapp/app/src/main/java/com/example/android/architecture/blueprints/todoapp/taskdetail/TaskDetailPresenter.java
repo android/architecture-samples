@@ -122,4 +122,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, TasksI
     public void onDataNotAvailable() {
         mTaskDetailView.showMissingTask();
     }
+
+    @Override
+    public void onDataReset() {
+
+    }
 }
