@@ -37,7 +37,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
 
     // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {}
+    private FakeTasksRemoteDataSource() {
+    }
 
     public static FakeTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
@@ -47,14 +48,14 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public List<Task> getTasks() {
-        return Lists.newArrayList(TASKS_SERVICE_DATA.values());
+    public void getTasks(@NonNull GetTasksCallback callback) {
+        callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
     }
 
     @Override
-    public Task getTask(@NonNull String taskId) {
+    public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        return task;
+        callback.onTaskLoaded(task);
     }
 
     @Override
@@ -95,7 +96,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         }
     }
 
-    public void refreshTasks() {
+    @Override
+    public void refreshTasks(GetTasksCallback callback) {
         // Not required because the {@link TasksRepository} handles the logic of refreshing the
         // tasks from all the available data sources.
     }

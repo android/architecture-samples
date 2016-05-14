@@ -33,7 +33,6 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
-
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
@@ -50,6 +49,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     private final TasksInteractor mTasksInteractor;
 
     private TaskFilter mCurrentFiltering;
+    private boolean mFirstLoad;
 
     public TasksPresenter(@NonNull TasksInteractor tasksInteractor, @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
         mTasksInteractor = checkNotNull(tasksInteractor, "tasksInteractor provider cannot be null");
@@ -77,7 +77,8 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
      */
     public void loadTasks(boolean forceUpdate) {
         mTasksView.setLoadingIndicator(true);
-        if (forceUpdate){
+        if (forceUpdate || mFirstLoad) {
+            mFirstLoad = false;
             mTasksRepository.getTasks(this);
         }
         mTasksInteractor.getTasks(mCurrentFiltering.getFilterExtras(), this);

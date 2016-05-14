@@ -117,7 +117,6 @@ public class TasksRepository implements TasksDataSource {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
             callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-
             return;
         }
 
