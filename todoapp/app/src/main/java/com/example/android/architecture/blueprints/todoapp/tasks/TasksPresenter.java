@@ -68,15 +68,18 @@ public class TasksPresenter implements TasksContract.Presenter, TasksInteractor.
     @Override
     public void onDataLoaded(Cursor data) {
         mTasksView.setLoadingIndicator(false);
-        if (data.getCount() > 0) {
-            // Show the list of tasks
-            mTasksView.showTasks(data);
-            // Set the filter label's text.
-            showFilterLabel();
-        } else {
-            // Show a message indicating there are no tasks for that filter type.
-            processEmptyTasks();
-        }
+        // Show the list of tasks
+        mTasksView.showTasks(data);
+        // Set the filter label's text.
+        showFilterLabel();
+    }
+
+
+    @Override
+    public void onDataEmpty() {
+        mTasksView.setLoadingIndicator(false);
+        // Show a message indicating there are no tasks for that filter type.
+        processEmptyTasks();
     }
 
     @Override

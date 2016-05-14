@@ -24,6 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 
 import org.junit.Rule;
@@ -44,19 +45,10 @@ import static org.hamcrest.core.IsNot.not;
 @LargeTest
 public class TaskDetailScreenTest {
 
+
     private static String TASK_TITLE = "ATSL";
 
     private static String TASK_DESCRIPTION = "Rocks";
-
-    /**
-     * {@link Task} stub that is added to the fake service API layer.
-     */
-    private static Task ACTIVE_TASK = new Task(TASK_TITLE, TASK_DESCRIPTION, false);
-
-    /**
-     * {@link Task} stub that is added to the fake service API layer.
-     */
-    private static Task COMPLETED_TASK = new Task(TASK_TITLE, TASK_DESCRIPTION, true);
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
@@ -75,6 +67,7 @@ public class TaskDetailScreenTest {
                 @Override
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
+
                     // Doing this in @Before generates a race condition.
 
                 }

@@ -60,6 +60,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksI
     }
 
     @Override
+    public void onDataEmpty() {
+        mStatisticsView.showStatistics(0, 0);
+    }
+
+    @Override
     public void onDataNotAvailable() {
         mStatisticsView.setProgressIndicator(false);
         mStatisticsView.showLoadingStatisticsError();

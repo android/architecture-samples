@@ -120,6 +120,8 @@ public class TasksInteractor {
     public interface GetTasksCallback {
         void onDataLoaded(Cursor data);
 
+        void onDataEmpty();
+
         void onDataNotAvailable();
     }
 
@@ -142,13 +144,16 @@ public class TasksInteractor {
                 default:
                     throw new IllegalArgumentException("Loader Id not recognised");
             }
-
         }
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if (data != null && data.getCount() > 0) {
-                callback.onDataLoaded(data);
+            if (data != null) {
+                if (data.getCount() > 0) {
+                    callback.onDataLoaded(data);
+                } else {
+                    callback.onDataEmpty();
+                }
             } else {
                 callback.onDataNotAvailable();
             }
@@ -156,7 +161,7 @@ public class TasksInteractor {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-
+            callback.onDataEmpty();
         }
 
     }
