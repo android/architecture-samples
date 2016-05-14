@@ -21,6 +21,7 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +40,7 @@ public class StatisticsPresenterTest {
     private StatisticsContract.View mStatisticsView;
 
     @Mock
-    private LoaderProvider mTasksLoaderProvider;
-
-    @Mock
-    private LoaderManager mLoaderManager;
+    private TasksInteractor mTasksInteractor;
 
     private MockCursorProvider.TaskMockCursor mAllTasksCursor;
     private MockCursorProvider.TaskMockCursor mEmptyTasksCursor;
@@ -59,13 +57,12 @@ public class StatisticsPresenterTest {
         mEmptyTasksCursor = MockCursorProvider.createEmptyTasksCursor();
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(
-                mStatisticsView, mTasksLoaderProvider, mLoaderManager);
+        mStatisticsPresenter = new StatisticsPresenter(mTasksInteractor, mStatisticsView);
     }
 
     @Test
     public void loadEmptyTasksFromRepository_CallViewToDisplay() {
-        mStatisticsPresenter.onLoadFinished(mock(Loader.class), mEmptyTasksCursor);
+        mStatisticsPresenter.onDataLoaded(mEmptyTasksCursor);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -75,7 +72,7 @@ public class StatisticsPresenterTest {
     @Test
     public void loadNonEmptyTasksFromRepository_CallViewToDisplay() {
         // When the loader finishes with tasks
-        mStatisticsPresenter.onLoadFinished(mock(Loader.class), mAllTasksCursor);
+        mStatisticsPresenter.onDataLoaded(mAllTasksCursor);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -85,7 +82,7 @@ public class StatisticsPresenterTest {
     @Test
     public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         // When the loader returns null
-        mStatisticsPresenter.onLoadFinished(mock(Loader.class), null);
+        mStatisticsPresenter.onDataNotAvailable();
 
         // Then an error message is shown
         verify(mStatisticsView).showLoadingStatisticsError();

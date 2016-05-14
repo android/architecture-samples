@@ -67,25 +67,20 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksI
 
     private void loadStatistics(Cursor data) {
         mStatisticsView.setProgressIndicator(false);
-        if (data.moveToFirst()) {
-            int activeTasks = 0;
-            int completedTasks = 0;
+        int activeTasks = 0;
+        int completedTasks = 0;
 
-            List<Task> tasks = convertCursorToTasks(data);
+        List<Task> tasks = convertCursorToTasks(data);
 
-            // Calculate number of active and completed tasks
-            for (Task task : tasks) {
-                if (task.isCompleted()) {
-                    completedTasks += 1;
-                } else {
-                    activeTasks += 1;
-                }
+        // Calculate number of active and completed tasks
+        for (Task task : tasks) {
+            if (task.isCompleted()) {
+                completedTasks += 1;
+            } else {
+                activeTasks += 1;
             }
-
-            mStatisticsView.showStatistics(activeTasks, completedTasks);
-        } else {
-            mStatisticsView.showLoadingStatisticsError();
         }
+        mStatisticsView.showStatistics(activeTasks, completedTasks);
     }
 
     private List<Task> convertCursorToTasks(Cursor data) {
