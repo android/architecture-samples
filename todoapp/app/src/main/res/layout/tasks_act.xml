@@ -20,7 +20,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TasksActivity"
+    tools:context=".tasks.TasksActivity"
     tools:openDrawer="start">
 
     <LinearLayout
@@ -59,7 +59,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@drawable/ic_add"
                 app:fabSize="normal"
-                app:layout_anchor="@id/coordinatorLayout"
+                app:layout_anchor="@id/contentFrame"
                 app:layout_anchorGravity="bottom|right|end" />
         </android.support.design.widget.CoordinatorLayout>
 
