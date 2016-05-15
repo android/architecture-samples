@@ -46,7 +46,6 @@ public class TasksRemoteDataSource implements TasksDataSource {
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
     }
 
-    @Inject
     public TasksRemoteDataSource() {}
 
     private static void addTask(String title, String description) {
