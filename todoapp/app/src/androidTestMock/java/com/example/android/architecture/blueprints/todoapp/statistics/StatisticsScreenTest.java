@@ -26,9 +26,7 @@ import android.view.Gravity;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,11 +34,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.*;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.DrawerActions.open;
 import static android.support.test.espresso.contrib.DrawerMatchers.isClosed;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -68,27 +71,7 @@ public class StatisticsScreenTest {
     public ActivityTestRule<StatisticsActivity> mStatisticsActivityTestRule =
             new ActivityTestRule<>(StatisticsActivity.class, true, false);
 
-    /**
-     * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
-     * <p/>
-     * Rules are interceptors which are executed for each test method and are important building
-     * blocks of Junit tests.
-     */
-    @Rule
-    public ActivityTestRule<TasksActivity> mTasksActivityTestRule =
-            new ActivityTestRule<TasksActivity>(TasksActivity.class) {
 
-                /**
-                 * To avoid a long list of tasks and the need to scroll through the list to find a
-                 * task, we call {@link TasksDataSource#deleteAllTasks()} before each test.
-                 */
-                @Override
-                protected void beforeActivityLaunched() {
-                    super.beforeActivityLaunched();
-                    // Doing this in @Before generates a race condition.
-
-                }
-            };
 
     /**
      * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
@@ -108,7 +91,7 @@ public class StatisticsScreenTest {
 
         // Lazily start the Activity from the ActivityTestRule
         Intent startIntent = new Intent();
-        mTasksActivityTestRule.launchActivity(startIntent);
+        mStatisticsActivityTestRule.launchActivity(startIntent);
     }
 
     @Test

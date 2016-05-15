@@ -55,7 +55,6 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
     private final LoaderProvider mLoaderProvider;
 
     private TaskFilter mCurrentFiltering;
-    private boolean mFirstLoad;
 
     public TasksPresenter(@NonNull LoaderProvider loaderProvider, @NonNull LoaderManager loaderManager, @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView, @NonNull TaskFilter taskFilter) {
         mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider provider cannot be null");
@@ -84,8 +83,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
      */
     public void loadTasks(boolean forceUpdate) {
         mTasksView.setLoadingIndicator(true);
-        if (forceUpdate || mFirstLoad) {
-            mFirstLoad = false;
+        if (forceUpdate) {
             mTasksRepository.getTasks(this);
         }
 

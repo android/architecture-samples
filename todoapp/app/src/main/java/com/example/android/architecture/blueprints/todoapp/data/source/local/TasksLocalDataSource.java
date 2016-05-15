@@ -87,7 +87,9 @@ public class TasksLocalDataSource implements TasksDataSource {
         String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
 
-        mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
+        int rows = mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
+
+        checkNotNull(rows);
     }
 
     public void activateTask(@NonNull Task task) {

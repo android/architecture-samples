@@ -70,10 +70,6 @@ public class TasksRepository implements TasksDataSource {
         INSTANCE = null;
     }
 
-    public void refreshTasks() {
-
-    }
-
     /**
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first.
@@ -177,7 +173,6 @@ public class TasksRepository implements TasksDataSource {
     }
 
     private void refreshLocalDataSource(List<Task> tasks) {
-        mTasksLocalDataSource.deleteAllTasks();
         for (Task task : tasks) {
             mTasksLocalDataSource.saveTask(task);
         }

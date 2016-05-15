@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,11 +31,9 @@ import java.util.Map;
  */
 public class TasksRemoteDataSource implements TasksDataSource {
 
-    private static TasksRemoteDataSource INSTANCE;
-
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
-
     private final static Map<String, Task> TASKS_SERVICE_DATA;
+    private static TasksRemoteDataSource INSTANCE;
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
@@ -44,15 +41,15 @@ public class TasksRemoteDataSource implements TasksDataSource {
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
     }
 
+    // Prevent direct instantiation.
+    private TasksRemoteDataSource() {
+    }
+
     public static TasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TasksRemoteDataSource();
         }
         return INSTANCE;
-    }
-
-    // Prevent direct instantiation.
-    private TasksRemoteDataSource() {
     }
 
     private static void addTask(String title, String description) {
@@ -97,17 +94,20 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        completeTask(oldTask);
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
-
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        TASKS_SERVICE_DATA.put(task.getId(), activeTask);
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
-
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        activateTask(oldTask);
     }
 
     public void clearCompletedTasks() {

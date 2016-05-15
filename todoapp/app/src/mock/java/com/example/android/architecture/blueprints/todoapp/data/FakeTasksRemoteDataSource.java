@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,9 +31,8 @@ import java.util.Map;
  */
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
-    private static FakeTasksRemoteDataSource INSTANCE;
-
     private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
+    private static FakeTasksRemoteDataSource INSTANCE;
 
     // Prevent direct instantiation.
     private FakeTasksRemoteDataSource() {
@@ -71,7 +69,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        completeTask(oldTask);
     }
 
     @Override
@@ -82,7 +81,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        activateTask(oldTask);
     }
 
     @Override
