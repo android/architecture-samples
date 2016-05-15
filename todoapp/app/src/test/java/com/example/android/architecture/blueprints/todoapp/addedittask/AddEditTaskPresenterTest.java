@@ -20,9 +20,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -48,7 +47,7 @@ public class AddEditTaskPresenterTest {
     private AddEditTaskContract.View mAddEditTaskView;
 
     @Mock
-    private TaskLoader mTaskLoader;
+    private LoaderProvider mLoaderProvider;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -74,7 +73,7 @@ public class AddEditTaskPresenterTest {
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,
-                                                         mTaskLoader, mLoaderManager);
+                mLoaderProvider, mLoaderManager);
 
     }
 

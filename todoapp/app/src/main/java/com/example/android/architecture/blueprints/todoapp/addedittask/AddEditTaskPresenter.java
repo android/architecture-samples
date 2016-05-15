@@ -24,7 +24,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -37,28 +37,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final int TASK_QUERY = 2;
-
+    private final LoaderProvider mLoaderProvider;
+    private final LoaderManager mLoaderManager;
     @NonNull
     private TasksRepository mTasksRepository;
-
     @NonNull
     private AddEditTaskContract.View mAddTaskView;
-
     @Nullable
     private String mTaskId;
 
-    private TaskLoader mTaskLoader;
-
-    private final LoaderManager mLoaderManager;
-
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
-                                @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
+                                @NonNull AddEditTaskContract.View addTaskView, @NonNull LoaderProvider loaderProvider,
                                 @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-        mTaskLoader = checkNotNull(taskLoader);
+        mLoaderProvider = checkNotNull(loaderProvider);
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mAddTaskView.setPresenter(this);
@@ -66,7 +60,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(TASK_QUERY, null, this);
+        mLoaderManager.initLoader(TasksInteractor.EDIT_TASK_LOADER, null, this);
     }
 
     @Override
@@ -88,10 +82,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (mTaskId == null) {
-            return null;
-        }
-        return mTaskLoader;
+        return mLoaderProvider.createTaskLoader(mTaskId);
     }
 
     @Override

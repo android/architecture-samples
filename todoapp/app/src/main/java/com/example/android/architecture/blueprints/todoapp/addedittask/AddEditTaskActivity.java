@@ -25,7 +25,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -77,7 +77,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 taskId,
                 Injection.provideTasksRepository(this),
                 addEditTaskFragment,
-                new TaskLoader(getApplicationContext(), internalTaskId),
+                new LoaderProvider(this),
                 getSupportLoaderManager());
     }
 

@@ -213,7 +213,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
-            if (data.moveToFirst()) {
+            if (data.moveToLast()) {
                 onDataLoaded(data);
             } else {
                 onDataEmpty();

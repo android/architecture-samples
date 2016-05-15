@@ -14,6 +14,8 @@ public class TasksInteractor {
 
     public final static int TASKS_LOADER = 1;
     public final static int TASK_LOADER = 2;
+    public final static int EDIT_TASK_LOADER = 3;
+
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
     public final static String KEY_TASK_ID = BuildConfig.APPLICATION_ID + "TASK_ID";
     private static TasksInteractor INSTANCE;

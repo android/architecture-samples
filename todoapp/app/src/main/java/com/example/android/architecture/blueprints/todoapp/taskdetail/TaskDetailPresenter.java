@@ -66,7 +66,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     private void loadTask() {
         mTaskDetailView.setLoadingIndicator(true);
-        mTasksRepository.getTask(mTaskId, this);
+//        mTasksRepository.getTask(mTaskId, this);
         mLoaderManager.initLoader(TasksInteractor.TASK_LOADER, null, this);
     }
 
@@ -150,7 +150,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
-            if (data.moveToFirst()) {
+            if (data.moveToLast()) {
                 onDataLoaded(data);
             } else {
                 onDataEmpty();
