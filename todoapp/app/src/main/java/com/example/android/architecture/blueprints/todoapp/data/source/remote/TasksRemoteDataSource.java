@@ -120,11 +120,6 @@ public class TasksRemoteDataSource implements TasksDataSource {
         }
     }
 
-    @Override
-    public void refreshTasks(GetTasksCallback callback) {
-
-    }
-
     public void deleteAllTasks() {
         TASKS_SERVICE_DATA.clear();
     }

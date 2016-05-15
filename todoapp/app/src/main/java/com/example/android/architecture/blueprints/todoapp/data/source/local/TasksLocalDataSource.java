@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -24,6 +25,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TaskValues;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 
@@ -36,12 +38,12 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     private static TasksLocalDataSource INSTANCE;
 
-    private TasksDbHelper mDbHelper;
+    private ContentResolver mContentResolver;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
-        mDbHelper = new TasksDbHelper(context);
+        mContentResolver = context.getContentResolver();
     }
 
     public static TasksLocalDataSource getInstance(@NonNull Context context) {
@@ -63,100 +65,76 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
-        values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
-        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-
-        db.insert(TaskEntry.TABLE_NAME, null, values);
-        db.close();
+        ContentValues values = TaskValues.from(task);
+        mContentResolver.insert(TasksPersistenceContract.TaskEntry.buildTasksUri(), values);
     }
 
     public void completeTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        checkNotNull(task);
 
         ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, 1);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {task.getId()};
 
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        db.close();
+        mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
     }
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
+        checkNotNull(taskId);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        ContentValues values = new ContentValues();
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, 1);
+
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
 
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        db.close();
+        mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
     }
 
     public void activateTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        checkNotNull(task);
 
         ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, false);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {task.getId()};
 
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        db.close();
+        mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        checkNotNull(taskId);
 
         ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
+        values.put(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED, false);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
 
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        db.close();
+        mContentResolver.update(TasksPersistenceContract.TaskEntry.buildTasksUri(), values, selection, selectionArgs);
     }
 
     public void clearCompletedTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
         String[] selectionArgs = {"1"};
 
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-        db.close();
-    }
-
-    @Override
-    public void refreshTasks(GetTasksCallback callback) {
-        // no-op
+        mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 
     public void deleteAllTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        db.delete(TaskEntry.TABLE_NAME, null, null);
-        db.close();
+        mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), null, null);
     }
 
     public void deleteTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String selection = TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
 
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-        db.close();
+        mContentResolver.delete(TasksPersistenceContract.TaskEntry.buildTasksUri(), selection, selectionArgs);
     }
 }

@@ -97,12 +97,6 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void refreshTasks(GetTasksCallback callback) {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
-    }
-
-    @Override
     public void deleteTask(String taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }
