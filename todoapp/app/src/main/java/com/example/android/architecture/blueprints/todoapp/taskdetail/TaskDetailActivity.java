@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
@@ -59,19 +60,18 @@ public class TaskDetailActivity extends AppCompatActivity {
             taskDetailFragment = TaskDetailFragment.newInstance(taskId);
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                                                taskDetailFragment, R.id.contentFrame
+                    taskDetailFragment, R.id.contentFrame
             );
         }
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
-        TasksInteractor tasksInteractor = TasksInteractor.getInstance(getSupportLoaderManager(), getContentResolver());
 
         // Create the presenter
         new TaskDetailPresenter(
                 taskId,
                 loaderProvider,
-                tasksInteractor,
+                Injection.provideTasksRepository(this),
                 taskDetailFragment
         );
     }

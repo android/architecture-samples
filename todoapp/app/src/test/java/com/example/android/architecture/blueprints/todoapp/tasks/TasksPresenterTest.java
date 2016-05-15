@@ -24,6 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class TasksPresenterTest {
     private TasksContract.View mTasksView;
 
     @Mock
-    private TasksInteractor mTasksInteractor;
+    private TasksRepository mTasksRepository;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -81,7 +82,7 @@ public class TasksPresenterTest {
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksInteractor, mTasksView, taskFilter);
+        mTasksPresenter = new TasksPresenter(mLoaderProvider, mLoaderManager, mTasksRepository, mTasksView, taskFilter);
 
         mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
         mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
@@ -163,7 +164,7 @@ public class TasksPresenterTest {
         mTasksPresenter.completeTask(task);
 
         // Then repository is called and task marked complete UI is shown
-        verify(mTasksInteractor).completeTask(task);
+        verify(mTasksRepository).completeTask(task);
         verify(mTasksView).showTaskMarkedComplete();
     }
 
@@ -176,7 +177,7 @@ public class TasksPresenterTest {
         mTasksPresenter.activateTask(task);
 
         // Then repository is called and task marked active UI is shown
-        verify(mTasksInteractor).activateTask(task);
+        verify(mTasksRepository).activateTask(task);
         verify(mTasksView).showTaskMarkedActive();
     }
 

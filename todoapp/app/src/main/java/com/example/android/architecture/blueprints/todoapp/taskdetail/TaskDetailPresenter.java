@@ -24,15 +24,18 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter, LoaderManager.LoaderCallbacks<Cursor> {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter, LoaderManager.LoaderCallbacks<Cursor>,TasksDataSource.GetTaskCallback {
 
     private TaskDetailContract.View mTaskDetailView;
     private LoaderProvider mLoaderProvider;
@@ -41,15 +44,15 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
     private String mTaskId;
 
     @NonNull
-    private final TasksInteractor mTasksInteractor;
+    private final TasksRepository mTasksRepository;
 
     public TaskDetailPresenter(@NonNull String taskId,
                                @NonNull LoaderProvider loaderProvider,
-                               @NonNull TasksInteractor tasksInteractor,
+                               @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailContract.View taskDetailView) {
         mTaskId = checkNotNull(taskId, "taskId cannot be null!");
         mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider cannot be null!");
-        mTasksInteractor = checkNotNull(tasksInteractor, "tasksOperations cannot be null!");
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mTaskDetailView.setPresenter(this);
     }
@@ -57,7 +60,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
     @Override
     public void start() {
         mTaskDetailView.setLoadingIndicator(true);
-        mTasksInteractor.getTask(mTaskId, this);
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override
@@ -71,7 +74,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     @Override
     public void deleteTask() {
-        mTasksInteractor.deleteTask(mTask);
+        mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
@@ -80,7 +83,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksInteractor.completeTask(mTask);
+        mTasksRepository.completeTask(mTask);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -90,7 +93,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksInteractor.activateTask(mTask);
+        mTasksRepository.activateTask(mTask);
         mTaskDetailView.showTaskMarkedActive();
     }
 
@@ -121,6 +124,11 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     public void onDataEmpty() {
         mTaskDetailView.showMissingTask();
+    }
+
+    @Override
+    public void onTaskLoaded(Task task) {
+
     }
 
     public void onDataNotAvailable() {

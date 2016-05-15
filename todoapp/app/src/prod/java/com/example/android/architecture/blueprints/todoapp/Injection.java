@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 
@@ -30,6 +31,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link TasksDataSource} at compile time.
  */
 public class Injection {
+
+    public static TasksRepository provideTasksRepository(Context context){
+        return TasksRepository.getInstance(provideRemoteDataSource(), provideLocalDataSource(context));
+    }
 
     public static TasksDataSource provideRemoteDataSource() {
         return TasksRemoteDataSource.getInstance();
