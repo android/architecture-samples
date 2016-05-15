@@ -5,36 +5,31 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.BuildConfig;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
 public class TasksInteractor {
 
-    private static TasksInteractor INSTANCE;
-
     public final static int TASKS_LOADER = 1;
-    private final static int TASK_LOADER = 2;
-
+    public final static int TASK_LOADER = 2;
     public final static String KEY_TASK_FILTER = BuildConfig.APPLICATION_ID + "TASK_FILTER";
     public final static String KEY_TASK_ID = BuildConfig.APPLICATION_ID + "TASK_ID";
-
+    private static TasksInteractor INSTANCE;
     private final LoaderManager mLoaderManager;
     private final ContentResolver mContentResolver;
+
+    private TasksInteractor(LoaderManager mLoaderManager, ContentResolver contentResolver) {
+        this.mLoaderManager = mLoaderManager;
+        this.mContentResolver = contentResolver;
+    }
 
     public static TasksInteractor getInstance(LoaderManager mLoaderManager, ContentResolver mContentResolver) {
         if (INSTANCE == null) {
             INSTANCE = new TasksInteractor(mLoaderManager, mContentResolver);
         }
         return INSTANCE;
-    }
-
-    private TasksInteractor(LoaderManager mLoaderManager, ContentResolver contentResolver) {
-        this.mLoaderManager = mLoaderManager;
-        this.mContentResolver = contentResolver;
     }
 
     public void getTasks(final Bundle extras, LoaderManager.LoaderCallbacks<Cursor> callback) {
