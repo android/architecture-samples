@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
@@ -42,7 +43,7 @@ public class Injection {
 
     public static TasksLocalDataSource provideLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
-        return TasksLocalDataSource.getInstance(context);
+        return TasksLocalDataSource.getInstance(context.getContentResolver());
     }
 
 }

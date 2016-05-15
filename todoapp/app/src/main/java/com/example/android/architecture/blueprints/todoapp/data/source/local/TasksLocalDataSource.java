@@ -41,14 +41,14 @@ public class TasksLocalDataSource implements TasksDataSource {
     private ContentResolver mContentResolver;
 
     // Prevent direct instantiation.
-    private TasksLocalDataSource(@NonNull Context context) {
-        checkNotNull(context);
-        mContentResolver = context.getContentResolver();
+    private TasksLocalDataSource(@NonNull ContentResolver contentResolver) {
+        checkNotNull(contentResolver);
+        mContentResolver = contentResolver;
     }
 
-    public static TasksLocalDataSource getInstance(@NonNull Context context) {
+    public static TasksLocalDataSource getInstance(@NonNull ContentResolver contentResolver) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksLocalDataSource(context);
+            INSTANCE = new TasksLocalDataSource(contentResolver);
         }
         return INSTANCE;
     }

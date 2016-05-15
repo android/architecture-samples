@@ -90,22 +90,6 @@ public class TasksRepository implements TasksDataSource {
 
     }
 
-    @Override
-    public void refreshTasks(final GetTasksCallback callback) {
-        mTasksRemoteDataSource.getTasks(new GetTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                refreshCache(tasks);
-                refreshLocalDataSource(tasks);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                callback.onDataNotAvailable();
-            }
-        });
-    }
-
     /**
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first.
