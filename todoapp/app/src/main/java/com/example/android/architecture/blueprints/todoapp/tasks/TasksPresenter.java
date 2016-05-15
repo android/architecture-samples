@@ -188,6 +188,11 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
         mTasksView.showCompletedTasksCleared();
     }
 
+    @Override
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering.getTasksFilterType();
+    }
+
     /**
      * Sets the current task filtering type.
      *
@@ -201,12 +206,6 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
     }
 
     @Override
-    public TasksFilterType getFiltering() {
-        return mCurrentFiltering.getTasksFilterType();
-    }
-
-
-    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return mLoaderProvider.createFilteredTasksLoader(mCurrentFiltering);
     }
@@ -214,7 +213,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
-            if (data.getCount() > 0) {
+            if (data.moveToFirst()) {
                 onDataLoaded(data);
             } else {
                 onDataEmpty();
