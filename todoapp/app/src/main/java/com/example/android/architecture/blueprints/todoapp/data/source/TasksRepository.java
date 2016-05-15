@@ -83,6 +83,9 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public void getTasks(@NonNull final GetTasksCallback callback) {
+        checkNotNull(callback);
+
+        // Load from server
         mTasksRemoteDataSource.getTasks(new GetTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
@@ -96,7 +99,6 @@ public class TasksRepository implements TasksDataSource {
         });
     }
 
-
     /**
      * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
      * uses the network data source. This is done to simplify the sample.
@@ -109,10 +111,8 @@ public class TasksRepository implements TasksDataSource {
         checkNotNull(taskId);
         checkNotNull(callback);
 
-        // Load from server/persisted if needed.
-
-        // Is the task in the local data source? If not, query the network.
-        mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
+        // Load from server
+        mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
                 callback.onTaskLoaded(task);
@@ -120,17 +120,7 @@ public class TasksRepository implements TasksDataSource {
 
             @Override
             public void onDataNotAvailable() {
-                mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
-                    @Override
-                    public void onTaskLoaded(Task task) {
-                        callback.onTaskLoaded(task);
-                    }
-
-                    @Override
-                    public void onDataNotAvailable() {
-                        callback.onDataNotAvailable();
-                    }
-                });
+                callback.onDataNotAvailable();
             }
         });
     }
@@ -145,27 +135,27 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void completeTask(@NonNull Task task) {
         checkNotNull(task);
-        mTasksRemoteDataSource.completeTask(task);
-        mTasksLocalDataSource.completeTask(task);
+        completeTask(task.getId());
     }
 
     @Override
     public void completeTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        completeTask(taskId);
+        mTasksRemoteDataSource.completeTask(taskId);
+        mTasksLocalDataSource.completeTask(taskId);
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
         checkNotNull(task);
-        mTasksRemoteDataSource.activateTask(task);
-        mTasksLocalDataSource.activateTask(task);
+        activateTask(task.getId());
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        activateTask(taskId);
+        mTasksRemoteDataSource.activateTask(taskId);
+        mTasksLocalDataSource.activateTask(taskId);
     }
 
     @Override
