@@ -268,9 +268,6 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasks_refreshesLocalDataSource() {
-        // Mark cache as dirty to force a reload of data from remote data source.
-        mTasksRepository.refreshTasks();
-
         // When calling getTasks in the repository
         mTasksRepository.getTasks(mGetTasksCallback);
 

@@ -16,15 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
 
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 

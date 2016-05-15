@@ -17,11 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,13 @@ public class StatisticsPresenterTest {
     private StatisticsContract.View mStatisticsView;
 
     @Mock
-    private TasksInteractor mTasksInteractor;
+    private TasksRepository mTasksRepository;
+
+    @Mock
+    private LoaderProvider mLoaderProvider;
+
+    @Mock
+    private LoaderManager mLoaderManager;
 
     private MockCursorProvider.TaskMockCursor mAllTasksCursor;
     private MockCursorProvider.TaskMockCursor mEmptyTasksCursor;
@@ -57,7 +62,7 @@ public class StatisticsPresenterTest {
         mEmptyTasksCursor = MockCursorProvider.createEmptyTasksCursor();
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mTasksInteractor, mStatisticsView);
+        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mLoaderProvider, mLoaderManager, mStatisticsView);
     }
 
     @Test

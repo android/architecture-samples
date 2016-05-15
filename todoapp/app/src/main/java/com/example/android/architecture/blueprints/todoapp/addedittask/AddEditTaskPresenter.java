@@ -25,7 +25,6 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,12 +36,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    public final static int EDIT_TASK_LOADER = 3;
+
+    @NonNull
     private final LoaderProvider mLoaderProvider;
+
+    @NonNull
     private final LoaderManager mLoaderManager;
+
     @NonNull
     private TasksRepository mTasksRepository;
+
     @NonNull
     private AddEditTaskContract.View mAddTaskView;
+
     @Nullable
     private String mTaskId;
 
@@ -60,7 +67,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(TasksInteractor.EDIT_TASK_LOADER, null, this);
+        mLoaderManager.initLoader(EDIT_TASK_LOADER, null, this);
     }
 
     @Override

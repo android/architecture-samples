@@ -25,7 +25,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -88,7 +87,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Given a task filter
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // Get a reference to the class under test
@@ -120,14 +119,14 @@ public class TasksPresenterTest {
     public void loadAllTasksInitsLoaderFirstTime() {
         mTasksPresenter.loadTasks(true);
 
-        when(mLoaderManager.getLoader(TasksInteractor.TASKS_LOADER)).thenReturn(null);
+        when(mLoaderManager.getLoader(TasksPresenter.TASKS_LOADER)).thenReturn(null);
         verify(mLoaderManager).initLoader(anyInt(), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
     }
 
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
@@ -143,7 +142,7 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksReturnsNothingShowsEmptyMessage() {
         // When the loader finishes with tasks and filter is set to completed
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
@@ -157,7 +156,7 @@ public class TasksPresenterTest {
     @Test
     public void loadCompletedTasksReturnsNothingShowsEmptyMessage() {
         // When the loader finishes with tasks and filter is set to completed
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
@@ -171,7 +170,7 @@ public class TasksPresenterTest {
     @Test
     public void loadActiveTasksReturnsNothingShowsEmptyMessage() {
         // When the loader finishes with tasks and filter is set to completed
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         mTasksPresenter.setFiltering(taskFilter);
@@ -184,7 +183,7 @@ public class TasksPresenterTest {
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with tasks and filter is set to active
@@ -199,7 +198,7 @@ public class TasksPresenterTest {
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with tasks and filter is set to completed
@@ -214,7 +213,7 @@ public class TasksPresenterTest {
 
     @Test
     public void unavailableTasks_ShowsError() {
-        when(mBundle.getSerializable(TasksInteractor.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
         TaskFilter taskFilter = new TaskFilter(mBundle);
 
         // When the loader finishes with error

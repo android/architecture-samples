@@ -25,7 +25,6 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,6 +36,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the UI as required.
  */
 public class TaskDetailPresenter implements TaskDetailContract.Presenter, LoaderManager.LoaderCallbacks<Cursor>,TasksDataSource.GetTaskCallback {
+
+    public final static int TASK_LOADER = 2;
 
     @NonNull
     private final TasksRepository mTasksRepository;
@@ -67,7 +68,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
     private void loadTask() {
         mTaskDetailView.setLoadingIndicator(true);
 //        mTasksRepository.getTask(mTaskId, this);
-        mLoaderManager.initLoader(TasksInteractor.TASK_LOADER, null, this);
+        mLoaderManager.initLoader(TASK_LOADER, null, this);
     }
 
     @Override

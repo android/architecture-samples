@@ -28,7 +28,6 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import java.util.List;
@@ -42,6 +41,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
 public class TasksPresenter implements TasksContract.Presenter, TasksRepository.LoadDataCallback, TasksDataSource.GetTasksCallback, LoaderManager.LoaderCallbacks<Cursor> {
+
+    public final static int TASKS_LOADER = 1;
 
     private final TasksContract.View mTasksView;
 
@@ -87,10 +88,10 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
             mTasksRepository.getTasks(this);
         }
 
-        if (mLoaderManager.getLoader(TasksInteractor.TASKS_LOADER) == null) {
-            mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
+            mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
         } else {
-            mLoaderManager.restartLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+            mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
         }
     }
 
@@ -200,7 +201,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
     @Override
     public void setFiltering(TaskFilter taskFilter) {
         mCurrentFiltering = taskFilter;
-        mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
     }
 
     @Override
