@@ -23,6 +23,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksInteractor;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TaskFilter;
@@ -37,24 +39,31 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter, TasksRepository.LoadDataCallback, LoaderManager.LoaderCallbacks<Cursor> {
-
-    private StatisticsContract.View mStatisticsView;
+public class StatisticsPresenter implements StatisticsContract.Presenter, TasksRepository.LoadDataCallback, LoaderManager.LoaderCallbacks<Cursor>, TasksDataSource.GetTasksCallback {
 
     @NonNull
-    private final TasksInteractor mTasksInteractor;
+    private final TasksRepository mTasksRepository;
+    @NonNull
+    private final LoaderManager mLoaderManager;
+    @NonNull
+    private final LoaderProvider mLoaderProvider;
+    private StatisticsContract.View mStatisticsView;
 
-    public StatisticsPresenter(@NonNull TasksInteractor tasksInteractor,
+    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
+                               @NonNull LoaderProvider loaderProvider,
+                               @NonNull LoaderManager loaderManager,
                                @NonNull StatisticsContract.View statisticsView) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mTasksInteractor = checkNotNull(tasksInteractor, "tasksInteractor cannot be null!");
+        mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider provider cannot be null");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager provider cannot be null");
+        mTasksRepository = checkNotNull(tasksRepository, "tasksInteractor cannot be null!");
         mStatisticsView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        Bundle allTasks = TaskFilter.from(TasksFilterType.ALL_TASKS).getFilterExtras();
-        mTasksInteractor.getTasks(allTasks, this);
+        mTasksRepository.getTasks(this);
+        mLoaderManager.initLoader(TasksInteractor.TASKS_LOADER, null, this);
     }
 
     @Override
@@ -65,6 +74,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksR
     @Override
     public void onDataEmpty() {
         mStatisticsView.showStatistics(0, 0);
+    }
+
+    @Override
+    public void onTasksLoaded(List<Task> tasks) {
+
     }
 
     @Override
@@ -111,12 +125,20 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksR
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        return mLoaderProvider.createFilteredTasksLoader(TaskFilter.from(TasksFilterType.ALL_TASKS));
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        if (data != null) {
+            if (data.moveToLast()) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
+        } else {
+            onDataNotAvailable();
+        }
     }
 
     @Override
