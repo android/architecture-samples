@@ -18,16 +18,11 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskValues;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,12 +50,12 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void getTasks(@NonNull GetTasksCallback callback) {
-
+        // no-op since the data is loader via Cursor Loader
     }
 
     @Override
     public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
-
+        // no-op since the data is loader via Cursor Loader
     }
 
     public void saveTask(@NonNull Task task) {

@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
@@ -26,15 +27,18 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -52,11 +56,12 @@ public class TasksLocalDataSourceTest {
     private final static String TITLE3 = "title3";
 
     private TasksLocalDataSource mLocalDataSource;
+    private ContentResolver mContentResolver;
 
     @Before
     public void setup() {
-        mLocalDataSource = TasksLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext());
+        mContentResolver = InstrumentationRegistry.getTargetContext().getContentResolver();
+        mLocalDataSource = TasksLocalDataSource.getInstance(mContentResolver);
     }
 
     @After
@@ -78,7 +83,14 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository
-        Cursor savedTaskCursor = mLocalDataSource.getTask(newTask.getId());
+        Cursor savedTaskCursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask.getId())},
+                null
+        );
+
         savedTaskCursor.moveToFirst();
         assertNotNull(savedTaskCursor);
         assertTrue(savedTaskCursor.getCount() >= 1);
@@ -97,7 +109,13 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.completeTask(newTask);
 
         // Then the task can be retrieved from the persistent repository and is completed
-        Cursor taskCursor = mLocalDataSource.getTask(newTask.getId());
+        Cursor taskCursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask.getId())},
+                null
+        );
         taskCursor.moveToFirst();
 
         Task completedTask = Task.from(taskCursor);
@@ -125,7 +143,13 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.activateTask(newTask);
 
         // Then the task can be retrieved from the persistent repository and is active
-        Cursor taskCursor = mLocalDataSource.getTask(newTask.getId());
+        Cursor taskCursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask.getId())},
+                null
+        );
         taskCursor.moveToFirst();
 
         Task activeTask = Task.from(taskCursor);
@@ -151,13 +175,31 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.clearCompletedTasks();
 
         // Then the completed tasks cannot be retrieved and the active one can
-        Cursor task1Cursor = mLocalDataSource.getTask(newTask1.getId());
+        Cursor task1Cursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask1.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask1.getId())},
+                null
+        );
         assertFalse(task1Cursor.moveToFirst());
 
-        Cursor task2Cursor = mLocalDataSource.getTask(newTask2.getId());
+        Cursor task2Cursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask2.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask2.getId())},
+                null
+        );
         assertFalse(task2Cursor.moveToFirst());
 
-        Cursor task3Cursor = mLocalDataSource.getTask(newTask3.getId());
+        Cursor task3Cursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUriWith(newTask3.getId()),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                new String[]{String.valueOf(newTask3.getId())},
+                null
+        );
         assertTrue(task3Cursor.moveToFirst());
     }
 
@@ -171,7 +213,14 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.deleteAllTasks();
 
         // Then the retrieved tasks is an empty list
-        Cursor cursor = mLocalDataSource.getTasks(null, null);
+        Cursor cursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                null,
+                null
+        );
+        cursor.moveToFirst();
         assertNotNull(cursor);
         assertEquals(cursor.getCount(), 0);
     }
@@ -185,7 +234,14 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask2);
 
         // Then the tasks can be retrieved from the persistent repository
-        Cursor cursor = mLocalDataSource.getTasks(null, null);
+        Cursor cursor = mContentResolver.query(
+                TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                TasksPersistenceContract.TaskEntry.TASKS_COLUMNS,
+                null,
+                null,
+                null
+        );
+        cursor.moveToFirst();
         assertNotNull(cursor);
         assertTrue(cursor.getCount() >= 2);
 
