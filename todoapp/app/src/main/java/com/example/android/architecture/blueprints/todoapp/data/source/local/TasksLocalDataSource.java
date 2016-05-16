@@ -43,7 +43,6 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     private TasksDbHelper mDbHelper;
 
-    @Inject
     public TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
         mDbHelper = new TasksDbHelper(context);
