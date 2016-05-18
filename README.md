@@ -2,7 +2,7 @@
 
 It is based on the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/todoapp) sample and uses the Data Binding library to display data and bind UI elements to actions.
 
-It's doesn't follow a strict Model-View-ViewModel or a Model-View-Presenter
+It doesn't follow a strict Model-View-ViewModel or a Model-View-Presenter
 pattern, as it uses both View Models and Presenters.
 
 The [Data Binding Library](http://developer.android.com/tools/data-binding/guide.html#data_objects) saves on boilerplate code allowing UI elements to be bound to a property in a
