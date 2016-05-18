@@ -32,18 +32,19 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    interface LoadTasksCallback {
-
-        void onTasksLoaded(List<Task> tasks);
+    interface Callback {
 
         void onDataNotAvailable();
     }
 
-    interface GetTaskCallback {
+    interface LoadTasksCallback extends Callback {
+
+        void onTasksLoaded(List<Task> tasks);
+    }
+
+    interface GetTaskCallback extends Callback {
 
         void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
     }
 
     void getTasks(@NonNull LoadTasksCallback callback);
