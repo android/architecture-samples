@@ -41,7 +41,9 @@ public interface AddEditTaskContract {
 
         void createTask(String title, String description);
 
-        void updateTask( String title, String description);
+        void updateTask(String title, String description);
+
+        void onTaskFabClick(String title, String description);
 
         void populateTask();
     }
