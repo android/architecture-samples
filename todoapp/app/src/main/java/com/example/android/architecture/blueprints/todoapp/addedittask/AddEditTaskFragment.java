@@ -74,7 +74,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.onTaskFabClick(mTitle.getText().toString(), mDescription.getText().toString());
+                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
             }
         });
     }

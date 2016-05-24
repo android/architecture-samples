@@ -84,7 +84,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void onTaskFabClick(String title, String description) {
+    public void saveTask(String title, String description) {
         if (isNewTask()) {
             createTask(title, description);
         } else {
