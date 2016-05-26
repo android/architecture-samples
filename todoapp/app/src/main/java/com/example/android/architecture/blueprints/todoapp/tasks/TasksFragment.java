@@ -177,7 +177,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.tasks_fragment_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

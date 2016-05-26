@@ -16,6 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
@@ -30,11 +35,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -76,7 +76,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the presenter is asked to save a task
-        mAddEditTaskPresenter.createTask("New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
@@ -86,7 +86,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // When the presenter is asked to save an empty task
-        mAddEditTaskPresenter.createTask("", "");
+        mAddEditTaskPresenter.saveTask("", "");
 
         // Then an empty not error is shown in the UI
         verify(mAddEditTaskView).showEmptyTaskError();
@@ -95,7 +95,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // When the presenter is asked to save an existing task
-        mAddEditTaskPresenter.updateTask("1", "New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model

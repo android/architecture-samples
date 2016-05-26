@@ -37,8 +37,6 @@ public interface AddEditTaskContract {
 
     interface Presenter extends BasePresenter {
 
-        void createTask(String title, String description);
-
-        void updateTask(String taskId, String title, String description);
+        void saveTask(String title, String description);
     }
 }

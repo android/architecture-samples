@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +27,6 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
@@ -38,10 +38,10 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private static final int TASK_QUERY = 2;
 
     @NonNull
-    private TasksDataSource mTasksRepository;
+    private final TasksDataSource mTasksRepository;
 
     @NonNull
-    private AddEditTaskContract.View mAddTaskView;
+    private final AddEditTaskContract.View mAddTaskView;
 
     @Nullable
     private String mTaskId;
@@ -64,24 +64,18 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(TASK_QUERY, null, this);
-    }
-
-    @Override
-    public void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
-        } else {
-            mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+        if (!isNewTask()) {
+	        mLoaderManager.initLoader(TASK_QUERY, null, this);
         }
     }
 
     @Override
-    public void updateTask(String taskId, String title, String description) {
-        mTasksRepository.saveTask(new Task(title, description, taskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+    public void saveTask(String title, String description) {
+        if (isNewTask()) {
+            createTask(title, description);
+        } else {
+            updateTask(title, description);
+        }
     }
 
     @Override
@@ -94,7 +88,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void onLoadFinished(Loader<Task> loader, Task data) {
-
         if (data != null) {
             mAddTaskView.setDescription(data.getDescription());
             mAddTaskView.setTitle(data.getTitle());
@@ -106,5 +99,27 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void onLoaderReset(Loader<Task> loader) {
 
+    }
+
+    private boolean isNewTask() {
+        return mTaskId == null;
+    }
+
+    private void createTask(String title, String description) {
+        Task newTask = new Task(title, description);
+        if (newTask.isEmpty()) {
+            mAddTaskView.showEmptyTaskError();
+        } else {
+            mTasksRepository.saveTask(newTask);
+            mAddTaskView.showTasksList();
+        }
+    }
+
+    private void updateTask(String title, String description) {
+        if (isNewTask()) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+        mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 }
