@@ -58,34 +58,23 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        if (mTaskId != null) {
+        if (!isNewTask()) {
             populateTask();
         }
     }
 
     @Override
-    public void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+    public void saveTask(String title, String description) {
+        if (isNewTask()) {
+            createTask(title, description);
         } else {
-            mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            updateTask(title, description);
         }
-    }
-
-    @Override
-    public void updateTask(String title, String description) {
-        if (mTaskId == null) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
     @Override
     public void populateTask() {
-        if (mTaskId == null) {
+        if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
         mTasksRepository.getTask(mTaskId, this);
@@ -105,5 +94,27 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    private boolean isNewTask() {
+        return mTaskId == null;
+    }
+
+    private void createTask(String title, String description) {
+        Task newTask = new Task(title, description);
+        if (newTask.isEmpty()) {
+            mAddTaskView.showEmptyTaskError();
+        } else {
+            mTasksRepository.saveTask(newTask);
+            mAddTaskView.showTasksList();
+        }
+    }
+
+    private void updateTask(String title, String description) {
+        if (isNewTask()) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+        mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 }

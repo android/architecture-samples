@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +31,8 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -78,16 +78,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isNewTask()) {
-                    mPresenter.createTask(
-                            mTitle.getText().toString(),
-                            mDescription.getText().toString());
-                } else {
-                    mPresenter.updateTask(
-                            mTitle.getText().toString(),
-                            mDescription.getText().toString());
-                }
-
+                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
             }
         });
     }
@@ -125,9 +116,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public boolean isActive() {
         return isAdded();
-    }
-
-    private boolean isNewTask() {
-        return getArguments() == null || !getArguments().containsKey(ARGUMENT_EDIT_TASK_ID);
     }
 }

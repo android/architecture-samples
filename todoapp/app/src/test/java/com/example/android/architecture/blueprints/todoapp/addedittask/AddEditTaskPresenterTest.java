@@ -68,7 +68,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the presenter is asked to save a task
-        mAddEditTaskPresenter.createTask("New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
@@ -77,8 +77,11 @@ public class AddEditTaskPresenterTest {
 
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
+        // Task is new (id is null)
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+
         // When the presenter is asked to save an empty task
-        mAddEditTaskPresenter.createTask("", "");
+        mAddEditTaskPresenter.saveTask("", "");
 
         // Then an empty not error is shown in the UI
         verify(mAddEditTaskView).showEmptyTaskError();
@@ -87,7 +90,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // When the presenter is asked to save an existing task
-        mAddEditTaskPresenter.updateTask("New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
