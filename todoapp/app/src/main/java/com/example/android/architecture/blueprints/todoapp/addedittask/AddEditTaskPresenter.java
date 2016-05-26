@@ -71,45 +71,12 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     }
 
     @Override
-    public void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+    public void saveTask(String title, String description) {
+        if (isNewTask()) {
+            createTask(title, description);
         } else {
-            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                    new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
-                        @Override
-                        public void onSuccess(SaveTask.ResponseValue response) {
-                            mAddTaskView.showTasksList();
-                        }
-
-                        @Override
-                        public void onError() {
-                            showSaveError();
-                        }
-                    });
+            updateTask(title, description);
         }
-    }
-
-    @Override
-    public void updateTask(String title, String description) {
-        if (mTaskId == null) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
-        Task newTask = new Task(title, description, mTaskId);
-        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
-                new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
-                    @Override
-                    public void onSuccess(SaveTask.ResponseValue response) {
-                        // After an edit, go back to the list.
-                        mAddTaskView.showTasksList();
-                    }
-
-                    @Override
-                    public void onError() {
-                        showSaveError();
-                    }
-                });
     }
 
     @Override
@@ -149,5 +116,49 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    private boolean isNewTask() {
+        return mTaskId == null;
+    }
+
+    private void createTask(String title, String description) {
+        Task newTask = new Task(title, description);
+        if (newTask.isEmpty()) {
+            mAddTaskView.showEmptyTaskError();
+        } else {
+            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                    new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                        @Override
+                        public void onSuccess(SaveTask.ResponseValue response) {
+                            mAddTaskView.showTasksList();
+                        }
+
+                        @Override
+                        public void onError() {
+                            showSaveError();
+                        }
+                    });
+        }
+    }
+
+    private void updateTask(String title, String description) {
+        if (mTaskId == null) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        Task newTask = new Task(title, description, mTaskId);
+        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(SaveTask.ResponseValue response) {
+                        // After an edit, go back to the list.
+                        mAddTaskView.showTasksList();
+                    }
+
+                    @Override
+                    public void onError() {
+                        showSaveError();
+                    }
+                });
     }
 }
