@@ -67,29 +67,26 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(EDIT_TASK_LOADER, null, this);
-    }
-
-    @Override
-    public void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
-        } else {
-            mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+        if (!isNewTask()) {
+            populateTask();
         }
     }
 
     @Override
-    public void updateTask(String taskId, String title, String description) {
-        mTasksRepository.saveTask(new Task(title, description, taskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+    public void saveTask(String title, String description) {
+        if (isNewTask()) {
+            createTask(title, description);
+        } else {
+            updateTask(title, description);
+        }
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return mLoaderProvider.createTaskLoader(mTaskId);
+    public void populateTask() {
+        if (isNewTask()) {
+            throw new RuntimeException("populateTask() was called but task is new.");
+        }
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override
@@ -106,5 +103,27 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    private boolean isNewTask() {
+        return mTaskId == null;
+    }
+
+    private void createTask(String title, String description) {
+        Task newTask = new Task(title, description);
+        if (newTask.isEmpty()) {
+            mAddTaskView.showEmptyTaskError();
+        } else {
+            mTasksRepository.saveTask(newTask);
+            mAddTaskView.showTasksList();
+        }
+    }
+
+    private void updateTask(String title, String description) {
+        if (isNewTask()) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+        mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 }

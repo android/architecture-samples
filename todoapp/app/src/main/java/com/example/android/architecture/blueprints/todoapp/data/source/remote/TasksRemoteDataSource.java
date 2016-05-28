@@ -83,11 +83,13 @@ public class TasksRemoteDataSource implements TasksDataSource {
         callback.onTaskLoaded(task);
     }
 
-    public void saveTask(Task task) {
+    @Override
+    public void saveTask(@NonNull Task task) {
         TASKS_SERVICE_DATA.put(task.getId(), task);
     }
 
-    public void completeTask(Task task) {
+    @Override
+    public void completeTask(@NonNull Task task) {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
@@ -124,7 +126,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.clear();
     }
 
-    public void deleteTask(String taskId) {
+    @Override
+    public void deleteTask(@NonNull String taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }
 }
