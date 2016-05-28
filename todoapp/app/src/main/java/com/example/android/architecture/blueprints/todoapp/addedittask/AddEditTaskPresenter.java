@@ -25,16 +25,18 @@ import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
  * the UI as required.
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, TasksDataSource.GetTaskCallback {
 
     public final static int EDIT_TASK_LOADER = 3;
 
@@ -90,6 +92,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mLoaderProvider.createTaskLoader(mTaskId);
+    }
+
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToLast()) {
             Task task = Task.from(data);
@@ -125,5 +132,15 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
+    }
+
+    @Override
+    public void onTaskLoaded(Task task) {
+
+    }
+
+    @Override
+    public void onDataNotAvailable() {
+
     }
 }

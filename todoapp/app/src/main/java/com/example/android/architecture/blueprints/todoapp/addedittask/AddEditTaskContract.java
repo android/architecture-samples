@@ -40,6 +40,5 @@ public interface AddEditTaskContract {
         void saveTask(String title, String description);
 
         void populateTask();
-        void updateTask(String taskId, String title, String description);
     }
 }

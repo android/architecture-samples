@@ -46,12 +46,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mDescription;
 
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
-    }
-
     public AddEditTaskFragment() {
         // Required empty public constructor
+    }
+
+    public static AddEditTaskFragment newInstance() {
+        return new AddEditTaskFragment();
     }
 
     @Override
@@ -113,8 +113,4 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mDescription.setText(description);
     }
 
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
 }
