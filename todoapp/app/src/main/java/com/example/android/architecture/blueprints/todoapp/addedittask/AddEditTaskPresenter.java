@@ -136,11 +136,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void onTaskLoaded(Task task) {
-
+        // not necessary, the UI knows when the data is refreshed via the Loader
     }
 
     @Override
     public void onDataNotAvailable() {
-
+        mAddTaskView.showEmptyTaskError();
     }
 }

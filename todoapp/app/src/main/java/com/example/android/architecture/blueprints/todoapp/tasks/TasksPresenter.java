@@ -114,7 +114,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
 
     @Override
     public void onTasksLoaded(List<Task> tasks) {
-
+        // not necessary, the UI knows when the data is refreshed via the Loader
     }
 
     @Override

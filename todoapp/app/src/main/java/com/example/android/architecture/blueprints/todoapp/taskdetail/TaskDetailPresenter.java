@@ -136,7 +136,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     @Override
     public void onTaskLoaded(Task task) {
-
+        // not necessary, the UI knows when the data is refreshed via the Loader
     }
 
     public void onDataNotAvailable() {
