@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title_hint"
-                 android:maxLines="1"
+                android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
         <EditText
