@@ -76,13 +76,13 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
 
     @Override
     public void start() {
-        loadTasks(true);
+        loadTasks();
     }
 
     /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
+     * We will always have fresh data from remote, the Loaders handle the local data
      */
-    public void loadTasks(boolean forceUpdate) {
+    public void loadTasks() {
         mTasksView.setLoadingIndicator(true);
         mTasksRepository.getTasks(this);
     }

@@ -156,7 +156,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTasks(false);
+                mPresenter.loadTasks();
             }
         });
 
@@ -175,7 +175,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mPresenter.loadTasks();
                 break;
         }
         return true;
@@ -204,7 +204,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                         mPresenter.setFiltering(TaskFilter.from(TasksFilterType.ALL_TASKS));
                         break;
                 }
-                mPresenter.loadTasks(false);
+                mPresenter.loadTasks();
                 return true;
             }
         });

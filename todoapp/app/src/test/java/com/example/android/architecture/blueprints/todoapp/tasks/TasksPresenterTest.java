@@ -38,6 +38,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -80,6 +81,9 @@ public class TasksPresenterTest {
 
     private TasksPresenter mTasksPresenter;
 
+    @Captor
+    private ArgumentCaptor<TasksDataSource.GetTasksCallback> getTasksCallbackArgumentCaptor;
+
     @Before
     public void setupTasksPresenter() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
@@ -100,27 +104,25 @@ public class TasksPresenterTest {
     }
 
     @Test
-    public void forceLoadAllTasksRefreshesDataFromRepository() {
-        mTasksPresenter.loadTasks(true);
+    public void loadAllTasksRefreshesDataFromRepository() {
+        mTasksPresenter.loadTasks();
 
         // Then the repository refreshes the data
-        verify(mTasksRepository).getTasks(any(TasksDataSource.GetTasksCallback.class));
-    }
+        verify(mTasksRepository).getTasks(getTasksCallbackArgumentCaptor.capture());
+        getTasksCallbackArgumentCaptor.getValue().onTasksLoaded(anyList());
 
-    @Test
-    public void loadAllTasksRepositoryNotCalled() {
-        mTasksPresenter.loadTasks(false);
-
-        // Then the repository does not refresh the data
-        verifyZeroInteractions(mTasksRepository);
-    }
-
-    @Test
-    public void loadAllTasksInitsLoaderFirstTime() {
-        mTasksPresenter.loadTasks(true);
-
-        when(mLoaderManager.getLoader(TasksPresenter.TASKS_LOADER)).thenReturn(null);
         verify(mLoaderManager).initLoader(anyInt(), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
+
+    }
+
+    @Test
+    public void loadAllTasksDoesntStartLoaderIfDataNotAvailable() {
+        mTasksPresenter.loadTasks();
+
+        verify(mTasksRepository).getTasks(getTasksCallbackArgumentCaptor.capture());
+        getTasksCallbackArgumentCaptor.getValue().onDataNotAvailable();
+
+        verifyZeroInteractions(mLoaderManager);
     }
 
     @Test
