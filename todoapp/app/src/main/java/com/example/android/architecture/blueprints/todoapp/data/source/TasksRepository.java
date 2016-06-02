@@ -86,6 +86,7 @@ public class TasksRepository implements TasksDataSource {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
                 refreshLocalDataSource(tasks);
+                callback.onTasksLoaded(null);
             }
 
             @Override

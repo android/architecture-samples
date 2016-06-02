@@ -67,8 +67,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     private void loadTask() {
         mTaskDetailView.setLoadingIndicator(true);
-//        mTasksRepository.getTask(mTaskId, this);
-        mLoaderManager.initLoader(TASK_LOADER, null, this);
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override
@@ -136,7 +135,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter, Loader
 
     @Override
     public void onTaskLoaded(Task task) {
-        // not necessary, the UI knows when the data is refreshed via the Loader
+        // the data is refreshed locally now but
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(TASK_LOADER, null, this);
     }
 
     public void onDataNotAvailable() {

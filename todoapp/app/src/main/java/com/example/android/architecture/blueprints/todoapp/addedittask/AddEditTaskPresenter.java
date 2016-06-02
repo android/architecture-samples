@@ -136,7 +136,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void onTaskLoaded(Task task) {
-        // not necessary, the UI knows when the data is refreshed via the Loader
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(EDIT_TASK_LOADER, null, this);
     }
 
     @Override

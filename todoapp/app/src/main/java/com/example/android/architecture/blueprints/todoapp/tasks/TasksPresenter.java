@@ -84,15 +84,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
      */
     public void loadTasks(boolean forceUpdate) {
         mTasksView.setLoadingIndicator(true);
-        if (forceUpdate) {
-            mTasksRepository.getTasks(this);
-        }
-
-        if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
-            mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
-        } else {
-            mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
-        }
+        mTasksRepository.getTasks(this);
     }
 
     @Override
@@ -114,7 +106,12 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
 
     @Override
     public void onTasksLoaded(List<Task> tasks) {
-        // not necessary, the UI knows when the data is refreshed via the Loader
+        // we don't care about the result since the CursorLoader will load the datafor us
+        if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
+            mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        } else {
+            mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+        }
     }
 
     @Override

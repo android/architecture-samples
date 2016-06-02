@@ -64,7 +64,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksR
     @Override
     public void start() {
         mTasksRepository.getTasks(this);
-        mLoaderManager.initLoader(TASKS_LOADER, null, this);
     }
 
     @Override
@@ -79,7 +78,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter, TasksR
 
     @Override
     public void onTasksLoaded(List<Task> tasks) {
-        // not necessary, the UI knows when the data is refreshed via the Loader
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(TASKS_LOADER, null, this);
     }
 
     @Override
