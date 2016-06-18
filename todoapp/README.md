@@ -20,9 +20,11 @@ The advantages of Loaders, from the [Loaders documentation page](http://develope
 ### Asynchronous loading
 
 The data is fetched by [Cursor Loaders](http://developer.android.com/reference/android/support/v4/content/CursorLoader.html) and delivered to the Presenters.
+The Presenter does not need to know how the data is loaded, for that reason the LoaderProvider class is passed as a dependency of the Presenter and is in charge
+of dealing with the data loading.
 
 
-In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproloaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
+In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com.example.android.architecture.blueprints.todoapp.data.source/LoaderProvider.java):
 
 
 ```
@@ -32,71 +34,93 @@ In [src/data/source/TasksLoader.java](https://github.com/googlesamples/android-a
                  TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
          );
 ```
-The results are received in the UI Thread, handled by the presenter.
+The results are received in the UI Thread, handled by the Presenter.
 
 In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
 
 
 ```
     @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task>
-data) {
-        mTasksView.setLoadingIndicator(false);
-
-        mCurrentTasks = data;
-        if (mCurrentTasks == null) {
-            mTasksView.showLoadingTasksError();
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            if (data.moveToLast()) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
         } else {
-            showFilteredTasks();
+            onDataNotAvailable();
         }
     }
 ```
-The presenter also triggers the loading the data, like in the MVP sample but in
-this case it does it through the LoaderManager:
 
+Since CursorLoaders have Observers listening to the underlying data changes in the ContentProvider, we don't need to tell them directly that new data is available.
+For that reason, the Presenter tells the Repository to go and grab the latest data.
 
 ```
-    @Override
-    public void start() {
-        mLoaderManager.initLoader(TASKS_QUERY, null, this);
+   /**
+     * We will always have fresh data from remote, the Loaders handle the local data
+     */
+    public void loadTasks() {
+        mTasksView.setLoadingIndicator(true);
+        mTasksRepository.getTasks(this);
     }
 ```
+
+Upon start, once the data has been stored locally we simply ask the LoaderProvider to start the Loader
+
+ ```
+     @Override
+     public void onTasksLoaded() {
+         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
+             mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+         } else {
+             mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+         }
+     }
+ ```
+
 ### Content Provider
 
-After every content change in the repository, <code>notifyContentObserver()</code> is called.
+After every content change in the Content Provider, <code>notifyChange(uri, null);</code> is called.
 
-In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java):
-
-
-```
-    @Override
-    public void deleteTask(@NonNull String taskId) {
-        mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
-        mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
-
-        mCachedTasks.remove(taskId);
-
-        // Update the UI
-       notifyContentObserver();
-    }
-```
-This notifies the Loader which in this case simply forces a reload of data.
-
-In [TasksLoader.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java):
+In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java):
 
 
 ```
     @Override
-    public void onTasksChanged() {
-        if (isStarted()) {
-            forceLoad();
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+
+        switch (match) {
+            case TASK:
+                rowsDeleted = db.delete(
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        if (selection == null || rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 ```
-## Additional dependencies
 
-This project uses the Loaders framework available from Android 3.0 (API Level
-11).
+We are telling everyone listening to that Uri (the CursorLoader in our case) that are new changes available and that they should go and grab them.
+
+## Additional considerations
+
+Content Providers are the perfect solution to share content with other applications. If your application doesn't need to share content then this is not
+the best approach for you.
+
+One can make the most out of them when using [Widgets](https://developer.android.com/design/patterns/widgets.html) or you'd like to share content the same
+way [Calendar](https://developer.android.com/guide/topics/providers/calendar-provider.html) or [Contacts](https://developer.android.com/guide/topics/providers/contacts-provider.html) do.
+
+Another benefit of Content Providers is that they don't need to use a SQLite database underneath, one could use other approach to give data to the application. For
+ example, [FileProvider](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) is a great example of that. FileProvider is a special subclass of ContentProvider that facilitates secure sharing of files associated with an app by creating a content:// Uri for a file instead of a file:/// Uri.
 
 ## Features
 
@@ -108,15 +132,16 @@ No external frameworks.
 
 #### Conceptual complexity 
 
-Developers need to be familiar with the Loaders framework, which is not
-trivial.
+Developers need to be familiar with the Loaders and Content Providers framework, which is not
+trivial. Following this approach is harder to decouple from dependencies of the Android Framework.
 
 ### Testability
 
 #### Unit testing
 
 The use of the Loaders framework adds a big dependency with the Android
-framework so unit testing is harder.
+framework so unit testing is harder. Same goes for the Content Provider, forcing us to use AndroidJUnit
+tests which run in a device / emulator and not in the developer's local JVM.
 
 #### UI testing
 
@@ -124,7 +149,7 @@ No difference with MVP.
 
 ### Code metrics
 
-Compared to MVP, the only new classes are TaskLoader and TasksLoader. Parts of
+Compared to MVP, the only new classes are LoaderProvider and TasksProvider. Parts of
 the code are simpler as Loaders take care of the asynchronous work. 
 
 
@@ -143,9 +168,9 @@ SUM:                            82           1182           1781           4118
 
 #### Ease of amending or adding a feature
 
-Similar to MVP
+Similar to MVP Loaders
 
 #### Learning cost
 
-Medium as the Loaders framework is not trivial.
+Medium as the Loaders and Content Providers framework are not trivial.
 

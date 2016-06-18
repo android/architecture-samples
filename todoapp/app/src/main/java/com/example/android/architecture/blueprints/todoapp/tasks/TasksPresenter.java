@@ -106,7 +106,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksRepository.
 
     @Override
     public void onTasksLoaded(List<Task> tasks) {
-        // we don't care about the result since the CursorLoader will load the datafor us
+        // we don't care about the result since the CursorLoader will load the data for us
         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
             mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
         } else {

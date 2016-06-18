@@ -13,11 +13,20 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 
 public class TasksProvider extends ContentProvider {
 
+    private static final int TASK = 100;
+    private static final int TASK_ITEM = 101;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private TasksDbHelper mTasksDbHelper;
 
-    private static final int TASK = 100;
-    private static final int TASK_ITEM = 101;
+    private static UriMatcher buildUriMatcher() {
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = TasksPersistenceContract.CONTENT_AUTHORITY;
+
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
+        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
+
+        return matcher;
+    }
 
     @Override
     public boolean onCreate() {
@@ -139,7 +148,6 @@ public class TasksProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;
-
     }
 
     @Override
@@ -161,16 +169,6 @@ public class TasksProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
-    }
-
-    private static UriMatcher buildUriMatcher() {
-        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = TasksPersistenceContract.CONTENT_AUTHORITY;
-
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME, TASK);
-        matcher.addURI(authority, TasksPersistenceContract.TaskEntry.TABLE_NAME + "/*", TASK_ITEM);
-
-        return matcher;
     }
 
 }
