@@ -16,6 +16,29 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
+import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.IsNot.not;
+
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -35,27 +58,6 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static android.support.test.InstrumentationRegistry.getTargetContext;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
-import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsNot.not;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -344,6 +346,55 @@ public class TasksScreenTest {
     }
 
     @Test
+    public void markTaskAsAcompleteAndActiveOnDetailScreen_taskIsActiveInList() {
+        viewAllTasks();
+
+        // Add 1 active task
+        createTask(TITLE1, DESCRIPTION);
+
+        // Click on the task on the list
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the checkbox in task details screen
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click again to restore it to original state
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription("Navigate up")).perform(click());
+
+        // Check that the task is marked as active
+        onView(allOf(withId(R.id.complete),
+                hasSibling(withText(TITLE1)))).check(matches(not(isChecked())));
+    }
+
+    @Test
+    public void markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
+        viewAllTasks();
+
+        // Add 1 completed task
+        createTask(TITLE1, DESCRIPTION);
+        clickCheckBoxForTask(TITLE1);
+
+        // Click on the task on the list
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the checkbox in task details screen
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click again to restore it to original state
+        onView(withId(R.id.task_detail_complete)).perform(click());
+
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription("Navigate up")).perform(click());
+
+        // Check that the task is marked as active
+        onView(allOf(withId(R.id.complete),
+                hasSibling(withText(TITLE1)))).check(matches(isChecked()));
+    }
+
+    @Test
     public void orientationChange_FilterActivePersists() {
 
         // Add a completed task
@@ -404,7 +455,8 @@ public class TasksScreenTest {
         onView(withId(R.id.fab_add_task)).perform(click());
 
         // Add task title and description
-        onView(withId(R.id.add_task_title)).perform(typeText(title)); // Type new task title
+        onView(withId(R.id.add_task_title)).perform(typeText(title),
+                closeSoftKeyboard()); // Type new task title
         onView(withId(R.id.add_task_description)).perform(typeText(description),
                 closeSoftKeyboard()); // Type new task description and close the keyboard
 

@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".TaskDetailActivity">
+    tools:context=".taskdetail.TaskDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -53,7 +53,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/ic_edit"
             app:fabSize="normal"
-            app:layout_anchor="@id/coordinatorLayout"
+            app:layout_anchor="@id/contentFrame"
             app:layout_anchorGravity="bottom|right|end" />
 
     </android.support.design.widget.CoordinatorLayout>
