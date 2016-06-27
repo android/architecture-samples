@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 

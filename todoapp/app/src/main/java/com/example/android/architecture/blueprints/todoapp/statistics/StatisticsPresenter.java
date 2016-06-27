@@ -22,11 +22,8 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
-
-import java.util.List;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.model.Statistics;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
@@ -36,15 +33,15 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final StatisticsContract.View mStatisticsView;
     private final UseCaseHandler mUseCaseHandler;
-    private final GetTasks mGetTasks;
+    private final GetStatistics mGetStatistics;
 
     public StatisticsPresenter(
             @NonNull UseCaseHandler useCaseHandler,
             @NonNull StatisticsContract.View statisticsView,
-            @NonNull GetTasks getTasks) {
+            @NonNull GetStatistics getStatistics) {
         mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mGetTasks = checkNotNull(getTasks,"getTasks cannot be null!");
+        mGetStatistics = checkNotNull(getStatistics,"getStatistics cannot be null!");
 
         mStatisticsView.setPresenter(this);
     }
@@ -57,30 +54,18 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        mUseCaseHandler.execute(mGetTasks, new GetTasks.RequestValues(false,
-                TasksFilterType.ALL_TASKS), new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
+        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
+                new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
             @Override
-            public void onSuccess(GetTasks.ResponseValue response) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                List<Task> tasks = response.getTasks();
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
-                    }
-                }
+            public void onSuccess(GetStatistics.ResponseValue response) {
+                Statistics statistics = response.getStatistics();
                 // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;
                 }
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
+                mStatisticsView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
             }
 
             @Override

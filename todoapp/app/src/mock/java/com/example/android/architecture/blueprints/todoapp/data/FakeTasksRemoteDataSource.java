@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.google.common.collect.Lists;
 
 import java.util.Iterator;
