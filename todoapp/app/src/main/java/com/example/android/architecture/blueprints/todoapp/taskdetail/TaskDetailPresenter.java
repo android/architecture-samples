@@ -86,11 +86,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                             return;
                         }
                         mTaskDetailView.setLoadingIndicator(false);
-                        if (null == task) {
-                            mTaskDetailView.showMissingTask();
-                        } else {
-                            showTask(task);
-                        }
+                        showTask(task);
                     }
 
                     @Override

@@ -41,8 +41,12 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
         mTasksRepository.getTask(values.getTaskId(), new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
-                ResponseValue responseValue = new ResponseValue(task);
-                getUseCaseCallback().onSuccess(responseValue);
+                if (task != null) {
+                    ResponseValue responseValue = new ResponseValue(task);
+                    getUseCaseCallback().onSuccess(responseValue);
+                } else {
+                    getUseCaseCallback().onError();
+                }
             }
 
             @Override
