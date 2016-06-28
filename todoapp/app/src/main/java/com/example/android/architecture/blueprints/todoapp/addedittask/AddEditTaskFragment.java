@@ -88,10 +88,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_task_title);
-        mDescription = (TextView) root.findViewById(R.id.add_task_description);
-
         mViewDataBinding = AddtaskFragBinding.bind(root);
+
+        mTitle = mViewDataBinding.addTaskTitle;
+        mDescription = mViewDataBinding.addTaskDescription;
+
         setHasOptionsMenu(true);
         setRetainInstance(true);
         return root;
