@@ -1,109 +1,167 @@
-# TODO-MVP
+# TODO-MVP-ContentProvider
 
-### Summary
+It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data to the repository.
 
-This sample is the base for many of the variants. It showcases a simple
-implementation of the Model-View-Presenter pattern with no architectural
-frameworks. It uses manual dependency injection to provide a repository with
-local and remote data sources. Asynchronous tasks are handled with callbacks.
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Diagram"/>
+The advantages of Content Providers, from the [Content Provider documentation page](http://developer.android.com/guide/topics/providers/content-providers.html), are:
 
-Note: in a MVP context, the term "view" is overloaded:
+  * Manage access to a structured set of data
+  * Content providers are the standard interface that connects data in one process with code running in another process
 
-  * The class android.view.View will be referred to as "Android View"
-  * The view that receives commands from a presenter in MVP, will be simply called
-"view".
+The advantages of Loaders, from the [Loaders documentation page](http://developer.android.com/guide/components/loaders.html), are:
 
-### Fragments
+  * They provide asynchronous loading of data, removing the need for callbacks in the repository.
+  * They monitor the source of their data and deliver new results when the content changes, in our case, the repository.
+  * They automatically reconnect to the last loader when being recreated after a configuration change.
 
-It uses fragments for two reasons:
+## Code
 
-  * The separation between Activity and Fragment fits nicely with this
-implementation of MVP: the Activity is the overall controller that creates and
-connects views and presenters.
-  * Tablet layout or screens with multiple views take advantage of the Fragments
-framework.
+### Asynchronous loading
 
-### Key concepts
+The data is fetched by [Cursor Loaders](http://developer.android.com/reference/android/support/v4/content/CursorLoader.html) and delivered to the Presenters.
+The Presenter does not need to know how the data is loaded, for that reason the LoaderProvider class is passed as a dependency of the Presenter and is in charge
+of dealing with the data loading.
 
-There are four features in the app:
 
-  * <code>Tasks</code>
-  * <code>TaskDetail</code>
-  * <code>AddEditTask</code>
-  * <code>Statistics</code>
+In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com.example.android.architecture.blueprints.todoapp.data.source/LoaderProvider.java):
 
-Each feature has:
 
-  * A contract defining the view and the presenter
-  * An Activity which is responsible for the creation of fragments and presenters
-  * A Fragment which implements the view interface. 
-  * A presenter which implements the presenter interface
+```java
+  return new CursorLoader(
+                 mContext,
+                 TasksPersistenceContract.TaskEntry.buildTasksUri(),
+                 TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
+         );
+```
+The results are received in the UI Thread, handled by the Presenter.
 
-In general, the business logic lives in the presenter and relies on the view to
-do the Android UI work. 
+In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
 
-The view contains almost no logic: it converts the presenter's commands to UI
-actions and listens to user actions, which are passed to the presenter. 
 
-Contracts are interfaces used to define the connection between views and
-presenters.
+```java
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            if (data.moveToLast()) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
+        } else {
+            onDataNotAvailable();
+        }
+    }
+```
 
-### Dependencies
+Since CursorLoaders have Observers listening to the underlying data changes in the ContentProvider, we don't need to tell them directly that new data is available.
+For that reason, the Presenter tells the Repository to go and grab the latest data.
 
-  * Common Android support libraries (<code>com.android.support.\*)</code>
-  * Android Testing Support Library (Espresso, AndroidJUnitRunner…)
-  * Mockito
-  * Guava (null checking)
+```java
+   /**
+     * We will always have fresh data from remote, the Loaders handle the local data
+     */
+    public void loadTasks() {
+        mTasksView.setLoadingIndicator(true);
+        mTasksRepository.getTasks(this);
+    }
+```
+
+Upon start, once the data has been stored locally we simply ask the LoaderProvider to start the Loader
+
+ ```java
+     @Override
+     public void onTasksLoaded() {
+         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
+             mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+         } else {
+             mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
+         }
+     }
+ ```
+
+
+### Content Provider and Tasks Repository
+
+The [TasksRepository](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java#L81) behaves a bit differently compared to the other branches. The main difference is that it's not returning data to the `Presenter`, but only storing the tasks in the [LocalDataSource](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java#L61). Once the `ContentProvider` inserts data, it will [notify](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java#L128) the change to the `Uri` and whoever is observing it will receive an update.
+
+```java
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+
+        switch (match) {
+            case TASK:
+                rowsDeleted = db.delete(
+                        TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (selection == null || rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
+    }
+```
+
+That's why there's no need to return the data to the `Presenter`, the `CursorLoader` will always have the data present in the `ContentProvider`
+
+
+## Additional considerations
+
+Content Providers are the perfect solution to share content with other applications. If your application doesn't need to share content then this is not
+the best approach for you.
+
+One can make the most out of them when using [Widgets](https://developer.android.com/design/patterns/widgets.html) or you'd like to share content the same
+way [Calendar](https://developer.android.com/guide/topics/providers/calendar-provider.html) or [Contacts](https://developer.android.com/guide/topics/providers/contacts-provider.html) do.
+
+Another benefit of Content Providers is that they don't need to use a SQLite database underneath, one could use other approach to give data to the application. For
+ example, [FileProvider](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) is a great example of that. FileProvider is a special subclass of `ContentProvider` that facilitates secure sharing of files associated with an app by creating a content:// Uri for a file instead of a file:/// Uri.
 
 ## Features
 
 ### Complexity - understandability
 
-#### Use of architectural frameworks/libraries/tools: 
+#### Use of architectural frameworks/libraries/tools:
 
-None 
+No external frameworks.
 
-#### Conceptual complexity 
+#### Conceptual complexity
 
-Low, as it's a pure MVP implementation for Android
+Developers need to be familiar with the Loaders and Content Providers framework, which is not
+trivial. Following this approach is harder to decouple from dependencies of the Android Framework.
 
 ### Testability
 
 #### Unit testing
 
-High, presenters are unit tested as well as repositories and data sources.
+The use of the Loaders framework adds a big dependency with the Android
+framework so unit testing is harder. Same goes for the Content Provider, forcing us to use AndroidJUnit
+tests which run in a device / emulator and not in the developer's local JVM.
 
 #### UI testing
 
-High, injection of fake modules allow for testing with fake data
+No difference with MVP.
 
 ### Code metrics
 
-Compared to a traditional project with no architecture in place, this sample
-introduces additional classes and interfaces: presenters, a repository,
-contracts, etc. So lines of code and number of classes are higher in MVP.
+Compared to MVP, the only new classes are LoaderProvider and TasksProvider. Parts of
+the code are simpler as Loaders take care of the asynchronous work.
 
 
 ```
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-Java                            46           1075           1451           3451
-XML                             34             97            337            601
--------------------------------------------------------------------------------
-SUM:                            80           1172           1788           4052
--------------------------------------------------------------------------------
+TODO
+
 ```
 ### Maintainability
 
 #### Ease of amending or adding a feature
 
-High. 
+Similar to MVP Loaders
 
 #### Learning cost
 
-Low. Features are easy to find and the responsibilities are clear. Developers
-don't need to be familiar with any external dependency to work on the project.
-
+Medium as the Loaders and Content Providers framework are not trivial.
