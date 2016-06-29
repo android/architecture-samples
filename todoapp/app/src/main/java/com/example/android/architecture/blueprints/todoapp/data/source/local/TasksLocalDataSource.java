@@ -55,7 +55,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
-        // no-op since the data is loader via Cursor Loader
+        // no-op since the data is loaded via Cursor Loader
     }
 
     public void saveTask(@NonNull Task task) {
