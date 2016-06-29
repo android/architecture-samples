@@ -80,12 +80,10 @@ Upon start, once the data has been stored locally we simply ask the LoaderProvid
      }
  ```
 
-### Content Provider
 
-After every content change in the Content Provider, <code>notifyChange(uri, null);</code> is called.
+### Content Provider and Tasks Repository
 
-In [src/data/source/TasksRepository.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java):
-
+The [TasksRepository](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java#L81) behaves a bit differently compared to the other branches. The main difference is that it's not returning data to the `Presenter`, but only storing the tasks in the [LocalDataSource](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java#L61). Once the `ContentProvider` inserts data, it will [notify](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java#L128) the change to the `Uri` and whoever is observing it will receive an update.
 
 ```
     @Override
@@ -109,7 +107,8 @@ In [src/data/source/TasksRepository.java](https://github.com/googlesamples/andro
     }
 ```
 
-We are telling everyone listening to that Uri (the CursorLoader in our case) that are new changes available and that they should go and grab them.
+That's why there's no need to return the data to the `Presenter`, the `CursorLoader` will always have the data present in the `ContentProvider`
+
 
 ## Additional considerations
 
@@ -126,11 +125,11 @@ Another benefit of Content Providers is that they don't need to use a SQLite dat
 
 ### Complexity - understandability
 
-#### Use of architectural frameworks/libraries/tools: 
+#### Use of architectural frameworks/libraries/tools:
 
-No external frameworks. 
+No external frameworks.
 
-#### Conceptual complexity 
+#### Conceptual complexity
 
 Developers need to be familiar with the Loaders and Content Providers framework, which is not
 trivial. Following this approach is harder to decouple from dependencies of the Android Framework.
@@ -150,7 +149,7 @@ No difference with MVP.
 ### Code metrics
 
 Compared to MVP, the only new classes are LoaderProvider and TasksProvider. Parts of
-the code are simpler as Loaders take care of the asynchronous work. 
+the code are simpler as Loaders take care of the asynchronous work.
 
 
 ```
@@ -173,4 +172,3 @@ Similar to MVP Loaders
 #### Learning cost
 
 Medium as the Loaders and Content Providers framework are not trivial.
-
