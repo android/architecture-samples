@@ -16,8 +16,7 @@ android {
 
     buildTypes {
         debug {
-            // Disable minifier until build tools 2.2 is out due to bug in proguard file parser.
-            minifyEnabled false
+            minifyEnabled true
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
             useProguard false
             proguardFiles 'proguard-android.txt', 'proguard-rules.pro'
