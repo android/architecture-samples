@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,8 +31,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
