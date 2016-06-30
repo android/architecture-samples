@@ -16,17 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
@@ -35,6 +30,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -48,7 +47,7 @@ public class AddEditTaskPresenterTest {
     private AddEditTaskContract.View mAddEditTaskView;
 
     @Mock
-    private TaskLoader mTaskLoader;
+    private LoaderProvider mLoaderProvider;
 
     @Mock
     private LoaderManager mLoaderManager;
@@ -58,7 +57,9 @@ public class AddEditTaskPresenterTest {
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+    private ArgumentCaptor<TasksRepository.LoadDataCallback> mGetTaskCallbackCaptor;
+
+    private MockCursorProvider.TaskMockCursor mActiveTaskCursor;
 
     private AddEditTaskPresenter mAddEditTaskPresenter;
 
@@ -68,9 +69,12 @@ public class AddEditTaskPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        mActiveTaskCursor = MockCursorProvider.createActiveTaskCursor();
+
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,
-                mTaskLoader, mLoaderManager);
+                mLoaderProvider, mLoaderManager);
+
     }
 
     @Test
@@ -106,11 +110,8 @@ public class AddEditTaskPresenterTest {
     public void populateTask_callsRepoAndUpdatesView() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
 
-        when(mTasksRepository.getTask(testTask.getId())).thenReturn(testTask);
-
-
         // When the presenter is asked to populate an existing task
-        mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), testTask);
+        mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), mActiveTaskCursor);
 
         // Then the task repository is queried and the view updated
         //verify(mTasksRepository).getTask(eq(testTask.getId()));

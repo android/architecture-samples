@@ -38,6 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.R;
 public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
+    public static final String ARGUMENT_EDIT_TASK_INTERNAL_ID = "EDIT_TASK_INTERNAL_ID";
 
     private AddEditTaskContract.Presenter mPresenter;
 
@@ -45,12 +46,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mDescription;
 
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
-    }
-
     public AddEditTaskFragment() {
         // Required empty public constructor
+    }
+
+    public static AddEditTaskFragment newInstance() {
+        return new AddEditTaskFragment();
     }
 
     @Override
@@ -88,7 +89,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
 
         setHasOptionsMenu(true);
-        setRetainInstance(true);
         return root;
     }
 
@@ -112,4 +112,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void setDescription(String description) {
         mDescription.setText(description);
     }
+
 }

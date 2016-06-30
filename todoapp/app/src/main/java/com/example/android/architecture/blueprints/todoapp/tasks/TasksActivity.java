@@ -30,8 +30,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -74,28 +73,28 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        TasksRepository repository = Injection.provideTasksRepository(getApplicationContext());
-        TasksLoader tasksLoader = new TasksLoader(getApplicationContext(), repository);
-
-        mTasksPresenter = new TasksPresenter(
-                tasksLoader,
-                getSupportLoaderManager(),
-                repository,
-                tasksFragment
-        );
+        LoaderProvider loaderProvider = new LoaderProvider(this);
 
         // Load previously saved state, if available.
+        TaskFilter taskFilter = TaskFilter.from(TasksFilterType.ALL_TASKS);
         if (savedInstanceState != null) {
             TasksFilterType currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mTasksPresenter.setFiltering(currentFiltering);
+            taskFilter = TaskFilter.from(currentFiltering);
         }
+
+        mTasksPresenter = new TasksPresenter(
+                loaderProvider,
+                getSupportLoaderManager(),
+                Injection.provideTasksRepository(getApplicationContext()),
+                tasksFragment,
+                taskFilter
+        );
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
-
         super.onSaveInstanceState(outState);
     }
 

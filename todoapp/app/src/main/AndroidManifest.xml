@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,27 +14,40 @@
   ~ limitations under the License.
   -->
 
-<manifest
-    package="com.example.android.architecture.blueprints.todoapp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.example.android.architecture.blueprints.todoapp">
 
-    <application
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity
-                android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
-                android:theme="@style/AppTheme.OverlapSystemBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity" />
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
-    </application>
+  <application
+    android:allowBackup="false"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
+    <activity
+      android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
+      android:theme="@style/AppTheme.OverlapSystemBar">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity">
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <data android:mimeType="vnd.android.cursor.item/vnd.${packageName}.task" />
+      </intent-filter>
+    </activity>
+
+    <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
+    <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
+
+    <provider
+      android:name="com.example.android.architecture.blueprints.todoapp.data.source.TasksProvider"
+      android:authorities="${packageName}"
+      android:exported="false" />
+  </application>
 
 </manifest>

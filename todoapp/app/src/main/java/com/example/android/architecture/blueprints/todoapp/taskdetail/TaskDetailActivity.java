@@ -25,7 +25,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -59,16 +59,21 @@ public class TaskDetailActivity extends AppCompatActivity {
             taskDetailFragment = TaskDetailFragment.newInstance(taskId);
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    taskDetailFragment, R.id.contentFrame);
+                    taskDetailFragment, R.id.contentFrame
+            );
         }
+
+        // Create the presenter
+        LoaderProvider loaderProvider = new LoaderProvider(getApplicationContext());
 
         // Create the presenter
         new TaskDetailPresenter(
                 taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment,
-                new TaskLoader(taskId, getApplicationContext()),
-                getSupportLoaderManager());
+                loaderProvider,
+                getSupportLoaderManager(),
+                Injection.provideTasksRepository(this),
+                taskDetailFragment
+        );
     }
 
     @Override

@@ -16,15 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.MockCursorProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.google.common.collect.Lists;
-
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,36 +37,52 @@ import org.mockito.MockitoAnnotations;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksPresenter}.
  */
 public class TasksPresenterTest {
 
-    private static List<Task> TASKS;
-
-    @Mock
-    private TasksRepository mTasksRepository;
-
-    @Mock
-    private TasksContract.View mTasksView;
-
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<List> mShowTasksArgumentCaptor;
+    private ArgumentCaptor<Cursor> mShowTasksArgumentCaptor;
 
     @Mock
-    private TasksLoader mTasksLoader;
+    private LoaderProvider mLoaderProvider;
+
+    @Mock
+    private TasksContract.View mTasksView;
+
+    @Mock
+    private TasksRepository mTasksRepository;
 
     @Mock
     private LoaderManager mLoaderManager;
 
+    @Mock
+    private Bundle mBundle;
+
+    @Mock
+    private TasksDataSource.GetTasksCallback mGetTasksCallback;
+
+    private MockCursorProvider.TaskMockCursor mCompletedTasksCursor;
+    private MockCursorProvider.TaskMockCursor mActiveTasksCursor;
+    private MockCursorProvider.TaskMockCursor mAllTasksCursor;
+    private MockCursorProvider.TaskMockCursor mEmptyTasksCursor;
+
     private TasksPresenter mTasksPresenter;
+
+    @Captor
+    private ArgumentCaptor<TasksDataSource.GetTasksCallback> getTasksCallbackArgumentCaptor;
 
     @Before
     public void setupTasksPresenter() {
@@ -73,51 +90,139 @@ public class TasksPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(
-                mTasksLoader, mLoaderManager, mTasksRepository, mTasksView);
+        // Given a task filter
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
 
-        // We initialise the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true),
-                new Task("Title3", "Description3", true)
-        );
+        // Get a reference to the class under test
+        mTasksPresenter = new TasksPresenter(mLoaderProvider, mLoaderManager, mTasksRepository, mTasksView, taskFilter);
+
+        mCompletedTasksCursor = MockCursorProvider.createCompletedTasksCursor();
+        mActiveTasksCursor = MockCursorProvider.createActiveTasksCursor();
+        mAllTasksCursor = MockCursorProvider.createAllTasksCursor();
+        mEmptyTasksCursor = MockCursorProvider.createEmptyTasksCursor();
+    }
+
+    @Test
+    public void loadAllTasksRefreshesDataFromRepository() {
+        mTasksPresenter.loadTasks();
+
+        // Then the repository refreshes the data
+        verify(mTasksRepository).getTasks(getTasksCallbackArgumentCaptor.capture());
+        getTasksCallbackArgumentCaptor.getValue().onTasksLoaded(anyList());
+
+        verify(mLoaderManager).initLoader(anyInt(), any(Bundle.class), any(LoaderManager.LoaderCallbacks.class));
+
+    }
+
+    @Test
+    public void loadAllTasksDoesntStartLoaderIfDataNotAvailable() {
+        mTasksPresenter.loadTasks();
+
+        verify(mTasksRepository).getTasks(getTasksCallbackArgumentCaptor.capture());
+        getTasksCallbackArgumentCaptor.getValue().onDataNotAvailable();
+
+        verifyZeroInteractions(mLoaderManager);
     }
 
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // When the loader finishes with tasks and filter is set to all
-        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        mTasksPresenter.setFiltering(taskFilter);
+
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mAllTasksCursor);
 
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(3));
+    }
+
+    @Test
+    public void loadAllTasksReturnsNothingShowsEmptyMessage() {
+        // When the loader finishes with tasks and filter is set to completed
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mEmptyTasksCursor);
+
+        // Then progress indicator is hidden and completed tasks are shown in UI
+        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).showNoTasks();
+    }
+
+    @Test
+    public void loadCompletedTasksReturnsNothingShowsEmptyMessage() {
+        // When the loader finishes with tasks and filter is set to completed
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mEmptyTasksCursor);
+
+        // Then progress indicator is hidden and completed tasks are shown in UI
+        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).showNoCompletedTasks();
+    }
+
+    @Test
+    public void loadActiveTasksReturnsNothingShowsEmptyMessage() {
+        // When the loader finishes with tasks and filter is set to completed
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mEmptyTasksCursor);
+
+        // Then progress indicator is hidden and completed tasks are shown in UI
+        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).showNoActiveTasks();
     }
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ACTIVE_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // When the loader finishes with tasks and filter is set to active
-        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mActiveTasksCursor);
 
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(1));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(2));
     }
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.COMPLETED_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
         // When the loader finishes with tasks and filter is set to completed
-        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), TASKS);
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), mCompletedTasksCursor);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().size(), is(2));
+        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(3));
+    }
+
+    @Test
+    public void unavailableTasks_ShowsError() {
+        when(mBundle.getSerializable(TaskFilter.KEY_TASK_FILTER)).thenReturn(TasksFilterType.ALL_TASKS);
+        TaskFilter taskFilter = new TaskFilter(mBundle);
+
+        // When the loader finishes with error
+        mTasksPresenter.setFiltering(taskFilter);
+        mTasksPresenter.onLoadFinished(mock(Loader.class), null);
+
+        // Then an error message is shown
+        verify(mTasksView).showLoadingTasksError();
     }
 
     @Test
@@ -138,7 +243,7 @@ public class TasksPresenterTest {
         mTasksPresenter.openTaskDetails(requestedTask);
 
         // Then task detail UI is shown
-        verify(mTasksView).showTaskDetailsUi(any(String.class));
+        verify(mTasksView).showTaskDetailsUi(requestedTask);
     }
 
     @Test
@@ -167,13 +272,4 @@ public class TasksPresenterTest {
         verify(mTasksView).showTaskMarkedActive();
     }
 
-    @Test
-    public void unavailableTasks_ShowsError() {
-        // When the loader finishes with error
-        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
-        mTasksPresenter.onLoadFinished(mock(Loader.class), null);
-
-        // Then an error message is shown
-        verify(mTasksView).showLoadingTasksError();
-    }
 }

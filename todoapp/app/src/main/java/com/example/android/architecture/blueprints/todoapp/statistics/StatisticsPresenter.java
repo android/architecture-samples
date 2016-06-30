@@ -16,14 +16,20 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.tasks.TaskFilter;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,67 +38,112 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter, LoaderManager.LoaderCallbacks<List<Task>> {
+public class StatisticsPresenter implements StatisticsContract.Presenter, TasksRepository.LoadDataCallback, LoaderManager.LoaderCallbacks<Cursor>, TasksDataSource.GetTasksCallback {
 
-    private static final int TASK_QUERY = 3;
+    public final static int TASKS_LOADER = 1;
 
+    @NonNull
+    private final TasksRepository mTasksRepository;
+    @NonNull
+    private final LoaderManager mLoaderManager;
+    @NonNull
+    private final LoaderProvider mLoaderProvider;
     private StatisticsContract.View mStatisticsView;
 
-    private TasksLoader mTasksLoader;
-
-    private LoaderManager mLoaderManager;
-
-    public StatisticsPresenter(@NonNull StatisticsContract.View statisticsView,
-                               @NonNull TasksLoader tasksLoader,
-                               @NonNull LoaderManager loaderManager) {
+    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
+                               @NonNull LoaderProvider loaderProvider,
+                               @NonNull LoaderManager loaderManager,
+                               @NonNull StatisticsContract.View statisticsView) {
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mTasksLoader = checkNotNull(tasksLoader, "tasksLoader cannot be null!");
-        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
-
+        mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider provider cannot be null");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager provider cannot be null");
+        mTasksRepository = checkNotNull(tasksRepository, "tasksInteractor cannot be null!");
         mStatisticsView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(TASK_QUERY, null, this);
+        mTasksRepository.getTasks(this);
     }
 
     @Override
-    public Loader<List<Task>> onCreateLoader(int id, Bundle args) {
-        mStatisticsView.setProgressIndicator(true);
-        return mTasksLoader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Task>> loader, List<Task> data) {
+    public void onDataLoaded(Cursor data) {
         loadStatistics(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Task>> loader) {
+    public void onDataEmpty() {
+        mStatisticsView.showStatistics(0, 0);
+    }
+
+    @Override
+    public void onTasksLoaded(List<Task> tasks) {
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(TASKS_LOADER, null, this);
+    }
+
+    @Override
+    public void onDataNotAvailable() {
+        mStatisticsView.setProgressIndicator(false);
+        mStatisticsView.showLoadingStatisticsError();
+    }
+
+    @Override
+    public void onDataReset() {
 
     }
 
-    private void loadStatistics(List<Task> tasks) {
-        if (tasks == null) {
-            mStatisticsView.showLoadingStatisticsError();
-        } else {
-            int activeTasks = 0;
-            int completedTasks = 0;
+    private void loadStatistics(Cursor data) {
+        mStatisticsView.setProgressIndicator(false);
+        int activeTasks = 0;
+        int completedTasks = 0;
 
-            // Calculate number of active and completed tasks
-            for (Task task : tasks) {
-                if (task.isCompleted()) {
-                    completedTasks += 1;
-                } else {
-                    activeTasks += 1;
-                }
+        List<Task> tasks = convertCursorToTasks(data);
+
+        // Calculate number of active and completed tasks
+        for (Task task : tasks) {
+            if (task.isCompleted()) {
+                completedTasks += 1;
+            } else {
+                activeTasks += 1;
             }
+        }
+        mStatisticsView.showStatistics(activeTasks, completedTasks);
+    }
 
-            mStatisticsView.setProgressIndicator(false);
+    private List<Task> convertCursorToTasks(Cursor data) {
+        List<Task> tasks = new ArrayList<>();
 
-            mStatisticsView.showStatistics(activeTasks, completedTasks);
+        if (data.moveToFirst()) {
+            do {
+                Task task = Task.from(data);
+                tasks.add(task);
+            } while (data.moveToNext());
+        }
+
+        return tasks;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mLoaderProvider.createFilteredTasksLoader(TaskFilter.from(TasksFilterType.ALL_TASKS));
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null) {
+            if (data.moveToLast()) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
+        } else {
+            onDataNotAvailable();
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

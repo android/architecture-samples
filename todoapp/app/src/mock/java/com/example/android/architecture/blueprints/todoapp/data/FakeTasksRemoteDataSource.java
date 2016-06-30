@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,12 +31,12 @@ import java.util.Map;
  */
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
+    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
     private static FakeTasksRemoteDataSource INSTANCE;
 
-    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
-
     // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {}
+    private FakeTasksRemoteDataSource() {
+    }
 
     public static FakeTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
@@ -47,14 +46,14 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public List<Task> getTasks() {
-        return Lists.newArrayList(TASKS_SERVICE_DATA.values());
+    public void getTasks(@NonNull GetTasksCallback callback) {
+        callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
     }
 
     @Override
-    public Task getTask(@NonNull String taskId) {
+    public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        return task;
+        callback.onTaskLoaded(task);
     }
 
     @Override
@@ -70,7 +69,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        completeTask(oldTask);
     }
 
     @Override
@@ -81,7 +81,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source.
+        Task oldTask = TASKS_SERVICE_DATA.get(taskId);
+        activateTask(oldTask);
     }
 
     @Override
@@ -93,11 +94,6 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
                 it.remove();
             }
         }
-    }
-
-    public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
     }
 
     @Override

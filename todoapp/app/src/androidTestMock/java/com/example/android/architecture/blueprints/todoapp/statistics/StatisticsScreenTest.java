@@ -88,4 +88,5 @@ public class StatisticsScreenTest {
                 .getString(R.string.statistics_completed_tasks);
         onView(withText(containsString(expectedCompletedTaskText))).check(matches(isDisplayed()));
     }
+
 }

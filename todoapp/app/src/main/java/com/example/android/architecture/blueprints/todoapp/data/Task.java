@@ -16,8 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 import com.google.common.base.Objects;
 
 import java.util.UUID;
@@ -28,14 +31,11 @@ import java.util.UUID;
 public final class Task {
 
     private final String mId;
-
-    @Nullable
     private final String mTitle;
-
-    @Nullable
     private final String mDescription;
-
     private final boolean mCompleted;
+    private int mInternalId;
+
     /**
      * Use this constructor to create a new active Task.
      *
@@ -94,6 +94,32 @@ public final class Task {
         mCompleted = completed;
     }
 
+    /**
+     * Use this constructor to return a Task from a Cursor
+     *
+     * @return
+     */
+    public static Task from(Cursor cursor) {
+        String entryId = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
+        String title = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
+        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, entryId, completed);
+    }
+
+    public static Task from(ContentValues values) {
+        String entryId = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID);
+        String title = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE);
+        String description = values.getAsString(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION);
+        boolean completed = values.getAsInteger(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED) == 1;
+
+        return new Task(title, description, entryId, completed);
+    }
+
     public String getId() {
         return mId;
     }
@@ -132,8 +158,12 @@ public final class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Task task = (Task) o;
         return Objects.equal(mId, task.mId) &&
                 Objects.equal(mTitle, task.mTitle) &&
@@ -149,4 +179,5 @@ public final class Task {
     public String toString() {
         return "Task with title " + mTitle;
     }
+
 }

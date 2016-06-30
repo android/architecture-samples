@@ -16,13 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
-
-import java.util.List;
 
 /**
  * This specifies the contract between the view and the presenter.
@@ -33,11 +32,11 @@ public interface TasksContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showTasks(List<Task> tasks);
+        void showTasks(Cursor tasks);
 
         void showAddTask();
 
-        void showTaskDetailsUi(String taskId);
+        void showTaskDetailsUi(Task task);
 
         void showTaskMarkedComplete();
 
@@ -68,7 +67,7 @@ public interface TasksContract {
 
         void result(int requestCode, int resultCode);
 
-        void loadTasks(boolean forceUpdate);
+        void loadTasks();
 
         void addNewTask();
 
@@ -80,7 +79,7 @@ public interface TasksContract {
 
         void clearCompletedTasks();
 
-        void setFiltering(TasksFilterType requestType);
+        void setFiltering(TaskFilter requestType);
 
         TasksFilterType getFiltering();
     }

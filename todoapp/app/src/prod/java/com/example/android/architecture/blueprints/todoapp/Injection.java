@@ -16,13 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,9 +33,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Injection {
 
-    public static TasksRepository provideTasksRepository(@NonNull Context context) {
-        checkNotNull(context);
-        return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+    public static TasksRepository provideTasksRepository(Context context){
+        return TasksRepository.getInstance(provideRemoteDataSource(), provideLocalDataSource(context));
     }
+
+    public static TasksDataSource provideRemoteDataSource() {
+        return TasksRemoteDataSource.getInstance();
+    }
+
+    public static TasksLocalDataSource provideLocalDataSource(@NonNull Context context) {
+        checkNotNull(context);
+        return TasksLocalDataSource.getInstance(context.getContentResolver());
+    }
+
 }

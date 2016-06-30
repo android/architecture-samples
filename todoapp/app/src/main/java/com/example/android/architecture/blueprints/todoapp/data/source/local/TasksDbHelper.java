@@ -27,13 +27,15 @@ public class TasksDbHelper extends SQLiteOpenHelper {
 
     private static final String TEXT_TYPE = " TEXT";
 
+    private static final String INTEGER_TYPE = " INTEGER";
+
     private static final String BOOLEAN_TYPE = " INTEGER";
 
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TasksPersistenceContract.TaskEntry.TABLE_NAME + " (" +
-                    TasksPersistenceContract.TaskEntry._ID + TEXT_TYPE + " PRIMARY KEY," +
+                    TasksPersistenceContract.TaskEntry._ID + INTEGER_TYPE + " PRIMARY KEY," +
                     TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
                     TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP +

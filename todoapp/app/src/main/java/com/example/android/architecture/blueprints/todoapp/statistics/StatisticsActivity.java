@@ -28,7 +28,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -66,13 +66,14 @@ public class StatisticsActivity extends AppCompatActivity {
         if (statisticsFragment == null) {
             statisticsFragment = StatisticsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    statisticsFragment, R.id.contentFrame);
+                    statisticsFragment, R.id.contentFrame
+            );
         }
 
-        TasksLoader tasksLoader = new TasksLoader(getApplicationContext(),
-                Injection.provideTasksRepository(getApplicationContext()));
-
-        new StatisticsPresenter(statisticsFragment, tasksLoader, getSupportLoaderManager());
+        // Create the presenter
+        LoaderProvider loaderProvider = new LoaderProvider(this);
+        new StatisticsPresenter(Injection.provideTasksRepository(this), loaderProvider,
+                getSupportLoaderManager(), statisticsFragment);
     }
 
     @Override

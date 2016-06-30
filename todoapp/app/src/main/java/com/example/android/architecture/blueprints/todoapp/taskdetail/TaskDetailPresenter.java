@@ -16,64 +16,67 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter,
-        LoaderManager.LoaderCallbacks<Task> {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter, LoaderManager.LoaderCallbacks<Cursor>,TasksDataSource.GetTaskCallback {
 
-    private static final int TASK_QUERY = 3;
+    public final static int TASK_LOADER = 2;
 
-    private TasksRepository mTasksRepository;
-
+    @NonNull
+    private final TasksRepository mTasksRepository;
     private TaskDetailContract.View mTaskDetailView;
-
-    private TaskLoader mTaskLoader;
-
+    private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
-
-    @Nullable
+    private Task mTask;
     private String mTaskId;
 
-    public TaskDetailPresenter(@Nullable String taskId,
+    public TaskDetailPresenter(@NonNull String taskId,
+                               @NonNull LoaderProvider loaderProvider,
+                               @NonNull LoaderManager loaderManager,
                                @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView,
-                               @NonNull TaskLoader taskLoader,
-                               @NonNull LoaderManager loaderManager) {
-        mTaskId = taskId;
+                               @NonNull TaskDetailContract.View taskDetailView) {
+        mTaskId = checkNotNull(taskId, "taskId cannot be null!");
+        mLoaderProvider = checkNotNull(loaderProvider, "loaderProvider cannot be null!");
+        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mTaskLoader = checkNotNull(taskLoader, "taskLoader cannot be null!");
-        mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
-
         mTaskDetailView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(TASK_QUERY, null, this);
+        loadTask();
+    }
+
+    private void loadTask() {
+        mTaskDetailView.setLoadingIndicator(true);
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override
     public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        mTaskDetailView.showEditTask(mTask.getId());
     }
 
     @Override
@@ -83,27 +86,29 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
     }
 
     public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(mTaskId);
+        mTasksRepository.completeTask(mTask);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
     public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (null == mTask) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(mTaskId);
+        mTasksRepository.activateTask(mTask);
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    private void showTask(Task task) {
-        String title = task.getTitle();
-        String description = task.getDescription();
+    private void showTask(Cursor data) {
+        mTask = Task.from(data);
+
+        String title = mTask.getTitle();
+        String description = mTask.getDescription();
 
         if (title != null && title.isEmpty()) {
             mTaskDetailView.hideTitle();
@@ -116,31 +121,49 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         } else {
             mTaskDetailView.showDescription(description);
         }
-        mTaskDetailView.showCompletionStatus(task.isCompleted());
+        mTaskDetailView.showCompletionStatus(mTask.isCompleted());
         mTaskDetailView.setLoadingIndicator(false);
     }
 
-    @Override
-    public Loader<Task> onCreateLoader(int id, Bundle args) {
-        if (mTaskId == null) {
-            return null;
-        }
-        mTaskDetailView.setLoadingIndicator(true);
-        return mTaskLoader;
+    public void onDataLoaded(Cursor data) {
+        showTask(data);
+    }
+
+    public void onDataEmpty() {
+        mTaskDetailView.showMissingTask();
     }
 
     @Override
-    public void onLoadFinished(Loader<Task> loader, Task data) {
+    public void onTaskLoaded(Task task) {
+        // the data is refreshed locally now but
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(TASK_LOADER, null, this);
+    }
+
+    public void onDataNotAvailable() {
+        mTaskDetailView.showMissingTask();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mLoaderProvider.createTaskLoader(mTaskId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
-            showTask(data);
+            if (data.moveToLast()) {
+                onDataLoaded(data);
+            } else {
+                onDataEmpty();
+            }
         } else {
-            mTaskDetailView.showMissingTask();
+            onDataNotAvailable();
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Task> loader) {
-        // no-op
-    }
+    public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
 }

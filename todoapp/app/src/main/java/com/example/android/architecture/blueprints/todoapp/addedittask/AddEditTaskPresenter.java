@@ -16,8 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,38 +24,44 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
+import com.example.android.architecture.blueprints.todoapp.data.source.LoaderProvider;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
  * the UI as required.
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        LoaderManager.LoaderCallbacks<Task> {
+        LoaderManager.LoaderCallbacks<Cursor>, TasksDataSource.GetTaskCallback {
 
-    private static final int TASK_QUERY = 2;
-
-    @NonNull
-    private final TasksDataSource mTasksRepository;
+    public final static int EDIT_TASK_LOADER = 3;
 
     @NonNull
-    private final AddEditTaskContract.View mAddTaskView;
+    private final LoaderProvider mLoaderProvider;
+
+    @NonNull
+    private final LoaderManager mLoaderManager;
+
+    @NonNull
+    private TasksRepository mTasksRepository;
+
+    @NonNull
+    private AddEditTaskContract.View mAddTaskView;
 
     @Nullable
     private String mTaskId;
 
-    private TaskLoader mTaskLoader;
-
-    private final LoaderManager mLoaderManager;
-
-    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView, @NonNull TaskLoader taskLoader,
-            @NonNull LoaderManager loaderManager) {
+    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
+                                @NonNull AddEditTaskContract.View addTaskView, @NonNull LoaderProvider loaderProvider,
+                                @NonNull LoaderManager loaderManager) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-        mTaskLoader = checkNotNull(taskLoader);
+        mLoaderProvider = checkNotNull(loaderProvider);
         mLoaderManager = checkNotNull(loaderManager, "loaderManager cannot be null!");
 
         mAddTaskView.setPresenter(this);
@@ -65,7 +70,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void start() {
         if (!isNewTask()) {
-	        mLoaderManager.initLoader(TASK_QUERY, null, this);
+            populateTask();
         }
     }
 
@@ -79,25 +84,31 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public Loader<Task> onCreateLoader(int id, Bundle args) {
-        if (mTaskId == null) {
-            return null;
+    public void populateTask() {
+        if (isNewTask()) {
+            throw new RuntimeException("populateTask() was called but task is new.");
         }
-        return mTaskLoader;
+        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override
-    public void onLoadFinished(Loader<Task> loader, Task data) {
-        if (data != null) {
-            mAddTaskView.setDescription(data.getDescription());
-            mAddTaskView.setTitle(data.getTitle());
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mLoaderProvider.createTaskLoader(mTaskId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null && data.moveToLast()) {
+            Task task = Task.from(data);
+            mAddTaskView.setDescription(task.getDescription());
+            mAddTaskView.setTitle(task.getTitle());
         } else {
             // NO-OP, add mode.
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Task> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
 
     }
 
@@ -121,5 +132,16 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
+    }
+
+    @Override
+    public void onTaskLoaded(Task task) {
+        // we don't need this result since the CursorLoader will load it for us
+        mLoaderManager.initLoader(EDIT_TASK_LOADER, null, this);
+    }
+
+    @Override
+    public void onDataNotAvailable() {
+        mAddTaskView.showEmptyTaskError();
     }
 }
