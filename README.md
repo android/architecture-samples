@@ -17,15 +17,12 @@ maintainability. However, bear in mind that there are many ways to build apps
 with these architectures and tools, depending on your priorities, so these
 shouldn't be considered canonical examples. The UI is deliberately kept simple.
 
-### What does <em>beta</em> mean?
-
-We're still making decisions that could affect all samples so we're keeping the
-initial number of variants low before the stable release.
-
 ## Samples
 
 All projects are released in their own branch. Check each project's README for
 more information.
+
+### Stable samples
 
   * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) - Basic Model-View-Presenter architecture.
   * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) - Based on todo-mvp, fetches data using Loaders.
@@ -33,12 +30,21 @@ more information.
   * [todo-mvp-clean/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) - Based on todo-mvp, uses concepts from Clean Architecture.
   * [todo-mvp-dagger/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) - Based on todo-mvp, uses Dagger2 for Dependency Injection
 
-In progress:
+### Samples in progress
 
   * [dev-todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-contentproviders/) - Based on todo-mvp-loaders, uses Content Providers
   * [dev-todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
 
 Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
+
+### Unofficial samples
+These are community contributions that may not be in sync with the rest of the branches.
+ * [todo-mvp-fragmentless/](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) - Based on todo-mvp, uses Android views instead of Fragments.
+
+### What does <em>beta</em> mean?
+
+We're still making decisions that could affect all samples so we're keeping the
+initial number of variants low before the stable release.
 
 ## Why a to-do application?
 
