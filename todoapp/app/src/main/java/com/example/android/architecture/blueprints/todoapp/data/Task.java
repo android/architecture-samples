@@ -30,11 +30,11 @@ import java.util.UUID;
  */
 public final class Task {
 
-    private int mInternalId;
     private final String mId;
     private final String mTitle;
     private final String mDescription;
     private final boolean mCompleted;
+    private int mInternalId;
 
     /**
      * Use this constructor to create a new active Task.
@@ -55,7 +55,7 @@ public final class Task {
      *
      * @param title
      * @param description
-     * @param id          of the class
+     * @param id of the class
      */
     public Task(@Nullable String title, @Nullable String description, String id) {
         mId = id;
@@ -100,10 +100,14 @@ public final class Task {
      * @return
      */
     public static Task from(Cursor cursor) {
-        String entryId = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
-        String title = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
-        String description = cursor.getString(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        String entryId = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID));
+        String title = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE));
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION));
+        boolean completed = cursor.getInt(cursor.getColumnIndexOrThrow(
+                TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
         return new Task(title, description, entryId, completed);
     }
 

@@ -1,6 +1,6 @@
 # TODO-MVP-ContentProvider
 
-It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data to the repository.
+It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data into the repository.
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
 
