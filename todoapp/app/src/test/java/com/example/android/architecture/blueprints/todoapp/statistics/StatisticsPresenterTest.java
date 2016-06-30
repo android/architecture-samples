@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -81,7 +80,7 @@ public class StatisticsPresenterTest {
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
-        verify(mStatisticsView).showStatistics(2, 3);
+        verify(mStatisticsView).showStatistics(1, 2);
     }
 
     @Test

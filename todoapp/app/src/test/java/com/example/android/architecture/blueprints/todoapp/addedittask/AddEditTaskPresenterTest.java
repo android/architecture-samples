@@ -108,7 +108,7 @@ public class AddEditTaskPresenterTest {
 
     @Test
     public void populateTask_callsRepoAndUpdatesView() {
-        Task testTask = new Task("Title", "Description");
+        Task testTask = new Task("TITLE", "DESCRIPTION");
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.onLoadFinished(mock(Loader.class), mActiveTaskCursor);

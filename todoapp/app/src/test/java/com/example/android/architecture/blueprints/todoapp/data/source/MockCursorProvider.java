@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import android.test.mock.MockCursor;
@@ -12,8 +28,8 @@ import java.util.UUID;
 
 public class MockCursorProvider {
 
-    public static final String TITLE_TEST = "Title";
-    public static final String DESCRIPTION_TEST = "Description";
+    public static final String TITLE_TEST = "TITLE";
+    public static final String DESCRIPTION_TEST = "DESCRIPTION";
 
     private static Map<Integer, Object> createActiveTaskCursorEntry(){
         Map<Integer, Object> entry = new HashMap<>();
@@ -66,8 +82,6 @@ public class MockCursorProvider {
         List<Map<Integer, Object>> entryList = new ArrayList<>();
         entryList.add(createCompletedTaskCursorEntry());
         entryList.add(createCompletedTaskCursorEntry());
-        entryList.add(createCompletedTaskCursorEntry());
-        entryList.add(createActiveTaskCursorEntry());
         entryList.add(createActiveTaskCursorEntry());
         return new TaskMockCursor(entryList);
     }

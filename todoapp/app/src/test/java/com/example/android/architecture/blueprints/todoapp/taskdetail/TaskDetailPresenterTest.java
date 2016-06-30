@@ -38,8 +38,8 @@ import static org.mockito.Mockito.verify;
  */
 public class TaskDetailPresenterTest {
 
-    public static final String TITLE_TEST = "Title";
-    public static final String DESCRIPTION_TEST = "Description";
+    public static final String TITLE_TEST = "TITLE";
+    public static final String DESCRIPTION_TEST = "DESCRIPTION";
     public static final String INVALID_TASK_ID = "";
 
     @Mock

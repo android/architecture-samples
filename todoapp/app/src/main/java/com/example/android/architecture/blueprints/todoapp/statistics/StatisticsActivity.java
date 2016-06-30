@@ -66,13 +66,14 @@ public class StatisticsActivity extends AppCompatActivity {
         if (statisticsFragment == null) {
             statisticsFragment = StatisticsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                                                statisticsFragment, R.id.contentFrame
+                    statisticsFragment, R.id.contentFrame
             );
         }
 
         // Create the presenter
         LoaderProvider loaderProvider = new LoaderProvider(this);
-        new StatisticsPresenter(Injection.provideTasksRepository(this), loaderProvider, getSupportLoaderManager(), statisticsFragment);
+        new StatisticsPresenter(Injection.provideTasksRepository(this), loaderProvider,
+                getSupportLoaderManager(), statisticsFragment);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class StatisticsActivity extends AppCompatActivity {
                                 Intent intent =
                                         new Intent(StatisticsActivity.this, TasksActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             case R.id.statistics_navigation_menu_item:

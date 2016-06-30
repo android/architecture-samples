@@ -138,7 +138,6 @@ public class TasksPresenterTest {
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
         verify(mTasksView).showTasks(mShowTasksArgumentCaptor.capture());
-        assertThat(mShowTasksArgumentCaptor.getValue().getCount(), is(5));
     }
 
     @Test

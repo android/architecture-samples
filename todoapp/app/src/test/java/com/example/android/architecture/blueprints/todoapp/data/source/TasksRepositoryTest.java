@@ -234,9 +234,6 @@ public class TasksRepositoryTest {
         // Verify the data sources were called
         verify(mTasksRemoteDataSource).deleteTask(newTask.getId());
         verify(mTasksLocalDataSource).deleteTask(newTask.getId());
-
-        // Verify it's removed from repository
-//        assertThat(mTasksRepository.mCachedTasks.containsKey(newTask.getId()), is(false));
     }
 
     @Test

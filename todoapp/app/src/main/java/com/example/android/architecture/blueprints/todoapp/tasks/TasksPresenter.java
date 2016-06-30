@@ -34,13 +34,14 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required. It is implemented as a non UI {@link Fragment} to make use of the
  * {@link LoaderManager} mechanism for managing loading and updating data asynchronously.
  */
-public class TasksPresenter implements TasksContract.Presenter, TasksRepository.LoadDataCallback, TasksDataSource.GetTasksCallback, LoaderManager.LoaderCallbacks<Cursor> {
+public class TasksPresenter implements TasksContract.Presenter,
+        TasksRepository.LoadDataCallback, TasksDataSource.GetTasksCallback,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     public final static int TASKS_LOADER = 1;
 
