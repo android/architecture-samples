@@ -1,4 +1,4 @@
-# TODO-MVP-ContentProvider
+# TODO-MVP-ContentProviders
 
 It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data into the repository.
 
@@ -153,9 +153,17 @@ the code are simpler as Loaders take care of the asynchronous work.
 
 
 ```
-TODO
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Java                            48           1100           1460           3535 (3450 in MVP)
+XML                             34             97            337            601
+-------------------------------------------------------------------------------
+SUM:                            82           1197           1797           4136
+-------------------------------------------------------------------------------
 
 ```
+
 ### Maintainability
 
 #### Ease of amending or adding a feature
