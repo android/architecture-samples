@@ -1,6 +1,6 @@
 # TODO-MVP-ContentProviders
 
-It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/master/todo-mvp-loaders) sample and uses a Content Provider to retrieve data into the repository.
+It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders) sample and uses a Content Provider to retrieve data into the repository.
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
 
@@ -24,7 +24,7 @@ The Presenter does not need to know how the data is loaded, for that reason the 
 of dealing with the data loading.
 
 
-In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com.example.android.architecture.blueprints.todoapp.data.source/LoaderProvider.java):
+In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/LoaderProvider.java):
 
 
 ```java
@@ -36,7 +36,7 @@ In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/androi
 ```
 The results are received in the UI Thread, handled by the Presenter.
 
-In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
+In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
 
 
 ```java
@@ -83,7 +83,7 @@ Upon start, once the data has been stored locally we simply ask the LoaderProvid
 
 ### Content Provider and Tasks Repository
 
-The [TasksRepository](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java#L81) behaves a bit differently compared to the other branches. The main difference is that it's not returning data to the `Presenter`, but only storing the tasks in the [LocalDataSource](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java#L61). Once the `ContentProvider` inserts data, it will [notify](https://github.com/googlesamples/android-architecture/blob/dev-todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java#L128) the change to the `Uri` and whoever is observing it will receive an update.
+The [TasksRepository](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java#L81) behaves a bit differently compared to the other branches. The main difference is that it's not returning data to the `Presenter`, but only storing the tasks in the [LocalDataSource](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java#L61). Once the `ContentProvider` inserts data, it will [notify](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java#L128) the change to the `Uri` and whoever is observing it will receive an update.
 
 ```java
     @Override
