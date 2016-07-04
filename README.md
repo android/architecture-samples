@@ -79,6 +79,8 @@ This project is **built by the community** and curated by Google and core mainta
 
 [Karumi](http://github.com/Karumi) - Developers (MVP Clean architecture sample)
 
+[Natalie Masse](http://github.com/freewheelnat) - Core developer
+
 [Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
@@ -86,8 +88,6 @@ This project is **built by the community** and curated by Google and core mainta
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
-
-[Natalie Masse](http://github.com/freewheelnat) - Core developer
 
 [Stephan Linzner](http://github.com/slinzner) - Core developer
 
