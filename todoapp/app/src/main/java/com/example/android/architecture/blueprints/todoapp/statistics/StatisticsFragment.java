@@ -27,8 +27,6 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Main UI for the statistics screen.
  */
@@ -44,7 +42,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     @Override
     public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+        mPresenter = presenter;
     }
 
     @Nullable

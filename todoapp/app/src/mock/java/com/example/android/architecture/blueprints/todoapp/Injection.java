@@ -34,7 +34,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Injection {
 
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
-        checkNotNull(context);
         return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
                 TasksLocalDataSource.getInstance(context));
     }
