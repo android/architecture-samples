@@ -22,8 +22,6 @@ import android.support.annotation.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
  * the UI as required.
@@ -50,8 +48,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
             @NonNull AddEditTaskContract.View addTaskView) {
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
-        mAddTaskView = checkNotNull(addTaskView);
+        mTasksRepository = tasksRepository;
+        mAddTaskView = addTaskView;
 
         mAddTaskView.setPresenter(this);
     }

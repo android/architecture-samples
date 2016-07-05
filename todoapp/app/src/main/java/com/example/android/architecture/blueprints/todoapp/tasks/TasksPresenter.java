@@ -45,8 +45,8 @@ public class TasksPresenter implements TasksContract.Presenter {
     private boolean mFirstLoad = true;
 
     public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
-        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mTasksRepository = tasksRepository;
+        mTasksView = tasksView;
 
         mTasksView.setPresenter(this);
     }
@@ -189,13 +189,11 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
-        checkNotNull(requestedTask, "requestedTask cannot be null!");
         mTasksView.showTaskDetailsUi(requestedTask.getId());
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
-        checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
         loadTasks(false, false);
@@ -203,7 +201,6 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void activateTask(@NonNull Task activeTask) {
-        checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
         loadTasks(false, false);

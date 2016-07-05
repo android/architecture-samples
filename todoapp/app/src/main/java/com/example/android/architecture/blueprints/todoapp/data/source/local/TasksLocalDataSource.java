@@ -43,7 +43,6 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context) {
-        checkNotNull(context);
         mDbHelper = new TasksDbHelper(context);
     }
 

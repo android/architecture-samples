@@ -94,8 +94,6 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public void getTasks(@NonNull final LoadTasksCallback callback) {
-        checkNotNull(callback);
-
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
             callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
@@ -124,7 +122,6 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void saveTask(@NonNull Task task) {
-        checkNotNull(task);
         mTasksRemoteDataSource.saveTask(task);
         mTasksLocalDataSource.saveTask(task);
 
@@ -137,7 +134,6 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull Task task) {
-        checkNotNull(task);
         mTasksRemoteDataSource.completeTask(task);
         mTasksLocalDataSource.completeTask(task);
 
@@ -152,13 +148,11 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        checkNotNull(taskId);
         completeTask(getTaskWithId(taskId));
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
-        checkNotNull(task);
         mTasksRemoteDataSource.activateTask(task);
         mTasksLocalDataSource.activateTask(task);
 
@@ -204,9 +198,6 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
-        checkNotNull(taskId);
-        checkNotNull(callback);
-
         Task cachedTask = getTaskWithId(taskId);
 
         // Respond immediately with cache if available
@@ -301,7 +292,6 @@ public class TasksRepository implements TasksDataSource {
 
     @Nullable
     private Task getTaskWithId(@NonNull String id) {
-        checkNotNull(id);
         if (mCachedTasks == null || mCachedTasks.isEmpty()) {
             return null;
         } else {
