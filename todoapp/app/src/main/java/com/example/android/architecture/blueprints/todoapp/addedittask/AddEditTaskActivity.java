@@ -78,7 +78,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 .addEditTaskPresenterModule(
                         new AddEditTaskPresenterModule(addEditTaskFragment, taskId))
                 .tasksRepositoryComponent(
-                        ((ToDoApplication) getApplication()).getTasksRepositoryComponent()).build()
+                        ToDoApplication.get(this).getTasksRepositoryComponent()).build()
                 .inject(this);
     }
 

@@ -68,8 +68,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Create the presenter
         DaggerTaskDetailComponent.builder()
                 .taskDetailPresenterModule(new TaskDetailPresenterModule(taskDetailFragment, taskId))
-                .tasksRepositoryComponent(((ToDoApplication) getApplication())
-                .getTasksRepositoryComponent()).build()
+                .tasksRepositoryComponent(ToDoApplication.get(this).getTasksRepositoryComponent()).build()
                 .inject(this);
     }
 
