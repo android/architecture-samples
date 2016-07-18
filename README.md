@@ -61,6 +61,10 @@ app, the size and experience of your team, the amount of maintenance that you
 foresee, whether you need a tablet layout or support multiple platforms, how
 compact you like your codebase, etc.
 
+See also:
+* [Samples at a glance](https://github.com/googlesamples/android-architecture/wiki/Samples-at-a-glance)
+* [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
+
 ## Opening a sample in Android Studio
 
 First check out one of the sample branches (`master` won't compile), and then choose to open the `todoapp/` directory. Example:
