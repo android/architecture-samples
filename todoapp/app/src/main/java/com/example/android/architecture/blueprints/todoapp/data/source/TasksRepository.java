@@ -221,6 +221,7 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
+                mCachedTasks.put(task.getId(), task);
                 callback.onTaskLoaded(task);
             }
 
@@ -229,6 +230,7 @@ public class TasksRepository implements TasksDataSource {
                 mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
                     @Override
                     public void onTaskLoaded(Task task) {
+                        mCachedTasks.put(task.getId(), task);
                         callback.onTaskLoaded(task);
                     }
 
