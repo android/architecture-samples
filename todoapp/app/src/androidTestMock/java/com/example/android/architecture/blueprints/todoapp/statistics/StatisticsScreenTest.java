@@ -24,8 +24,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 import org.junit.Before;
 import org.junit.Rule;

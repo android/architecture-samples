@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 import com.google.common.collect.Lists;
-
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,7 +66,7 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+        mStatisticsPresenter = givenStatisticsPresenter();
 
         // The presenter won't update the view unless it's active.
         when(mStatisticsView.isActive()).thenReturn(true);
@@ -123,5 +126,12 @@ public class StatisticsPresenterTest {
 
         // Then an error message is shown
         verify(mStatisticsView).showLoadingStatisticsError();
+    }
+
+    private StatisticsPresenter givenStatisticsPresenter() {
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        GetStatistics getStatistics = new GetStatistics(mTasksRepository);
+
+        return new StatisticsPresenter(useCaseHandler, mStatisticsView, getStatistics);
     }
 }

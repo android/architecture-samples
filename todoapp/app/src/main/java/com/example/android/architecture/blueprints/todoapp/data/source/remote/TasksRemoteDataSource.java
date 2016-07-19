@@ -17,9 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.google.common.collect.Lists;
 
@@ -27,7 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
@@ -61,7 +61,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public void getTasks(final @NonNull LoadTasksCallback callback) {
         // Simulate network by delaying the execution.
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

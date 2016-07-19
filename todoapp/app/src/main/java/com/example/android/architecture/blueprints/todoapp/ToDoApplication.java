@@ -44,7 +44,6 @@ public class ToDoApplication extends Application {
         mRepositoryComponent = DaggerTasksRepositoryComponent.builder()
                 .applicationModule(new ApplicationModule((getApplicationContext())))
                 .tasksRepositoryModule(new TasksRepositoryModule()).build();
-
     }
 
     public TasksRepositoryComponent getTasksRepositoryComponent() {

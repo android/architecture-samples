@@ -21,4 +21,8 @@ public class TasksPresenterModule {
         return mView;
     }
 
+//    @Provides
+//    UseCaseScheduler provideUseCaseScheduler() {
+//        return new UseCaseThreadPoolScheduler();
+//    }
 }

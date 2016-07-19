@@ -16,7 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -65,7 +69,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = givenEditTaskPresenter("1");
 
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -75,10 +79,11 @@ public class AddEditTaskPresenterTest {
         verify(mAddEditTaskView).showTasksList(); // shown in the UI
     }
 
+
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = givenEditTaskPresenter(null);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.saveTask("", "");
@@ -90,7 +95,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = givenEditTaskPresenter("1");
 
         // When the presenter is asked to save an existing task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -104,8 +109,7 @@ public class AddEditTaskPresenterTest {
     public void populateTask_callsRepoAndUpdatesView() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = givenEditTaskPresenter(testTask.getId());
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.populateTask();
@@ -118,5 +122,15 @@ public class AddEditTaskPresenterTest {
 
         verify(mAddEditTaskView).setTitle(testTask.getTitle());
         verify(mAddEditTaskView).setDescription(testTask.getDescription());
+    }
+
+    private AddEditTaskPresenter givenEditTaskPresenter(String taskId) {
+
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        GetTask getTask = new GetTask(mTasksRepository);
+        SaveTask saveTask = new SaveTask(mTasksRepository);
+
+        return new AddEditTaskPresenter(useCaseHandler, taskId, mAddEditTaskView, getTask,
+                saveTask);
     }
 }

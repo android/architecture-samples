@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
-
-import java.util.List;
+import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.model.Statistics;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 
 import javax.inject.Inject;
 
@@ -38,20 +36,20 @@ import javax.inject.Inject;
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  **/
 final class StatisticsPresenter implements StatisticsContract.Presenter {
-
-    private final TasksRepository mTasksRepository;
-
     private final StatisticsContract.View mStatisticsView;
+    private final UseCaseHandler mUseCaseHandler;
+    private final GetStatistics mGetStatistics;
 
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
      */
     @Inject
-    StatisticsPresenter(TasksRepository tasksRepository,
-                               StatisticsContract.View statisticsView) {
-        mTasksRepository = tasksRepository;
+    StatisticsPresenter(UseCaseHandler useCaseHandler, StatisticsContract.View statisticsView,
+                        GetStatistics getStatistics) {
         mStatisticsView = statisticsView;
+        mUseCaseHandler = useCaseHandler;
+        mGetStatistics = getStatistics;
     }
 
     /**
@@ -71,42 +69,22 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
-
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
+                new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
             @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
-                    }
-                }
+            public void onSuccess(GetStatistics.ResponseValue response) {
+                Statistics statistics = response.getStatistics();
                 // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;
                 }
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
+                mStatisticsView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onError() {
                 // The view may not be able to handle UI updates anymore
                 if (!mStatisticsView.isActive()) {
                     return;

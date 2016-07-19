@@ -19,9 +19,11 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 import javax.inject.Inject;
 
@@ -38,14 +40,16 @@ import javax.inject.Inject;
  * therefore, to ensure the developer doesn't instantiate the class manually bypassing Dagger,
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  */
-final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
-        TasksDataSource.GetTaskCallback {
-
-    @NonNull
-    private final TasksDataSource mTasksRepository;
+public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
+
+    private final GetTask mGetTask;
+
+    private final SaveTask mSaveTask;
+
+    private final UseCaseHandler mUseCaseHandler;
 
     @Nullable
     private String mTaskId;
@@ -55,11 +59,14 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * with {@code @Nullable} values.
      */
     @Inject
-    AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository,
-            AddEditTaskContract.View addTaskView) {
+    AddEditTaskPresenter(UseCaseHandler useCaseHandler, @Nullable String taskId,
+                         AddEditTaskContract.View addTaskView,
+                         GetTask getTask, SaveTask saveTask) {
         mTaskId = taskId;
-        mTasksRepository = tasksRepository;
         mAddTaskView = addTaskView;
+        mUseCaseHandler = useCaseHandler;
+        mGetTask = getTask;
+        mSaveTask = saveTask;
     }
 
     /**
@@ -92,11 +99,22 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        mTasksRepository.getTask(mTaskId, this);
+
+        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(GetTask.ResponseValue response) {
+                        showTask(response.getTask());
+                    }
+
+                    @Override
+                    public void onError() {
+                        showEmptyTaskError();
+                    }
+                });
     }
 
-    @Override
-    public void onTaskLoaded(Task task) {
+    private void showTask(Task task) {
         // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.setTitle(task.getTitle());
@@ -104,8 +122,11 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         }
     }
 
-    @Override
-    public void onDataNotAvailable() {
+    private void showSaveError() {
+        // Show error, log, etc.
+    }
+
+    private void showEmptyTaskError() {
         // The view may not be able to handle UI updates anymore
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
@@ -121,8 +142,18 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
-            mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                    new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                        @Override
+                        public void onSuccess(SaveTask.ResponseValue response) {
+                            mAddTaskView.showTasksList();
+                        }
+
+                        @Override
+                        public void onError() {
+                            showSaveError();
+                        }
+                    });
         }
     }
 
@@ -130,7 +161,19 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        Task newTask = new Task(title, description, mTaskId);
+        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+                new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(SaveTask.ResponseValue response) {
+                        // After an edit, go back to the list.
+                        mAddTaskView.showTasksList();
+                    }
+
+                    @Override
+                    public void onError() {
+                        showSaveError();
+                    }
+                });
     }
 }
