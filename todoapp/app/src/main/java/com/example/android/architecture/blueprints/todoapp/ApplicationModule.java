@@ -25,7 +25,7 @@ public final class ApplicationModule {
     }
 
     @Provides
-    UseCaseScheduler provideUseCaseScheduler() {
-        return new UseCaseThreadPoolScheduler();
+    UseCaseScheduler provideUseCaseScheduler(UseCaseThreadPoolScheduler scheduler) {
+        return scheduler;
     }
 }

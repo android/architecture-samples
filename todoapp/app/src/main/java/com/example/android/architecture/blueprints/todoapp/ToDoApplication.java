@@ -42,7 +42,7 @@ public class ToDoApplication extends Application {
         super.onCreate();
 
         mRepositoryComponent = DaggerTasksRepositoryComponent.builder()
-                .applicationModule(new ApplicationModule((getApplicationContext())))
+                .applicationModule(new ApplicationModule(getApplicationContext()))
                 .tasksRepositoryModule(new TasksRepositoryModule()).build();
     }
 
