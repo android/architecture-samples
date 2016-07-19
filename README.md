@@ -1,101 +1,105 @@
-# Android Architecture Blueprints [beta]
+# Android Architecture Blueprints [beta] - MVP + Clean Architecture + Dagger2
 
-The Android framework offers a lot of flexibility when it comes to defining how
-to organize and <em>architect</em> an Android app. This freedom, whilst very valuable, can also result in apps
-with large classes, inconsistent naming and architectures (or lack of) that can
-make testing, maintaining and extending difficult.
+Project owner: AndroidClasses ([funyoung](http://github.com/AndroidClasses))
 
-Android Architecture Blueprints is meant to demonstrate possible ways to help
-with these common problems. In this project we offer the same application
-implemented using different architectural concepts and tools.
+### Summary
+This sample stands on the principles of [Clean Architecture](https://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
-You can use these samples as a reference or as a starting point for creating
-your own apps. The focus here is on code structure, architecture, testing and
-maintainability. However, bear in mind that there are many ways to build apps
-with these architectures and tools, depending on your priorities, so these
-shouldn't be considered canonical examples. The UI is deliberately kept simple.
+It apply dependency injection with [Dagger2](http://google.github.io/dagger/) for [MVP Clean sample](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean), which is based on the [MVP sample](https://github.com/googlesamples/android-architecture/tree/todo-mvp), adding a domain layer between the presentation layer and repositories, splitting the app in three layers:
 
-## Samples
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-clean.png" alt="Diagram"/>
 
-All projects are released in their own branch. Check each project's README for
-more information.
+* **MVP**: Model View Presenter pattern from the base sample.
+* **Domain**: Holds all business logic. The domain layer starts with classes named *use cases* or *interactors* used by the application presenters. These *use cases* represent all the possible actions a developer can perform from the presentation layer.
+* **Repository**: Repository pattern from the base sample.  
 
-### Stable samples
+### Key concepts
+The big difference with base MVP sample is the use of the Domain layer and *use cases*. Moving the domain layer from the presenters will help to avoid code repetition on presenters (e.g. [Task filters](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/domain/filter)).
 
-  * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) - Basic Model-View-Presenter architecture.
-  * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) - Based on todo-mvp, fetches data using Loaders.
-  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) - Based on todo-mvp, uses the Data Binding Library.
-  * [todo-mvp-clean/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) - Based on todo-mvp, uses concepts from Clean Architecture.
-  * [todo-mvp-dagger/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) - Based on todo-mvp, uses Dagger2 for Dependency Injection
-  * [todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) - Based on todo-mvp-loaders, fetches data using Loaders and uses Content Providers
-  
-### Samples in progress
-  * [dev-todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
+*Use cases* define the operations that the app needs. This increases readability since the names of the classes make the purpose obvious (see [tasks/domain/usecase/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/domain/usecase)).
 
-Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
+*Use cases* are good for operation reuse over our domain code. [`CompleteTask`] (https://github.com/googlesamples/android-architecture/blob/todo-mvp-clean/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/domain/usecase/CompleteTask.java) is a good example of this as it's used from both the [`TaskDetailPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-clean/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailPresenter.java) and the [`TasksPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-clean/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java).
 
-### External samples
-These are community contributions that may not be in sync with the rest of the branches.
- * [todo-mvp-fragmentless/](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) - Based on todo-mvp, uses Android views instead of Fragments.
+The execution of these *use cases* is done in a background thread using the [command pattern](http://www.oodesign.com/command-pattern.html). The domain layer is completely decoupled from the Android SDK or other third party libraries.
 
-### What does <em>beta</em> mean?
 
-We're still making decisions that could affect all samples so we're keeping the
-initial number of variants low before the stable release.
+[Dagger2](http://google.github.io/dagger/) is a fully static, compile-time dependency injection framework for both Java and Android. It is an adaptation of an earlier version created by Square and now maintained by Google.
 
-## Why a to-do application?
+Dependency injection frameworks take charge of object creation. For example, in todo-mvp we create the TasksPresenter in [TasksActivity](https://github.com/googlesamples/android-architecture/blob/todo-mvp/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksActivity.java#L75):
 
-The aim of the app is to be simple enough that it's understood quickly, but
-complex enough to showcase difficult design decisions and testing scenarios.
-Check out the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
+```java
+mTasksPresenter = new TasksPresenter(
+        Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+```
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/tasks2.png" alt="Screenshot" width="160" style="display: inline; float: right"/>
+But in this sample, the presenter is injected. Dagger2 takes care of creation and figuring out the dependencies:
 
-Also, a similar project exists to compare JavaScript frameworks, called [TodoMVC](https://github.com/tastejs/todomvc).
+```java
+public class TasksActivity extends AppCompatActivity {
+    @Inject TasksPresenter mTasksPresenter;
+    ...
+}
+```
 
-## Which sample should I choose for my app?
+For this to work we added new classes to the feature, check out:
+ * [TasksComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksComponent.java)
+ * [TasksPresenterModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenterModule.java)
+ * [TasksRepositoryComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryComponent.java)
+ * [TasksRepositoryModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/prod/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryModule.java)
+ * [ApplicationModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/ApplicationModule.java)
 
-That's for you to decide: each sample has a README where you'll find metrics
-and subjective assessments. Your mileage may vary depending on the size of the
-app, the size and experience of your team, the amount of maintenance that you
-foresee, whether you need a tablet layout or support multiple platforms, how
-compact you like your codebase, etc.
+That's a lot of work to replace a constructor call! The main advantage of doing this is that we can substitute modules for testing. It can be done at compile time, using flavors, or at runtime, using some kind of debug panel for manual testing. They can also be configured from automated tests, to test different scenarios.
 
-See also:
-* [Samples at a glance](https://github.com/googlesamples/android-architecture/wiki/Samples-at-a-glance)
-* [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
+This sample is still using the mock/prod flavors from todo-mvp to generate different APKs. There is a [TasksRepositoryModule in prod/](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/prod/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryModule.java) which fetches data from the slow data source (simulating a backend API) and [another one in mock/](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/mock/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepositoryModule.java), which provides fake data, ideal for automated testing. With this approach the app can be configured to use fake location coordinates, write and read from fake shared preferences, simulate network conditions, etc.
 
-## Opening a sample in Android Studio
+### Issues/notes
+*Use cases* run off the main thread, which is a good solution for Android apps.  This is done as soon as possible to avoid blocking the UI thread. We decided to use a command pattern and execute each use case with a thread pool, but we can implement the same with RxJava or Promises.
 
-First check out one of the sample branches (`master` won't compile), and then choose to open the `todoapp/` directory. Example:
+We are using asynchronous repositories, but there's no need to do this any more because use cases execute off the main thread. This is kept to maintain the sample as similar as possible to the original one.
 
-  * `git clone git@github.com:googlesamples/android-architecture.git`
-  * `git checkout todo-mvp` (or replace `todo-mvp` with the project you want to check out)
-  * In Android Studio open the `todoapp/` directory.
+We recommend using different models for View, domain and API layers, but in this case all models are immutable so there's no need to duplicate them. If View models contained any Android-related fields, we would use two models, one for domain and other for View and a mapper class that converts between them.
 
-## Who is behind this project?
+Callbacks have an `onError` method that in a real app should contain information about the problem.
 
-This project is **built by the community** and curated by Google and core maintainers.
+### Testability
 
-### External contributors
+Very high. With this approach, all domain code is tested with unit tests. This can be extended with integration tests, that cover from Use Cases to the boundaries of the view and repository. And the use of Dagger2 improves flexibility in local integration tests and UI tests. Components can be replaced by doubles very easily and test different scenarios.
 
-[David González](http://github.com/malmstein) - Core developer (Content Providers sample)
+### Dependencies
 
-[Karumi](http://github.com/Karumi) - Developers (MVP Clean architecture sample)
+ * Dagger2
+ * Clean Architecture
 
-[Natalie Masse](http://github.com/freewheelnat) - Core developer
+## Features
 
-[Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
+### Complexity - understandability
 
-[Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
+#### Use of architectural frameworks/libraries/tools:
+Dagger2 and Clean Architecture pattern
 
-### Googlers
+#### Conceptual complexity 
 
-[Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
+Medium, it's an MVP approach with a new layer that handles domain logic. Building an app with a dependency injection framework is not trivial as it uses new concepts and many operations are done under the hood. However, once in place, it's not hard to understand and use.
 
-[Stephan Linzner](http://github.com/slinzner) - Core developer
+### Code metrics
 
-[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
-Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
+Adding a domain layer produces more classes and Java code.
 
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Java                            79           1405           1940           4348 (3451 in MVP)
+XML                             35             97            337            602
+-------------------------------------------------------------------------------
+SUM:                            114           1502           2277           4950
+-------------------------------------------------------------------------------
+```
+### Maintainability
+
+#### Ease of amending or adding a feature
+Very easy. This approach is more verbose, making the maintenance tasks more obvious.
+
+#### Learning cost
+Medium. Developers need to be aware of how Dagger2 works, although the setup of new features should look very similar to existing ones.
