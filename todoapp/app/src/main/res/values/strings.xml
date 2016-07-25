@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">TO-DO-MVP</string>
+    <string name="app_name">TO-DO-MVP-TABLET</string>
     <string name="add_task">New TO-DO</string>
     <string name="edit_task">Edit TO-DO</string>
     <string name="task_marked_complete">Task marked complete</string>
@@ -25,6 +25,7 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_task">Delete task</string>
+    <string name="menu_edit_task">Edit task</string>
     <string name="navigation_view_header_title">TO-DOs</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your TO-DO here.</string>

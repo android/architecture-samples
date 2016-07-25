@@ -16,6 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -30,11 +35,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for the implementation of {@link TasksPresenter}
  */
@@ -44,6 +44,9 @@ public class TasksPresenterTest {
 
     @Mock
     private TasksRepository mTasksRepository;
+
+    @Mock
+    private TasksNavigator mTasksNavigator;
 
     @Mock
     private TasksContract.View mTasksView;
@@ -64,7 +67,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView, mTasksNavigator);
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -148,7 +151,7 @@ public class TasksPresenterTest {
         mTasksPresenter.openTaskDetails(requestedTask);
 
         // Then task detail UI is shown
-        verify(mTasksView).showTaskDetailsUi(any(String.class));
+        verify(mTasksNavigator).startTaskDetail(any(String.class));
     }
 
     @Test

@@ -16,14 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksNavigator;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
@@ -31,26 +33,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
-    private final TasksRepository mTasksRepository;
+    @NonNull private final TasksRepository mTasksRepository;
 
     private final TaskDetailContract.View mTaskDetailView;
+
+    @NonNull private TasksPresenter mTasksPresenter;
+
+    @NonNull  private TasksNavigator mTasksNavigator;
 
     @Nullable
     private String mTaskId;
 
     public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
+            @NonNull TasksRepository tasksRepository,
+            @NonNull TaskDetailContract.View taskDetailView,
+            @NonNull TasksNavigator tasksNavigator) {
         this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-
-        mTaskDetailView.setPresenter(this);
+        mTasksNavigator = checkNotNull(tasksNavigator);
     }
 
     @Override
     public void start() {
-        openTask();
+        if (mTaskDetailView.isActive()) {
+            openTask();
+        }
     }
 
     private void openTask() {
@@ -58,8 +66,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-
-        mTaskDetailView.setLoadingIndicator(true);
+        if (mTaskDetailView.isActive()) {
+            mTaskDetailView.setLoadingIndicator(true);
+        }
         mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
@@ -98,7 +107,12 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void deleteTask() {
         mTasksRepository.deleteTask(mTaskId);
-        mTaskDetailView.showTaskDeleted();
+        if (isTablet()) {
+            mTasksPresenter.start();
+            mTasksNavigator.removeDetailPane();
+        } else {
+            mTaskDetailView.showTaskDeleted();
+        }
     }
 
     @Override
@@ -108,6 +122,15 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             return;
         }
         mTasksRepository.completeTask(mTaskId);
+        showTaskMarkedComplete();
+
+        // In tablet mode, ping the other presenter in case it needs to update
+        if (mTasksPresenter != null) {
+            mTasksPresenter.start();
+        }
+    }
+
+    public void showTaskMarkedComplete() {
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -119,6 +142,11 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
         mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
+
+        // In tablet mode, ping the other presenter in case it needs to update
+        if (mTasksPresenter != null) {
+            mTasksPresenter.start();
+        }
     }
 
     private void showTask(Task task) {
@@ -137,5 +165,18 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showDescription(description);
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
+    }
+
+    @Nullable
+    public String getTaskId() {
+        return mTaskId;
+    }
+
+    public void setTasksPresenter(TasksPresenter tasksPresenter) {
+        mTasksPresenter = tasksPresenter;
+    }
+
+    private boolean isTablet() {
+        return mTasksPresenter != null;
     }
 }

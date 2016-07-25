@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -46,8 +48,6 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
@@ -172,7 +172,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 mPresenter.loadTasks(true);
                 break;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -266,7 +266,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false
+                true
         );
     }
 

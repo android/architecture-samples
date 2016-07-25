@@ -16,19 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
@@ -39,21 +41,32 @@ public class TasksPresenter implements TasksContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
+    @NonNull
+    private final TasksNavigator mTasksNavigator;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    @Nullable
+    private TaskDetailPresenter mTaskDetailPresenter;
+
+    TasksPresenter(
+            @NonNull TasksRepository tasksRepository,
+            @NonNull TasksContract.View tasksView,
+            @NonNull TasksNavigator tasksNavigator) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-
-        mTasksView.setPresenter(this);
+        mTasksNavigator = checkNotNull(tasksNavigator);
     }
 
     @Override
     public void start() {
         loadTasks(false);
+    }
+
+    public void setTaskDetailPresenter(@Nullable TaskDetailPresenter presenter) {
+        mTaskDetailPresenter = presenter;
     }
 
     @Override
@@ -190,7 +203,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+        mTasksNavigator.startTaskDetail(requestedTask.getId());
     }
 
     @Override
@@ -199,6 +212,12 @@ public class TasksPresenter implements TasksContract.Presenter {
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
         loadTasks(false, false);
+
+        // In tablet mode, ping the other presenter in case it needs to update
+        if (mTaskDetailPresenter != null
+                && mTaskDetailPresenter.getTaskId().equals(completedTask.getId())) {
+            mTaskDetailPresenter.start();
+        }
     }
 
     @Override
@@ -207,6 +226,11 @@ public class TasksPresenter implements TasksContract.Presenter {
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
         loadTasks(false, false);
+        // In tablet mode, ping the other presenter in case it needs to update
+        if (mTaskDetailPresenter != null
+                && mTaskDetailPresenter.getTaskId().equals(activeTask.getId())) {
+            mTaskDetailPresenter.start();
+        }
     }
 
     @Override
@@ -214,6 +238,30 @@ public class TasksPresenter implements TasksContract.Presenter {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
         loadTasks(false, false);
+
+        // In tablet mode, ping the other presenter in case it needs to update
+        if (mTaskDetailPresenter != null) {
+
+            // If task on detail has just been cleared, remove fragment.
+            String taskId = mTaskDetailPresenter.getTaskId();
+            if (taskId != null) {
+                mTasksRepository.getTask(taskId,
+                        new TasksDataSource.GetTaskCallback() {
+                            @Override
+                            public void onTaskLoaded(Task task) {
+                                // No-op
+                                if (task == null) {
+                                    mTasksNavigator.onTaskDeleted();
+                                }
+                            }
+
+                            @Override
+                            public void onDataNotAvailable() {
+                                mTasksNavigator.onTaskDeleted();
+                            }
+                        });
+            }
+        }
     }
 
     /**

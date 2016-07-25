@@ -28,10 +28,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 public class TasksActivity extends AppCompatActivity {
@@ -40,7 +38,7 @@ public class TasksActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksPresenter mTasksPresenter;
+    private TasksContract.Presenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +60,10 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        TasksFragment tasksFragment =
-                (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
-        if (tasksFragment == null) {
-            // Create the fragment
-            tasksFragment = TasksFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
-        }
+        // Create a TasksMvpController every time, even after rotation.
+        TasksMvpController tasksMvpController = TasksMvpController.createTasksView(this);
 
-        // Create the presenter
-        mTasksPresenter = new TasksPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+        mTasksPresenter = tasksMvpController.getTasksPresenter();
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
@@ -98,7 +88,7 @@ public class TasksActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     private void setupDrawerContent(NavigationView navigationView) {

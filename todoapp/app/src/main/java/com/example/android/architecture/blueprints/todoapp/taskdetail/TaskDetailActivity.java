@@ -23,9 +23,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksMvpController;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**
@@ -51,21 +50,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
-        TaskDetailFragment taskDetailFragment = (TaskDetailFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.contentFrame);
-
-        if (taskDetailFragment == null) {
-            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
-
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    taskDetailFragment, R.id.contentFrame);
-        }
-
-        // Create the presenter
-        new TaskDetailPresenter(
-                taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment);
+        TasksMvpController.createTaskDetailView(this, taskId);
     }
 
     @Override

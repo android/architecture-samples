@@ -174,7 +174,10 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void activateTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        activateTask(getTaskWithId(taskId));
+        Task taskWithId = getTaskWithId(taskId);
+        if (taskWithId != null) {
+            activateTask(taskWithId);
+        }
     }
 
     @Override

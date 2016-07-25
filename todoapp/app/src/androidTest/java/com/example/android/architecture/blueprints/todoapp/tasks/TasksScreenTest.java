@@ -141,7 +141,15 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).perform(click());
 
         // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click());
+        if (mTasksActivityTestRule.getActivity()
+                .getSupportFragmentManager().findFragmentById(R.id.contentFrame_detail) == null) {
+            // On phone click on FAB
+            onView(withId(R.id.fab_edit_task)).perform(click());
+        } else {
+            // On tablet, click on menu item
+            onView(withId(R.id.menu_edit)).perform(click());
+        }
+
 
         String editTaskTitle = TITLE2;
         String editTaskDescription = "New Description";

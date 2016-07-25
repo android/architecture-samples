@@ -77,6 +77,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
+        // TODO: why are we retaining
+        setRetainInstance(true);
         mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
         mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
         mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
@@ -84,13 +86,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.editTask();
-            }
-        });
+        if (fab != null) { // Fab is null in tablet mode
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPresenter.editTask();
+                }
+            });
+        }
 
         return root;
     }
@@ -105,6 +108,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 mPresenter.deleteTask();
+                return true;
+            case R.id.menu_edit: // tablet mode only
+                mPresenter.editTask();
                 return true;
         }
         return false;
@@ -164,7 +170,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showTaskDeleted() {
-        getActivity().finish();
+        // Close the activity if not in tablet mode.
+        if (getFragmentManager().findFragmentById(R.id.contentFrame_detail) == null) {
+            getActivity().finish();
+        }
     }
 
     public void showTaskMarkedComplete() {
@@ -183,7 +192,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         if (requestCode == REQUEST_EDIT_TASK) {
             // If the task was edited successfully, go back to the list.
             if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
+                if (getFragmentManager().findFragmentById(R.id.contentFrame_detail) == null) {
+                    getActivity().finish();
+                }
             }
         }
     }
@@ -196,12 +207,16 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showMissingTask() {
-        mDetailTitle.setText("");
+        mDetailTitle.setText(getString(R.string.no_data));
         mDetailDescription.setText(getString(R.string.no_data));
     }
 
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    public TaskDetailContract.Presenter getPresenter() {
+        return mPresenter;
     }
 }
