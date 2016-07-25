@@ -77,7 +77,7 @@ public class TasksNavigator {
         return mFragmentActivity.getResources().getBoolean(R.bool.isTablet);
     }
 
-    public void removeDetailPane() {
+    private void removeDetailPane() {
         Fragment detailFragment = getDetailFragment();
         FragmentTransaction transaction = mFragmentActivity.getSupportFragmentManager().beginTransaction();
         transaction.remove(detailFragment);

@@ -35,6 +35,8 @@ public class TasksMvpController {
 
     private final FragmentActivity mFragmentActivity;
 
+    private TasksTabletPresenter mTasksTabletPresenter;
+
     private TasksPresenter mTasksPresenter;
 
     private TaskDetailPresenter mTaskDetailPresenter;
@@ -103,33 +105,44 @@ public class TasksMvpController {
         TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(taskId);
 
         // Create the Presenter
-        mTaskDetailPresenter = createTaskDetailPresenter(taskId,
+        TaskDetailPresenter taskDetailPresenter = createTaskDetailPresenter(taskId,
                 taskDetailFragment);
 
         // Wire presenters
-        taskDetailFragment.setPresenter(mTaskDetailPresenter);
-        mTasksPresenter.setTaskDetailPresenter(mTaskDetailPresenter);
-        mTaskDetailPresenter.setTasksPresenter(mTasksPresenter);
-
+        mTasksTabletPresenter.setTaskDetailPresenter(taskDetailPresenter);
+        taskDetailFragment.setPresenter(mTasksTabletPresenter);
         return taskDetailFragment;
     }
 
     private void createTabletElements() {
         TasksFragment tasksFragment;// Tablet presenter rule all presenters
 
+        mTasksTabletPresenter = new TasksTabletPresenter(
+                Injection.provideTasksRepository(mFragmentActivity),
+                new TasksNavigator(mFragmentActivity, this));
+
         tasksFragment = findOrCreateTasksFragment();
         mTasksPresenter = createListPresenter(tasksFragment);
+        mTasksTabletPresenter.setTasksPresenter(mTasksPresenter);
 
-        tasksFragment.setPresenter(mTasksPresenter);
+        tasksFragment.setPresenter(mTasksTabletPresenter);
 
         // TaskDetailFragment is retained, so let's reuse its presenter.
         TaskDetailFragment taskDetailFragment = getDetailFragment();
         if (taskDetailFragment != null && taskDetailFragment.isAdded()) {
-                mTaskDetailPresenter =
-                        (TaskDetailPresenter) taskDetailFragment.getPresenter();
 
-                mTasksPresenter.setTaskDetailPresenter(mTaskDetailPresenter);
-                mTaskDetailPresenter.setTasksPresenter(mTasksPresenter);
+            if (taskDetailFragment.getPresenter() instanceof TasksTabletPresenter) {
+                TasksTabletPresenter retainedPresenter =
+                        (TasksTabletPresenter) taskDetailFragment.getPresenter();
+
+                TaskDetailPresenter retainedTaskDetailPresenter =
+                        retainedPresenter.getTaskDetailPresenter();
+
+                mTasksTabletPresenter.setTaskDetailPresenter(retainedTaskDetailPresenter);
+
+                // Replace retained presenter with new one.
+                taskDetailFragment.setPresenter(mTasksTabletPresenter);
+            }
         }
     }
 
@@ -139,15 +152,13 @@ public class TasksMvpController {
         return new TaskDetailPresenter(
                 taskId,
                 Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
-                taskDetailFragment,
-                new TasksNavigator(mFragmentActivity, this));
+                taskDetailFragment);
     }
 
     private TasksPresenter createListPresenter(TasksFragment tasksFragment) {
         mTasksPresenter = new TasksPresenter(
                 Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
-                tasksFragment,
-                new TasksNavigator(mFragmentActivity, this));
+                tasksFragment);
 
         return mTasksPresenter;
     }
