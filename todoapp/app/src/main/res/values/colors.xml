@@ -23,4 +23,6 @@
 
     <drawable name="touchFeedback">#CFD8DC</drawable>
 
+    <drawable name="selectedTask">#CFD8DC</drawable>
+
 </resources>

@@ -59,6 +59,9 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         mTaskDetailPresenter = checkNotNull(taskDetailPresenter);
     }
 
+    public TasksPresenter getTasksPresenter() {
+        return mTasksPresenter;
+    }
 
     public TaskDetailPresenter getTaskDetailPresenter() {
         return mTaskDetailPresenter;

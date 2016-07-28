@@ -106,6 +106,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
+        // Retain the fragment to persist the presenter and its state. Use it wisely.
+        setRetainInstance(true);
+
         // Set up tasks view
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);
         listView.setAdapter(mListAdapter);
@@ -352,10 +355,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return isAdded();
     }
 
+    public TasksContract.Presenter getPresenter() {
+        return mPresenter;
+    }
+
     private static class TasksAdapter extends BaseAdapter {
 
         private List<Task> mTasks;
+
         private TaskItemListener mItemListener;
+
+        private String selectedItem = null;
 
         public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
             setList(tasks);
@@ -387,7 +397,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int i, View view, final ViewGroup viewGroup) {
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
@@ -403,9 +413,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+
+            if (selectedItem != null && selectedItem.equals(task.getId())) {
+                rowView.setBackgroundDrawable(
+                        viewGroup.getContext().getResources().getDrawable(R.drawable.selectedTask));
             } else {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
                         .getResources().getDrawable(R.drawable.touch_feedback));
@@ -426,6 +437,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 @Override
                 public void onClick(View view) {
                     mItemListener.onTaskClick(task);
+                    selectedItem = task.getId();
+                    notifyDataSetInvalidated();
                 }
             });
 

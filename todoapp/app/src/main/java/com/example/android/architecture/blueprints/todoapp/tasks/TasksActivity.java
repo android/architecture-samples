@@ -64,20 +64,6 @@ public class TasksActivity extends AppCompatActivity {
         TasksMvpController tasksMvpController = TasksMvpController.createTasksView(this);
 
         mTasksPresenter = tasksMvpController.getTasksPresenter();
-
-        // Load previously saved state, if available.
-        if (savedInstanceState != null) {
-            TasksFilterType currentFiltering =
-                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mTasksPresenter.setFiltering(currentFiltering);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
-
-        super.onSaveInstanceState(outState);
     }
 
     @Override

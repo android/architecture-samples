@@ -48,6 +48,7 @@
             android:layout_height="match_parent">
 
             <LinearLayout
+                android:id="@+id/fragmentsContainer"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -57,7 +58,8 @@
                     android:id="@+id/contentFrame"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:background="@drawable/tablet_list_border"/>
 
                 <FrameLayout
                     android:id="@+id/contentFrame_detail"
@@ -73,7 +75,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@drawable/ic_add"
                 app:fabSize="normal"
-                app:layout_anchor="@id/contentFrame"
+                app:layout_anchor="@id/fragmentsContainer"
                 app:layout_anchorGravity="bottom|right|end" />
         </android.support.design.widget.CoordinatorLayout>
 

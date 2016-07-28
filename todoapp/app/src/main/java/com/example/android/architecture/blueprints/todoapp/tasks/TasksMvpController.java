@@ -76,7 +76,11 @@ public class TasksMvpController {
             createTabletElements();
         } else {
             TasksFragment tasksFragment = findOrCreateTasksFragment();
-            mTasksPresenter = createListPresenter(tasksFragment);
+            if (tasksFragment.getPresenter() != null) {
+                mTasksPresenter = (TasksPresenter) tasksFragment.getPresenter();
+            } else {
+                mTasksPresenter = createListPresenter(tasksFragment);
+            }
             tasksFragment.setPresenter(mTasksPresenter);
         }
     }
@@ -122,7 +126,16 @@ public class TasksMvpController {
                 new TasksNavigator(mFragmentActivity, this));
 
         tasksFragment = findOrCreateTasksFragment();
-        mTasksPresenter = createListPresenter(tasksFragment);
+
+        // TasksFragment is retained so let's reuse its presenter.
+        if (tasksFragment.getPresenter() != null) {
+            TasksTabletPresenter retainedPresenter =
+                    (TasksTabletPresenter) tasksFragment.getPresenter();
+            mTasksPresenter = retainedPresenter.getTasksPresenter();
+        } else {
+            mTasksPresenter = createListPresenter(tasksFragment);
+        }
+
         mTasksTabletPresenter.setTasksPresenter(mTasksPresenter);
 
         tasksFragment.setPresenter(mTasksTabletPresenter);
