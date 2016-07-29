@@ -34,7 +34,7 @@ import java.util.List;
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
  */
-class TasksPresenter implements TasksContract.Presenter {
+public class TasksPresenter implements TasksContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
@@ -44,7 +44,7 @@ class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    TasksPresenter(
+    public TasksPresenter(
             @NonNull TasksRepository tasksRepository,
             @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
@@ -57,9 +57,10 @@ class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void result(int requestCode, int resultCode) {
+    public void onTasksResult(int requestCode, int resultCode) {
         // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
             mTasksView.showSuccessfullySavedMessage();
         }
     }

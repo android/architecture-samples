@@ -24,7 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksMvpController;
+import com.example.android.architecture.blueprints.todoapp.TasksMvpController;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**

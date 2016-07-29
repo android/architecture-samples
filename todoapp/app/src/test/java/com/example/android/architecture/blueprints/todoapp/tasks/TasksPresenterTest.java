@@ -21,6 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.android.architecture.blueprints.todoapp.TasksTabletNavigator;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -46,7 +47,7 @@ public class TasksPresenterTest {
     private TasksRepository mTasksRepository;
 
     @Mock
-    private TasksNavigator mTasksNavigator;
+    private TasksTabletNavigator mTasksNavigator;
 
     @Mock
     private TasksContract.View mTasksView;
@@ -67,7 +68,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView, mTasksNavigator);
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -151,7 +152,7 @@ public class TasksPresenterTest {
         mTasksPresenter.openTaskDetails(requestedTask);
 
         // Then task detail UI is shown
-        verify(mTasksNavigator).startTaskDetail(any(String.class));
+        verify(mTasksView).showTaskDetailsUi(any(String.class));
     }
 
     @Test

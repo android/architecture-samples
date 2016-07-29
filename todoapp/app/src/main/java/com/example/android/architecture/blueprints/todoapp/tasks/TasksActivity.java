@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.TasksMvpController;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -37,8 +38,6 @@ public class TasksActivity extends AppCompatActivity {
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
     private DrawerLayout mDrawerLayout;
-
-    private TasksContract.Presenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +60,7 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create a TasksMvpController every time, even after rotation.
-        TasksMvpController tasksMvpController = TasksMvpController.createTasksView(this);
-
-        mTasksPresenter = tasksMvpController.getTasksPresenter();
+        TasksMvpController.createTasksView(this);
     }
 
     @Override

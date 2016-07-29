@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks;
+package com.example.android.architecture.blueprints.todoapp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -26,51 +26,49 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailContract;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksContract;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
 
 /**
- * TODO: javadoc
+ * Presenter for the tablet screen that can act as a Tasks Presenter and a Task Detail Presenter.
  */
-
 public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetailContract.Presenter {
-
-    private TasksPresenter mTasksPresenter;
-
-    @Nullable
-    private TaskDetailPresenter mTaskDetailPresenter;
 
     @NonNull
     private final TasksRepository mTasksRepository;
     @NonNull
-    private final TasksNavigator mTasksNavigator;
+    private final TasksTabletNavigator mTasksNavigator;
+    @NonNull
+    private TasksPresenter mTasksPresenter;
+    @Nullable
+    private TaskDetailPresenter mTaskDetailPresenter;
 
     public TasksTabletPresenter(@NonNull TasksRepository tasksRepository,
-            @NonNull TasksNavigator tasksNavigator) {
-        mTasksRepository = tasksRepository;
-        mTasksNavigator = tasksNavigator;
-    }
-
-    public void setTasksPresenter(
+            @NonNull TasksTabletNavigator tasksNavigator,
             @NonNull TasksPresenter tasksPresenter) {
+        mTasksRepository = checkNotNull(tasksRepository);
+        mTasksNavigator = checkNotNull(tasksNavigator);
         mTasksPresenter = checkNotNull(tasksPresenter);
     }
 
-    public void setTaskDetailPresenter(
-            @NonNull TaskDetailPresenter taskDetailPresenter) {
-        mTaskDetailPresenter = checkNotNull(taskDetailPresenter);
-    }
-
-    public TasksPresenter getTasksPresenter() {
+    @NonNull public TasksPresenter getTasksPresenter() {
         return mTasksPresenter;
     }
 
-    public TaskDetailPresenter getTaskDetailPresenter() {
+    @Nullable public TaskDetailPresenter getTaskDetailPresenter() {
         return mTaskDetailPresenter;
     }
 
+    public void setTaskDetailPresenter(TaskDetailPresenter taskDetailPresenter) {
+        mTaskDetailPresenter = taskDetailPresenter;
+    }
+
+    /* TasksContract.Presenter methods can be called with or without a detail pane */
+
     @Override
-    public void result(int requestCode, int resultCode) {
-        mTasksPresenter.result(requestCode, resultCode);
-        mTasksPresenter.startTasksPresenter();
+    public void onTasksResult(int requestCode, int resultCode) {
+        mTasksPresenter.onTasksResult(requestCode, resultCode);
     }
 
     @Override
@@ -85,15 +83,17 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
-        mTasksNavigator.startTaskDetail(requestedTask.getId());
+        mTasksNavigator.startTaskDetailForTablet(requestedTask.getId());
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
         mTasksPresenter.completeTask(completedTask);
         // Refresh detail view
-        if (mTaskDetailPresenter != null) {
-            mTaskDetailPresenter.startTaskDetailPresenter();
+        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
+            if (mTaskDetailPresenter.getTaskId().equals(completedTask.getId())) {
+                mTaskDetailPresenter.startTaskDetailPresenter();
+            }
         }
     }
 
@@ -101,8 +101,10 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     public void activateTask(@NonNull Task activeTask) {
         mTasksPresenter.activateTask(activeTask);
         // Refresh detail view
-        if (mTaskDetailPresenter != null) {
-            mTaskDetailPresenter.startTaskDetailPresenter();
+        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
+            if (mTaskDetailPresenter.getTaskId().equals(activeTask.getId())) {
+                mTaskDetailPresenter.startTaskDetailPresenter();
+            }
         }
     }
 
@@ -120,22 +122,17 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
                             public void onTaskLoaded(Task task) {
                                 // No-op
                                 if (task == null) {
-                                    mTasksNavigator.onTaskDeleted();
+                                    mTasksNavigator.removeDetailPane();
                                 }
                             }
 
                             @Override
                             public void onDataNotAvailable() {
-                                mTasksNavigator.onTaskDeleted();
+                                mTasksNavigator.removeDetailPane();
                             }
                         });
             }
         }
-    }
-
-    @Override
-    public void setFiltering(TasksFilterType requestType) {
-        mTasksPresenter.setFiltering(requestType);
     }
 
     @Override
@@ -144,9 +141,16 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     }
 
     @Override
+    public void setFiltering(TasksFilterType requestType) {
+        mTasksPresenter.setFiltering(requestType);
+    }
+
+    @Override
     public void startTasksPresenter() {
         mTasksPresenter.startTasksPresenter();
     }
+
+    /* TaskDetailContract.Presenter methods */
 
     @Override
     public void editTask() {
@@ -156,9 +160,11 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @Override
     public void deleteTask() {
-        mTaskDetailPresenter.deleteTask();
-        mTasksNavigator.onTaskDeleted();
-        mTaskDetailPresenter = null; // TODO
+        if (mTaskDetailPresenter.getTaskId() != null) {
+            mTasksRepository.deleteTask(mTaskDetailPresenter.getTaskId());
+        }
+        mTasksNavigator.removeDetailPane();
+        mTaskDetailPresenter = null; // Detail is gone, so make sure the detail presenter is cleared
         mTasksPresenter.startTasksPresenter();
     }
 

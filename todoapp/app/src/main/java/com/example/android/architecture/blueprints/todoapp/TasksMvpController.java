@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks;
+package com.example.android.architecture.blueprints.todoapp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,10 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
-import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 /**
@@ -119,13 +119,7 @@ public class TasksMvpController {
     }
 
     private void createTabletElements() {
-        TasksFragment tasksFragment;// Tablet presenter rule all presenters
-
-        mTasksTabletPresenter = new TasksTabletPresenter(
-                Injection.provideTasksRepository(mFragmentActivity),
-                new TasksNavigator(mFragmentActivity, this));
-
-        tasksFragment = findOrCreateTasksFragment();
+        TasksFragment tasksFragment = findOrCreateTasksFragment();
 
         // TasksFragment is retained so let's reuse its presenter.
         if (tasksFragment.getPresenter() != null) {
@@ -136,7 +130,10 @@ public class TasksMvpController {
             mTasksPresenter = createListPresenter(tasksFragment);
         }
 
-        mTasksTabletPresenter.setTasksPresenter(mTasksPresenter);
+        mTasksTabletPresenter = new TasksTabletPresenter(
+                Injection.provideTasksRepository(mFragmentActivity),
+                new TasksTabletNavigator(mFragmentActivity, this),
+                mTasksPresenter);
 
         tasksFragment.setPresenter(mTasksTabletPresenter);
 

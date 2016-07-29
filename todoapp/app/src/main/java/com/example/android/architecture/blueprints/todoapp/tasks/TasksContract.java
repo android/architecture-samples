@@ -67,7 +67,7 @@ public interface TasksContract {
 
     interface Presenter {
 
-        void result(int requestCode, int resultCode);
+        void onTasksResult(int requestCode, int resultCode);
 
         void loadTasks(boolean forceUpdate);
 

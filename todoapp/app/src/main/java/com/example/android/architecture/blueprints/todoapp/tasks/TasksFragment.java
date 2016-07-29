@@ -97,7 +97,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mPresenter.onTasksResult(requestCode, resultCode);
     }
 
     @Nullable
@@ -292,7 +292,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTaskIcon.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
@@ -415,11 +415,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             completeCB.setChecked(task.isCompleted());
 
             if (selectedItem != null && selectedItem.equals(task.getId())) {
-                rowView.setBackgroundDrawable(
-                        viewGroup.getContext().getResources().getDrawable(R.drawable.selectedTask));
+                //noinspection deprecation
+                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
+                        viewGroup.getContext(), R.drawable.selectedTask));
+
             } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
+                //noinspection deprecation
+                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
+                        viewGroup.getContext(), R.drawable.touch_feedback));
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {

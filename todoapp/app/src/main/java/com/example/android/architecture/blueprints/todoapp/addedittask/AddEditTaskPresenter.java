@@ -16,13 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
@@ -57,7 +57,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void start() {
+    public void startAddEditTaskPresenter() {
         if (!isNewTask()) {
             populateTask();
         }
