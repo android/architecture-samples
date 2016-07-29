@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
@@ -27,8 +29,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
@@ -44,22 +44,23 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(
+            @NonNull TasksRepository tasksRepository,
+            @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-
-        mTasksView.setPresenter(this);
     }
 
     @Override
-    public void start() {
+    public void startTasksPresenter() {
         loadTasks(false);
     }
 
     @Override
-    public void result(int requestCode, int resultCode) {
+    public void onTasksResult(int requestCode, int resultCode) {
         // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
             mTasksView.showSuccessfullySavedMessage();
         }
     }

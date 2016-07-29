@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -46,8 +48,6 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
@@ -87,7 +87,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.startTasksPresenter();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mPresenter.onTasksResult(requestCode, resultCode);
     }
 
     @Nullable
@@ -105,6 +105,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
+
+        // Retain the fragment to persist the presenter and its state. Use it wisely.
+        setRetainInstance(true);
 
         // Set up tasks view
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);
@@ -172,7 +175,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 mPresenter.loadTasks(true);
                 break;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -266,7 +269,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false
+                true
         );
     }
 
@@ -289,7 +292,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTaskIcon.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
@@ -352,10 +355,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return isAdded();
     }
 
+    public TasksContract.Presenter getPresenter() {
+        return mPresenter;
+    }
+
     private static class TasksAdapter extends BaseAdapter {
 
         private List<Task> mTasks;
+
         private TaskItemListener mItemListener;
+
+        private String selectedItem = null;
 
         public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
             setList(tasks);
@@ -387,7 +397,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int i, View view, final ViewGroup viewGroup) {
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
@@ -403,12 +413,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+
+            if (selectedItem != null && selectedItem.equals(task.getId())) {
+                //noinspection deprecation
+                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
+                        viewGroup.getContext(), R.drawable.selectedTask));
+
             } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
+                //noinspection deprecation
+                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
+                        viewGroup.getContext(), R.drawable.touch_feedback));
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {
@@ -426,6 +440,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 @Override
                 public void onClick(View view) {
                     mItemListener.onTaskClick(task);
+                    selectedItem = task.getId();
+                    notifyDataSetInvalidated();
                 }
             });
 

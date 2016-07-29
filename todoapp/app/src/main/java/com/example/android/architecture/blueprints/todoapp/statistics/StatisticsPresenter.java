@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -24,8 +26,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
@@ -46,7 +46,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     @Override
-    public void start() {
+    public void startStatisticsPresenter() {
         loadStatistics();
     }
 
