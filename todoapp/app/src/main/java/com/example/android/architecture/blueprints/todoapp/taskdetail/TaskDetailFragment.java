@@ -77,7 +77,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
-        // TODO: why are we retaining
+
+        // Retain the fragment to persist the presenter and its state.
+        // This means that it won't be recreated on a configuration change, but
+        // it's dangerous as it can produce bugs and leaks. Use it wisely.
         setRetainInstance(true);
         mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
         mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);

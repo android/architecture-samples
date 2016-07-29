@@ -47,7 +47,7 @@ android {
         }
     }
 
-    // Always show the onTasksResult of every unit test, even if it passes.
+    // Always show the result of every unit test, even if it passes.
     testOptions.unitTests.all {
         testLogging {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'

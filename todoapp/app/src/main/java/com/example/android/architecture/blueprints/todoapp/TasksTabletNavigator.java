@@ -25,7 +25,6 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 /**
  * Manages screens in tablet mode.
  */
-
 public class TasksTabletNavigator {
 
     private final FragmentActivity mFragmentActivity;

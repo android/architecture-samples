@@ -106,7 +106,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
-        // Retain the fragment to persist the presenter and its state. Use it wisely.
+        // Retain the fragment to persist the presenter and its state.
+        // This means that it won't be recreated on a configuration change, but
+        // it's dangerous as it can produce bugs and leaks. Use it wisely.
         setRetainInstance(true);
 
         // Set up tasks view
@@ -148,7 +150,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        swqipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
