@@ -21,11 +21,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
+import com.example.android.architecture.blueprints.todoapp.util.BaseSchedulerProvider;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
@@ -33,7 +35,6 @@ import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,16 +44,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksLocalDataSource implements TasksDataSource {
 
+    @Nullable
     private static TasksLocalDataSource INSTANCE;
+
+    @NonNull
     private final BriteDatabase mDatabaseHelper;
+
+    @NonNull
     private Func1<Cursor, Task> mTaskMapperFunction;
 
     // Prevent direct instantiation.
-    private TasksLocalDataSource(@NonNull Context context) {
-        checkNotNull(context);
+    private TasksLocalDataSource(@NonNull Context context,
+                                 @NonNull BaseSchedulerProvider schedulerProvider) {
+        checkNotNull(context, "context cannot be null");
+        checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
         SqlBrite sqlBrite = SqlBrite.create();
-        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, Schedulers.io());
+        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
         mTaskMapperFunction = new Func1<Cursor, Task>() {
             @Override
             public Task call(Cursor c) {
@@ -67,9 +75,11 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
     }
 
-    public static TasksLocalDataSource getInstance(@NonNull Context context) {
+    public static TasksLocalDataSource getInstance(
+            @NonNull Context context,
+            @NonNull BaseSchedulerProvider schedulerProvider) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksLocalDataSource(context);
+            INSTANCE = new TasksLocalDataSource(context, schedulerProvider);
         }
         return INSTANCE;
     }
