@@ -61,6 +61,8 @@ public class TasksRepositoryTest {
 
     private TasksRepository mTasksRepository;
 
+    private TestSubscriber<List<Task>> mTasksTestSubscriber;
+
     @Mock
     private TasksDataSource mTasksRemoteDataSource;
 
@@ -80,6 +82,8 @@ public class TasksRepositoryTest {
         // Get a reference to the class under test
         mTasksRepository = TasksRepository.getInstance(
                 mTasksRemoteDataSource, mTasksLocalDataSource);
+
+        mTasksTestSubscriber = new TestSubscriber<>();
     }
 
     @After
@@ -140,12 +144,11 @@ public class TasksRepositoryTest {
         setTasksNotAvailable(mTasksRemoteDataSource);
 
         // When tasks are requested from the tasks repository
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mTasksRepository.getTasks().subscribe(testSubscriber);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Then tasks are loaded from the local data source
         verify(mTasksLocalDataSource).getTasks();
-        testSubscriber.assertValue(TASKS);
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
@@ -310,13 +313,12 @@ public class TasksRepositoryTest {
 
         // When calling getTasks in the repository with dirty cache
         mTasksRepository.refreshTasks();
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mTasksRepository.getTasks().subscribe(testSubscriber);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Verify the tasks from the remote data source are returned, not the local
         verify(mTasksLocalDataSource, never()).getTasks();
         verify(mTasksRemoteDataSource).getTasks();
-        testSubscriber.assertValue(TASKS);
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
@@ -327,12 +329,11 @@ public class TasksRepositoryTest {
         setTasksAvailable(mTasksRemoteDataSource, TASKS);
 
         // When calling getTasks in the repository
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mTasksRepository.getTasks().subscribe(testSubscriber);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Verify the tasks from the remote data source are returned
         verify(mTasksRemoteDataSource).getTasks();
-        testSubscriber.assertValue(TASKS);
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
@@ -343,11 +344,10 @@ public class TasksRepositoryTest {
         setTasksNotAvailable(mTasksRemoteDataSource);
 
         // When calling getTasks in the repository
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mTasksRepository.getTasks().subscribe(testSubscriber);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Verify no data is returned
-        testSubscriber.assertNoValues();
+        mTasksTestSubscriber.assertNoValues();
     }
 
     @Test
@@ -376,8 +376,7 @@ public class TasksRepositoryTest {
         mTasksRepository.refreshTasks();
 
         // When calling getTasks in the repository
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mTasksRepository.getTasks().subscribe(testSubscriber);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Verify that the data fetched from the remote data source was saved in local.
         verify(mTasksLocalDataSource, times(TASKS.size())).saveTask(any(Task.class));

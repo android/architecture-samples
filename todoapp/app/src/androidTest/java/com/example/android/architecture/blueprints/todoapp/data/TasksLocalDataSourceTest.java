@@ -23,8 +23,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
-import com.example.android.architecture.blueprints.todoapp.util.ImmediateSchedulerProvider;
-import com.example.android.architecture.blueprints.todoapp.util.BaseSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 
 import org.junit.After;
 import org.junit.Before;
@@ -180,7 +180,7 @@ public class TasksLocalDataSourceTest {
     }
 
     @Test
-    public void getTask_whenTaskNotSaved(){
+    public void getTask_whenTaskNotSaved() {
         //Given that no task has been saved
         //When querying for a task, null is returned.
         TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
