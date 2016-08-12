@@ -21,11 +21,10 @@ import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import rx.Observer;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,20 +35,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
+    @NonNull
     private final TasksRepository mTasksRepository;
 
+    @NonNull
     private final TaskDetailContract.View mTaskDetailView;
+
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
 
     @Nullable
     private String mTaskId;
+
+    @NonNull
     private CompositeSubscription mSubscriptions;
 
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
+                               @NonNull TaskDetailContract.View taskDetailView,
+                               @NonNull BaseSchedulerProvider schedulerProvider) {
         this.mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+
         mSubscriptions = new CompositeSubscription();
         mTaskDetailView.setPresenter(this);
     }
@@ -73,8 +82,8 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView.setLoadingIndicator(true);
         Subscription subscription = mTasksRepository
                 .getTask(mTaskId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Observer<Task>() {
                     @Override
                     public void onCompleted() {
@@ -129,7 +138,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    private void showTask(Task task) {
+    private void showTask(@NonNull Task task) {
         String title = task.getTitle();
         String description = task.getDescription();
 
