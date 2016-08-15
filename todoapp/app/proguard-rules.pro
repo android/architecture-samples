@@ -25,3 +25,8 @@
 -dontwarn com.squareup.javawriter.JavaWriter
 # Uncomment this if you use Mockito
 -dontwarn org.mockito.**
+
+# rxjava
+-keep class rx.observers.TestSubscriber {
+    public <methods>;
+}
