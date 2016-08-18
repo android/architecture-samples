@@ -21,6 +21,11 @@ import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+
+import rx.Observer;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,22 +41,32 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
     @Nullable
     private String mTaskId;
+
+    @NonNull
+    private CompositeSubscription mSubscriptions;
 
     /**
      * Creates a presenter for the add/edit view.
      *
-     * @param taskId ID of the task to edit or null for a new task
+     * @param taskId          ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
-     * @param addTaskView the add/edit view
+     * @param addTaskView     the add/edit view
      */
-    public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+    public AddEditTaskPresenter(@Nullable String taskId,
+                                @NonNull TasksDataSource tasksRepository,
+                                @NonNull AddEditTaskContract.View addTaskView,
+                                @NonNull BaseSchedulerProvider schedulerProvider) {
         mTaskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
-        mAddTaskView = checkNotNull(addTaskView);
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
+        mAddTaskView = checkNotNull(addTaskView, "addTaskView cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null!");
 
+        mSubscriptions = new CompositeSubscription();
         mAddTaskView.setPresenter(this);
     }
 
@@ -64,7 +79,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     @Override
     public void unsubscribe() {
-
+        mSubscriptions.clear();
     }
 
     @Override
@@ -92,23 +107,32 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (mTaskId == null) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        mTasksRepository.getTask(mTaskId);
-    }
+        Subscription subscription = mTasksRepository
+                .getTask(mTaskId)
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(new Observer<Task>() {
+                    @Override
+                    public void onCompleted() {
 
-/*    @Override
-    public void onTaskLoaded(Task task) {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.setTitle(task.getTitle());
-            mAddTaskView.setDescription(task.getDescription());
-        }
-    }
+                    }
 
-    @Override
-    public void onDataNotAvailable() {
-        // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.showEmptyTaskError();
-        }
-    }*/
+                    @Override
+                    public void onError(Throwable e) {
+                        if (mAddTaskView.isActive()) {
+                            mAddTaskView.showEmptyTaskError();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Task task) {
+                        if (mAddTaskView.isActive()) {
+                            mAddTaskView.setTitle(task.getTitle());
+                            mAddTaskView.setDescription(task.getDescription());
+                        }
+                    }
+                });
+
+        mSubscriptions.add(subscription);
+    }
 }

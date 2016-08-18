@@ -17,18 +17,22 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.NoSuchElementException;
+
+import rx.Observable;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,12 +47,7 @@ public class AddEditTaskPresenterTest {
     @Mock
     private AddEditTaskContract.View mAddEditTaskView;
 
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-//    @Captor
-//    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
+    private BaseSchedulerProvider mSchedulerProvider;
 
     private AddEditTaskPresenter mAddEditTaskPresenter;
 
@@ -58,6 +57,8 @@ public class AddEditTaskPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        mSchedulerProvider = new ImmediateSchedulerProvider();
+
         // The presenter wont't update the view unless it's active.
         when(mAddEditTaskView.isActive()).thenReturn(true);
     }
@@ -65,7 +66,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView,
+                mSchedulerProvider);
 
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.createTask("New Task Title", "Some Task Description");
@@ -78,7 +80,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,
+                mSchedulerProvider);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.createTask("", "");
@@ -90,7 +93,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView,
+                mSchedulerProvider);
 
         // When the presenter is asked to save an existing task
         mAddEditTaskPresenter.updateTask("New Task Title", "Some Task Description");
@@ -101,11 +105,13 @@ public class AddEditTaskPresenterTest {
     }
 
     @Test
-    public void populateTask_callsRepoAndUpdatesView() {
+    public void populateTask_callsRepoAndUpdatesViewOnSuccess() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
+        when(mTasksRepository.getTask(testTask.getId())).thenReturn(Observable.just(testTask));
+
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+                mTasksRepository, mAddEditTaskView, mSchedulerProvider);
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.populateTask();
@@ -113,10 +119,28 @@ public class AddEditTaskPresenterTest {
         // Then the task repository is queried and the view updated
         verify(mTasksRepository).getTask(eq(testTask.getId()));
 
-        // Simulate callback
-//        mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
-
         verify(mAddEditTaskView).setTitle(testTask.getTitle());
         verify(mAddEditTaskView).setDescription(testTask.getDescription());
+    }
+
+    @Test
+    public void populateTask_callsRepoAndUpdatesViewOnError() {
+        Task testTask = new Task("TITLE", "DESCRIPTION");
+        when(mTasksRepository.getTask(testTask.getId())).thenReturn(
+                Observable.<Task>error(new NoSuchElementException()));
+
+        // Get a reference to the class under test
+        mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
+                mTasksRepository, mAddEditTaskView, mSchedulerProvider);
+
+        // When the presenter is asked to populate an existing task
+        mAddEditTaskPresenter.populateTask();
+
+        // Then the task repository is queried and the view updated
+        verify(mTasksRepository).getTask(eq(testTask.getId()));
+
+        verify(mAddEditTaskView).showEmptyTaskError();
+        verify(mAddEditTaskView, never()).setTitle(testTask.getTitle());
+        verify(mAddEditTaskView, never()).setDescription(testTask.getDescription());
     }
 }
