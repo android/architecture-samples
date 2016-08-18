@@ -24,15 +24,14 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,18 +42,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksPresenter implements TasksContract.Presenter {
 
+    @NonNull
     private final TasksRepository mTasksRepository;
 
+    @NonNull
     private final TasksContract.View mTasksView;
 
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
+    @NonNull
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private boolean mFirstLoad = true;
+
+    @NonNull
     private CompositeSubscription mSubscriptions;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(@NonNull TasksRepository tasksRepository,
+                          @NonNull TasksContract.View tasksView,
+                          @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+
         mSubscriptions = new CompositeSubscription();
         mTasksView.setPresenter(this);
     }
@@ -88,7 +99,7 @@ public class TasksPresenter implements TasksContract.Presenter {
      * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
+    private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
             mTasksView.setLoadingIndicator(true);
         }
@@ -124,8 +135,8 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
                 })
                 .toList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Observer<List<Task>>() {
                     @Override
                     public void onCompleted() {
@@ -145,7 +156,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         mSubscriptions.add(subscription);
     }
 
-    private void processTasks(List<Task> tasks) {
+    private void processTasks(@NonNull List<Task> tasks) {
         if (tasks.isEmpty()) {
             // Show a message indicating there are no tasks for that filter type.
             processEmptyTasks();
@@ -227,7 +238,7 @@ public class TasksPresenter implements TasksContract.Presenter {
      *                    {@link TasksFilterType#ACTIVE_TASKS}
      */
     @Override
-    public void setFiltering(TasksFilterType requestType) {
+    public void setFiltering(@NonNull TasksFilterType requestType) {
         mCurrentFiltering = requestType;
     }
 
