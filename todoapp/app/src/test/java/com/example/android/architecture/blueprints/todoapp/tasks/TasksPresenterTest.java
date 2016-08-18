@@ -17,20 +17,20 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-//import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import rx.Observable;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,12 +48,7 @@ public class TasksPresenterTest {
     @Mock
     private TasksContract.View mTasksView;
 
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-//    @Captor
-//    private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
+    private BaseSchedulerProvider mSchedulerProvider;
 
     private TasksPresenter mTasksPresenter;
 
@@ -63,8 +58,11 @@ public class TasksPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        // Make the sure that all schedulers are immediate.
+        mSchedulerProvider = new ImmediateSchedulerProvider();
+
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView, mSchedulerProvider);
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -77,57 +75,39 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
-
-        // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks();
-//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is shown
         verify(mTasksView).setLoadingIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
-        ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
-        assertTrue(showTasksArgumentCaptor.getValue().size() == 3);
     }
 
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
         mTasksPresenter.loadTasks(true);
 
-        // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks();
-//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
-
         // Then progress indicator is hidden and active tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
-        ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
-        assertTrue(showTasksArgumentCaptor.getValue().size() == 1);
     }
 
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.loadTasks(true);
 
-        // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks();
-//        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
-
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
-        ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
-        assertTrue(showTasksArgumentCaptor.getValue().size() == 2);
     }
 
     @Test
@@ -155,6 +135,8 @@ public class TasksPresenterTest {
     public void completeTask_ShowsTaskMarkedComplete() {
         // Given a stubbed task
         Task task = new Task("Details Requested", "For this task");
+        // And no tasks available in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
 
         // When task is marked as complete
         mTasksPresenter.completeTask(task);
@@ -168,6 +150,8 @@ public class TasksPresenterTest {
     public void activateTask_ShowsTaskMarkedActive() {
         // Given a stubbed completed task
         Task task = new Task("Details Requested", "For this task", true);
+        // And no tasks available in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
         mTasksPresenter.loadTasks(true);
 
         // When task is marked as activated
@@ -179,14 +163,13 @@ public class TasksPresenterTest {
     }
 
     @Test
-    public void unavailableTasks_ShowsError() {
+    public void errorLoadingTasks_ShowsError() {
+        // Given that no tasks are available in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>error(new Exception()));
+
         // When tasks are loaded
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
-
-        // And the tasks aren't available in the repository
-        verify(mTasksRepository).getTasks();
-//        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
         verify(mTasksView).showLoadingTasksError();
