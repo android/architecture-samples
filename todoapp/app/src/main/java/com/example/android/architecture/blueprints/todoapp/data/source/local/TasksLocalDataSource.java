@@ -84,6 +84,10 @@ public class TasksLocalDataSource implements TasksDataSource {
         return INSTANCE;
     }
 
+    public static void destroyInstance() {
+        INSTANCE = null;
+    }
+
     @Override
     public Observable<List<Task>> getTasks() {
         String[] projection = {
