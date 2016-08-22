@@ -150,7 +150,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swqipeRefreshLayout.setScrollUpChild(listView);
+        swipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
