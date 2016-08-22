@@ -38,8 +38,7 @@ public final class TasksPersistenceContract {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    public TasksPersistenceContract() {
-    }
+    private TasksPersistenceContract() {}
 
     public static Uri getBaseTaskUri(String taskId) {
         return Uri.parse(CONTENT_SCHEME + CONTENT_TASK_ITEM_TYPE + SEPARATOR + taskId);
