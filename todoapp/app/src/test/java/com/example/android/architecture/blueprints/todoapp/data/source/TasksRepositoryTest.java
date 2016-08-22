@@ -247,6 +247,24 @@ public class TasksRepositoryTest {
     }
 
     @Test
+    public void getTask_whenDataNotLocal_fails() {
+        // Given a stub completed task with title and description in the remote repository
+        Task task = new Task(TASK_TITLE, "Some Task Description", true);
+        setTaskAvailable(mTasksRemoteDataSource, task);
+        // And the task not available in the local repository
+        setTaskNotAvailable(mTasksLocalDataSource, task.getId());
+
+        // When a task is requested from the tasks repository
+        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
+
+        // Verify no data is returned
+        testSubscriber.assertNoValues();
+        // Verify that error is returned
+        testSubscriber.assertError(NoSuchElementException.class);
+    }
+
+    @Test
     public void deleteCompletedTasks_deleteCompletedTasksToServiceAPIUpdatesCache() {
         // Given 2 stub completed tasks and 1 stub active tasks in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
@@ -348,6 +366,8 @@ public class TasksRepositoryTest {
 
         // Verify no data is returned
         mTasksTestSubscriber.assertNoValues();
+        // Verify that error is returned
+        mTasksTestSubscriber.assertError(NoSuchElementException.class);
     }
 
     @Test
@@ -380,6 +400,7 @@ public class TasksRepositoryTest {
 
         // Verify that the data fetched from the remote data source was saved in local.
         verify(mTasksLocalDataSource, times(TASKS.size())).saveTask(any(Task.class));
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     private void setTasksNotAvailable(TasksDataSource dataSource) {
@@ -387,14 +408,15 @@ public class TasksRepositoryTest {
     }
 
     private void setTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
-        when(dataSource.getTasks()).thenReturn(Observable.just(tasks));
+        // don't allow the data sources to complete.
+        when(dataSource.getTasks()).thenReturn(Observable.just(tasks).concatWith(Observable.<List<Task>>never()));
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-        when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null));
+        when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.<Task>never()));
     }
 
     private void setTaskAvailable(TasksDataSource dataSource, Task task) {
-        when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task));
+        when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task).concatWith(Observable.<Task>never()));
     }
 }
