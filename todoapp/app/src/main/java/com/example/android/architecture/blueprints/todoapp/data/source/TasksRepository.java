@@ -129,38 +129,36 @@ public class TasksRepository implements TasksDataSource {
 
     private Observable<List<Task>> getAndCacheLocalTasks() {
         return mTasksLocalDataSource.getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return Observable.from(tasks)
+                                .doOnNext(new Action1<Task>() {
+                                    @Override
+                                    public void call(Task task) {
+                                        mCachedTasks.put(task.getId(), task);
+                                    }
+                                })
+                                .toList();
                     }
-                })
-                .doOnNext(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        mCachedTasks.put(task.getId(), task);
-                    }
-                })
-                .toList();
+                });
     }
 
     private Observable<List<Task>> getAndSaveRemoteTasks() {
         return mTasksRemoteDataSource
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return Observable.from(tasks).doOnNext(new Action1<Task>() {
+                            @Override
+                            public void call(Task task) {
+                                mTasksLocalDataSource.saveTask(task);
+                                mCachedTasks.put(task.getId(), task);
+                            }
+                        }).toList();
                     }
                 })
-                .doOnNext(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        mTasksLocalDataSource.saveTask(task);
-                        mCachedTasks.put(task.getId(), task);
-                    }
-                })
-                .toList()
                 .doOnCompleted(new Action0() {
                     @Override
                     public void call() {

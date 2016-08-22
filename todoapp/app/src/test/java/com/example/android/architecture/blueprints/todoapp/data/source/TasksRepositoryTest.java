@@ -387,7 +387,8 @@ public class TasksRepositoryTest {
     }
 
     private void setTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
-        when(dataSource.getTasks()).thenReturn(Observable.just(tasks));
+        // don't allow the data sources to complete.
+        when(dataSource.getTasks()).thenReturn(Observable.just(tasks).concatWith(Observable.<List<Task>>never()));
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
