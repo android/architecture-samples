@@ -1,6 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTasksRepositoryComponent;
@@ -29,14 +31,19 @@ public class ToDoApplication extends Application {
 
     private TasksRepositoryComponent mRepositoryComponent;
 
+    // Prevent need in a singleton (global) reference to the application object.
+    @NonNull
+    public static ToDoApplication get(@NonNull Context context) {
+        return (ToDoApplication) context.getApplicationContext();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         mRepositoryComponent = DaggerTasksRepositoryComponent.builder()
-                .applicationModule(new ApplicationModule((getApplicationContext())))
+                .applicationModule(new ApplicationModule(getApplicationContext()))
                 .tasksRepositoryModule(new TasksRepositoryModule()).build();
-
     }
 
     public TasksRepositoryComponent getTasksRepositoryComponent() {

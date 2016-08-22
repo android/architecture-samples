@@ -16,9 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ClearCompleteTasks;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -32,6 +39,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +72,7 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+        mTasksPresenter = givenTasksPresenter();
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -72,6 +80,17 @@ public class TasksPresenterTest {
         // We start the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+    }
+
+    private TasksPresenter givenTasksPresenter() {
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
+        CompleteTask completeTask = new CompleteTask(mTasksRepository);
+        ActivateTask activateTask = new ActivateTask(mTasksRepository);
+        ClearCompleteTasks clearCompleteTasks = new ClearCompleteTasks(mTasksRepository);
+
+        return new TasksPresenter(useCaseHandler, mTasksView, getTasks, completeTask, activateTask,
+                clearCompleteTasks);
     }
 
     @Test
@@ -160,7 +179,7 @@ public class TasksPresenterTest {
         mTasksPresenter.completeTask(task);
 
         // Then repository is called and task marked complete UI is shown
-        verify(mTasksRepository).completeTask(task);
+        verify(mTasksRepository).completeTask(eq(task.getId()));
         verify(mTasksView).showTaskMarkedComplete();
     }
 
@@ -174,7 +193,7 @@ public class TasksPresenterTest {
         mTasksPresenter.activateTask(task);
 
         // Then repository is called and task marked active UI is shown
-        verify(mTasksRepository).activateTask(task);
+        verify(mTasksRepository).activateTask(eq(task.getId()));
         verify(mTasksView).showTaskMarkedActive();
     }
 

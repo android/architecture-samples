@@ -74,8 +74,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         DaggerStatisticsComponent.builder()
             .statisticsPresenterModule(new StatisticsPresenterModule(statisticsFragment))
-            .tasksRepositoryComponent(((ToDoApplication) getApplication())
-            .getTasksRepositoryComponent())
+            .tasksRepositoryComponent(ToDoApplication.get(this).getTasksRepositoryComponent())
             .build().inject(this);
     }
 

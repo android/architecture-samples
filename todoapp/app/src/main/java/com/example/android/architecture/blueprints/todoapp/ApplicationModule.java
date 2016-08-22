@@ -23,4 +23,9 @@ public final class ApplicationModule {
     Context provideContext() {
         return mContext;
     }
+
+    @Provides
+    UseCaseScheduler provideUseCaseScheduler(UseCaseThreadPoolScheduler scheduler) {
+        return scheduler;
+    }
 }

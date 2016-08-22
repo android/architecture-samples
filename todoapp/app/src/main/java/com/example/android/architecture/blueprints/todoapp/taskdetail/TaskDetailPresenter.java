@@ -18,9 +18,13 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.UseCase;
+import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
+import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
 
 import javax.inject.Inject;
 
@@ -36,11 +40,14 @@ import javax.inject.Inject;
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  */
-final class TaskDetailPresenter implements TaskDetailContract.Presenter {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
-    private TasksRepository mTasksRepository;
-
-    private TaskDetailContract.View mTaskDetailView;
+    private final TaskDetailContract.View mTaskDetailView;
+    private final UseCaseHandler mUseCaseHandler;
+    private final GetTask mGetTask;
+    private final CompleteTask mCompleteTask;
+    private final ActivateTask mActivateTask;
+    private final DeleteTask mDeleteTask;
 
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
@@ -52,12 +59,17 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
      * with {@code @Nullable} values.
      */
     @Inject
-    TaskDetailPresenter(@Nullable String taskId,
-            TasksRepository tasksRepository,
-            TaskDetailContract.View taskDetailView) {
-        mTasksRepository = tasksRepository;
+    TaskDetailPresenter(UseCaseHandler useCaseHandler, @Nullable String taskId,
+                        TaskDetailContract.View taskDetailView,
+                        GetTask getTask, CompleteTask completeTask,
+                        ActivateTask activateTask, DeleteTask deleteTask) {
         mTaskDetailView = taskDetailView;
         mTaskId = taskId;
+        mUseCaseHandler = useCaseHandler;
+        mGetTask = getTask;
+        mCompleteTask = completeTask;
+        mActivateTask = activateTask;
+        mDeleteTask = deleteTask;
     }
 
     /**
@@ -81,30 +93,30 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
 
         mTaskDetailView.setLoadingIndicator(true);
-        mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
-            @Override
-            public void onTaskLoaded(Task task) {
-                // The view may not be able to handle UI updates anymore
-                if (!mTaskDetailView.isActive()) {
-                    return;
-                }
-                mTaskDetailView.setLoadingIndicator(false);
-                if (null == task) {
-                    mTaskDetailView.showMissingTask();
-                } else {
-                    showTask(task);
-                }
-            }
 
-            @Override
-            public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mTaskDetailView.isActive()) {
-                    return;
-                }
-                mTaskDetailView.showMissingTask();
-            }
-        });
+        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(GetTask.ResponseValue response) {
+                        Task task = response.getTask();
+
+                        // The view may not be able to handle UI updates anymore
+                        if (!mTaskDetailView.isActive()) {
+                            return;
+                        }
+                        mTaskDetailView.setLoadingIndicator(false);
+                        showTask(task);
+                    }
+
+                    @Override
+                    public void onError() {
+                        // The view may not be able to handle UI updates anymore
+                        if (!mTaskDetailView.isActive()) {
+                            return;
+                        }
+                        mTaskDetailView.showMissingTask();
+                    }
+                });
     }
 
     @Override
@@ -118,8 +130,18 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void deleteTask() {
-        mTasksRepository.deleteTask(mTaskId);
-        mTaskDetailView.showTaskDeleted();
+        mUseCaseHandler.execute(mDeleteTask, new DeleteTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<DeleteTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(DeleteTask.ResponseValue response) {
+                        mTaskDetailView.showTaskDeleted();
+                    }
+
+                    @Override
+                    public void onError() {
+                        // Show error, log, etc.
+                    }
+                });
     }
 
     @Override
@@ -128,8 +150,19 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(mTaskId);
-        mTaskDetailView.showTaskMarkedComplete();
+
+        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(CompleteTask.ResponseValue response) {
+                        mTaskDetailView.showTaskMarkedComplete();
+                    }
+
+                    @Override
+                    public void onError() {
+                        // Show error, log, etc.
+                    }
+                });
     }
 
     @Override
@@ -138,8 +171,18 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(mTaskId);
-        mTaskDetailView.showTaskMarkedActive();
+        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(mTaskId),
+                new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
+                    @Override
+                    public void onSuccess(ActivateTask.ResponseValue response) {
+                        mTaskDetailView.showTaskMarkedActive();
+                    }
+
+                    @Override
+                    public void onError() {
+                        // Show error, log, etc.
+                    }
+                });
     }
 
     private void showTask(Task task) {
