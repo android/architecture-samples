@@ -269,14 +269,7 @@ public class TasksRepository implements TasksDataSource {
         }
 
         // Is the task in the local data source? If not, query the network.
-        Observable<Task> localTask = mTasksLocalDataSource
-                .getTask(taskId)
-                .doOnNext(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        mCachedTasks.put(taskId, task);
-                    }
-                });
+        Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
         Observable<Task> remoteTask = mTasksRemoteDataSource
                 .getTask(taskId)
                 .doOnNext(new Action1<Task>() {
@@ -331,5 +324,18 @@ public class TasksRepository implements TasksDataSource {
         } else {
             return mCachedTasks.get(id);
         }
+    }
+
+    @NonNull
+    Observable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
+        return mTasksLocalDataSource
+                .getTask(taskId)
+                .doOnNext(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        mCachedTasks.put(taskId, task);
+                    }
+                })
+                .first();
     }
 }
