@@ -316,7 +316,7 @@ public class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click());
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription("Navigate up")).perform(click());
+        onView(withContentDescription(getToolbarNavigationContentDescription())).perform(click());
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete),
@@ -338,7 +338,7 @@ public class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click());
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription("Navigate up")).perform(click());
+        onView(withContentDescription(getToolbarNavigationContentDescription())).perform(click());
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete),
@@ -362,7 +362,7 @@ public class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click());
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription("Navigate up")).perform(click());
+        onView(withContentDescription(getToolbarNavigationContentDescription())).perform(click());
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete),
@@ -387,7 +387,7 @@ public class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click());
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription("Navigate up")).perform(click());
+        onView(withContentDescription(getToolbarNavigationContentDescription())).perform(click());
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete),
@@ -470,5 +470,10 @@ public class TasksScreenTest {
 
     private String getText(int stringId) {
         return mTasksActivityTestRule.getActivity().getResources().getString(stringId);
+    }
+
+    private String getToolbarNavigationContentDescription() {
+        return TestUtils.getToolbarNavigationContentDescription(
+                mTasksActivityTestRule.getActivity(), R.id.toolbar);
     }
 }
