@@ -119,7 +119,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -191,10 +190,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             // If the task was edited successfully, go back to the list.
             if (resultCode == Activity.RESULT_OK) {
                 getActivity().finish();
-                return;
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
