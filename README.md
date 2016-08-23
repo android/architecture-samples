@@ -1,9 +1,62 @@
 # TODO-MVP-RXJAVA
 
-It's based on the TODO-MVP sample and uses RxJava for communication between layers.
+It's based on the TODO-MVP sample and uses RxJava for communication between the data model and presenter layers.
 
 ### Summary
-TODO
+
+Compared to the TODO-MVP, both the Presenter contracts and the implementation of the Views stay the same. The changes are done to the data model layer and in the implementation of the Presenters.
+
+The data model layer exposes RxJava ``Observable`` streams as a way of retrieving tasks. The ``TasksDataSource`` interface contains methods like:
+
+```java
+Observable<List<Task>> getTasks();
+
+Observable<Task> getTask(@NonNull String taskId);
+```
+
+This is implemented in ``TasksLocalDataSource`` with the help of [SqlBrite](https://github.com/square/sqlbrite). The result of queries to the database being easily exposed as streams of data.
+
+```java
+@Override
+public Observable<List<Task>> getTasks() {
+    ...
+    return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
+            .mapToList(mTaskMapperFunction);
+}
+```
+
+The ``TasksRepository`` combines the streams of data from the local and the remote data sources, exposing it to whoever needs it. In our project, the Presenters and the unit tests are actually the consumers of these ``Observable``s.
+
+The Presenters subscribe to the ``Observable``s from the ``TasksRepository`` and after manipulating the data, they are the ones that decide what the views should display, in the ``.subscribe(...)`` method. Also, the Presenters are the ones that decide on the working threads. For example, in the ``StatisticsPresenter``, we decide on which thread we should do the computation of the active and completed tasks and what should happen when this computation is done: show the statistics, if all is ok; show loading statistics error, if needed; and telling the view that the loading indicator should not be visible anymore.
+
+```java
+...
+Subscription subscription = Observable
+        .zip(completedTasks, activeTasks, new Func2<Integer, Integer, Pair<Integer, Integer>>() {
+            @Override
+            public Pair<Integer, Integer> call(Integer completed, Integer active) {
+                return Pair.create(active, completed);
+            }
+        })
+        .subscribeOn(mSchedulerProvider.computation())
+        .observeOn(mSchedulerProvider.ui())
+        .subscribe(new Action1<Pair<Integer, Integer>>() {
+            @Override
+            public void call(Pair<Integer, Integer> stats) {
+                mStatisticsView.showStatistics(stats.first, stats.second);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                mStatisticsView.showLoadingStatisticsError();
+            }
+        }, new Action0() {
+            @Override
+            public void call() {
+                mStatisticsView.setProgressIndicator(false);
+            }
+        });
+```
 
 ### Dependencies
 
