@@ -1,38 +1,41 @@
 # TODO-MVP-RXJAVA
 
+It's based on the TODO-MVP sample and uses RxJava for communication between layers.
+
 ### Summary
 TODO
 
 ### Dependencies
 
-TODO
+* [RxJava](https://github.com/ReactiveX/RxJava)
+* [RxAndroid](https://github.com/ReactiveX/RxAndroid)
+* [SqlBrite](https://github.com/square/sqlbrite)
 
 ## Features
 
 ### Complexity - understandability
 
-#### Use of architectural frameworks/libraries/tools: 
+#### Use of architectural frameworks/libraries/tools:
 
+Building an app with RxJava is not trivial as it uses new concepts.
 
-TODO
+#### Conceptual complexity
 
-#### Conceptual complexity 
-
-TODO
+Developers need to be familiar with RxJava, which is not trivial.
 
 ### Testability
 
 #### Unit testing
 
-TODO
+Very High. Given that the RxJava ``Observable``s are highly unit testable, unit tests are easy to implement.
 
 #### UI testing
 
-TODO
+Similar with TODO-MVP
 
 ### Code metrics
 
-TODO
+Compared to TODO-MVP, new classes were added for handing the ``Schedulers`` that provide the working threads.
 
 ```
 -------------------------------------------------------------------------------
@@ -48,8 +51,8 @@ SUM:                            80           1172           1788           4052
 
 #### Ease of amending or adding a feature
 
-TODO
+High.
 
 #### Learning cost
 
-TODO
+Medium as RxJava is not trivial.
