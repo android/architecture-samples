@@ -1,5 +1,7 @@
 # Android Architecture Blueprints [beta]
 
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/aab-logo.png" alt="Android Architecture Blueprints"/>
+
 The Android framework offers a lot of flexibility when it comes to defining how
 to organize and <em>architect</em> an Android app. This freedom, whilst very valuable, can also result in apps
 with large classes, inconsistent naming and architectures (or lack of) that can
