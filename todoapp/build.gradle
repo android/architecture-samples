@@ -5,6 +5,10 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0-beta1'
 
+        // Retrolambda Support
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -23,7 +27,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 10
+    minSdkVersion = 14
     targetSdkVersion = 22
     compileSdkVersion = 23
     buildToolsVersion = '23.0.2'
@@ -40,5 +44,7 @@ ext {
     espressoVersion = '2.2.1'
     rxjavaVersion = '1.1.8'
     rxandroidVersion = '1.2.1'
+    rxrelayVersion = '1.1.0'
+    rxbindingVersion = '0.4.0'
     sqlbriteVersion = '0.7.0'
 }

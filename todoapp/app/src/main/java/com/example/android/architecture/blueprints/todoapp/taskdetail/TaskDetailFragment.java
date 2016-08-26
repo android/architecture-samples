@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,19 +24,28 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.jakewharton.rxbinding.view.RxMenuItem;
+import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
+import com.jakewharton.rxrelay.PublishRelay;
+
+import rx.Observable;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
@@ -57,6 +64,16 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     private CheckBox mDetailCompleteStatus;
 
+    private PublishRelay<Void> mDeleteTaskClick = PublishRelay.create();
+
+    private Observable<Void> mEditTaskClick;
+
+    private Observable<Boolean> mCheckedChanges;
+
+    // When mUpdating is true, mCheckedChanges won't emit.
+    // Stops model changes events from causing loop-backs.
+    private boolean mUpdating = false;
+
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_TASK_ID, taskId);
@@ -74,6 +91,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onPause() {
         super.onPause();
+
         mPresenter.unsubscribe();
     }
 
@@ -91,12 +109,13 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.editTask();
-            }
-        });
+        // RxBindings
+        mEditTaskClick = RxView.clicks(fab);
+        mCheckedChanges = RxCompoundButton
+                .checkedChanges(mDetailCompleteStatus)
+                .doOnNext(checked-> Log.i("TEST","Pre-UpdatingFilter "+checked))
+                .filter(checked -> !mUpdating)
+                .share();
 
         return root;
     }
@@ -107,18 +126,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_delete:
-                mPresenter.deleteTask();
-                return true;
-        }
-        return false;
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
+
+        // By using RxRelay, we can abstract Fragment's lifecycle implementation details.
+        RxMenuItem
+                .clicks(menu.findItem(R.id.menu_delete))
+                .subscribe(mDeleteTaskClick);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -148,18 +163,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showCompletionStatus(final boolean complete) {
+        mUpdating = true;
         mDetailCompleteStatus.setChecked(complete);
-        mDetailCompleteStatus.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            mPresenter.completeTask();
-                        } else {
-                            mPresenter.activateTask();
-                        }
-                    }
-                });
+        mUpdating = false;
     }
 
     @Override
@@ -212,5 +218,31 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public Observable<Void> editTask() {
+        return mEditTaskClick;
+    }
+
+    @Override
+    public Observable<Void> deleteTask() {
+        return mDeleteTaskClick;
+    }
+
+    @Override
+    public Observable<Void> completeTask() {
+        return mCheckedChanges
+                .doOnNext(checked-> Log.i("TEST",""+checked))
+                .filter(checked -> checked)
+                .map(checked -> (Void) null);
+    }
+
+    @Override
+    public Observable<Void> activateTask() {
+        return mCheckedChanges
+                .doOnNext(checked-> Log.i("TEST",""+checked))
+                .filter(checked -> !checked)
+                .map(checked -> (Void) null);
     }
 }

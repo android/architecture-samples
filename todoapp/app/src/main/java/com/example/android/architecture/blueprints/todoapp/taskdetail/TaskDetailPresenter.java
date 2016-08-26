@@ -80,7 +80,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
 
         mTaskDetailView.setLoadingIndicator(true);
-        Subscription subscription = mTasksRepository
+        Subscription repoSubscription = mTasksRepository
                 .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
@@ -100,11 +100,30 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                         showTask(task);
                     }
                 });
-        mSubscriptions.add(subscription);
+        mSubscriptions.add(repoSubscription);
+
+        Subscription editSubscription = mTaskDetailView
+                .editTask()
+                .subscribe(aVoid -> editTask());
+        mSubscriptions.add(editSubscription);
+
+        Subscription deleteSubscription = mTaskDetailView
+                .deleteTask()
+                .subscribe(aVoid -> deleteTask());
+        mSubscriptions.add(deleteSubscription);
+
+        Subscription completeSubscription = mTaskDetailView
+                .completeTask()
+                .subscribe(aVoid -> completeTask());
+        mSubscriptions.add(completeSubscription);
+
+        Subscription activateSubscription = mTaskDetailView
+                .activateTask()
+                .subscribe(aVoid -> activateTask());
+        mSubscriptions.add(activateSubscription);
     }
 
-    @Override
-    public void editTask() {
+    private void editTask() {
         if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
@@ -112,14 +131,12 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView.showEditTask(mTaskId);
     }
 
-    @Override
-    public void deleteTask() {
+    private void deleteTask() {
         mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
-    @Override
-    public void completeTask() {
+    private void completeTask() {
         if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;
@@ -128,8 +145,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView.showTaskMarkedComplete();
     }
 
-    @Override
-    public void activateTask() {
+    private void activateTask() {
         if (null == mTaskId || mTaskId.isEmpty()) {
             mTaskDetailView.showMissingTask();
             return;

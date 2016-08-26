@@ -19,12 +19,26 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
+import rx.Observable;
+
 /**
  * This specifies the contract between the view and the presenter.
  */
 public interface TaskDetailContract {
 
     interface View extends BaseView<Presenter> {
+
+        /* User event Observables */
+
+        Observable<Void> editTask();
+
+        Observable<Void> deleteTask();
+
+        Observable<Void> completeTask();
+
+        Observable<Void> activateTask();
+
+        /* View update methods */
 
         void setLoadingIndicator(boolean active);
 
@@ -49,16 +63,11 @@ public interface TaskDetailContract {
         void showTaskMarkedActive();
 
         boolean isActive();
+
     }
 
+    // TODO: Consider removing this, since View is the one emitting and receiving signals.
     interface Presenter extends BasePresenter {
-
-        void editTask();
-
-        void deleteTask();
-
-        void completeTask();
-
-        void activateTask();
     }
+
 }

@@ -1,8 +1,14 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "com.example.android.architecture.blueprints.todomvp"
@@ -72,6 +78,10 @@ dependencies {
     compile "com.google.guava:guava:$rootProject.guavaVersion"
     compile "io.reactivex:rxjava:$rootProject.rxjavaVersion"
     compile "io.reactivex:rxandroid:$rootProject.rxandroidVersion"
+    compile "com.jakewharton.rxrelay:rxrelay:$rootProject.rxrelayVersion"
+    compile "com.jakewharton.rxbinding:rxbinding:$rootProject.rxbindingVersion"
+    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$rootProject.rxbindingVersion"
+    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rootProject.rxbindingVersion"
     compile "com.squareup.sqlbrite:sqlbrite:$rootProject.sqlbriteVersion"
 
     // Dependencies for local unit tests
