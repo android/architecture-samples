@@ -20,31 +20,40 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import rx.Subscriber;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment implements StatisticsContract.View {
+public class StatisticsFragment extends Fragment {
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.Presenter mPresenter;
+    @NonNull
+    private StatisticsViewModel mViewModel;
+
+    @NonNull
+    private CompositeSubscription mSubscription;
+
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
     @Override
-    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = Injection.provideStatisticsViewModel(getContext());
     }
 
     @Nullable
@@ -59,24 +68,68 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        bind();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+        unbind();
     }
 
-    @Override
-    public void setProgressIndicator(boolean active) {
+    private void bind() {
+        mSubscription = new CompositeSubscription();
+
+        mSubscription.add(mViewModel.getProgressIndicator()
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showLoadingStatisticsError();
+                    }
+
+                    @Override
+                    public void onNext(Boolean active) {
+                        setProgressIndicator(active);
+                    }
+                }));
+
+        mSubscription.add(mViewModel.getStatistics()
+                .subscribe(new Subscriber<Pair<Integer, Integer>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showLoadingStatisticsError();
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Integer> activeCompletedTasks) {
+                        showStatistics(activeCompletedTasks.first,
+                                activeCompletedTasks.second);
+                    }
+                }));
+
+    }
+
+    private void unbind() {
+        mSubscription.unsubscribe();
+    }
+
+    private void setProgressIndicator(boolean active) {
         if (active) {
             mStatisticsTV.setText(getString(R.string.loading));
         }
     }
 
-    @Override
-    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
+    private void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {
@@ -87,13 +140,8 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         }
     }
 
-    @Override
-    public void showLoadingStatisticsError() {
+    private void showLoadingStatisticsError() {
         mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
     }
 
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
 }

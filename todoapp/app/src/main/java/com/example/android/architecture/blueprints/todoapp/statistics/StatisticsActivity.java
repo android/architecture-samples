@@ -26,7 +26,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -67,10 +66,6 @@ public class StatisticsActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     statisticsFragment, R.id.contentFrame);
         }
-
-        new StatisticsPresenter(
-                Injection.provideTasksRepository(getApplicationContext()), statisticsFragment,
-                Injection.provideSchedulerProvider());
     }
 
     @Override
