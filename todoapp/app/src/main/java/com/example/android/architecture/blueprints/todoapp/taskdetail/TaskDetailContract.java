@@ -26,7 +26,7 @@ import rx.Observable;
  */
 public interface TaskDetailContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView<BasePresenter> {
 
         /* User event Observables */
 
@@ -63,11 +63,5 @@ public interface TaskDetailContract {
         void showTaskMarkedActive();
 
         boolean isActive();
-
     }
-
-    // TODO: Consider removing this, since View is the one emitting and receiving signals.
-    interface Presenter extends BasePresenter {
-    }
-
 }
