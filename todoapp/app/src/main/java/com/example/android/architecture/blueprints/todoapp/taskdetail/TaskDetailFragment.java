@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
@@ -42,8 +43,6 @@ import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.jakewharton.rxrelay.PublishRelay;
 
 import rx.Observable;
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,7 +55,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     public static final int REQUEST_EDIT_TASK = 1;
 
-    private TaskDetailContract.Presenter mPresenter;
+    private BasePresenter mPresenter;
 
     private TextView mDetailTitle;
 
@@ -113,7 +112,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mEditTaskClick = RxView.clicks(fab);
         mCheckedChanges = RxCompoundButton
                 .checkedChanges(mDetailCompleteStatus)
-                .doOnNext(checked-> Log.i("TEST","Pre-UpdatingFilter "+checked))
+                .doOnNext(checked -> Log.i("TEST", "Pre-UpdatingFilter " + checked))
                 .filter(checked -> !mUpdating)
                 .share();
 
@@ -121,7 +120,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
+    public void setPresenter(@NonNull BasePresenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
 
@@ -233,7 +232,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public Observable<Void> completeTask() {
         return mCheckedChanges
-                .doOnNext(checked-> Log.i("TEST",""+checked))
+                .doOnNext(checked -> Log.i("TEST", "" + checked))
                 .filter(checked -> checked)
                 .map(checked -> (Void) null);
     }
@@ -241,7 +240,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public Observable<Void> activateTask() {
         return mCheckedChanges
-                .doOnNext(checked-> Log.i("TEST",""+checked))
+                .doOnNext(checked -> Log.i("TEST", "" + checked))
                 .filter(checked -> !checked)
                 .map(checked -> (Void) null);
     }
