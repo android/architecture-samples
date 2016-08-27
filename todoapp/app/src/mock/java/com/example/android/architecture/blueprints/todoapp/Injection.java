@@ -26,6 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.ResourceProvider;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
 
@@ -59,5 +60,12 @@ public class Injection {
     public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
         return new StatisticsViewModel(provideTasksRepository(context),
                 provideResourceProvider(context));
+    }
+
+    @NonNull
+    public static TaskDetailViewModel provideTaskDetailsViewModel(
+            @NonNull String taskId,
+            @NonNull Context context) {
+        return new TaskDetailViewModel(taskId, provideTasksRepository(context));
     }
 }
