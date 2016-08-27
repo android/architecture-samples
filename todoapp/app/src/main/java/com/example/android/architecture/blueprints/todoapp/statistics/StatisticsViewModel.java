@@ -30,13 +30,13 @@ import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
- * the UI as required.
+ * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and exposes
+ * updates for the progress of retrieveing the statistics, and the statistics.
  */
 public class StatisticsViewModel {
 
@@ -44,12 +44,12 @@ public class StatisticsViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private PublishSubject<Boolean> mProgressIndicatorSubject;
+    private BehaviorSubject<Boolean> mProgressIndicatorSubject;
 
     public StatisticsViewModel(@NonNull TasksRepository tasksRepository) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
 
-        mProgressIndicatorSubject = PublishSubject.create();
+        mProgressIndicatorSubject = BehaviorSubject.create(false);
     }
 
     /**
@@ -61,9 +61,6 @@ public class StatisticsViewModel {
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
-
-        // the progress indicator should be visible
-        mProgressIndicatorSubject.onNext(true);
 
         Observable<Task> tasks = mTasksRepository
                 .getTasks()
@@ -93,6 +90,13 @@ public class StatisticsViewModel {
                         return Pair.create(active, completed);
                     }
                 })
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        // the progress indicator should be visible
+                        mProgressIndicatorSubject.onNext(true);
+                    }
+                })
                 .doOnCompleted(new Action0() {
                     @Override
                     public void call() {
@@ -101,6 +105,10 @@ public class StatisticsViewModel {
                 });
     }
 
+    /**
+     * @return a stream of data, indicating whether the retrieval of the statistics is in progress or not
+     */
+    @NonNull
     public Observable<Boolean> getProgressIndicator() {
         return mProgressIndicatorSubject.asObservable();
     }

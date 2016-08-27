@@ -25,16 +25,16 @@ import static org.mockito.Mockito.when;
  */
 public class StatisticsViewModelTest {
 
-    private static List<Task> TASKS;
+    private List<Task> TASKS;
 
     @Mock
     private TasksRepository mTasksRepository;
 
     private StatisticsViewModel mViewModel;
 
-    TestSubscriber<Boolean> mProgressIndicatorTestSubscriber;
+    private TestSubscriber<Boolean> mProgressIndicatorTestSubscriber;
 
-    TestSubscriber<Pair<Integer, Integer>> mStatisticsTestSubscriber;
+    private TestSubscriber<Pair<Integer, Integer>> mStatisticsTestSubscriber;
 
     @Before
     public void setupStatisticsPresenter() {
@@ -53,12 +53,12 @@ public class StatisticsViewModelTest {
     }
 
     @Test
-    public void getProgressIndicator_doesNotEmit_ifStatisticsNotRequested() {
+    public void getProgressIndicator_emitsFalseInitially() {
         // When subscribing to the progress indicator
         mViewModel.getProgressIndicator().subscribe(mProgressIndicatorTestSubscriber);
 
-        // No value is emitted
-        mProgressIndicatorTestSubscriber.assertNoValues();
+        // One value: false, is emitted
+        mProgressIndicatorTestSubscriber.assertValue(false);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class StatisticsViewModelTest {
     }
 
     @Test
-    public void getStatistics_withNoTasksreturnsCorrectData() {
+    public void getStatistics_withNoTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
 
@@ -97,9 +97,10 @@ public class StatisticsViewModelTest {
         // And when subscribing to the progress indicator
         mViewModel.getProgressIndicator().subscribe(mProgressIndicatorTestSubscriber);
         //When subscribing to the statistics stream
-        mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
+        mViewModel.getStatistics().subscribe();
 
-        // The values true and false were emitted
-        mProgressIndicatorTestSubscriber.assertValues(true, false);
+        // The intial value, false is emitted,
+        // then values true and false were emitted
+        mProgressIndicatorTestSubscriber.assertValues(false, true, false);
     }
 }

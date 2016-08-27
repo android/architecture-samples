@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -29,7 +28,9 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 
-import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -37,12 +38,13 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class StatisticsFragment extends Fragment {
 
+    @Nullable
     private TextView mStatisticsTV;
 
-    @NonNull
+    @Nullable
     private StatisticsViewModel mViewModel;
 
-    @NonNull
+    @Nullable
     private CompositeSubscription mSubscription;
 
 
@@ -81,41 +83,39 @@ public class StatisticsFragment extends Fragment {
         mSubscription = new CompositeSubscription();
 
         mSubscription.add(mViewModel.getProgressIndicator()
-                .subscribe(new Subscriber<Boolean>() {
+                .doOnNext(new Action1<Boolean>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showLoadingStatisticsError();
-                    }
-
-                    @Override
-                    public void onNext(Boolean active) {
+                    public void call(Boolean active) {
                         setProgressIndicator(active);
                     }
-                }));
-
-        mSubscription.add(mViewModel.getStatistics()
-                .subscribe(new Subscriber<Pair<Integer, Integer>>() {
+                })
+                .doOnError(new Action1<Throwable>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
+                    public void call(Throwable throwable) {
                         showLoadingStatisticsError();
                     }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
 
+        mSubscription.add(mViewModel.getStatistics()
+                .doOnNext(new Action1<Pair<Integer, Integer>>() {
                     @Override
-                    public void onNext(Pair<Integer, Integer> activeCompletedTasks) {
+                    public void call(Pair<Integer, Integer> activeCompletedTasks) {
                         showStatistics(activeCompletedTasks.first,
                                 activeCompletedTasks.second);
                     }
-                }));
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showLoadingStatisticsError();
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
 
     }
 
