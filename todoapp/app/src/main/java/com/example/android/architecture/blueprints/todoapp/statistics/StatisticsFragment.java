@@ -27,9 +27,10 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.google.common.base.Preconditions;
 
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -80,56 +81,70 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void bind() {
+        Preconditions.checkNotNull(mViewModel);
+
         mSubscription = new CompositeSubscription();
 
         mSubscription.add(mViewModel.getProgressIndicator()
-                .doOnNext(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean active) {
-                        setProgressIndicator(active);
-                    }
-                })
-                .doOnError(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showLoadingStatisticsError();
-                    }
-                })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showLoadingStatisticsError();
+                    }
+
+                    @Override
+                    public void onNext(Boolean active) {
+                        setProgressIndicator(active);
+                    }
+                }));
 
         mSubscription.add(mViewModel.getStatistics()
-                .doOnNext(new Action1<Pair<Integer, Integer>>() {
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Pair<Integer, Integer>>() {
                     @Override
-                    public void call(Pair<Integer, Integer> activeCompletedTasks) {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showLoadingStatisticsError();
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Integer> activeCompletedTasks) {
                         showStatistics(activeCompletedTasks.first,
                                 activeCompletedTasks.second);
                     }
-                })
-                .doOnError(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showLoadingStatisticsError();
-                    }
-                })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+                }));
 
     }
 
     private void unbind() {
+        Preconditions.checkNotNull(mSubscription);
+
         mSubscription.unsubscribe();
     }
 
     private void setProgressIndicator(boolean active) {
+        Preconditions.checkNotNull(mStatisticsTV);
+
         if (active) {
             mStatisticsTV.setText(getString(R.string.loading));
         }
     }
 
     private void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
+        Preconditions.checkNotNull(mStatisticsTV);
+
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {
@@ -141,6 +156,8 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void showLoadingStatisticsError() {
+        Preconditions.checkNotNull(mStatisticsTV);
+
         mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
     }
 
