@@ -30,7 +30,7 @@ import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,19 +44,26 @@ public class StatisticsViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private BehaviorSubject<Boolean> mProgressIndicatorSubject;
+    private PublishSubject<Boolean> mProgressIndicatorSubject;
 
     public StatisticsViewModel(@NonNull TasksRepository tasksRepository) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
 
-        mProgressIndicatorSubject = BehaviorSubject.create(true);
+        mProgressIndicatorSubject = PublishSubject.create();
     }
 
+    /**
+     * @return A stream of statistics data: <active tasks, completed tasks> pair.
+     */
+    @NonNull
     public Observable<Pair<Integer, Integer>> getStatistics() {
 
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
+
+        // the progress indicator should be visible
+        mProgressIndicatorSubject.onNext(true);
 
         Observable<Task> tasks = mTasksRepository
                 .getTasks()
