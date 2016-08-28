@@ -93,8 +93,8 @@ public class TaskDetailFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         unbind();
+        super.onPause();
     }
 
     private void bind() {
