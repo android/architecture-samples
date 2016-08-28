@@ -345,20 +345,17 @@ public class TaskDetailFragment extends Fragment {
 
     @NonNull
     private CompositeSubscription getSubscription() {
-        Preconditions.checkNotNull(mSubscription);
-        return mSubscription;
+        return Preconditions.checkNotNull(mSubscription);
     }
 
     @NonNull
     private TextView getDetailTitle() {
-        Preconditions.checkNotNull(mDetailTitle);
-        return mDetailTitle;
+        return Preconditions.checkNotNull(mDetailTitle);
     }
 
     @NonNull
     private TextView getDetailDescription() {
-        Preconditions.checkNotNull(mDetailDescription);
-        return mDetailDescription;
+        return Preconditions.checkNotNull(mDetailDescription);
     }
 
     private abstract class MissingTaskSubscription<T> extends Subscriber<T> {
