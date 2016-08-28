@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 

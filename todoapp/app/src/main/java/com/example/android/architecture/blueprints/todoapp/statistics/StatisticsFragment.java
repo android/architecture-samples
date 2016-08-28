@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
@@ -77,8 +76,8 @@ public class StatisticsFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         unbind();
+        super.onPause();
     }
 
     private void bind() {
