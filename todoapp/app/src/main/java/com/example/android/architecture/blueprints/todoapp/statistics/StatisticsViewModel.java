@@ -57,7 +57,6 @@ public class StatisticsViewModel {
      */
     @NonNull
     public Observable<Pair<Integer, Integer>> getStatistics() {
-
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
@@ -112,5 +111,4 @@ public class StatisticsViewModel {
     public Observable<Boolean> getProgressIndicator() {
         return mProgressIndicatorSubject.asObservable();
     }
-
 }

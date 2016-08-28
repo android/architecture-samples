@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -29,8 +30,8 @@ import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.google.common.base.Preconditions;
 
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -88,44 +89,33 @@ public class StatisticsFragment extends Fragment {
         mSubscription.add(mViewModel.getProgressIndicator()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
+                .subscribe(new Action1<Boolean>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showLoadingStatisticsError();
-                    }
-
-                    @Override
-                    public void onNext(Boolean active) {
+                    public void call(Boolean active) {
                         setProgressIndicator(active);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showLoadingStatisticsError();
                     }
                 }));
 
         mSubscription.add(mViewModel.getStatistics()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Pair<Integer, Integer>>() {
+                .subscribe(new Action1<Pair<Integer, Integer>>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showLoadingStatisticsError();
-                    }
-
-                    @Override
-                    public void onNext(Pair<Integer, Integer> activeCompletedTasks) {
+                    public void call(Pair<Integer, Integer> activeCompletedTasks) {
                         showStatistics(activeCompletedTasks.first,
                                 activeCompletedTasks.second);
                     }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showLoadingStatisticsError();
+                    }
                 }));
-
     }
 
     private void unbind() {
@@ -135,30 +125,29 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setProgressIndicator(boolean active) {
-        Preconditions.checkNotNull(mStatisticsTV);
-
         if (active) {
-            mStatisticsTV.setText(getString(R.string.loading));
+            getStatisticsTextView().setText(getString(R.string.loading));
         }
     }
 
     private void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
-        Preconditions.checkNotNull(mStatisticsTV);
-
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
-            mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
+            getStatisticsTextView().setText(getResources().getString(R.string.statistics_no_tasks));
         } else {
             String displayString = getResources().getString(R.string.statistics_active_tasks) + " "
                     + numberOfIncompleteTasks + "\n" + getResources().getString(
                     R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
-            mStatisticsTV.setText(displayString);
+            getStatisticsTextView().setText(displayString);
         }
     }
 
     private void showLoadingStatisticsError() {
-        Preconditions.checkNotNull(mStatisticsTV);
-
-        mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
+        getStatisticsTextView().setText(getResources().getString(R.string.statistics_error));
     }
 
+    @NonNull
+    private TextView getStatisticsTextView() {
+        Preconditions.checkNotNull(mStatisticsTV);
+        return mStatisticsTV;
+    }
 }
