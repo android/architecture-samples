@@ -177,8 +177,6 @@ public class TaskDetailFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Preconditions.checkNotNull(mViewModel);
-
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 deleteTask();
