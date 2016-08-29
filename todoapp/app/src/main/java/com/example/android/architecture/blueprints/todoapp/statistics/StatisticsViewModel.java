@@ -43,7 +43,7 @@ public class StatisticsViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private BehaviorSubject<Boolean> mProgressIndicatorSubject;
+    private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
 
     public StatisticsViewModel(@NonNull TasksRepository tasksRepository) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
@@ -95,7 +95,7 @@ public class StatisticsViewModel {
                         mProgressIndicatorSubject.onNext(true);
                     }
                 })
-                .doOnCompleted(new Action0() {
+                .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
                         mProgressIndicatorSubject.onNext(false);

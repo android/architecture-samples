@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
  */
 public class StatisticsViewModelTest {
 
-    private List<Task> TASKS;
+    private List<Task> mTasks;
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -46,8 +46,10 @@ public class StatisticsViewModelTest {
         mViewModel = new StatisticsViewModel(mTasksRepository);
 
         // We subscribe the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+        mTasks = Lists.newArrayList(
+                new Task("Title1", "Description1"),
+                new Task("Title2", "Description2", true),
+                new Task("Title3", "Description3", true));
         mProgressIndicatorTestSubscriber = new TestSubscriber<>();
         mStatisticsTestSubscriber = new TestSubscriber<>();
     }
@@ -64,7 +66,7 @@ public class StatisticsViewModelTest {
     @Test
     public void getStatistics_withTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
 
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
@@ -92,12 +94,27 @@ public class StatisticsViewModelTest {
     @Test
     public void getProgressIndicator_emits_afterStatisticsAreRetrieved() {
         //Given a list of tasks in the repository
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
 
         // And when subscribing to the progress indicator
         mViewModel.getProgressIndicator().subscribe(mProgressIndicatorTestSubscriber);
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe();
+
+        // The intial value, false is emitted,
+        // then values true and false were emitted
+        mProgressIndicatorTestSubscriber.assertValues(false, true, false);
+    }
+
+    @Test
+    public void getProgressIndicator_emits_afterStatisticsAreRetrieved_WithError() {
+        //Given a list of tasks in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>error(new Exception()));
+
+        // And when subscribing to the progress indicator
+        mViewModel.getProgressIndicator().subscribe(mProgressIndicatorTestSubscriber);
+        //When subscribing to the statistics stream
+        mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
 
         // The intial value, false is emitted,
         // then values true and false were emitted

@@ -48,7 +48,6 @@ public class StatisticsFragment extends Fragment {
     @Nullable
     private CompositeSubscription mSubscription;
 
-
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
@@ -146,7 +145,6 @@ public class StatisticsFragment extends Fragment {
 
     @NonNull
     private TextView getStatisticsTextView() {
-        Preconditions.checkNotNull(mStatisticsTV);
-        return mStatisticsTV;
+        return Preconditions.checkNotNull(mStatisticsTV);
     }
 }
