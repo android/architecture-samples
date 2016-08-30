@@ -96,7 +96,7 @@ public class TaskDetailViewModel {
     public Single<String> editTask() {
         return Single.fromCallable(new Callable<String>() {
             @Override
-            public String call() throws Exception {
+            public String call() {
                 if (Strings.isNullOrEmpty(mTaskId)) {
                     throw new RuntimeException("Task id null or empty");
                 }

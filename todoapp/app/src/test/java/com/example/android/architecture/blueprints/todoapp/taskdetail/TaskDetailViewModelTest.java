@@ -108,7 +108,7 @@ public class TaskDetailViewModelTest {
         mViewModel.editTask().subscribe(testSubscriber);
 
         // An error is emitted
-        testSubscriber.assertError(Exception.class);
+        testSubscriber.assertError(RuntimeException.class);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class TaskDetailViewModelTest {
         mViewModel.deleteTask().subscribe(mTestSubscriber);
 
         // An error is emitted
-        mTestSubscriber.assertError(Exception.class);
+        mTestSubscriber.assertError(RuntimeException.class);
     }
 
     @Test
@@ -159,7 +159,7 @@ public class TaskDetailViewModelTest {
         mViewModel.completeTask().subscribe(mTestSubscriber);
 
         // An error is emitted
-        mTestSubscriber.assertError(Exception.class);
+        mTestSubscriber.assertError(RuntimeException.class);
     }
 
     @Test
@@ -185,7 +185,7 @@ public class TaskDetailViewModelTest {
         mViewModel.activateTask().subscribe(mTestSubscriber);
 
         // An error is emitted
-        mTestSubscriber.assertError(Exception.class);
+        mTestSubscriber.assertError(RuntimeException.class);
     }
 
     @Test
