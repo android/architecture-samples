@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
  */
 public class TaskDetailViewModelTest {
 
-    private final Task TASK = new Task("TITLE", "DESCRIPTION");
+    private static final Task TASK = new Task("TITLE", "DESCRIPTION");
 
     @Mock
     private TasksRepository mTasksRepository;

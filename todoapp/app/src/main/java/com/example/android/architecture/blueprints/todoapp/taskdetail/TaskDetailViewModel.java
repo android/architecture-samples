@@ -98,7 +98,7 @@ public class TaskDetailViewModel {
             @Override
             public String call() throws Exception {
                 if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new Exception("Task id null or empty");
+                    throw new RuntimeException("Task id null or empty");
                 }
                 return mTaskId;
             }
