@@ -26,7 +26,7 @@ public class TaskDetailViewModelTest {
     private TasksRepository mTasksRepository;
 
     private TestSubscriber<Void> mTestSubscriber;
-    
+
     private TestSubscriber<Task> mTaskTestSubscriber;
 
     private TaskDetailViewModel mViewModel;
@@ -146,8 +146,8 @@ public class TaskDetailViewModelTest {
 
         // The task is deleted in the repository
         verify(mTasksRepository).deleteTask(eq(TASK.getId()));
-        // The stream emits once
-        mTestSubscriber.assertValueCount(1);
+        // The stream completes
+        mTestSubscriber.assertCompleted();
     }
 
     @Test
@@ -172,8 +172,8 @@ public class TaskDetailViewModelTest {
 
         // The task is completed in the repository
         verify(mTasksRepository).completeTask(eq(TASK.getId()));
-        // The stream emits once
-        mTestSubscriber.assertValueCount(1);
+        // The stream completes
+        mTestSubscriber.assertCompleted();
     }
 
     @Test
@@ -198,7 +198,7 @@ public class TaskDetailViewModelTest {
 
         // The task is deleted in the repository
         verify(mTasksRepository).activateTask(eq(TASK.getId()));
-        // The stream emits once
-        mTestSubscriber.assertValueCount(1);
+        // The stream completes
+        mTestSubscriber.assertCompleted();
     }
 }

@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -64,7 +65,7 @@ public class Injection {
 
     @NonNull
     public static TaskDetailViewModel provideTaskDetailsViewModel(
-            @NonNull String taskId,
+            @Nullable String taskId,
             @NonNull Context context) {
         return new TaskDetailViewModel(taskId, provideTasksRepository(context));
     }

@@ -21,10 +21,14 @@ import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.google.common.base.Strings;
 
+import java.util.concurrent.Callable;
+
+import rx.Completable;
 import rx.Observable;
+import rx.Single;
 import rx.functions.Action0;
-import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,14 +43,14 @@ public class TaskDetailViewModel {
     private final TasksRepository mTasksRepository;
 
     @Nullable
-    private String mTaskId;
+    private final String mTaskId;
 
     @NonNull
     private final BehaviorSubject<Boolean> mLoadingSubject;
 
     public TaskDetailViewModel(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository) {
-        this.mTaskId = taskId;
+        mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mLoadingSubject = BehaviorSubject.create(false);
     }
@@ -66,7 +70,7 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Observable<Task> getTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             return Observable.error(new Exception("Task id null or empty"));
         }
 
@@ -89,11 +93,16 @@ public class TaskDetailViewModel {
      * @return a stream containing the current task id, or error if the task id is invalid.
      */
     @NonNull
-    public Observable<String> editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            return Observable.error(new Exception("Task id null or empty"));
-        }
-        return Observable.just(mTaskId);
+    public Single<String> editTask() {
+        return Single.fromCallable(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                if (Strings.isNullOrEmpty(mTaskId)) {
+                    throw new Exception("Task id null or empty");
+                }
+                return mTaskId;
+            }
+        });
     }
 
     /**
@@ -103,18 +112,17 @@ public class TaskDetailViewModel {
      * @return a stream notifying about the deletion of the task
      */
     @NonNull
-    public Observable<Void> deleteTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            return Observable.error(new Exception("Task id null or empty"));
-        }
-        return Observable.just(mTaskId)
-                .map(new Func1<String, Void>() {
-                    @Override
-                    public Void call(String s) {
-                        mTasksRepository.deleteTask(mTaskId);
-                        return null;
-                    }
-                });
+    public Completable deleteTask() {
+        return Completable.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                if (Strings.isNullOrEmpty(mTaskId)) {
+                    throw new Exception("Task id null or empty");
+                }
+                mTasksRepository.deleteTask(mTaskId);
+                return null;
+            }
+        });
     }
 
     /**
@@ -124,18 +132,17 @@ public class TaskDetailViewModel {
      * @return a stream notifying about the marking of the task as completed
      */
     @NonNull
-    public Observable<Void> completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            return Observable.error(new Exception("Task id null or empty"));
-        }
-        return Observable.just(mTaskId)
-                .map(new Func1<String, Void>() {
-                    @Override
-                    public Void call(String s) {
-                        mTasksRepository.completeTask(mTaskId);
-                        return null;
-                    }
-                });
+    public Completable completeTask() {
+        return Completable.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                if (Strings.isNullOrEmpty(mTaskId)) {
+                    throw new Exception("Task id null or empty");
+                }
+                mTasksRepository.completeTask(mTaskId);
+                return null;
+            }
+        });
     }
 
     /**
@@ -145,17 +152,16 @@ public class TaskDetailViewModel {
      * @return a stream notifying about the marking of the task as active
      */
     @NonNull
-    public Observable<Void> activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
-            return Observable.error(new Exception("Task id null or empty"));
-        }
-        return Observable.just(mTaskId)
-                .map(new Func1<String, Void>() {
-                    @Override
-                    public Void call(String s) {
-                        mTasksRepository.activateTask(mTaskId);
-                        return null;
-                    }
-                });
+    public Completable activateTask() {
+        return Completable.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                if (Strings.isNullOrEmpty(mTaskId)) {
+                    throw new RuntimeException("Task id null or empty");
+                }
+                mTasksRepository.activateTask(mTaskId);
+                return null;
+            }
+        });
     }
 }
