@@ -113,14 +113,13 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable deleteTask() {
-        return Completable.fromCallable(new Callable<Void>() {
+        return Completable.fromAction(new Action0() {
             @Override
-            public Void call() throws Exception {
+            public void call() {
                 if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new Exception("Task id null or empty");
+                    throw new RuntimeException("Task id null or empty");
                 }
                 mTasksRepository.deleteTask(mTaskId);
-                return null;
             }
         });
     }
@@ -133,14 +132,13 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable completeTask() {
-        return Completable.fromCallable(new Callable<Void>() {
+        return Completable.fromAction(new Action0() {
             @Override
-            public Void call() throws Exception {
+            public void call() {
                 if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new Exception("Task id null or empty");
+                    throw new RuntimeException("Task id null or empty");
                 }
                 mTasksRepository.completeTask(mTaskId);
-                return null;
             }
         });
     }
@@ -153,14 +151,13 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable activateTask() {
-        return Completable.fromCallable(new Callable<Void>() {
+        return Completable.fromAction(new Action0() {
             @Override
-            public Void call() throws Exception {
+            public void call() {
                 if (Strings.isNullOrEmpty(mTaskId)) {
                     throw new RuntimeException("Task id null or empty");
                 }
                 mTasksRepository.activateTask(mTaskId);
-                return null;
             }
         });
     }
