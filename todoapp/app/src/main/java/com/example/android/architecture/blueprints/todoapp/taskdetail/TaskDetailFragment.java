@@ -45,9 +45,9 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
  */
 public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
 
-    public static final String ARGUMENT_TASK_ID = "TASK_ID";
+    private static final String ARGUMENT_TASK_ID = "TASK_ID";
 
-    public static final int REQUEST_EDIT_TASK = 1;
+    private static final int REQUEST_EDIT_TASK = 1;
 
     private TaskDetailContract.Presenter mPresenter;
 
