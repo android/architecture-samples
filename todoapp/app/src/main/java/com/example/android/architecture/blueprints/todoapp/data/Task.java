@@ -16,9 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 import java.util.UUID;
 
@@ -27,6 +29,7 @@ import java.util.UUID;
  */
 public final class Task {
 
+    @NonNull
     private final String mId;
 
     @Nullable
@@ -36,6 +39,7 @@ public final class Task {
     private final String mDescription;
 
     private final boolean mCompleted;
+
     /**
      * Use this constructor to create a new active Task.
      *
@@ -57,7 +61,7 @@ public final class Task {
      * @param description
      * @param id of the class
      */
-    public Task(@Nullable String title, @Nullable String description, String id) {
+    public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
         mId = id;
         mTitle = title;
         mDescription = description;
@@ -87,7 +91,8 @@ public final class Task {
      * @param id
      * @param completed
      */
-    public Task(@Nullable String title, @Nullable String description, String id, boolean completed) {
+    public Task(@Nullable String title, @Nullable String description,
+                @NonNull String id, boolean completed) {
         mId = id;
         mTitle = title;
         mDescription = description;
@@ -105,7 +110,7 @@ public final class Task {
 
     @Nullable
     public String getTitleForList() {
-        if (mTitle != null && !mTitle.equals("")) {
+        if (!Strings.isNullOrEmpty(mTitle)) {
             return mTitle;
         } else {
             return mDescription;
@@ -126,8 +131,8 @@ public final class Task {
     }
 
     public boolean isEmpty() {
-        return (mTitle == null || "".equals(mTitle)) &&
-                (mDescription == null || "".equals(mDescription));
+        return Strings.isNullOrEmpty(mTitle) &&
+                Strings.isNullOrEmpty(mDescription);
     }
 
     @Override
