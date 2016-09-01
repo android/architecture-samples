@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,22 +37,31 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.google.common.base.Preconditions;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
  */
 public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
 
+    @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
 
+    @NonNull
     private static final int REQUEST_EDIT_TASK = 1;
 
+    @Nullable
     private TaskDetailContract.Presenter mPresenter;
 
+    @Nullable
     private TextView mDetailTitle;
 
+    @Nullable
     private TextView mDetailDescription;
 
+    @Nullable
     private CheckBox mDetailCompleteStatus;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
@@ -68,7 +75,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        getPresenter().start();
     }
 
     @Nullable
@@ -88,7 +95,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.editTask();
+                getPresenter().editTask();
             }
         });
 
@@ -104,7 +111,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                mPresenter.deleteTask();
+                getPresenter().deleteTask();
                 return true;
         }
         return false;
@@ -118,38 +125,40 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void setLoadingIndicator(boolean active) {
         if (active) {
-            mDetailTitle.setText("");
-            mDetailDescription.setText(getString(R.string.loading));
+            getDetailTitle().setText("");
+            getDetailDescription().setText(getString(R.string.loading));
         }
     }
 
     @Override
     public void hideDescription() {
-        mDetailDescription.setVisibility(View.GONE);
+        getDetailDescription().setVisibility(View.GONE);
     }
 
     @Override
     public void hideTitle() {
-        mDetailTitle.setVisibility(View.GONE);
+        getDetailTitle().setVisibility(View.GONE);
     }
 
     @Override
     public void showDescription(@NonNull String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
+        getDetailDescription().setVisibility(View.VISIBLE);
+        getDetailDescription().setText(description);
     }
 
     @Override
     public void showCompletionStatus(final boolean complete) {
+        Preconditions.checkNotNull(mDetailCompleteStatus);
+
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            mPresenter.completeTask();
+                            getPresenter().completeTask();
                         } else {
-                            mPresenter.activateTask();
+                            getPresenter().activateTask();
                         }
                     }
                 });
@@ -190,18 +199,33 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showTitle(@NonNull String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
-        mDetailTitle.setText(title);
+        getDetailTitle().setVisibility(View.VISIBLE);
+        getDetailTitle().setText(title);
     }
 
     @Override
     public void showMissingTask() {
-        mDetailTitle.setText("");
-        mDetailDescription.setText(getString(R.string.no_data));
+        getDetailTitle().setText("");
+        getDetailDescription().setText(getString(R.string.no_data));
     }
 
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @NonNull
+    private TaskDetailContract.Presenter getPresenter() {
+        return Preconditions.checkNotNull(mPresenter);
+    }
+
+    @NonNull
+    private TextView getDetailTitle() {
+        return Preconditions.checkNotNull(mDetailTitle);
+    }
+
+    @NonNull
+    private TextView getDetailDescription() {
+        return Preconditions.checkNotNull(mDetailDescription);
     }
 }
