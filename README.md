@@ -91,6 +91,8 @@ This project is **built by the community** and curated by Google and core mainta
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
+[Florina Montenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
+
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
