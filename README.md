@@ -1,10 +1,12 @@
 # TODO-MVP-RXJAVA
 
-It's based on the TODO-MVP sample and uses RxJava for communication between the data model and presenter layers.
+Project owners: [Erik Hellman](https://github.com/erikhellman) & [Florina Muntenescu (upday)](https://github.com/florina-muntenescu)
 
 ### Summary
 
-Compared to the TODO-MVP, both the Presenter contracts and the implementation of the Views stay the same. The changes are done to the data model layer and in the implementation of the Presenters.
+This sample is based on the TODO-MVP project and uses RxJava for communication between the data model and presenter layers.
+
+Compared to the TODO-MVP, both the Presenter contracts and the implementation of the Views stay the same. The changes are done to the data model layer and in the implementation of the Presenters. For the sake of simplicity we decided to keep the RxJava usage minimal, leaving optimizations like RxJava caching aside.
 
 The data model layer exposes RxJava ``Observable`` streams as a way of retrieving tasks. The ``TasksDataSource`` interface contains methods like:
 
@@ -57,6 +59,8 @@ Subscription subscription = Observable
             }
         });
 ```
+
+Handling of the working threads is done with the help of RxJava's `Scheduler`s. For example, the creation of the database together with all the database queries is happening on the IO thread. The `subscribeOn` and `observeOn` methods are used in the Presenter classes to define that the `Observer`s will operate on the computation thread and that the observing is on the main thread.
 
 ### Dependencies
 
