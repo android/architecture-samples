@@ -43,53 +43,44 @@ public final class Task {
     /**
      * Use this constructor to create a new active Task.
      *
-     * @param title
-     * @param description
+     * @param title       title of the task
+     * @param description description of the task
      */
     public Task(@Nullable String title, @Nullable String description) {
-        mId = UUID.randomUUID().toString();
-        mTitle = title;
-        mDescription = description;
-        mCompleted = false;
+        this(UUID.randomUUID().toString(), title, description, false);
     }
 
     /**
      * Use this constructor to create an active Task if the Task already has an id (copy of another
      * Task).
      *
-     * @param title
-     * @param description
-     * @param id of the class
+     * @param title       title of the task
+     * @param description description of the task
+     * @param id          id of the task
      */
     public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
-        mId = id;
-        mTitle = title;
-        mDescription = description;
-        mCompleted = false;
+        this(id, title, description, false);
     }
 
     /**
      * Use this constructor to create a new completed Task.
      *
-     * @param title
-     * @param description
-     * @param completed
+     * @param title       title of the task
+     * @param description description of the task
+     * @param completed   true if the task is completed, false if it's active
      */
     public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        mId = UUID.randomUUID().toString();
-        mTitle = title;
-        mDescription = description;
-        mCompleted = completed;
+        this(UUID.randomUUID().toString(), title, description, completed);
     }
 
     /**
      * Use this constructor to specify a completed Task if the Task already has an id (copy of
      * another Task).
      *
-     * @param title
-     * @param description
-     * @param id
-     * @param completed
+     * @param title       title of the task
+     * @param description description of the task
+     * @param id          id of the task
+     * @param completed   true if the task is completed, false if it's active
      */
     public Task(@Nullable String title, @Nullable String description,
                 @NonNull String id, boolean completed) {
@@ -99,6 +90,7 @@ public final class Task {
         mCompleted = completed;
     }
 
+    @NonNull
     public String getId() {
         return mId;
     }

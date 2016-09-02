@@ -52,16 +52,12 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @NonNull
     private static final int REQUEST_EDIT_TASK = 1;
 
-    @Nullable
     private TaskDetailContract.Presenter mPresenter;
 
-    @Nullable
     private TextView mDetailTitle;
 
-    @Nullable
     private TextView mDetailDescription;
 
-    @Nullable
     private CheckBox mDetailCompleteStatus;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
@@ -75,7 +71,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        getPresenter().start();
+        mPresenter.start();
     }
 
     @Nullable
@@ -95,7 +91,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getPresenter().editTask();
+                mPresenter.editTask();
             }
         });
 
@@ -111,7 +107,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                getPresenter().deleteTask();
+                mPresenter.deleteTask();
                 return true;
         }
         return false;
@@ -125,25 +121,25 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void setLoadingIndicator(boolean active) {
         if (active) {
-            getDetailTitle().setText("");
-            getDetailDescription().setText(getString(R.string.loading));
+            mDetailTitle.setText("");
+            mDetailDescription.setText(getString(R.string.loading));
         }
     }
 
     @Override
     public void hideDescription() {
-        getDetailDescription().setVisibility(View.GONE);
+        mDetailDescription.setVisibility(View.GONE);
     }
 
     @Override
     public void hideTitle() {
-        getDetailTitle().setVisibility(View.GONE);
+        mDetailTitle.setVisibility(View.GONE);
     }
 
     @Override
     public void showDescription(@NonNull String description) {
-        getDetailDescription().setVisibility(View.VISIBLE);
-        getDetailDescription().setText(description);
+        mDetailDescription.setVisibility(View.VISIBLE);
+        mDetailDescription.setText(description);
     }
 
     @Override
@@ -156,9 +152,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            getPresenter().completeTask();
+                            mPresenter.completeTask();
                         } else {
-                            getPresenter().activateTask();
+                            mPresenter.activateTask();
                         }
                     }
                 });
@@ -199,14 +195,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showTitle(@NonNull String title) {
-        getDetailTitle().setVisibility(View.VISIBLE);
-        getDetailTitle().setText(title);
+        mDetailTitle.setVisibility(View.VISIBLE);
+        mDetailTitle.setText(title);
     }
 
     @Override
     public void showMissingTask() {
-        getDetailTitle().setText("");
-        getDetailDescription().setText(getString(R.string.no_data));
+        mDetailTitle.setText("");
+        mDetailDescription.setText(getString(R.string.no_data));
     }
 
     @Override
@@ -214,18 +210,4 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return isAdded();
     }
 
-    @NonNull
-    private TaskDetailContract.Presenter getPresenter() {
-        return Preconditions.checkNotNull(mPresenter);
-    }
-
-    @NonNull
-    private TextView getDetailTitle() {
-        return Preconditions.checkNotNull(mDetailTitle);
-    }
-
-    @NonNull
-    private TextView getDetailDescription() {
-        return Preconditions.checkNotNull(mDetailDescription);
-    }
 }
