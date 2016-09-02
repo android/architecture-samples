@@ -1,11 +1,14 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.support.v4.util.Pair;
+import android.support.annotation.StringRes;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.google.common.collect.Lists;
 
+import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,7 +19,7 @@ import java.util.List;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -25,16 +28,23 @@ import static org.mockito.Mockito.when;
  */
 public class StatisticsViewModelTest {
 
+    private static final String NO_TASKS = "no tasks";
+    private static final String ACTIVE_TASKS = "active";
+    private static final String COMPLETED_TASKS = "completed";
+
     private List<Task> mTasks;
 
     @Mock
     private TasksRepository mTasksRepository;
 
+    @Mock
+    private BaseResourceProvider mResourceProvider;
+
     private StatisticsViewModel mViewModel;
 
     private TestSubscriber<Boolean> mProgressIndicatorTestSubscriber;
 
-    private TestSubscriber<Pair<Integer, Integer>> mStatisticsTestSubscriber;
+    private TestSubscriber<String> mStatisticsTestSubscriber;
 
     @Before
     public void setupStatisticsPresenter() {
@@ -43,7 +53,7 @@ public class StatisticsViewModelTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mViewModel = new StatisticsViewModel(mTasksRepository);
+        mViewModel = new StatisticsViewModel(mTasksRepository, mResourceProvider);
 
         // We subscribe the tasks to 3, with one active and two completed
         mTasks = Lists.newArrayList(
@@ -67,28 +77,34 @@ public class StatisticsViewModelTest {
     public void getStatistics_withTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
+        // And string resources
+        withText(R.string.statistics_active_tasks, ACTIVE_TASKS);
+        withText(R.string.statistics_completed_tasks, COMPLETED_TASKS);
 
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
 
         //The correct pair is returned
-        Pair<Integer, Integer> result = mStatisticsTestSubscriber.getOnNextEvents().get(0);
-        assertThat(result.first, is(1));
-        assertThat(result.second, is(2));
+        String result = mStatisticsTestSubscriber.getOnNextEvents().get(0);
+        assertThat(result, StringContains.containsString(ACTIVE_TASKS));
+        assertThat(result, StringContains.containsString("1"));
+        assertThat(result, StringContains.containsString(COMPLETED_TASKS));
+        assertThat(result, StringContains.containsString("2"));
     }
 
     @Test
     public void getStatistics_withNoTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
+        // And string resources
+        withText(R.string.statistics_no_tasks, NO_TASKS);
 
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
 
         //The correct pair is returned
-        Pair<Integer, Integer> result = mStatisticsTestSubscriber.getOnNextEvents().get(0);
-        assertThat(result.first, is(0));
-        assertThat(result.second, is(0));
+        String result = mStatisticsTestSubscriber.getOnNextEvents().get(0);
+        assertThat(result, is(NO_TASKS));
     }
 
     @Test
@@ -119,5 +135,9 @@ public class StatisticsViewModelTest {
         // The intial value, false is emitted,
         // then values true and false were emitted
         mProgressIndicatorTestSubscriber.assertValues(false, true, false);
+    }
+
+    private void withText(@StringRes int stringId, String returnedString) {
+        when(mResourceProvider.getString(stringId)).thenReturn(returnedString);
     }
 }
