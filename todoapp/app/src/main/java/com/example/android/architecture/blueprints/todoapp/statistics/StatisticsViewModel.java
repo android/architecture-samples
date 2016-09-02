@@ -17,11 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
 import java.util.List;
 
@@ -43,19 +44,24 @@ public class StatisticsViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
+    private final BaseResourceProvider mResourceProvider;
+
+    @NonNull
     private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
 
-    public StatisticsViewModel(@NonNull TasksRepository tasksRepository) {
+    public StatisticsViewModel(@NonNull TasksRepository tasksRepository,
+                               @NonNull BaseResourceProvider resourceProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
+        mResourceProvider = checkNotNull(resourceProvider, "resourceProvider cannot be null");
 
         mProgressIndicatorSubject = BehaviorSubject.create(false);
     }
 
     /**
-     * @return A stream of statistics data: <active tasks, completed tasks> pair.
+     * @return A stream of statistics to be displayed.
      */
     @NonNull
-    public Observable<Pair<Integer, Integer>> getStatistics() {
+    public Observable<String> getStatistics() {
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
@@ -82,10 +88,10 @@ public class StatisticsViewModel {
         }).count();
 
         return Observable
-                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, Pair<Integer, Integer>>() {
+                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, String>() {
                     @Override
-                    public Pair<Integer, Integer> call(Integer completed, Integer active) {
-                        return Pair.create(active, completed);
+                    public String call(Integer completed, Integer active) {
+                        return getStatisticsString(active, completed);
                     }
                 })
                 .doOnSubscribe(new Action0() {
@@ -101,6 +107,17 @@ public class StatisticsViewModel {
                         mProgressIndicatorSubject.onNext(false);
                     }
                 });
+    }
+
+    @NonNull
+    private String getStatisticsString(int numberOfActiveTasks, int numberOfCompletedTasks) {
+        if (numberOfCompletedTasks == 0 && numberOfActiveTasks == 0) {
+            return mResourceProvider.getString(R.string.statistics_no_tasks);
+        } else {
+            return mResourceProvider.getString(R.string.statistics_active_tasks) + " "
+                    + numberOfActiveTasks + "\n" + mResourceProvider.getString(
+                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
+        }
     }
 
     /**

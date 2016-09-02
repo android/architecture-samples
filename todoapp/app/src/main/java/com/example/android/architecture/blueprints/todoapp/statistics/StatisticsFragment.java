@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,11 +101,10 @@ public class StatisticsFragment extends Fragment {
         mSubscription.add(mViewModel.getStatistics()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Pair<Integer, Integer>>() {
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void call(Pair<Integer, Integer> activeCompletedTasks) {
-                        showStatistics(activeCompletedTasks.first,
-                                activeCompletedTasks.second);
+                    public void call(String statistics) {
+                        showStatistics(statistics);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -128,15 +126,8 @@ public class StatisticsFragment extends Fragment {
         }
     }
 
-    private void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
-        if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
-            getStatisticsTextView().setText(getResources().getString(R.string.statistics_no_tasks));
-        } else {
-            String displayString = getResources().getString(R.string.statistics_active_tasks) + " "
-                    + numberOfIncompleteTasks + "\n" + getResources().getString(
-                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
-            getStatisticsTextView().setText(displayString);
-        }
+    private void showStatistics(@NonNull String statistics) {
+        getStatisticsTextView().setText(statistics);
     }
 
     private void showLoadingStatisticsError() {
