@@ -91,16 +91,16 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        bind();
+        bindViewModel();
     }
 
     @Override
     public void onPause() {
-        unbind();
+        unbindViewModel();
         super.onPause();
     }
 
-    private void bind() {
+    private void bindViewModel() {
         mSubscription = new CompositeSubscription();
 
         mSubscription.add(getViewModel().getTask()
@@ -143,7 +143,7 @@ public class TaskDetailFragment extends Fragment {
                 }));
     }
 
-    private void unbind() {
+    private void unbindViewModel() {
         getSubscription().unsubscribe();
     }
 
