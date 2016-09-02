@@ -70,16 +70,16 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        bind();
+        bindViewModel();
     }
 
     @Override
     public void onPause() {
-        unbind();
+        unbindViewModel();
         super.onPause();
     }
 
-    private void bind() {
+    private void bindViewModel() {
         Preconditions.checkNotNull(mViewModel);
 
         mSubscription = new CompositeSubscription();
@@ -116,7 +116,7 @@ public class StatisticsFragment extends Fragment {
                 }));
     }
 
-    private void unbind() {
+    private void unbindViewModel() {
         Preconditions.checkNotNull(mSubscription);
 
         mSubscription.unsubscribe();

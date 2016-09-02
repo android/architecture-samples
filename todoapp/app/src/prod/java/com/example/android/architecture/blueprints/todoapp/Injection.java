@@ -23,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
+import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
 
@@ -42,5 +43,9 @@ public class Injection {
 
     public static BaseSchedulerProvider provideSchedulerProvider() {
         return SchedulerProvider.getInstance();
+    }
+
+    public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
+        return new StatisticsViewModel(provideTasksRepository(context));
     }
 }
