@@ -24,4 +24,9 @@ public class ResourceProvider implements BaseResourceProvider {
         return mContext.getString(id);
     }
 
+    @NonNull
+    @Override
+    public String getString(@StringRes final int id, final Object... formatArgs) {
+        return mContext.getString(id, formatArgs);
+    }
 }

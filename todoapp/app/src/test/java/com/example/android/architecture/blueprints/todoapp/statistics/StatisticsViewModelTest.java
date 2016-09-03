@@ -8,7 +8,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.google.common.collect.Lists;
 
-import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,8 +18,10 @@ import java.util.List;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -29,8 +30,7 @@ import static org.mockito.Mockito.when;
 public class StatisticsViewModelTest {
 
     private static final String NO_TASKS = "no tasks";
-    private static final String ACTIVE_TASKS = "active";
-    private static final String COMPLETED_TASKS = "completed";
+    private static final String ACTIVE_COMPLETED_TASKS = "Active tasks: %1$d \n Completed tasks: %2$d";
 
     private List<Task> mTasks;
 
@@ -78,18 +78,13 @@ public class StatisticsViewModelTest {
         //Given a list of tasks in the repository
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
         // And string resources
-        withText(R.string.statistics_active_tasks, ACTIVE_TASKS);
-        withText(R.string.statistics_completed_tasks, COMPLETED_TASKS);
+        withFormattedText(R.string.statistics_active_completed_tasks, ACTIVE_COMPLETED_TASKS);
 
         //When subscribing to the statistics stream
-        mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
+        mViewModel.getStatistics().subscribe();
 
         //The correct pair is returned
-        String result = mStatisticsTestSubscriber.getOnNextEvents().get(0);
-        assertThat(result, StringContains.containsString(ACTIVE_TASKS));
-        assertThat(result, StringContains.containsString("1"));
-        assertThat(result, StringContains.containsString(COMPLETED_TASKS));
-        assertThat(result, StringContains.containsString("2"));
+        verify(mResourceProvider).getString(R.string.statistics_active_completed_tasks, 1, 2);
     }
 
     @Test
@@ -140,4 +135,9 @@ public class StatisticsViewModelTest {
     private void withText(@StringRes int stringId, String returnedString) {
         when(mResourceProvider.getString(stringId)).thenReturn(returnedString);
     }
+
+    private void withFormattedText(@StringRes int stringId, String returnedString) {
+        when(mResourceProvider.getString(stringId, any(Object.class), any(Object.class))).thenReturn(returnedString);
+    }
+
 }

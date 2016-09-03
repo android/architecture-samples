@@ -33,6 +33,7 @@
     <string name="list_title">TO-DO List</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tasks">You have no tasks.</string>
+    <string name="statistics_active_completed_tasks">Active tasks: %1$d \nCompleted tasks: %2$d</string>
     <string name="statistics_active_tasks">Active tasks:</string>
     <string name="statistics_completed_tasks">Completed tasks:</string>
     <string name="statistics_error">Error loading statistics.</string>

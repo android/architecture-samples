@@ -114,9 +114,8 @@ public class StatisticsViewModel {
         if (numberOfCompletedTasks == 0 && numberOfActiveTasks == 0) {
             return mResourceProvider.getString(R.string.statistics_no_tasks);
         } else {
-            return mResourceProvider.getString(R.string.statistics_active_tasks) + " "
-                    + numberOfActiveTasks + "\n" + mResourceProvider.getString(
-                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
+            return mResourceProvider.getString(R.string.statistics_active_completed_tasks,
+                    numberOfActiveTasks, numberOfCompletedTasks);
         }
     }
 
