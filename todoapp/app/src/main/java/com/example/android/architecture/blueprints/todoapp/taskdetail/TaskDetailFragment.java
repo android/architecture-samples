@@ -58,9 +58,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TaskDetailFragment extends Fragment {
 
     @NonNull
-    public static final String ARGUMENT_TASK_ID = "TASK_ID";
+    private static final String ARGUMENT_TASK_ID = "TASK_ID";
 
-    public static final int REQUEST_EDIT_TASK = 1;
+    @NonNull
+    private static final int REQUEST_EDIT_TASK = 1;
 
     @Nullable
     private TextView mLoadingProgress;
