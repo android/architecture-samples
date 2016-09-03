@@ -127,7 +127,7 @@ public class StatisticsViewModelTest {
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe(mStatisticsTestSubscriber);
 
-        // The intial value, false is emitted,
+        // The initial value, false is emitted,
         // then values true and false were emitted
         mProgressIndicatorTestSubscriber.assertValues(false, true, false);
     }
