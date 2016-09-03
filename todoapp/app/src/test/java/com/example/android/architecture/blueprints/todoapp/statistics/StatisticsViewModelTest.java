@@ -77,8 +77,6 @@ public class StatisticsViewModelTest {
     public void getStatistics_withTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
-        // And string resources
-        withFormattedText(R.string.statistics_active_completed_tasks, ACTIVE_COMPLETED_TASKS);
 
         //When subscribing to the statistics stream
         mViewModel.getStatistics().subscribe();
@@ -135,9 +133,4 @@ public class StatisticsViewModelTest {
     private void withText(@StringRes int stringId, String returnedString) {
         when(mResourceProvider.getString(stringId)).thenReturn(returnedString);
     }
-
-    private void withFormattedText(@StringRes int stringId, String returnedString) {
-        when(mResourceProvider.getString(stringId, any(Object.class), any(Object.class))).thenReturn(returnedString);
-    }
-
 }
