@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,12 +30,12 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
 public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
-
-    public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
     private AddEditTaskContract.Presenter mPresenter;
 
@@ -45,14 +43,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     private TextView mDescription;
 
-    private String mEditedTaskId;
-
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
-    }
-
-    public AddEditTaskFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -76,24 +68,14 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setTaskIdIfAny();
-
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isNewTask()) {
-                    mPresenter.createTask(
-                            mTitle.getText().toString(),
-                            mDescription.getText().toString());
-                } else {
-                    mPresenter.updateTask(
-                            mTitle.getText().toString(),
-                            mDescription.getText().toString());
-                }
-
+                mPresenter.saveTask(mTitle.getText().toString(),
+                        mDescription.getText().toString());
             }
         });
     }
@@ -101,7 +83,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
@@ -135,15 +117,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public boolean isActive() {
         return isAdded();
-    }
-
-    private void setTaskIdIfAny() {
-        if (getArguments() != null && getArguments().containsKey(ARGUMENT_EDIT_TASK_ID)) {
-            mEditedTaskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
-        }
-    }
-
-    private boolean isNewTask() {
-        return mEditedTaskId == null;
     }
 }
