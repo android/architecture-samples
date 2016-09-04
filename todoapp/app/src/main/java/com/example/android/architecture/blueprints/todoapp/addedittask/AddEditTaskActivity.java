@@ -33,7 +33,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity {
 
-    public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
     public static final int REQUEST_ADD_TASK = 1;
 
     @Override
@@ -55,8 +54,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
-            if (getIntent().hasExtra(ARGUMENT_EDIT_TASK_ID)) {
-                taskId = getIntent().getStringExtra(ARGUMENT_EDIT_TASK_ID);
+            if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
+                taskId = getIntent().getStringExtra(
+                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
             } else {
                 actionBar.setTitle(R.string.add_task);
