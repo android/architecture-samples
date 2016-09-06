@@ -58,9 +58,6 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 taskId = getIntent().getStringExtra(
                         AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
-                Bundle bundle = new Bundle();
-                bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-                addEditTaskFragment.setArguments(bundle);
             } else {
                 actionBar.setTitle(R.string.add_task);
             }
