@@ -22,7 +22,9 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -73,16 +75,15 @@ public class AddEditTaskScreenTest {
 
     @Test
     public void errorShownOnEmptyTask() {
-        // Add task title and description
+        // Add invalid title and description combination
         onView(withId(R.id.add_task_title)).perform(typeText(""));
         onView(withId(R.id.add_task_description)).perform(typeText(""),
                 closeSoftKeyboard());
-        // Save the task
+        // Try to save the task
         onView(withId(R.id.fab_edit_task_done)).perform(click());
 
-        // Verify empty tasks snackbar is shown
-        String emptyTaskMessageText = getTargetContext().getString(R.string.empty_task_message);
-        onView(withText(emptyTaskMessageText)).check(matches(isDisplayed()));
+        // Verify that the activity is still displayed (a correct task would close it).
+        onView(withId(R.id.add_task_title)).check(matches(isDisplayed()));
     }
 
     /**
