@@ -19,7 +19,7 @@ public class SchedulerProvider implements BaseSchedulerProvider {
     private SchedulerProvider() {
     }
 
-    public static SchedulerProvider getInstance() {
+    public static synchronized SchedulerProvider getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new SchedulerProvider();
         }
