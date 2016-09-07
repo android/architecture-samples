@@ -47,7 +47,7 @@ public final class Task {
      * @param description description of the task
      */
     public Task(@Nullable String title, @Nullable String description) {
-        this(UUID.randomUUID().toString(), title, description, false);
+        this(title, description, UUID.randomUUID().toString(), false);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class Task {
      * @param id          id of the task
      */
     public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
-        this(id, title, description, false);
+        this(title, description, id, false);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class Task {
      * @param completed   true if the task is completed, false if it's active
      */
     public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        this(UUID.randomUUID().toString(), title, description, completed);
+        this(title, description, UUID.randomUUID().toString(), completed);
     }
 
     /**
@@ -124,7 +124,7 @@ public final class Task {
 
     public boolean isEmpty() {
         return Strings.isNullOrEmpty(mTitle) &&
-                Strings.isNullOrEmpty(mDescription);
+               Strings.isNullOrEmpty(mDescription);
     }
 
     @Override
@@ -133,8 +133,8 @@ public final class Task {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return Objects.equal(mId, task.mId) &&
-                Objects.equal(mTitle, task.mTitle) &&
-                Objects.equal(mDescription, task.mDescription);
+               Objects.equal(mTitle, task.mTitle) &&
+               Objects.equal(mDescription, task.mDescription);
     }
 
     @Override
