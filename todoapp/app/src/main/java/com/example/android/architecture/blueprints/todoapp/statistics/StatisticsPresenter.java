@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
@@ -34,6 +35,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private final StatisticsContract.View mStatisticsView;
     private final UseCaseHandler mUseCaseHandler;
     private final GetStatistics mGetStatistics;
+    private Subscription mGetStatisticsSubscription;
 
     public StatisticsPresenter(
             @NonNull UseCaseHandler useCaseHandler,
@@ -51,31 +53,48 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         loadStatistics();
     }
 
+    @Override
+    public void stop() {
+        if (mGetStatisticsSubscription != null) {
+            mGetStatisticsSubscription.unsubscribe();
+        }
+    }
+
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
-                new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
-            @Override
-            public void onSuccess(GetStatistics.ResponseValue response) {
-                Statistics statistics = response.getStatistics();
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.setProgressIndicator(false);
+        mGetStatisticsSubscription = mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
+                new UseCase.Callback<GetStatistics.ResponseValue>() {
+                    @Override
+                    public void onStart() {
 
-                mStatisticsView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
-            }
+                    }
 
-            @Override
-            public void onError() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
-            }
-        });
+                    @Override
+                    public void onNext(GetStatistics.ResponseValue responseValues) {
+                        Statistics statistics = responseValues.getStatistics();
+                        // The view may not be able to handle UI updates anymore
+                        if (!mStatisticsView.isActive()) {
+                            return;
+                        }
+                        mStatisticsView.setProgressIndicator(false);
+
+                        mStatisticsView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable exception) {
+                        // The view may not be able to handle UI updates anymore
+                        if (!mStatisticsView.isActive()) {
+                            return;
+                        }
+                        mStatisticsView.showLoadingStatisticsError();
+                    }
+                });
     }
 }

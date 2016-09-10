@@ -63,6 +63,12 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.stop();
+    }
+
+    @Override
     public void setProgressIndicator(boolean active) {
         if (active) {
             mStatisticsTV.setText(getString(R.string.loading));

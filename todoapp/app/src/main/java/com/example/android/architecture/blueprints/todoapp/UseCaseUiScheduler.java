@@ -16,9 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-/**
- * Interface for schedulers, see {@link UseCaseThreadPoolScheduler}.
- */
-public interface UseCaseScheduler {
-    void execute(Runnable runnable);
+
+import android.os.Handler;
+import android.os.Looper;
+
+public class UseCaseUiScheduler implements UseCaseScheduler {
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    @Override
+    public void execute(Runnable runnable) {
+        handler.post(runnable);
+    }
 }

@@ -2,6 +2,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics.domain.us
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -15,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Calculate statistics of active and completed Tasks {@link Task} in the {@link TasksRepository}.
  */
-public class GetStatistics extends UseCase<GetStatistics.RequestValues, GetStatistics.ResponseValue> {
+public class GetStatistics implements UseCase<GetStatistics.RequestValues, GetStatistics.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -24,7 +25,13 @@ public class GetStatistics extends UseCase<GetStatistics.RequestValues, GetStati
     }
 
     @Override
-    protected void executeUseCase(RequestValues requestValues) {
+    public void executeUseCase(@NonNull RequestValues requestValues, @NonNull final Callback<ResponseValue> callback, @NonNull final Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+
+        callback.onStart();
+
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
@@ -41,13 +48,22 @@ public class GetStatistics extends UseCase<GetStatistics.RequestValues, GetStati
                     }
                 }
 
+                if (subscription.isUnsubscribed()) {
+                    return;
+                }
+
                 ResponseValue responseValue = new ResponseValue(new Statistics(completedTasks, activeTasks));
-                getUseCaseCallback().onSuccess(responseValue);
+                callback.onNext(responseValue);
+                callback.onCompleted();
             }
 
             @Override
             public void onDataNotAvailable() {
-                getUseCaseCallback().onError();
+                if (subscription.isUnsubscribed()) {
+                    return;
+                }
+
+                callback.onError(new Exception("Data not available"));
             }
         });
     }

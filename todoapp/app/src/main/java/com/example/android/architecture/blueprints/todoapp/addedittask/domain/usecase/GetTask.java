@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -28,7 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 /**
  * Retrieves a {@link Task} from the {@link TasksRepository}.
  */
-public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValue> {
+public class GetTask implements UseCase<GetTask.RequestValues, GetTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -37,21 +38,34 @@ public class GetTask extends UseCase<GetTask.RequestValues, GetTask.ResponseValu
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        mTasksRepository.getTask(values.getTaskId(), new TasksDataSource.GetTaskCallback() {
+    public void executeUseCase(@NonNull final RequestValues requestValues, @NonNull final Callback<ResponseValue> callback, @NonNull final Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+
+        mTasksRepository.getTask(requestValues.getTaskId(), new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
+                if (subscription.isUnsubscribed()) {
+                    return;
+                }
+
                 if (task != null) {
                     ResponseValue responseValue = new ResponseValue(task);
-                    getUseCaseCallback().onSuccess(responseValue);
+                    callback.onNext(responseValue);
+                    callback.onCompleted();
                 } else {
-                    getUseCaseCallback().onError();
+                    callback.onError(new Exception("Failed to load task with id: " + requestValues.getTaskId()));
                 }
             }
 
             @Override
             public void onDataNotAvailable() {
-                getUseCaseCallback().onError();
+                if (subscription.isUnsubscribed()) {
+                    return;
+                }
+
+                callback.onError(new Exception("Data not available"));
             }
         });
     }

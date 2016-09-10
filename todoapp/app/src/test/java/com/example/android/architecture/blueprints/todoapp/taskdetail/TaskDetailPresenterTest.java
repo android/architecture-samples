@@ -195,7 +195,7 @@ public class TaskDetailPresenterTest {
     }
 
     private TaskDetailPresenter givenTaskDetailPresenter(String id) {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler(), new TestUseCaseScheduler());
         GetTask getTask = new GetTask(mTasksRepository);
         CompleteTask completeTask = new CompleteTask(mTasksRepository);
         ActivateTask activateTask = new ActivateTask(mTasksRepository);

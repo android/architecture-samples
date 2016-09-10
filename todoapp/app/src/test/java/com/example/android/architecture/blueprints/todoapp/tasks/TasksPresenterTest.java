@@ -84,7 +84,7 @@ public class TasksPresenterTest {
     }
 
     private TasksPresenter givenTasksPresenter() {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler(), new TestUseCaseScheduler());
         GetTasks getTasks = new GetTasks(mTasksRepository, new FilterFactory());
         CompleteTask completeTask = new CompleteTask(mTasksRepository);
         ActivateTask activateTask = new ActivateTask(mTasksRepository);

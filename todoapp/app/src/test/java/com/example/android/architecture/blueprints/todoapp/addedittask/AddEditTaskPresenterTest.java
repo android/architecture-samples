@@ -126,7 +126,7 @@ public class AddEditTaskPresenterTest {
 
     private AddEditTaskPresenter givenEditTaskPresenter(String taskId) {
 
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler(), new TestUseCaseScheduler());
         GetTask getTask = new GetTask(mTasksRepository);
         SaveTask saveTask = new SaveTask(mTasksRepository);
 
