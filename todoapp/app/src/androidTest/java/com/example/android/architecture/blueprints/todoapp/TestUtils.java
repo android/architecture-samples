@@ -24,7 +24,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.v7.widget.Toolbar;
 
@@ -71,18 +71,28 @@ public class TestUtils {
         }
     }
 
-    public static Activity getCurrentActivity() {
+    /**
+     * Gets an Activity in the RESUMED stage.
+     * <p>
+     * This method should never be called from the Main thread. In certain situations there might
+     * be more than one Activities in RESUMED stage, but only one is returned.
+     * See {@link ActivityLifecycleMonitor}.
+     */
+    public static Activity getCurrentActivity() throws IllegalStateException {
+        // The array is just to wrap the Activity and be able to access it from the Runnable.
         final Activity[] resumedActivity = new Activity[1];
+
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
                 Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance()
                         .getActivitiesInStage(RESUMED);
                 if (resumedActivities.iterator().hasNext()) {
                     resumedActivity[0] = (Activity) resumedActivities.iterator().next();
+                } else {
+                    throw new IllegalStateException("No Activity in stage RESUMED");
                 }
             }
         });
         return resumedActivity[0];
     }
-
 }
