@@ -34,6 +34,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
+import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import static org.hamcrest.Matchers.allOf;
@@ -408,7 +409,7 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(not(isDisplayed())));
 
         // when rotating the screen
-        TestUtils.rotateOrientation(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule.getActivity());
 
         // then nothing changes
         onView(withText(TITLE1)).check(doesNotExist());
@@ -428,11 +429,41 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(isDisplayed()));
 
         // when rotating the screen
-        TestUtils.rotateOrientation(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule.getActivity());
 
         // then nothing changes
         onView(withText(TITLE1)).check(matches(isDisplayed()));
         onView(withText(R.string.label_completed)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void orientationChange_DuringEdit() {
+        // Add a completed task
+        createTask(TITLE1, DESCRIPTION);
+
+        // Open the task in details view
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the edit task button
+        onView(withId(R.id.fab_edit_task)).perform(click());
+
+        // Rotate the screen
+        TestUtils.rotateOrientation(getCurrentActivity());
+
+        // Edit task title and description
+        onView(withId(R.id.add_task_title))
+                .perform(replaceText(TITLE2), closeSoftKeyboard()); // Type new task title
+        onView(withId(R.id.add_task_description)).perform(replaceText(DESCRIPTION),
+                closeSoftKeyboard()); // Type new task description and close the keyboard
+
+        // Save the task
+        onView(withId(R.id.fab_edit_task_done)).perform(click());
+
+        // Verify task is displayed on screen in the task list.
+        onView(withItemText(TITLE2)).check(matches(isDisplayed()));
+
+        // Verify previous task is not displayed
+        onView(withItemText(TITLE1)).check(doesNotExist());
     }
 
     private void viewAllTasks() {
