@@ -180,6 +180,8 @@ public class UseCaseHandler {
             if (callback != null) {
                 callback.onCompleted();
             }
+
+            unsubscribe();
         }
 
         @Override
@@ -193,6 +195,8 @@ public class UseCaseHandler {
             if (callback != null) {
                 callback.onError(exception);
             }
+
+            unsubscribe();
         }
 
         @Override
