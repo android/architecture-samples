@@ -90,6 +90,12 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.start();
+    }
+
+    @Override
     public void setPresenter(@NonNull TasksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
@@ -153,9 +159,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 mPresenter.loadTasks();
             }
         });
-
-        // Since we use loader, we can start earlier than in onResume
-        mPresenter.start();
 
         setHasOptionsMenu(true);
 

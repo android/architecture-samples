@@ -81,15 +81,12 @@ public class TasksRepository implements TasksDataSource {
     public void getTasks(@NonNull final GetTasksCallback callback) {
         checkNotNull(callback);
 
-        // Load from db
-        callback.onTasksLoaded(null);
-
         // Load from server
         mTasksRemoteDataSource.getTasks(new GetTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                // List will be updated automatically
                 refreshLocalDataSource(tasks);
+                callback.onTasksLoaded(null);
             }
 
             @Override
