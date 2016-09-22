@@ -92,7 +92,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
     }
 
     @Override
@@ -161,6 +160,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         });
 
         setHasOptionsMenu(true);
+
+        // Since we use loaders, we can start earlier than in onResume
+        // We can load data from local data source first
+        mPresenter.start();
 
         return root;
     }
