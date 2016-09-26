@@ -115,7 +115,7 @@ public class TaskDetailScreenTest {
         // Click on the task on the list
         onView(withText(TASK_TITLE)).perform(click());
 
-        TestUtils.rotateOrientation(mTasksActivityTestRule);
+        TestUtils.rotateOrientation(mTasksActivityTestRule.getActivity());
 
         // Check that the task is shown
         onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));

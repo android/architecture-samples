@@ -18,10 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 import java.util.UUID;
 
@@ -30,10 +32,17 @@ import java.util.UUID;
  */
 public final class Task {
 
+    @NonNull
     private final String mId;
+
+    @Nullable
     private final String mTitle;
+
+    @Nullable
     private final String mDescription;
+
     private final boolean mCompleted;
+
     private int mInternalId;
 
     /**
@@ -120,6 +129,7 @@ public final class Task {
         return new Task(title, description, entryId, completed);
     }
 
+    @NonNull
     public String getId() {
         return mId;
     }
@@ -131,7 +141,7 @@ public final class Task {
 
     @Nullable
     public String getTitleForList() {
-        if (mTitle != null && !mTitle.equals("")) {
+        if (!Strings.isNullOrEmpty(mTitle)) {
             return mTitle;
         } else {
             return mDescription;
@@ -152,22 +162,18 @@ public final class Task {
     }
 
     public boolean isEmpty() {
-        return (mTitle == null || "".equals(mTitle)) &&
-                (mDescription == null || "".equals(mDescription));
+        return Strings.isNullOrEmpty(mTitle) &&
+               Strings.isNullOrEmpty(mDescription);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return Objects.equal(mId, task.mId) &&
-                Objects.equal(mTitle, task.mTitle) &&
-                Objects.equal(mDescription, task.mDescription);
+               Objects.equal(mTitle, task.mTitle) &&
+               Objects.equal(mDescription, task.mDescription);
     }
 
     @Override
@@ -179,5 +185,4 @@ public final class Task {
     public String toString() {
         return "Task with title " + mTitle;
     }
-
 }

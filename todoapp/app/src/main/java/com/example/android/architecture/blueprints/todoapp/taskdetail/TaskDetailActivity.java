@@ -81,9 +81,4 @@ public class TaskDetailActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
-    }
 }
