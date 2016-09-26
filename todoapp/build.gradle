@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -24,18 +24,18 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     minSdkVersion = 10
-    targetSdkVersion = 22
-    compileSdkVersion = 23
-    buildToolsVersion = '23.0.2'
+    targetSdkVersion = 24
+    compileSdkVersion = 24
+    buildToolsVersion = '24.0.2'
 
     // App dependencies
-    supportLibraryVersion = '23.4.0'
+    supportLibraryVersion = '24.2.0'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
     hamcrestVersion = '1.3'
-    runnerVersion = '0.4.1'
-    rulesVersion = '0.4.1'
-    espressoVersion = '2.2.1'
+    runnerVersion = '0.5'
+    rulesVersion = '0.5'
+    espressoVersion = '2.2.2'
 }

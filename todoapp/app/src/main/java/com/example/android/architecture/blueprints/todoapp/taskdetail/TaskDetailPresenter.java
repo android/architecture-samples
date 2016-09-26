@@ -25,6 +25,7 @@ import android.support.v4.content.Loader;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TaskLoader;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -69,7 +70,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void editTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -78,12 +79,16 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void deleteTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
+            mTaskDetailView.showMissingTask();
+            return;
+        }
         mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
     public void completeTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -93,7 +98,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
 
     @Override
     public void activateTask() {
-        if (null == mTaskId || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -101,17 +106,17 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter,
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    private void showTask(Task task) {
+    private void showTask(@NonNull Task task) {
         String title = task.getTitle();
         String description = task.getDescription();
 
-        if (title != null && title.isEmpty()) {
+        if (Strings.isNullOrEmpty(title)) {
             mTaskDetailView.hideTitle();
         } else {
             mTaskDetailView.showTitle(title);
         }
 
-        if (description != null && description.isEmpty()) {
+        if (Strings.isNullOrEmpty(description)) {
             mTaskDetailView.hideDescription();
         } else {
             mTaskDetailView.showDescription(description);
