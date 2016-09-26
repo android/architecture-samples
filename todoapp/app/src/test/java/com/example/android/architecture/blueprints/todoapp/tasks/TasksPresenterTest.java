@@ -16,19 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-        .LoadTasksCallback;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ClearCompleteTasks;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
@@ -44,6 +37,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksPresenter}

@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,6 +26,9 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.domain.us
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
+import com.google.common.base.Strings;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
