@@ -121,7 +121,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -133,7 +132,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
                 return;
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

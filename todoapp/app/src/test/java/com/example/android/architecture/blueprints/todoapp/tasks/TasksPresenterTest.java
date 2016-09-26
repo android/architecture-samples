@@ -16,11 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -30,10 +25,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksPresenter}
@@ -56,7 +58,6 @@ public class TasksPresenterTest {
     private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
 
     private TasksPresenter mTasksPresenter;
-
 
     @Before
     public void setupTasksPresenter() {
@@ -86,9 +87,11 @@ public class TasksPresenterTest {
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
+        // Then progress indicator is shown
+        InOrder inOrder = inOrder(mTasksView);
+        inOrder.verify(mTasksView).setLoadingIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
-        verify(mTasksView).setLoadingIndicator(true);
-        verify(mTasksView).setLoadingIndicator(false);
+        inOrder.verify(mTasksView).setLoadingIndicator(false);
         ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
         assertTrue(showTasksArgumentCaptor.getValue().size() == 3);

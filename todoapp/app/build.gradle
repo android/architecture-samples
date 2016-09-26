@@ -91,11 +91,13 @@ dependencies {
 
     // Espresso UI Testing
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion")
+    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
 
     // Resolve conflicts between main and test APK:
     androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
 }
