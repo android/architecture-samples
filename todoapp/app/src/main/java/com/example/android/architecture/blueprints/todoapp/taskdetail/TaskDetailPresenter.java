@@ -68,7 +68,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     private void openTask() {
-        if (mTaskId == null || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -102,7 +102,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void editTask() {
-        if (mTaskId == null || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -127,7 +127,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void completeTask() {
-        if (mTaskId == null || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -148,7 +148,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void activateTask() {
-        if (mTaskId == null || mTaskId.isEmpty()) {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
@@ -166,17 +166,17 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                 });
     }
 
-    private void showTask(Task task) {
+    private void showTask(@NonNull Task task) {
         String title = task.getTitle();
         String description = task.getDescription();
 
-        if (title != null && title.isEmpty()) {
+        if (Strings.isNullOrEmpty(title)) {
             mTaskDetailView.hideTitle();
         } else {
             mTaskDetailView.showTitle(title);
         }
 
-        if (description != null && description.isEmpty()) {
+        if (Strings.isNullOrEmpty(description)) {
             mTaskDetailView.hideDescription();
         } else {
             mTaskDetailView.showDescription(description);

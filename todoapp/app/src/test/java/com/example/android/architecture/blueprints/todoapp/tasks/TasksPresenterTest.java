@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -106,9 +107,10 @@ public class TasksPresenterTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is shown
-        verify(mTasksView).setLoadingIndicator(true);
+        InOrder inOrder = inOrder(mTasksView);
+        inOrder.verify(mTasksView).setLoadingIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
-        verify(mTasksView).setLoadingIndicator(false);
+        inOrder.verify(mTasksView).setLoadingIndicator(false);
         ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
         assertTrue(showTasksArgumentCaptor.getValue().size() == 3);
