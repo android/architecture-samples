@@ -1,6 +1,6 @@
 # Android Architecture Blueprints [beta]
 
-[![Join the chat at https://gitter.im/googlesamples/android-architecture](https://badges.gitter.im/googlesamples/android-architecture.svg)](https://gitter.im/googlesamples/android-architecture?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/aab-logo.png" alt="Android Architecture Blueprints"/>
 
 The Android framework offers a lot of flexibility when it comes to defining how
 to organize and <em>architect</em> an Android app. This freedom, whilst very valuable, can also result in apps
@@ -26,18 +26,18 @@ more information.
 
   * [todo-mvp/](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) - Basic Model-View-Presenter architecture.
   * [todo-mvp-loaders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) - Based on todo-mvp, fetches data using Loaders.
-  * [todo-mvp-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) - Based on todo-mvp, uses the Data Binding Library.
+  * [todo-databinding/](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) - Based on todo-mvp, uses the Data Binding Library.
   * [todo-mvp-clean/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) - Based on todo-mvp, uses concepts from Clean Architecture.
   * [todo-mvp-dagger/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) - Based on todo-mvp, uses Dagger2 for Dependency Injection
+  * [todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) - Based on todo-mvp-loaders, fetches data using Loaders and uses Content Providers
+  * [todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
 
 ### Samples in progress
-
-  * [dev-todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-contentproviders/) - Based on todo-mvp-loaders, uses Content Providers
-  * [dev-todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
+  * [dev-todo-mvp-tablet/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) - Based on todo-mvp, adds a master/detail view for tablets.
 
 Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
 
-### Unofficial samples
+### External samples
 These are community contributions that may not be in sync with the rest of the branches.
  * [todo-mvp-fragmentless/](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) - Based on todo-mvp, uses Android views instead of Fragments.
 
@@ -64,6 +64,10 @@ app, the size and experience of your team, the amount of maintenance that you
 foresee, whether you need a tablet layout or support multiple platforms, how
 compact you like your codebase, etc.
 
+See also:
+* [Samples at a glance](https://github.com/googlesamples/android-architecture/wiki/Samples-at-a-glance)
+* [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
+
 ## Opening a sample in Android Studio
 
 First check out one of the sample branches (`master` won't compile), and then choose to open the `todoapp/` directory. Example:
@@ -82,19 +86,20 @@ This project is **built by the community** and curated by Google and core mainta
 
 [Karumi](http://github.com/Karumi) - Developers (MVP Clean architecture sample)
 
+[Natalie Masse](http://github.com/freewheelnat) - Core developer
+
 [Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
+[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
+
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
-
-[Natalie Masse](http://github.com/freewheelnat) - Core developer
 
 [Stephan Linzner](http://github.com/slinzner) - Core developer
 
 [Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
 Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
-
