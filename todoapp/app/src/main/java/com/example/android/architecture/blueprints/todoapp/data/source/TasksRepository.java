@@ -28,6 +28,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -38,15 +44,19 @@ import java.util.Map;
  */
 public class TasksRepository implements TasksDataSource {
 
+    @Nullable
     private static TasksRepository INSTANCE = null;
 
+    @NonNull
     private final TasksDataSource mTasksRemoteDataSource;
 
+    @NonNull
     private final TasksDataSource mTasksLocalDataSource;
 
     /**
      * This variable has package local visibility so it can be accessed from tests.
      */
+    @NonNull
     Map<String, Task> mCachedTasks;
 
     /**
@@ -69,8 +79,8 @@ public class TasksRepository implements TasksDataSource {
      * @param tasksLocalDataSource  the device storage data source
      * @return the {@link TasksRepository} instance
      */
-    public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
-                                              TasksDataSource tasksLocalDataSource) {
+    public static TasksRepository getInstance(@NonNull TasksDataSource tasksRemoteDataSource,
+                                              @NonNull TasksDataSource tasksLocalDataSource) {
         if (INSTANCE == null) {
             INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
         }
@@ -88,38 +98,73 @@ public class TasksRepository implements TasksDataSource {
     /**
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first.
-     * <p>
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is fired if all data sources fail to
-     * get the data.
      */
     @Override
-    public void getTasks(@NonNull final LoadTasksCallback callback) {
-        checkNotNull(callback);
-
-        // Respond immediately with cache if available and not dirty
+    public Observable<List<Task>> getTasks() {
+        // Respond immediately with cache if available and dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-            return;
+            return Observable.from(mCachedTasks.values()).toList();
+        } else if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<String, Task>();
         }
+
+        Observable<List<Task>> remoteTasks = getAndSaveRemoteTasks();
 
         if (mCacheIsDirty) {
-            // If the cache is dirty we need to fetch new data from the network.
-            getTasksFromRemoteDataSource(callback);
+            return remoteTasks;
         } else {
             // Query the local storage if available. If not, query the network.
-            mTasksLocalDataSource.getTasks(new LoadTasksCallback() {
-                @Override
-                public void onTasksLoaded(List<Task> tasks) {
-                    refreshCache(tasks);
-                    callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    getTasksFromRemoteDataSource(callback);
-                }
-            });
+            Observable<List<Task>> localTasks = getAndCacheLocalTasks();
+            return Observable.concat(localTasks, remoteTasks)
+                    .filter(new Func1<List<Task>, Boolean>() {
+                        @Override
+                        public Boolean call(List<Task> tasks) {
+                            return !tasks.isEmpty();
+                        }
+                    }).first();
         }
+    }
+
+
+
+    private Observable<List<Task>> getAndCacheLocalTasks() {
+        return mTasksLocalDataSource.getTasks()
+                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return Observable.from(tasks)
+                                .doOnNext(new Action1<Task>() {
+                                    @Override
+                                    public void call(Task task) {
+                                        mCachedTasks.put(task.getId(), task);
+                                    }
+                                })
+                                .toList();
+                    }
+                });
+    }
+
+    private Observable<List<Task>> getAndSaveRemoteTasks() {
+        return mTasksRemoteDataSource.getTasks()
+                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return Observable.from(tasks)
+                                .doOnNext(new Action1<Task>() {
+                                    @Override
+                                    public void call(Task task) {
+                                        mTasksLocalDataSource.saveTask(task);
+                                        mCachedTasks.put(task.getId(), task);
+                                    }
+                                }).toList();
+                    }
+                })
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        mCacheIsDirty = false;
+                    }
+                });
     }
 
     @Override
@@ -174,7 +219,10 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void activateTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        activateTask(getTaskWithId(taskId));
+        Task taskWithId = getTaskWithId(taskId);
+        if (taskWithId != null) {
+            activateTask(taskWithId);
+        }
     }
 
     @Override
@@ -198,48 +246,40 @@ public class TasksRepository implements TasksDataSource {
     /**
      * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
      * uses the network data source. This is done to simplify the sample.
-     * <p>
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is fired if both data sources fail to
-     * get the data.
      */
     @Override
-    public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
+    public Observable<Task> getTask(@NonNull final String taskId) {
         checkNotNull(taskId);
-        checkNotNull(callback);
 
-        Task cachedTask = getTaskWithId(taskId);
+        final Task cachedTask = getTaskWithId(taskId);
 
-        // Respond immediately with cache if available
+        // Respond immediately with cache if available.
         if (cachedTask != null) {
-            callback.onTaskLoaded(cachedTask);
-            return;
+            mCachedTasks = new LinkedHashMap<String, Task>();
         }
 
-        // Load from server/persisted if needed.
-
         // Is the task in the local data source? If not, query the network.
-        mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
-            @Override
-            public void onTaskLoaded(Task task) {
-                callback.onTaskLoaded(task);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
+        Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
+        Observable<Task> remoteTask = mTasksRemoteDataSource.getTask(taskId)
+                .doOnNext(new Action1<Task>() {
                     @Override
-                    public void onTaskLoaded(Task task) {
-                        callback.onTaskLoaded(task);
-                    }
-
-                    @Override
-                    public void onDataNotAvailable() {
-                        callback.onDataNotAvailable();
+                    public void call(Task task) {
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
                     }
                 });
-            }
-        });
+        return Observable.concat(localTask, remoteTask).first()
+                .map(new Func1<Task, Task>() {
+                    @Override
+                    public Task call(Task task) {
+                        if (task == null) {
+                            throw  new NoSuchElementException("No task found with taskId " + taskId);
+                        }
+                        return task;
+                    }
+                });
     }
+
 
     @Override
     public void refreshTasks() {
@@ -265,40 +305,6 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.remove(taskId);
     }
 
-    private void getTasksFromRemoteDataSource(@NonNull final LoadTasksCallback callback) {
-        mTasksRemoteDataSource.getTasks(new LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                refreshCache(tasks);
-                refreshLocalDataSource(tasks);
-                callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                callback.onDataNotAvailable();
-            }
-        });
-    }
-
-    private void refreshCache(List<Task> tasks) {
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.clear();
-        for (Task task : tasks) {
-            mCachedTasks.put(task.getId(), task);
-        }
-        mCacheIsDirty = false;
-    }
-
-    private void refreshLocalDataSource(List<Task> tasks) {
-        mTasksLocalDataSource.deleteAllTasks();
-        for (Task task : tasks) {
-            mTasksLocalDataSource.saveTask(task);
-        }
-    }
-
     @Nullable
     private Task getTaskWithId(@NonNull String id) {
         checkNotNull(id);
@@ -308,4 +314,17 @@ public class TasksRepository implements TasksDataSource {
             return mCachedTasks.get(id);
         }
     }
+
+    @NonNull
+    Observable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
+        return mTasksLocalDataSource.getTask(taskId)
+                .doOnNext(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        mCachedTasks.put(taskId, task);
+                    }
+                })
+                .first();
+    }
+
 }

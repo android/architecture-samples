@@ -22,6 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import java.util.List;
 
+import rx.Observable;
+
 /**
  * Main entry point for accessing tasks data.
  * <p>
@@ -32,23 +34,9 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    interface LoadTasksCallback {
+    Observable<List<Task>> getTasks();
 
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
-    }
-
-    void getTasks(@NonNull LoadTasksCallback callback);
-
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+    Observable<Task> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 
@@ -67,4 +55,5 @@ public interface TasksDataSource {
     void deleteAllTasks();
 
     void deleteTask(@NonNull String taskId);
+
 }
