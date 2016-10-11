@@ -72,7 +72,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
         new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
+                addEditTaskFragment,
+                Injection.providerSchedulerProvider());
     }
 
     @Override

@@ -17,13 +17,24 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
+
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,21 +44,37 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class StatisticsPresenter implements StatisticsContract.Presenter {
 
+    @NonNull
     private final TasksRepository mTasksRepository;
 
+    @NonNull
     private final StatisticsContract.View mStatisticsView;
 
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvier;
+
+    @NonNull
+    private CompositeSubscription mSubscriptions;
+
     public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
-                               @NonNull StatisticsContract.View statisticsView) {
+                               @NonNull StatisticsContract.View statisticsView,
+                               @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
+        mSchedulerProvier = checkNotNull(schedulerProvider, "schedulerProvider cannot bet null!");
 
+        mSubscriptions = new CompositeSubscription();
         mStatisticsView.setPresenter(this);
     }
 
     @Override
-    public void start() {
+    public void subscribe() {
         loadStatistics();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mSubscriptions.clear();
     }
 
     private void loadStatistics() {
@@ -57,44 +84,58 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
+        Observable<Task> tasks = mTasksRepository.getTasks()
+                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
                     }
-                }
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.setProgressIndicator(false);
+                });
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
-            }
+        Observable<Integer> completedTasks = tasks
+                .filter(new Func1<Task, Boolean>() {
+                    @Override
+                    public Boolean call(Task task) {
+                        return task.isCompleted();
+                    }
+                })
+                .count();
 
-            @Override
-            public void onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
-            }
-        });
+        Observable<Integer> activeTasks = tasks
+                .filter(new Func1<Task, Boolean>() {
+                    @Override
+                    public Boolean call(Task task) {
+                        return task.isActive();
+                    }
+                })
+                .count();
+
+        Subscription subscription = Observable
+                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, Pair<Integer, Integer>>() {
+                    @Override
+                    public Pair<Integer, Integer> call(Integer completed, Integer active) {
+                        return Pair.create(active, completed);
+                    }
+                })
+                .subscribeOn(mSchedulerProvier.computation())
+                .observeOn(mSchedulerProvier.ui())
+                .subscribe(new Action1<Pair<Integer, Integer>>() {
+                    @Override
+                    public void call(Pair<Integer, Integer> stats) {
+                        mStatisticsView.showStatistics(stats.first, stats.second);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mStatisticsView.showLoadingStatisticsError();
+                    }
+                }, new Action0() {
+                    @Override
+                    public void call() {
+                        mStatisticsView.setProgressIndicator(false);
+                    }
+                });
+        mSubscriptions.add(subscription);
     }
+
 }

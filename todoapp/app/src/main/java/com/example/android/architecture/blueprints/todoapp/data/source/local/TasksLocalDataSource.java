@@ -48,7 +48,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     private static TasksLocalDataSource INSTANCE;
 
     @NonNull
-    private BriteDatabase mDatabaseHalper;
+    private BriteDatabase mDatatbaseHelper;
 
     @NonNull
     private Func1<Cursor, Task> mTaskMapperFunction;
@@ -60,7 +60,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
         SqlBrite sqlBrite = SqlBrite.create();
-        mDatabaseHalper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
+        mDatatbaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
         mTaskMapperFunction = new Func1<Cursor, Task>() {
             @Override
             public Task call(Cursor cursor) {
@@ -96,7 +96,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
         String sql = String.format("SELECT %s FROM %s",
                 TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
-        return mDatabaseHalper.createQuery(TaskEntry.TABLE_NAME, sql)
+        return mDatatbaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
                 .mapToList(mTaskMapperFunction);
     }
 
@@ -110,7 +110,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
                 TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
-        return mDatabaseHalper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
+        return mDatatbaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
                 .mapToOneOrDefault(mTaskMapperFunction, null);
     }
 
@@ -122,7 +122,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
         values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-        mDatabaseHalper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
+        mDatatbaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
-        mDatabaseHalper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+        mDatatbaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 
     @Override
@@ -152,27 +152,32 @@ public class TasksLocalDataSource implements TasksDataSource {
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
-        mDatabaseHalper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+        mDatatbaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 
     @Override
     public void clearCompletedTasks() {
-
+        String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
+        String[] selectionArgs = {"1"};
+        mDatatbaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     @Override
     public void refreshTasks() {
-
+        // Not required because the {@link TasksRepository} handles the logic of
+        // refreshing the tasks from all the available data sources.
     }
 
     @Override
     public void deleteAllTasks() {
-
+        mDatatbaseHelper.delete(TaskEntry.TABLE_NAME, null);
     }
 
     @Override
     public void deleteTask(@NonNull String taskId) {
-
+        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String[] selectionArgs = {taskId};
+        mDatatbaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
     }
 
 }
