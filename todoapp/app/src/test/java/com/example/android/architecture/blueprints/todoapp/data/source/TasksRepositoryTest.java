@@ -16,15 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -33,12 +24,26 @@ import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import rx.Observable;
+import rx.observers.TestSubscriber;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -56,6 +61,8 @@ public class TasksRepositoryTest {
 
     private TasksRepository mTasksRepository;
 
+    private TestSubscriber<List<Task>> mTasksTestSubscriber;
+
     @Mock
     private TasksDataSource mTasksRemoteDataSource;
 
@@ -64,26 +71,6 @@ public class TasksRepositoryTest {
 
     @Mock
     private Context mContext;
-
-    @Mock
-    private TasksDataSource.GetTaskCallback mGetTaskCallback;
-
-    @Mock
-    private TasksDataSource.LoadTasksCallback mLoadTasksCallback;
-
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mTasksCallbackCaptor;
-
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor
-    private ArgumentCaptor<TasksDataSource.GetTaskCallback> mTaskCallbackCaptor;
 
     @Before
     public void setupTasksRepository() {
@@ -94,30 +81,71 @@ public class TasksRepositoryTest {
         // Get a reference to the class under test
         mTasksRepository = TasksRepository.getInstance(
                 mTasksRemoteDataSource, mTasksLocalDataSource);
+        mTasksTestSubscriber = new TestSubscriber<>();
     }
 
     @After
     public void destroyRepositoryInstance() {
         TasksRepository.destroyInstance();
     }
+    @Test
+    public void getTasks_repositoryCachesAfterFirstSubscription_whenTasksAvailableInLocalStorage() {
+        // Given that the local data source has data available
+        setTasksAvailable(mTasksLocalDataSource, TASKS);
+        // And the remote data source does not have any data available
+        setTasksNotAvailable(mTasksRemoteDataSource);
+
+        // When two subscriptions are set
+        TestSubscriber<List<Task>> testSubscriber1 = new TestSubscriber<>();
+        mTasksRepository.getTasks().subscribe(testSubscriber1);
+
+        TestSubscriber<List<Task>> testSubscriber2 = new TestSubscriber<>();
+        mTasksRepository.getTasks().subscribe(testSubscriber2);
+
+        // Then tasks were only requested once from remote and local sources
+        verify(mTasksRemoteDataSource).getTasks();
+        verify(mTasksLocalDataSource).getTasks();
+        //
+        assertFalse(mTasksRepository.mCacheIsDirty);
+        testSubscriber1.assertValue(TASKS);
+        testSubscriber2.assertValue(TASKS);
+    }
 
     @Test
-    public void getTasks_repositoryCachesAfterFirstApiCall() {
-        // Given a setup Captor to capture callbacks
-        // When two calls are issued to the tasks repository
-        twoTasksLoadCallsToRepository(mLoadTasksCallback);
+    public void getTasks_repositoryCachesAfterFirstSubscription_whenTasksAvailableInRemoteStorage() {
+        // Given that the local data source has data available
+        setTasksAvailable(mTasksRemoteDataSource, TASKS);
+        // And the remote data source does not have any data available
+        setTasksNotAvailable(mTasksLocalDataSource);
 
-        // Then tasks were only requested once from Service API
-        verify(mTasksRemoteDataSource).getTasks(any(TasksDataSource.LoadTasksCallback.class));
+        // When two subscriptions are set
+        TestSubscriber<List<Task>> testSubscriber1 = new TestSubscriber<>();
+        mTasksRepository.getTasks().subscribe(testSubscriber1);
+
+        TestSubscriber<List<Task>> testSubscriber2 = new TestSubscriber<>();
+        mTasksRepository.getTasks().subscribe(testSubscriber2);
+
+        // Then tasks were only requested once from remote and local sources
+        verify(mTasksRemoteDataSource).getTasks();
+        verify(mTasksLocalDataSource).getTasks();
+        assertFalse(mTasksRepository.mCacheIsDirty);
+        testSubscriber1.assertValue(TASKS);
+        testSubscriber2.assertValue(TASKS);
     }
 
     @Test
     public void getTasks_requestsAllTasksFromLocalDataSource() {
+        // Given that the local data source has data available
+        setTasksAvailable(mTasksLocalDataSource, TASKS);
+        // And the remote data source does not have any data available
+        setTasksNotAvailable(mTasksRemoteDataSource);
+
         // When tasks are requested from the tasks repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Then tasks are loaded from the local data source
-        verify(mTasksLocalDataSource).getTasks(any(TasksDataSource.LoadTasksCallback.class));
+        verify(mTasksLocalDataSource).getTasks();
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
@@ -200,12 +228,37 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTask_requestsSingleTaskFromLocalDataSource() {
+        // Given a stub completed task with title and description in the local repository
+        Task task = new Task(TASK_TITLE, "Some Task Description", true);
+        setTaskAvailable(mTasksLocalDataSource, task);
+        // And the task not available in the remote repository
+        setTaskNotAvailable(mTasksRemoteDataSource, task.getId());
+
         // When a task is requested from the tasks repository
-        mTasksRepository.getTask(TASK_TITLE, mGetTaskCallback);
+        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
 
         // Then the task is loaded from the database
-        verify(mTasksLocalDataSource).getTask(eq(TASK_TITLE), any(
-                TasksDataSource.GetTaskCallback.class));
+        verify(mTasksLocalDataSource).getTask(eq(task.getId()));
+        testSubscriber.assertValue(task);
+    }
+
+    @Test
+    public void getTask_whenDataNotLocal_fails() {
+        // Given a stub completed task with title and description in the remote repository
+        Task task = new Task(TASK_TITLE, "Some Task Description", true);
+        setTaskAvailable(mTasksRemoteDataSource, task);
+        // And the task not available in the local repository
+        setTaskNotAvailable(mTasksLocalDataSource, task.getId());
+
+        // When a task is requested from the tasks repository
+        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
+
+        // Verify no data is returned
+        testSubscriber.assertNoValues();
+        // Verify that error is returned
+        testSubscriber.assertError(NoSuchElementException.class);
     }
 
     @Test
@@ -220,7 +273,6 @@ public class TasksRepositoryTest {
 
         // When a completed tasks are cleared to the tasks repository
         mTasksRepository.clearCompletedTasks();
-
 
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).clearCompletedTasks();
@@ -271,121 +323,98 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasksWithDirtyCache_tasksAreRetrievedFromRemote() {
-        // When calling getTasks in the repository with dirty cache
-        mTasksRepository.refreshTasks();
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the remote data source has data available
+        // Given that the remote data source has data available
         setTasksAvailable(mTasksRemoteDataSource, TASKS);
 
+        // When calling getTasks in the repository with dirty cache
+        mTasksRepository.refreshTasks();
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
+
         // Verify the tasks from the remote data source are returned, not the local
-        verify(mTasksLocalDataSource, never()).getTasks(mLoadTasksCallback);
-        verify(mLoadTasksCallback).onTasksLoaded(TASKS);
+        verify(mTasksLocalDataSource, never()).getTasks();
+        verify(mTasksRemoteDataSource).getTasks();
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
     public void getTasksWithLocalDataSourceUnavailable_tasksAreRetrievedFromRemote() {
-        // When calling getTasks in the repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the local data source has no data available
+        // Given that the local data source has no data available
         setTasksNotAvailable(mTasksLocalDataSource);
-
         // And the remote data source has data available
         setTasksAvailable(mTasksRemoteDataSource, TASKS);
 
-        // Verify the tasks from the local data source are returned
-        verify(mLoadTasksCallback).onTasksLoaded(TASKS);
+        // When calling getTasks in the repository
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
+
+        // Verify the tasks from the remote data source are returned
+        verify(mTasksRemoteDataSource).getTasks();
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     @Test
     public void getTasksWithBothDataSourcesUnavailable_firesOnDataUnavailable() {
-        // When calling getTasks in the repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // And the local data source has no data available
+        // Given that the local data source has no data available
         setTasksNotAvailable(mTasksLocalDataSource);
-
         // And the remote data source has no data available
         setTasksNotAvailable(mTasksRemoteDataSource);
 
+        // When calling getTasks in the repository
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
+
         // Verify no data is returned
-        verify(mLoadTasksCallback).onDataNotAvailable();
+        mTasksTestSubscriber.assertNoValues();
+        // Verify that error is returned
+        mTasksTestSubscriber.assertError(NoSuchElementException.class);
     }
 
     @Test
-    public void getTaskWithBothDataSourcesUnavailable_firesOnDataUnavailable() {
+    public void getTaskWithBothDataSourcesUnavailable_firesOnError() {
         // Given a task id
         final String taskId = "123";
-
-        // When calling getTask in the repository
-        mTasksRepository.getTask(taskId, mGetTaskCallback);
-
         // And the local data source has no data available
         setTaskNotAvailable(mTasksLocalDataSource, taskId);
-
         // And the remote data source has no data available
         setTaskNotAvailable(mTasksRemoteDataSource, taskId);
 
-        // Verify no data is returned
-        verify(mGetTaskCallback).onDataNotAvailable();
+        // When calling getTask in the repository
+        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        mTasksRepository.getTask(taskId).subscribe(testSubscriber);
+
+        // Verify that error is returned
+        testSubscriber.assertError(NoSuchElementException.class);
     }
 
     @Test
     public void getTasks_refreshesLocalDataSource() {
+        // Given that the remote data source has data available
+        setTasksAvailable(mTasksRemoteDataSource, TASKS);
+
         // Mark cache as dirty to force a reload of data from remote data source.
         mTasksRepository.refreshTasks();
 
         // When calling getTasks in the repository
-        mTasksRepository.getTasks(mLoadTasksCallback);
-
-        // Make the remote data source return data
-        setTasksAvailable(mTasksRemoteDataSource, TASKS);
+        mTasksRepository.getTasks().subscribe(mTasksTestSubscriber);
 
         // Verify that the data fetched from the remote data source was saved in local.
         verify(mTasksLocalDataSource, times(TASKS.size())).saveTask(any(Task.class));
-    }
-
-    /**
-     * Convenience method that issues two calls to the tasks repository
-     */
-    private void twoTasksLoadCallsToRepository(TasksDataSource.LoadTasksCallback callback) {
-        // When tasks are requested from repository
-        mTasksRepository.getTasks(callback); // First call to API
-
-        // Use the Mockito Captor to capture the callback
-        verify(mTasksLocalDataSource).getTasks(mTasksCallbackCaptor.capture());
-
-        // Local data source doesn't have data yet
-        mTasksCallbackCaptor.getValue().onDataNotAvailable();
-
-
-        // Verify the remote data source is queried
-        verify(mTasksRemoteDataSource).getTasks(mTasksCallbackCaptor.capture());
-
-        // Trigger callback so tasks are cached
-        mTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
-
-        mTasksRepository.getTasks(callback); // Second call to API
+        mTasksTestSubscriber.assertValue(TASKS);
     }
 
     private void setTasksNotAvailable(TasksDataSource dataSource) {
-        verify(dataSource).getTasks(mTasksCallbackCaptor.capture());
-        mTasksCallbackCaptor.getValue().onDataNotAvailable();
+        when(dataSource.getTasks()).thenReturn(Observable.just(Collections.<Task>emptyList()));
     }
 
     private void setTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
-        verify(dataSource).getTasks(mTasksCallbackCaptor.capture());
-        mTasksCallbackCaptor.getValue().onTasksLoaded(tasks);
+        // don't allow the data sources to complete.
+        when(dataSource.getTasks()).thenReturn(Observable.just(tasks).concatWith(Observable.<List<Task>>never()));
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-        verify(dataSource).getTask(eq(taskId), mTaskCallbackCaptor.capture());
-        mTaskCallbackCaptor.getValue().onDataNotAvailable();
+        when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.<Task>never()));
     }
 
     private void setTaskAvailable(TasksDataSource dataSource, Task task) {
-        verify(dataSource).getTask(eq(task.getId()), mTaskCallbackCaptor.capture());
-        mTaskCallbackCaptor.getValue().onTaskLoaded(task);
+        when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task).concatWith(Observable.<Task>never()));
     }
+
  }

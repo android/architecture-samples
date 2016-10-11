@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -56,6 +57,7 @@ public class TasksRepository implements TasksDataSource {
     /**
      * This variable has package local visibility so it can be accessed from tests.
      */
+    @VisibleForTesting
     @NonNull
     Map<String, Task> mCachedTasks;
 
@@ -63,6 +65,7 @@ public class TasksRepository implements TasksDataSource {
      * Marks the cache as invalid, to force an update the next time data is requested. This variable
      * has package local visibility so it can be accessed from tests.
      */
+    @VisibleForTesting
     boolean mCacheIsDirty = false;
 
     // Prevent direct instantiation.
@@ -124,8 +127,6 @@ public class TasksRepository implements TasksDataSource {
                     }).first();
         }
     }
-
-
 
     private Observable<List<Task>> getAndCacheLocalTasks() {
         return mTasksLocalDataSource.getTasks()
@@ -198,7 +199,10 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public void completeTask(@NonNull String taskId) {
         checkNotNull(taskId);
-        completeTask(getTaskWithId(taskId));
+        Task taskWithId = getTaskWithId(taskId);
+        if (taskWithId != null) {
+            completeTask(taskWithId);
+        }
     }
 
     @Override
