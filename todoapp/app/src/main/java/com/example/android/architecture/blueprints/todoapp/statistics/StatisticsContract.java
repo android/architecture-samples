@@ -24,7 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.BaseView;
  */
 public interface StatisticsContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View {
 
         void setProgressIndicator(boolean active);
 
@@ -32,10 +32,9 @@ public interface StatisticsContract {
 
         void showLoadingStatisticsError();
 
-        boolean isActive();
     }
 
     interface Presenter extends BasePresenter {
-
+        void loadStatistics();
     }
 }

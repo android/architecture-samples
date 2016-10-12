@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,24 +27,27 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment implements StatisticsContract.View {
+public class StatisticsFragment extends Fragment {
 
-    private TextView mStatisticsTV;
+    private StatisticsPresenter mPresenter;
 
-    private StatisticsContract.Presenter mPresenter;
+    private StatisticsFragBinding mViewDataBinding;
+
+    private StatisticsViewModel mStatisticsViewModel;
+
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
-    @Override
-    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
+    public void setPresenter(@NonNull StatisticsPresenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
 
@@ -51,9 +55,15 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.statistics_frag, container, false);
-        mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
+        mViewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container, false);
+        View root = mViewDataBinding.getRoot();
         return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewDataBinding.setStats(mStatisticsViewModel);
     }
 
     @Override
@@ -68,32 +78,12 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         mPresenter.unsubscribe();
     }
 
-    @Override
-    public void setProgressIndicator(boolean active) {
-        if (active) {
-            mStatisticsTV.setText(getString(R.string.loading));
-        }
+    public void setViewModel(StatisticsViewModel viewModel) {
+        mStatisticsViewModel = viewModel;
     }
 
-    @Override
-    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
-        if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
-            mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
-        } else {
-            String displayString = getResources().getString(R.string.statistics_active_tasks) + " "
-                    + numberOfIncompleteTasks + "\n" + getResources().getString(
-                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
-            mStatisticsTV.setText(displayString);
-        }
-    }
-
-    @Override
-    public void showLoadingStatisticsError() {
-        mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
-    }
-
-    @Override
     public boolean isActive() {
         return isAdded();
     }
+
 }

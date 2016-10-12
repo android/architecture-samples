@@ -77,6 +77,9 @@ public class TasksActivity extends AppCompatActivity {
                 tasksFragment,
                 Injection.providerSchedulerProvider());
 
+        TasksViewModel tasksViewModel = new TasksViewModel(getApplicationContext(), mTasksPresenter);
+        tasksFragment.setViewModel(tasksViewModel);
+
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
             TasksFilterType currentFiltering =

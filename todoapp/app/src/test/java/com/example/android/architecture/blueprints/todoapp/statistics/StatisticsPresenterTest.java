@@ -65,7 +65,7 @@ public class StatisticsPresenterTest {
                 mStatisticsView, mSchedulerProvider);
 
         // The presenter won't update the view unless it's active.
-        when(mStatisticsView.isActive()).thenReturn(true);
+        // when(mStatisticsView.isActive()).thenReturn(true);
 
         // We start the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),

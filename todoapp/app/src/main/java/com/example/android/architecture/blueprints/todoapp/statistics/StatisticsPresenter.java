@@ -18,10 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.support.v7.widget.LinearLayoutCompat;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
@@ -47,11 +46,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     @NonNull
     private final TasksRepository mTasksRepository;
 
-    @NonNull
-    private final StatisticsContract.View mStatisticsView;
+     @NonNull
+     private final StatisticsContract.View mStatisticsView;
 
     @NonNull
-    private final BaseSchedulerProvider mSchedulerProvier;
+    private final BaseSchedulerProvider mSchedulerProvider;
 
     @NonNull
     private CompositeSubscription mSubscriptions;
@@ -61,10 +60,9 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                                @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mSchedulerProvier = checkNotNull(schedulerProvider, "schedulerProvider cannot bet null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot bet null!");
 
         mSubscriptions = new CompositeSubscription();
-        mStatisticsView.setPresenter(this);
     }
 
     @Override
@@ -77,7 +75,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mSubscriptions.clear();
     }
 
-    private void loadStatistics() {
+    @Override
+    public void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
         // The network request might be handled in a different thread so make sure Espresso knows
@@ -117,8 +116,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                         return Pair.create(active, completed);
                     }
                 })
-                .subscribeOn(mSchedulerProvier.computation())
-                .observeOn(mSchedulerProvier.ui())
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Action1<Pair<Integer, Integer>>() {
                     @Override
                     public void call(Pair<Integer, Integer> stats) {

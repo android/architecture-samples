@@ -150,51 +150,52 @@ public class TasksPresenter implements TasksContract.Presenter {
 
                     @Override
                     public void onNext(List<Task> tasks) {
-                        processTasks(tasks);
+                        mTasksView.showTasks(tasks);
+                        // processTasks(tasks);
                     }
                 });
         mSubscriptions.add(subscription);
     }
 
-    private void processTasks(List<Task> tasks) {
-        if (tasks.isEmpty()) {
-            // Show a message indicating there are no tasks for that filter type.
-            processEmptyTasks();
-        } else {
-            // Show the list of tasks
-            mTasksView.showTasks(tasks);
-            // Set the filter label's text.
-            showFilterLabel();
-        }
-    }
+    // private void processTasks(List<Task> tasks) {
+    //     if (tasks.isEmpty()) {
+    //         // Show a message indicating there are no tasks for that filter type.
+    //         processEmptyTasks();
+    //     } else {
+    //         // Show the list of tasks
+    //         mTasksView.showTasks(tasks);
+    //         // Set the filter label's text.
+    //         showFilterLabel();
+    //     }
+    // }
 
-    private void showFilterLabel() {
-        switch (mCurrentFiltering) {
-            case ACTIVE_TASKS:
-                mTasksView.showActiveFilterLabel();
-                break;
-            case COMPLETED_TASKS:
-                mTasksView.showCompletedFilterLabel();
-                break;
-            default:
-                mTasksView.showAllFilterLabel();
-                break;
-        }
-    }
+   //  private void showFilterLabel() {
+   //      switch (mCurrentFiltering) {
+   //          case ACTIVE_TASKS:
+   //              mTasksView.showActiveFilterLabel();
+   //              break;
+   //          case COMPLETED_TASKS:
+   //              mTasksView.showCompletedFilterLabel();
+   //              break;
+   //          default:
+   //              mTasksView.showAllFilterLabel();
+   //              break;
+   //      }
+   //  }
 
-    private void processEmptyTasks() {
-        switch (mCurrentFiltering) {
-            case ACTIVE_TASKS:
-                mTasksView.showNoActiveTasks();
-                break;
-            case COMPLETED_TASKS:
-                mTasksView.showNoCompletedTasks();
-                break;
-            default:
-                mTasksView.showNoTasks();
-                break;
-        }
-    }
+    // private void processEmptyTasks() {
+    //     switch (mCurrentFiltering) {
+    //         case ACTIVE_TASKS:
+    //             mTasksView.showNoActiveTasks();
+    //             break;
+    //         case COMPLETED_TASKS:
+    //             mTasksView.showNoCompletedTasks();
+    //             break;
+    //         default:
+    //             mTasksView.showNoTasks();
+    //             break;
+    //     }
+    // }
 
     @Override
     public void addNewTask() {

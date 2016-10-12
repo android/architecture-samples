@@ -14,72 +14,94 @@
   ~ limitations under the License.
   -->
 
-<com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/refresh_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:id="@+id/tasksContainer"
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="tasks"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
+
+        <variable
+            name="actionHandler"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksContract.Presenter" />
+    </data>
+
+    <com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:onRefresh="@{actionHandler}">
 
-        <LinearLayout
-            android:id="@+id/tasksLL"
+        <RelativeLayout
+            android:id="@+id/tasksContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/filteringLabel"
+            <LinearLayout
+                android:id="@+id/tasksLL"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="@dimen/list_item_padding"
-                android:layout_marginRight="@dimen/list_item_padding"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="@{tasks.notEmpty ? View.VISIBLE : View.GONE}">
 
-            <ListView
-                android:id="@+id/tasks_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/filteringLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/list_item_padding"
+                    android:layout_marginRight="@dimen/list_item_padding"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:text="@{tasks.currentFilteringLabel}" />
 
-        <LinearLayout
-            android:id="@+id/noTasks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="vertical">
+                <ListView
+                    android:id="@+id/tasks_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/noTasksIcon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_assignment_turned_in_24dp" />
-
-            <TextView
-                android:id="@+id/noTasksMain"
+            <LinearLayout
+                android:id="@+id/noTasks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/no_tasks_all"
-                android:layout_marginBottom="@dimen/list_item_padding" />
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:visibility="@{tasks.notEmpty ? View.GONE : View.VISIBLE}">
 
-            <TextView
-                android:id="@+id/noTasksAdd"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:background="@drawable/touch_feedback"
-                android:gravity="center"
-                android:text="@string/no_tasks_add" />
 
-        </LinearLayout>
-    </RelativeLayout>
-</com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout>
+                <ImageView
+                    android:id="@+id/noTasksIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@{tasks.noTaskIconRes}" />
 
+                <TextView
+                    android:id="@+id/noTasksMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@{tasks.noTasksLabel}"
+                    android:layout_marginBottom="@dimen/list_item_padding"/>
+
+                <TextView
+                    android:id="@+id/noTasksAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/touch_feedback"
+                    android:gravity="center"
+                    android:text="@string/no_tasks_add"
+                    android:onClick="@{() -> actionHandler.addNewTask()}"
+                    android:visibility="@{tasks.tasksAddViewVisible ? View.VISIBLE : View.GONE}" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout>
+</layout>
