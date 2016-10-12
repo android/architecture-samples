@@ -58,17 +58,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private TasksAdapter mListAdapter;
 
-    private View mNoTasksView;
-
-    private ImageView mNoTaskIcon;
-
-    private TextView mNoTaskMainView;
-
-    private TextView mNoTaskAddView;
-
-    private LinearLayout mTasksView;
-
-    private TextView mFilteringLabelView;
+    private TasksViewModel mTasksViewModel;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -110,6 +100,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
