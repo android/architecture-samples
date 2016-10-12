@@ -17,13 +17,12 @@
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <variable
             name="stats"
             type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel"
             />
-
     </data>
 
     <LinearLayout

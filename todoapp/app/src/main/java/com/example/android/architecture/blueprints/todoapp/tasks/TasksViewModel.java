@@ -104,6 +104,5 @@ public class TasksViewModel extends BaseObservable {
         notifyPropertyChanged(BR.currentFilteringLabel);
         notifyPropertyChanged(BR.notEmpty);
         notifyPropertyChanged(BR.tasksAddViewVisible);
-        // notifyPropertyChanged(BR.tasksAddViewVisiable);
     }
 }

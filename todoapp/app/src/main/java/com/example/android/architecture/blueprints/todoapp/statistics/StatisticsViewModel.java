@@ -16,11 +16,12 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Context;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 
+import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 
-import java.util.List;
 
 /**
  * Created by Wang, Sheng-Yuan on 2016/10/12.
@@ -28,7 +29,7 @@ import java.util.List;
  * Exposes the data to be used in the {@link StatisticsContract.View}.
  * Note that in this case the view model is also the view, not the fragment.
  */
-public class StatisticsViewModel implements StatisticsContract.View {
+public class StatisticsViewModel extends BaseObservable implements StatisticsContract.View {
 
     private int mNumberOfCompletedTasks = 0;
 
@@ -49,6 +50,7 @@ public class StatisticsViewModel implements StatisticsContract.View {
     /**
      * Returns a string showing the number of active tasks.
      */
+    @Bindable
     public String getNumberOfActiveTasks() {
         return mContext.getResources().getString(R.string.statistics_active_tasks)
                 + " " + mNumberOfActiveTasks;
@@ -57,6 +59,7 @@ public class StatisticsViewModel implements StatisticsContract.View {
     /**
      * Returns a string showing the number of completed tasks.
      */
+    @Bindable
     public String getNumberOfCompletedTasks() {
         return mContext.getResources().getString(R.string.statistics_completed_tasks)
                 + " " + mNumberOfCompletedTasks;
@@ -65,6 +68,7 @@ public class StatisticsViewModel implements StatisticsContract.View {
     /**
      * Controls whether the stats are shown or a "No data" message.
      */
+    @Bindable
     public boolean isEmpty() {
         return mNumberOfActiveTasks + mNumberOfCompletedTasks == 0;
     }
@@ -72,6 +76,7 @@ public class StatisticsViewModel implements StatisticsContract.View {
     /**
      * Returns a string with the current status to show to the user.
      */
+    @Bindable
     public String getStatus() {
         if (mError) {
             return mContext.getResources().getString(R.string.loading_tasks_error);
@@ -86,7 +91,8 @@ public class StatisticsViewModel implements StatisticsContract.View {
      * Controls whether the status view is shown in case there's an error or data
      * is still loading.
      */
-    public boolean showStatus() {
+    @Bindable
+    public boolean getShowStatus() {
         return mError || mIsLoading;
     }
 
@@ -94,20 +100,23 @@ public class StatisticsViewModel implements StatisticsContract.View {
      * Method from {@link StatisticsContract.View} that controls whether a Loading
      * message should be displayed.
      */
-    @Override
     public void setProgressIndicator(boolean active) {
         mIsLoading = active;
+        notifyPropertyChanged(BR.status);
+        notifyPropertyChanged(BR.numberOfActiveTasks);
+        notifyPropertyChanged(BR.numberOfCompletedTasks);
+        notifyPropertyChanged(BR.showStatus);
+        notifyPropertyChanged(BR.empty);
     }
 
 
     /**
      * Method from {@link StatisticsContract.View} called when new data is ready.
      */
-    @Override
     public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
-        mNumberOfCompletedTasks = numberOfCompletedTasks;
-        mNumberOfActiveTasks = numberOfIncompleteTasks;
-        mIsLoading = false;
+        mNumberOfCompletedTasks += numberOfCompletedTasks;
+        mNumberOfActiveTasks += numberOfIncompleteTasks;
+        // mIsLoading = false;
     }
 
     /**

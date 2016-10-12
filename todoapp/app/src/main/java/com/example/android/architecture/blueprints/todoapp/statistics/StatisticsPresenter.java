@@ -42,12 +42,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the UI as required.
  */
 public class StatisticsPresenter implements StatisticsContract.Presenter {
-
     @NonNull
     private final TasksRepository mTasksRepository;
 
-     @NonNull
-     private final StatisticsContract.View mStatisticsView;
+    @NonNull
+    private final StatisticsContract.View mStatisticsView;
 
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
