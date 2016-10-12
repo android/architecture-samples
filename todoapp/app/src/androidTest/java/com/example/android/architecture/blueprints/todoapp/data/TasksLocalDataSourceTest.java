@@ -16,8 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
@@ -63,7 +63,9 @@ public class TasksLocalDataSourceTest {
         mSchedulerProvider = new ImmediateSchedulerProvider();
 
         mLocalDataSource = TasksLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext(), mSchedulerProvider);
+                InstrumentationRegistry.getTargetContext(),
+                mSchedulerProvider
+        );
     }
 
     @After
@@ -81,7 +83,7 @@ public class TasksLocalDataSourceTest {
         // Given a new task
         final Task newTask = new Task(TITLE, "");
 
-        // When saved into the persistent repository
+        // When save into the persistent repository
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository

@@ -29,10 +29,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getToolbarNavigationContentDescription;
 import static com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo;
 
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.widget.DrawerLayout;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.Gravity;
 
 import com.example.android.architecture.blueprints.todoapp.R;

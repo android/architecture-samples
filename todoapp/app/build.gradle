@@ -57,6 +57,7 @@ android {
     }
 }
 
+
 /*
  Dependency versions are defined in the top level build.gradle file. This helps keeping track of
  all versions in a single place. This improves readability and helps managing project complexity.
@@ -74,22 +75,27 @@ dependencies {
     compile "io.reactivex:rxjava:$rootProject.rxjavaVersion"
     compile "io.reactivex:rxandroid:$rootProject.rxandroidVersion"
     compile "com.squareup.sqlbrite:sqlbrite:$rootProject.sqlbriteVersion"
+
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"
     testCompile "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
     testCompile "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
+
     // Android Testing Support Library's runner and rules
     androidTestCompile "com.android.support.test:runner:$rootProject.ext.runnerVersion"
     androidTestCompile "com.android.support.test:rules:$rootProject.ext.runnerVersion"
+
     // Dependencies for Android unit tests
     androidTestCompile "junit:junit:$rootProject.ext.junitVersion"
     androidTestCompile "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+
     // Espresso UI Testing
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
+
     // Resolve conflicts between main and test APK:
     androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:support-v4:$rootProject.supportLibraryVersion"

@@ -41,9 +41,10 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
