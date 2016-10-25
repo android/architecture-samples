@@ -40,7 +40,7 @@ Also, see ["New sample" issues](https://github.com/googlesamples/android-archite
 ### External samples
 [External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches.
  * [todo-mvp-fragmentless/](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) - Based on todo-mvp, uses Android views instead of Fragments.
- * [todo-mvp-conductor/](https://github.com/gregpearce/android-architecture/tree/todo-mvp-conductor) - Based on todo-mvp, uses the Conductor framework to refactor to a single Activity architecture.
+ * [todo-mvp-conductor/](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) - Based on todo-mvp, uses the Conductor framework to refactor to a single Activity architecture.
 
 ### What does <em>beta</em> mean?
 
