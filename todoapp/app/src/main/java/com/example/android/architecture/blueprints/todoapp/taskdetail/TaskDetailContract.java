@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 /**
  * This specifies the contract between the view and the presenter.
@@ -28,15 +29,17 @@ public interface TaskDetailContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showMissingTask();
+        void showTask(Task task);
 
-        void hideTitle();
+        // void showMissingTask();
 
-        void showTitle(String title);
+        // void hideTitle();
 
-        void hideDescription();
+        // void showTitle(String title);
 
-        void showDescription(String description);
+        // void hideDescription();
+
+        // void showDescription(String description);
 
         void showCompletionStatus(boolean complete);
 
@@ -60,5 +63,7 @@ public interface TaskDetailContract {
         void completeTask();
 
         void activateTask();
+
     }
+
 }

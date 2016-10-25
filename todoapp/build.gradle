@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
 
         // Plugin to help with annotation processing
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'

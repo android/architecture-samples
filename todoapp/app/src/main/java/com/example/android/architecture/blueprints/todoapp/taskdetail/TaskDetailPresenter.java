@@ -43,7 +43,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private final TaskDetailContract.View mTaskDetailView;
 
     @NonNull
-    private final BaseSchedulerProvider mSchedulerProvier;
+    private final BaseSchedulerProvider mSchedulerProvider;
 
     @Nullable
     private String mTaskId;
@@ -58,7 +58,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-        mSchedulerProvier = checkNotNull(schedulerProvider, "schedulerProvider cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null!");
 
         mSubscriptions = new CompositeSubscription();
         mTaskDetailView.setPresenter(this);
@@ -76,14 +76,14 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            // mTaskDetailView.showMissingTask();
             return;
         }
 
         mTaskDetailView.setLoadingIndicator(true);
         Subscription subscription = mTasksRepository.getTask(mTaskId)
-                .subscribeOn(mSchedulerProvier.computation())
-                .observeOn(mSchedulerProvier.ui())
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Observer<Task>() {
                     @Override
                     public void onCompleted() {
@@ -96,7 +96,8 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
                     @Override
                     public void onNext(Task task) {
-                        showTask(task);
+                        mTaskDetailView.showTask(task);
+                        // showTask(task);
                     }
                 });
         mSubscriptions.add(subscription);
@@ -105,7 +106,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void editTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            // mTaskDetailView.showMissingTask();
             return;
         }
         mTaskDetailView.showEditTask(mTaskId);
@@ -114,7 +115,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void deleteTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            // mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.deleteTask(mTaskId);
@@ -124,7 +125,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void completeTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            // mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.completeTask(mTaskId);
@@ -134,28 +135,28 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void activateTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            // mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    private void showTask(@NonNull Task task) {
-        String title = task.getTitle();
-        String description = task.getDescription();
+    // private void showTask(@NonNull Task task) {
+    //     String title = task.getTitle();
+    //     String description = task.getDescription();
 
-        if (Strings.isNullOrEmpty(title)) {
-            mTaskDetailView.hideTitle();
-        } else {
-            mTaskDetailView.showTitle(title);
-        }
+    //     if (Strings.isNullOrEmpty(title)) {
+    //         mTaskDetailView.hideTitle();
+    //     } else {
+    //         mTaskDetailView.showTitle(title);
+    //     }
 
-        if (Strings.isNullOrEmpty(description)) {
-            mTaskDetailView.hideDescription();
-        } else {
-            mTaskDetailView.showDescription(description);
-        }
-        mTaskDetailView.showCompletionStatus(task.isCompleted());
-    }
+    //     if (Strings.isNullOrEmpty(description)) {
+    //         mTaskDetailView.hideDescription();
+    //     } else {
+    //         mTaskDetailView.showDescription(description);
+    //     }
+    //     mTaskDetailView.showCompletionStatus(task.isCompleted());
+    // }
 }

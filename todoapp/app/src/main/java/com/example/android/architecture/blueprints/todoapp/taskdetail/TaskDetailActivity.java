@@ -35,6 +35,8 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
+    private TaskDetailPresenter mTaskDetailPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +64,13 @@ public class TaskDetailActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        new TaskDetailPresenter(
-                taskId,
+        mTaskDetailPresenter = new TaskDetailPresenter(taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 taskDetailFragment, Injection.providerSchedulerProvider());
+        TaskDetailViewModel taskDetailViewModel = new TaskDetailViewModel(this,
+                mTaskDetailPresenter);
+        taskDetailFragment.setViewModel(taskDetailViewModel);
+
     }
 
     @Override
