@@ -221,6 +221,11 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
+                // Do in memory cache update to keep the app UI up to date
+                if (mCachedTasks == null) {
+                    mCachedTasks = new LinkedHashMap<>();
+                }
+                mCachedTasks.put(task.getId(), task);
                 callback.onTaskLoaded(task);
             }
 
@@ -229,6 +234,11 @@ public class TasksRepository implements TasksDataSource {
                 mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
                     @Override
                     public void onTaskLoaded(Task task) {
+                        // Do in memory cache update to keep the app UI up to date
+                        if (mCachedTasks == null) {
+                            mCachedTasks = new LinkedHashMap<>();
+                        }
+                        mCachedTasks.put(task.getId(), task);
                         callback.onTaskLoaded(task);
                     }
 
