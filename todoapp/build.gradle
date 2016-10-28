@@ -41,4 +41,5 @@ ext {
     rulesVersion = '0.5'
     espressoVersion = '2.2.2'
     daggerVersion = '2.2'
+    dexmakerVersion = '1.2'
 }
