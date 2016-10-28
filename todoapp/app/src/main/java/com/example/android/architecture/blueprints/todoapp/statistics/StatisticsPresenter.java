@@ -111,6 +111,14 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                 })
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                            EspressoIdlingResource.decrement(); // Set app as idle.
+                        }
+                    }
+                })
                 .subscribe(new Action1<Pair<Integer, Integer>>() {
                     @Override
                     public void call(Pair<Integer, Integer> stats) {

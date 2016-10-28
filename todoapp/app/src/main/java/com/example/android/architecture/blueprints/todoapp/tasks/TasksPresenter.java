@@ -31,6 +31,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -137,6 +138,14 @@ public class TasksPresenter implements TasksContract.Presenter {
                 .toList()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                            EspressoIdlingResource.decrement(); // Set app as idle.
+                        }
+                    }
+                })
                 .subscribe(new Observer<List<Task>>() {
                     @Override
                     public void onCompleted() {
