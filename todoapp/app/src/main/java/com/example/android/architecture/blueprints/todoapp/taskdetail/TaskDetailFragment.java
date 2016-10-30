@@ -30,16 +30,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
-import com.google.common.base.Preconditions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -147,6 +143,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void showTask(Task task) {
         // TODO: TaskDetailViewModel.setTask(task);
         mTaskDetailViewModel.setTask(task);
+        // showCompletionStatus(task.isCompleted());
     }
 
     // @Override
@@ -165,8 +162,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         // mDetailDescription.setText(description);
     // }
 
-    @Override
-    public void showCompletionStatus(final boolean complete) {
+    // @Override
+    // public void showCompletionStatus(final boolean complete) {
         // Preconditions.checkNotNull(mDetailCompleteStatus);
 
         // mDetailCompleteStatus.setChecked(complete);
@@ -181,7 +178,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         //                 }
         //             }
         //         });
-    }
+    // }
 
     @Override
     public void showEditTask(@NonNull String taskId) {
@@ -222,11 +219,12 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         // mDetailTitle.setText(title);
     // }
 
-    // @Override
-    // public void showMissingTask() {
-        // mDetailTitle.setText("");
-        // mDetailDescription.setText(getString(R.string.no_data));
-    // }
+    @Override
+    public void showMissingTask() {
+        mTaskDetailViewModel.missingTask();
+     // mDetailTitle.setText("");
+     // mDetailDescription.setText(getString(R.string.no_data));
+    }
 
     @Override
     public boolean isActive() {

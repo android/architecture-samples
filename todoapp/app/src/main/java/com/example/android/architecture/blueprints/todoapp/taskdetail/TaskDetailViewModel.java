@@ -23,7 +23,6 @@ import android.databinding.Bindable;
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 /**
@@ -37,8 +36,10 @@ public class TaskDetailViewModel extends BaseObservable {
     private Context mContext;
 
     private String mTitle;
+    private boolean mHidTitle = false;
+    private boolean mHidDescription = false;
     private String mDescription;
-    private boolean mNoData = false;
+    private boolean mIsCompleted = false;
 
     public TaskDetailViewModel(Context context, TaskDetailContract.Presenter presenter) {
         mContext = context;
@@ -51,29 +52,68 @@ public class TaskDetailViewModel extends BaseObservable {
     }
 
     @Bindable
+    public boolean isHidTitle() {
+        return mHidTitle;
+    }
+
+    @Bindable
     public String getDescription() {
         return mDescription;
     }
 
     @Bindable
-    public boolean isNoData() {
-        return mNoData;
+    public boolean isHidDescription() {
+        return mHidDescription;
     }
 
-    public void setTask(Task task) {
-        if (task == null) {
-            mNoData = true;
-            mTitle = mContext.getString(R.string.no_data);
-            mDescription = mContext.getString(R.string.no_data);
+    @Bindable
+    public boolean isCompleted() {
+        return mIsCompleted;
+    }
+
+
+    /**
+     * Called by the Data Binding library when the checkbox is toggled.
+     */
+    public void completeChanged(boolean isChecked) {
+        if (isChecked) {
+            mPresenter.completeTask();
         } else {
-            mNoData = false;
-            mTitle = task.getTitle();
-            mDescription = task.getDescription();
+            mPresenter.activateTask();
+        }
+    }
+
+    public void missingTask() {
+        mTitle = "";
+        mDescription = mContext.getString(R.string.no_data);
+        mHidTitle = true;
+        mHidDescription = true;
+        notifyPropertyChanged(BR.title);
+        notifyPropertyChanged(BR.description);
+        notifyPropertyChanged(BR.hidTitle);
+        notifyPropertyChanged(BR.hidDescription);
+    }
+
+
+    public void setTask(Task task) {
+        String title = task.getTitle();
+        String description = task.getDescription();
+        mIsCompleted = task.isCompleted();
+        if (Strings.isNullOrEmpty(title)) {
+            mHidTitle = true;
+        } else {
+            mTitle = title;
+        }
+
+        if (Strings.isNullOrEmpty(description)) {
+            mHidDescription = true;
+        } else {
+            mDescription = description;
         }
         notifyPropertyChanged(BR.title);
         notifyPropertyChanged(BR.description);
-        notifyPropertyChanged(BR.noData);
-        // mTaskDetailView.showCompletionStatus(task.isCompleted());
+        notifyPropertyChanged(BR.hidTitle);
+        notifyPropertyChanged(BR.hidDescription);
     }
 
 }

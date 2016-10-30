@@ -86,9 +86,11 @@ public class TaskDetailPresenterTest {
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
         verify(mTaskDetailView).setLoadingIndicator(false);
+        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, false);
+        verify(mTaskDetailView).showTask(task);
         // verify(mTaskDetailView).showTitle(TITLE_TEST);
         // verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
-        verify(mTaskDetailView).showCompletionStatus(false);
+        // verify(mTaskDetailView).showCompletionStatus(false);
     }
 
     @Test
@@ -105,9 +107,11 @@ public class TaskDetailPresenterTest {
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
         verify(mTaskDetailView).setLoadingIndicator(false);
+        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
+        verify(mTaskDetailView).showTask(task);
         // verify(mTaskDetailView).showTitle(TITLE_TEST);
         // verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
-        verify(mTaskDetailView).showCompletionStatus(true);
+        // verify(mTaskDetailView).showCompletionStatus(true);
     }
 
     @Test
@@ -116,7 +120,7 @@ public class TaskDetailPresenterTest {
         mTaskDetailPresenter = new TaskDetailPresenter(
                 INVALID_TASK_ID, mTasksRepository, mTaskDetailView, mSchedulerProvider);
         mTaskDetailPresenter.subscribe();
-        // verify(mTaskDetailView).showMissingTask();
+        verify(mTaskDetailView).showMissingTask();
     }
 
     @Test
@@ -187,7 +191,7 @@ public class TaskDetailPresenterTest {
         // Then the edit mode is never started
         verify(mTaskDetailView, never()).showEditTask(INVALID_TASK_ID);
         // instead, the error is shown.
-        // verify(mTaskDetailView).showMissingTask();
+        verify(mTaskDetailView).showMissingTask();
     }
 
     private void setTaskAvailable(Task task) {

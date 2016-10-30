@@ -66,7 +66,8 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Create the presenter
         mTaskDetailPresenter = new TaskDetailPresenter(taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment, Injection.providerSchedulerProvider());
+                taskDetailFragment,
+                Injection.providerSchedulerProvider());
         TaskDetailViewModel taskDetailViewModel = new TaskDetailViewModel(this,
                 mTaskDetailPresenter);
         taskDetailFragment.setViewModel(taskDetailViewModel);

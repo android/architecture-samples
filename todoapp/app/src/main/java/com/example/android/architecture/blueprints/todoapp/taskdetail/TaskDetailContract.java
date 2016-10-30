@@ -31,7 +31,7 @@ public interface TaskDetailContract {
 
         void showTask(Task task);
 
-        // void showMissingTask();
+        void showMissingTask();
 
         // void hideTitle();
 
@@ -41,7 +41,7 @@ public interface TaskDetailContract {
 
         // void showDescription(String description);
 
-        void showCompletionStatus(boolean complete);
+        // void showCompletionStatus(boolean complete);
 
         void showEditTask(String taskId);
 

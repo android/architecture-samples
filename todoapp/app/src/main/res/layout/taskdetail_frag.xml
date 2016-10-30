@@ -23,8 +23,7 @@
 
         <variable
             name="task"
-            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel"
-            />
+            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel"/>
 
     </data>
 
@@ -43,7 +42,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:visibility="@{task.noData ? View.GONE : View.VISIBLE}"
+            android:checked="@{task.completed}"
+            android:onCheckedChanged="@{(cd, isChecked) -> task.completeChanged(isChecked)}"
             />
 
         <TextView
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:text="@{task.title}"
-            android:visibility="@{task.noData ? View.GONE : View.VISIBLE}"
+            android:visibility="@{task.hidTitle ? View.GONE : View.VISIBLE}"
             />
 
         <TextView
@@ -63,6 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:visibility="@{task.hidDescription? View.GONE : View.VISIBLE}"
             android:text="@{task.Description}"
             />
 

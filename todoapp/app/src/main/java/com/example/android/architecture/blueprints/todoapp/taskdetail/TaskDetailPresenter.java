@@ -76,7 +76,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            // mTaskDetailView.showMissingTask();
+            mTaskDetailView.showMissingTask();
             return;
         }
 
@@ -106,7 +106,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void editTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            // mTaskDetailView.showMissingTask();
+            mTaskDetailView.showMissingTask();
             return;
         }
         mTaskDetailView.showEditTask(mTaskId);
@@ -115,7 +115,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void deleteTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            // mTaskDetailView.showMissingTask();
+            mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.deleteTask(mTaskId);
@@ -125,7 +125,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void completeTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            // mTaskDetailView.showMissingTask();
+            mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.completeTask(mTaskId);
@@ -135,7 +135,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void activateTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            // mTaskDetailView.showMissingTask();
+            mTaskDetailView.showMissingTask();
             return;
         }
         mTasksRepository.activateTask(mTaskId);
