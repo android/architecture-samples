@@ -65,7 +65,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
 
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -93,7 +93,7 @@ public class AddEditTaskPresenterTest {
         mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
 
         // When the presenter is asked to save an existing task
-        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("Existing Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
