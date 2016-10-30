@@ -5,7 +5,6 @@ import android.app.Application;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsComponent;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailComponent;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
