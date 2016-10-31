@@ -35,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
+
     @NonNull
     private final TasksDataSource mTasksRepository;
 
@@ -53,9 +54,9 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     /**
      * Creates a presenter for the add/edit view.
      *
-     * @param taskId ID of the task to edit or null for a new task
+     * @param taskId          ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
-     * @param addTaskView the add/edit view
+     * @param addTaskView     the add/edit view
      */
     public AddEditTaskPresenter(@Nullable String taskId,
                                 @NonNull TasksDataSource tasksRepository,
@@ -104,7 +105,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (mTaskId == null) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        Subscription subscription = mTasksRepository.getTask(mTaskId)
+        Subscription subscription = mTasksRepository
+                .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Observer<Task>() {
@@ -128,6 +130,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                         }
                     }
                 });
+
         mSubscriptions.add(subscription);
     }
 

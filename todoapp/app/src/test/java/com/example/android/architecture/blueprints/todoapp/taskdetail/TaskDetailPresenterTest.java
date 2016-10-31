@@ -31,6 +31,7 @@ import rx.Observable;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,8 +87,7 @@ public class TaskDetailPresenterTest {
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
         verify(mTaskDetailView).setLoadingIndicator(false);
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, false);
-        verify(mTaskDetailView).showTask(task);
+        verify(mTaskDetailView).showTask(ACTIVE_TASK);
         // verify(mTaskDetailView).showTitle(TITLE_TEST);
         // verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
         // verify(mTaskDetailView).showCompletionStatus(false);
@@ -107,8 +107,7 @@ public class TaskDetailPresenterTest {
         // Then progress indicator is hidden and title, description and completion status are shown
         // in UI
         verify(mTaskDetailView).setLoadingIndicator(false);
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
-        verify(mTaskDetailView).showTask(task);
+        verify(mTaskDetailView).showTask(COMPLETED_TASK);
         // verify(mTaskDetailView).showTitle(TITLE_TEST);
         // verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
         // verify(mTaskDetailView).showCompletionStatus(true);

@@ -67,7 +67,7 @@ public class TasksPresenterTest {
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
 
-        // We start the tasks to 3, with one active and two completed
+        // We subscribe the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
     }
@@ -106,7 +106,6 @@ public class TasksPresenterTest {
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.loadTasks(true);
 
-
         // Then progress indicator is hidden and completed tasks are shown in UI
         verify(mTasksView).setLoadingIndicator(false);
     }
@@ -136,6 +135,8 @@ public class TasksPresenterTest {
     public void completeTask_ShowsTaskMarkedComplete() {
         // Given a stubbed task
         Task task = new Task("Details Requested", "For this task");
+        // And no tasks available in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
 
         // When task is marked as complete
         mTasksPresenter.completeTask(task);
@@ -149,6 +150,8 @@ public class TasksPresenterTest {
     public void activateTask_ShowsTaskMarkedActive() {
         // Given a stubbed completed task
         Task task = new Task("Details Requested", "For this task", true);
+        // And no tasks available in the repository
+        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
         mTasksPresenter.loadTasks(true);
 
         // When task is marked as activated

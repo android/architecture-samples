@@ -48,7 +48,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     private static TasksLocalDataSource INSTANCE;
 
     @NonNull
-    private BriteDatabase mDatabaseHelper;
+    private final BriteDatabase mDatabaseHelper;
 
     @NonNull
     private Func1<Cursor, Task> mTaskMapperFunction;
@@ -57,7 +57,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     private TasksLocalDataSource(@NonNull Context context,
                                  @NonNull BaseSchedulerProvider schedulerProvider) {
         checkNotNull(context, "context cannot be null");
-        checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+        checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
         SqlBrite sqlBrite = SqlBrite.create();
         mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
@@ -73,11 +73,11 @@ public class TasksLocalDataSource implements TasksDataSource {
                 return new Task(title, description, itemId, completed);
             }
         };
-
     }
 
-    public static TasksLocalDataSource getInstance(@NonNull Context context,
-                                                   @NonNull BaseSchedulerProvider schedulerProvider) {
+    public static TasksLocalDataSource getInstance(
+            @NonNull Context context,
+            @NonNull BaseSchedulerProvider schedulerProvider) {
         if (INSTANCE == null) {
             INSTANCE = new TasksLocalDataSource(context, schedulerProvider);
         }
@@ -96,8 +96,7 @@ public class TasksLocalDataSource implements TasksDataSource {
                 TaskEntry.COLUMN_NAME_DESCRIPTION,
                 TaskEntry.COLUMN_NAME_COMPLETED
         };
-        String sql = String.format("SELECT %s FROM %s",
-                TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
+        String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
                 .mapToList(mTaskMapperFunction);
     }
@@ -166,8 +165,8 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of
-        // refreshing the tasks from all the available data sources.
+        // Not required because the {@link TasksRepository} handles the logic of refreshing the
+        // tasks from all the available data sources.
     }
 
     @Override
@@ -181,5 +180,4 @@ public class TasksLocalDataSource implements TasksDataSource {
         String[] selectionArgs = {taskId};
         mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
     }
-
 }

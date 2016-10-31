@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -97,7 +98,6 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
                     @Override
                     public void onNext(Task task) {
                         mTaskDetailView.showTask(task);
-                        // showTask(task);
                     }
                 });
         mSubscriptions.add(subscription);

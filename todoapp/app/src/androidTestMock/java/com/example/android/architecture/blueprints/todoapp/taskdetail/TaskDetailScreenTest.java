@@ -18,15 +18,17 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,7 +100,8 @@ public class TaskDetailScreenTest {
     private void startActivityWithWithStubbedTask(Task task) {
         // Add a task stub to the fake service api layer.
         TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(task);
+        TasksLocalDataSource.destroyInstance();
+        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext()).saveTask(task);
 
         // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         Intent startIntent = new Intent();
@@ -130,10 +133,14 @@ public class TaskDetailScreenTest {
     public void orientationChange_menuAndTaskPersist() {
         loadActiveTask();
 
+        // Check that the task is shown
+        onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));
+        onView(withId(R.id.task_detail_description)).check(matches(withText(TASK_DESCRIPTION)));
+
         // Check delete menu item is displayed and is unique
         onView(withId(R.id.menu_delete)).check(matches(isDisplayed()));
 
-        TestUtils.rotateOrientation(mTaskDetailActivityTestRule.getActivity());
+        TestUtils.rotateOrientation(mTaskDetailActivityTestRule);
 
         // Check that the task is shown
         onView(withId(R.id.task_detail_title)).check(matches(withText(TASK_TITLE)));

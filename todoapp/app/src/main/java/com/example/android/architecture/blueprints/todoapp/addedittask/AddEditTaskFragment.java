@@ -49,10 +49,6 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         return new AddEditTaskFragment();
     }
 
-    public AddEditTaskFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -80,7 +76,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+                mPresenter.saveTask(mTitle.getText().toString(),
+                        mDescription.getText().toString());
             }
         });
     }
@@ -123,5 +120,4 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public boolean isActive() {
         return isAdded();
     }
-
 }

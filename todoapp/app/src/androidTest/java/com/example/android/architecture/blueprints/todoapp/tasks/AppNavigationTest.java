@@ -113,4 +113,5 @@ public class AppNavigationTest {
         onView(withId(R.id.drawer_layout))
                 .check(matches(isOpen(Gravity.LEFT))); // Left drawer is open open.
     }
+
 }

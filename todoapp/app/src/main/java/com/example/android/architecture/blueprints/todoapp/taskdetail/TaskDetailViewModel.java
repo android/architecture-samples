@@ -83,15 +83,20 @@ public class TaskDetailViewModel extends BaseObservable {
         }
     }
 
+    public void loadingTask() {
+        mTitle = "";
+        mDescription = mContext.getString(R.string.loading);
+        mHidTitle = false;
+        mHidDescription = false;
+        notifyPropertyChanged();
+    }
+
     public void missingTask() {
         mTitle = "";
         mDescription = mContext.getString(R.string.no_data);
         mHidTitle = true;
         mHidDescription = true;
-        notifyPropertyChanged(BR.title);
-        notifyPropertyChanged(BR.description);
-        notifyPropertyChanged(BR.hidTitle);
-        notifyPropertyChanged(BR.hidDescription);
+        notifyPropertyChanged();
     }
 
 
@@ -110,10 +115,15 @@ public class TaskDetailViewModel extends BaseObservable {
         } else {
             mDescription = description;
         }
+        notifyPropertyChanged();
+    }
+
+    private void notifyPropertyChanged() {
         notifyPropertyChanged(BR.title);
         notifyPropertyChanged(BR.description);
         notifyPropertyChanged(BR.hidTitle);
         notifyPropertyChanged(BR.hidDescription);
+        notifyPropertyChanged(BR.completed);
     }
 
 }

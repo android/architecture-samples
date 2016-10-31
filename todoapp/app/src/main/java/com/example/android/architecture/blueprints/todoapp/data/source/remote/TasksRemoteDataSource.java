@@ -56,10 +56,6 @@ public class TasksRemoteDataSource implements TasksDataSource {
         return INSTANCE;
     }
 
-    public static void destroyInstance() {
-        INSTANCE = null;
-    }
-
     // Prevent direct instantiation.
     private TasksRemoteDataSource() {}
 
@@ -68,26 +64,18 @@ public class TasksRemoteDataSource implements TasksDataSource {
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 
-
-    /**
-     * Note: In a real remote data source implementation, this would be fired if
-     * the server can't be contacted or the server returns an error.
-     */
     @Override
     public Observable<List<Task>> getTasks() {
-        return Observable.from(TASKS_SERVICE_DATA.values())
+        return Observable
+                .from(TASKS_SERVICE_DATA.values())
                 .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
                 .toList();
     }
 
-    /**
-     * Note: In a real remote data source implementation, this would be fired if
-     * the server can't be contacted or the server returns an error.
-     */
     @Override
     public Observable<Task> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
-        if (task != null) {
+        if(task != null) {
             return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
             return Observable.empty();

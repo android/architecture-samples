@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -133,52 +134,17 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void setLoadingIndicator(boolean active) {
+        Log.d(TaskDetailFragment.class.getSimpleName(),
+                "Is active:" + active);
         if (active) {
-            // mDetailTitle.setText("");
-            // mDetailDescription.setText(getString(R.string.loading));
+            mTaskDetailViewModel.loadingTask();
         }
     }
 
     @Override
     public void showTask(Task task) {
-        // TODO: TaskDetailViewModel.setTask(task);
         mTaskDetailViewModel.setTask(task);
-        // showCompletionStatus(task.isCompleted());
     }
-
-    // @Override
-    // public void hideDescription() {
-        // mDetailDescription.setVisibility(View.GONE);
-    // }
-
-    // @Override
-    // public void hideTitle() {
-        // mDetailTitle.setVisibility(View.GONE);
-    // }
-
-    // @Override
-    // public void showDescription(@NonNull String description) {
-        // mDetailDescription.setVisibility(View.VISIBLE);
-        // mDetailDescription.setText(description);
-    // }
-
-    // @Override
-    // public void showCompletionStatus(final boolean complete) {
-        // Preconditions.checkNotNull(mDetailCompleteStatus);
-
-        // mDetailCompleteStatus.setChecked(complete);
-        // mDetailCompleteStatus.setOnCheckedChangeListener(
-        //         new CompoundButton.OnCheckedChangeListener() {
-        //             @Override
-        //             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        //                 if (isChecked) {
-        //                     mPresenter.completeTask();
-        //                 } else {
-        //                     mPresenter.activateTask();
-        //                 }
-        //             }
-        //         });
-    // }
 
     @Override
     public void showEditTask(@NonNull String taskId) {

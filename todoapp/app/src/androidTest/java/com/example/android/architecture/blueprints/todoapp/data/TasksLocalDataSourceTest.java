@@ -63,9 +63,7 @@ public class TasksLocalDataSourceTest {
         mSchedulerProvider = new ImmediateSchedulerProvider();
 
         mLocalDataSource = TasksLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext(),
-                mSchedulerProvider
-        );
+                InstrumentationRegistry.getTargetContext(), mSchedulerProvider);
     }
 
     @After
@@ -83,7 +81,7 @@ public class TasksLocalDataSourceTest {
         // Given a new task
         final Task newTask = new Task(TITLE, "");
 
-        // When save into the persistent repository
+        // When saved into the persistent repository
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository

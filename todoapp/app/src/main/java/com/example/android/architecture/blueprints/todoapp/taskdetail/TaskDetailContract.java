@@ -33,16 +33,6 @@ public interface TaskDetailContract {
 
         void showMissingTask();
 
-        // void hideTitle();
-
-        // void showTitle(String title);
-
-        // void hideDescription();
-
-        // void showDescription(String description);
-
-        // void showCompletionStatus(boolean complete);
-
         void showEditTask(String taskId);
 
         void showTaskDeleted();
