@@ -37,6 +37,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
+    private final boolean mLoadData;
+
     @Nullable
     private String mTaskId;
 
@@ -48,17 +50,18 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * @param addTaskView the add/edit view
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+            @NonNull AddEditTaskContract.View addTaskView, boolean loadData) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
+        mLoadData = loadData;
 
         mAddTaskView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        if (!isNewTask()) {
+        if (!isNewTask() && mLoadData) {
             populateTask();
         }
     }
