@@ -16,8 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Runs {@link UseCase}s using a {@link UseCaseScheduler}.
@@ -36,6 +37,7 @@ public class UseCaseHandler {
             final UseCase<T, R> useCase, T values, UseCase.UseCaseCallback<R> callback) {
         useCase.setRequestValues(values);
         useCase.setUseCaseCallback(new UiCallbackWrapper(callback, this));
+        final WeakReference<UseCase<T, R>> weakUseCase = new WeakReference<>(useCase);
 
         // The network request might be handled in a different thread so make sure
         // Espresso knows
@@ -45,8 +47,10 @@ public class UseCaseHandler {
         mUseCaseScheduler.execute(new Runnable() {
             @Override
             public void run() {
-
-                useCase.run();
+                UseCase<T, R> useCaseToExecute = weakUseCase.get();
+                if(useCaseToExecute != null) {
+                    useCase.run();
+                }
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
                 // it throws "Counter has been corrupted!" exception.
