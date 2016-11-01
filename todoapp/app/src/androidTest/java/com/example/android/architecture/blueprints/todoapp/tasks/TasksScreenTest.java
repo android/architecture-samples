@@ -447,19 +447,15 @@ public class TasksScreenTest {
         // Click on the edit task button
         onView(withId(R.id.fab_edit_task)).perform(click());
 
-        // Edit task title and description
+        // Change task title (but don't save)
         onView(withId(R.id.add_task_title))
                 .perform(replaceText(TITLE2), closeSoftKeyboard()); // Type new task title
 
         // Rotate the screen
         TestUtils.rotateOrientation(getCurrentActivity());
 
-        onView(withId(R.id.add_task_title)).perform(closeSoftKeyboard());
-
-        // Verify task is displayed on screen in the task list.
+        // Verify task title is restored
         onView(withId(R.id.add_task_title)).check(matches(withText(TITLE2)));
-        onView(withId(R.id.add_task_description)).check(matches(withText(DESCRIPTION)));
-
     }
 
     @Test
