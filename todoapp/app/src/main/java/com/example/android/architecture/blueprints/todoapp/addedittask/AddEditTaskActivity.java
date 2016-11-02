@@ -50,9 +50,6 @@ public class AddEditTaskActivity extends AppCompatActivity {
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
-        // Prevent the presenter from loading data from the repository if this is a config change.
-        boolean shouldLoadDataFromRepo = addEditTaskFragment == null;
-
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
 
         if (addEditTaskFragment == null) {
@@ -70,6 +67,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
+
+        // Prevent the presenter from loading data from the repository if this is a config change.
+        boolean shouldLoadDataFromRepo = addEditTaskFragment == null;
 
         // Create the presenter
         new AddEditTaskPresenter(

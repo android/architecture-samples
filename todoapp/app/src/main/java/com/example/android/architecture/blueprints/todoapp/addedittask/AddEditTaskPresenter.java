@@ -37,10 +37,10 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final AddEditTaskContract.View mAddTaskView;
 
-    private final boolean mLoadData;
-
     @Nullable
     private String mTaskId;
+
+    private final boolean mLoadData;
 
     /**
      * Creates a presenter for the add/edit view.
@@ -48,6 +48,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * @param taskId ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
      * @param addTaskView the add/edit view
+     * @param loadData whether data needs to be loaded or not (like after a rotation)
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
             @NonNull AddEditTaskContract.View addTaskView, boolean loadData) {
