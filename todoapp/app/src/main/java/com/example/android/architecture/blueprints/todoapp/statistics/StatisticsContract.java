@@ -35,6 +35,6 @@ public interface StatisticsContract {
     }
 
     interface Presenter {
-        void startStatisticsPresenter();
+        void loadStats();
     }
 }

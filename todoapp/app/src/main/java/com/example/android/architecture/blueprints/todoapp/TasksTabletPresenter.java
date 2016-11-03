@@ -76,7 +76,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         mTaskDetailPresenter.setTaskId(requestedTask.getId());
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         // Refresh detail view
         if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
             if (mTaskDetailPresenter.getTaskId().equals(completedTask.getId())) {
-                mTaskDetailPresenter.startTaskDetailPresenter();
+                mTaskDetailPresenter.loadTask();
             }
         }
     }
@@ -96,7 +96,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         // Refresh detail view
         if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
             if (mTaskDetailPresenter.getTaskId().equals(activeTask.getId())) {
-                mTaskDetailPresenter.startTaskDetailPresenter();
+                mTaskDetailPresenter.loadTask();
             }
         }
     }
@@ -105,7 +105,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     public void clearCompletedTasks() {
         mTasksPresenter.clearCompletedTasks();
 
-        // If task on detail has just been cleared, remove fragment.
+        // If task on detail has just been cleared, update it.
         if (mTaskDetailPresenter != null) {
             String taskId = mTaskDetailPresenter.getTaskId();
             if (taskId != null) {
@@ -113,7 +113,6 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
                         new TasksDataSource.GetTaskCallback() {
                             @Override
                             public void onTaskLoaded(Task task) {
-                                // No-op
                                 if (task == null) {
                                     mTaskDetailPresenter.setTaskId(null);
                                 }
@@ -138,17 +137,12 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         mTasksPresenter.setFiltering(requestType);
     }
 
-    @Override
-    public void startTasksPresenter() {
-        mTasksPresenter.startTasksPresenter();
-    }
-
     /* TaskDetailContract.Presenter methods */
 
     @Override
     public void editTask() {
         mTaskDetailPresenter.editTask();
-        mTasksPresenter.startTasksPresenter();
+        mTasksPresenter.loadTasks(false);
     }
 
     @Override
@@ -157,24 +151,24 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
             mTasksRepository.deleteTask(mTaskDetailPresenter.getTaskId());
         }
         mTaskDetailPresenter.setTaskId(null); // Show an empty detail view
-        mTasksPresenter.startTasksPresenter(); // Reload the list
+        mTasksPresenter.loadTasks(false); // Reload the list
     }
 
     @Override
     public void completeTask() {
         mTaskDetailPresenter.completeTask();
-        mTasksPresenter.startTasksPresenter();
+        mTasksPresenter.loadTasks(false);
     }
 
     @Override
     public void activateTask() {
         mTaskDetailPresenter.activateTask();
-        mTasksPresenter.startTasksPresenter();
+        mTasksPresenter.loadTasks(false);
     }
 
     @Override
-    public void startTaskDetailPresenter() {
-        mTaskDetailPresenter.startTaskDetailPresenter();
+    public void loadTask() {
+        mTaskDetailPresenter.loadTask();
     }
 
     @Override

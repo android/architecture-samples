@@ -77,7 +77,7 @@ public class TaskDetailPresenterTest {
         // When tasks presenter is asked to open a task
         mTaskDetailPresenter = new TaskDetailPresenter(
                 ACTIVE_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(mTasksRepository).getTask(eq(ACTIVE_TASK.getId()), mGetTaskCallbackCaptor.capture());
@@ -98,7 +98,7 @@ public class TaskDetailPresenterTest {
     public void getCompletedTaskFromRepositoryAndLoadIntoView() {
         mTaskDetailPresenter = new TaskDetailPresenter(
                 COMPLETED_TASK.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(mTasksRepository).getTask(
@@ -121,7 +121,7 @@ public class TaskDetailPresenterTest {
         // When loading of a task is requested with an invalid task ID.
         mTaskDetailPresenter = new TaskDetailPresenter(
                 INVALID_TASK_ID, mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
         verify(mTaskDetailView).showMissingTask();
     }
 
@@ -146,7 +146,7 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
         mTaskDetailPresenter = new TaskDetailPresenter(
                 task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
 
         // When the presenter is asked to complete the task
         mTaskDetailPresenter.completeTask();
@@ -162,7 +162,7 @@ public class TaskDetailPresenterTest {
         Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
         mTaskDetailPresenter = new TaskDetailPresenter(
                 task.getId(), mTasksRepository, mTaskDetailView);
-        mTaskDetailPresenter.startTaskDetailPresenter();
+        mTaskDetailPresenter.loadTask();
 
         // When the presenter is asked to activate the task
         mTaskDetailPresenter.activateTask();

@@ -59,9 +59,9 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
-    public void startAddEditTaskPresenter() {
+    public void populateTask() {
         if (!isNewTask() && mLoadData) {
-            populateTask();
+            mTasksRepository.getTask(mTaskId, this);
         }
     }
 
@@ -72,14 +72,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         } else {
             updateTask(title, description);
         }
-    }
-
-    @Override
-    public void populateTask() {
-        if (isNewTask()) {
-            throw new RuntimeException("populateTask() was called but task is new.");
-        }
-        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override

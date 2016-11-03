@@ -79,7 +79,7 @@ public class StatisticsPresenterTest {
         TASKS.clear();
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.startStatisticsPresenter();
+        mStatisticsPresenter.loadStats();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
@@ -98,7 +98,7 @@ public class StatisticsPresenterTest {
         // Given an initialized StatisticsPresenter with 1 active and 2 completed tasks
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.startStatisticsPresenter();
+        mStatisticsPresenter.loadStats();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
@@ -115,7 +115,7 @@ public class StatisticsPresenterTest {
     @Test
     public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         // When statistics are loaded
-        mStatisticsPresenter.startStatisticsPresenter();
+        mStatisticsPresenter.loadStats();
 
         // And tasks data isn't available
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());

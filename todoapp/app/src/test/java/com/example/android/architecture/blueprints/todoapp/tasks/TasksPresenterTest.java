@@ -16,12 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.example.android.architecture.blueprints.todoapp.TasksTabletNavigator;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -36,6 +30,11 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 /**
  * Unit tests for the implementation of {@link TasksPresenter}
  */
@@ -45,9 +44,6 @@ public class TasksPresenterTest {
 
     @Mock
     private TasksRepository mTasksRepository;
-
-    @Mock
-    private TasksTabletNavigator mTasksNavigator;
 
     @Mock
     private TasksContract.View mTasksView;

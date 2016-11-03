@@ -52,6 +52,8 @@ public interface TaskDetailContract {
 
     interface Presenter {
 
+        void loadTask();
+
         void editTask();
 
         void deleteTask();
@@ -59,8 +61,6 @@ public interface TaskDetailContract {
         void completeTask();
 
         void activateTask();
-
-        void startTaskDetailPresenter();
 
         void setTaskId(String taskId);
 

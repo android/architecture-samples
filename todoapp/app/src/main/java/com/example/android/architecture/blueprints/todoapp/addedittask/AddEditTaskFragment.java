@@ -56,7 +56,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.startAddEditTaskPresenter();
+        mPresenter.populateTask();
     }
 
     @Override

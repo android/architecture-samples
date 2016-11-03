@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
@@ -29,6 +27,8 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
@@ -52,11 +52,6 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void startTasksPresenter() {
-        loadTasks(false);
-    }
-
-    @Override
     public void onTasksResult(int requestCode, int resultCode) {
         // If a task was successfully added, show snackbar
         if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
@@ -73,8 +68,8 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
-     * @param showLoadingUI Pass in true to display a loading icon in the UI
+     * @param forceUpdate   whether to refresh the data in the {@link TasksDataSource}
+     * @param showLoadingUI whether to display a loading icon in the UI
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {

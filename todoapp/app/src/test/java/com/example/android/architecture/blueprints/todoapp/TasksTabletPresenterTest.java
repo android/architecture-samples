@@ -16,14 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -36,6 +28,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksTabletPresenter}
@@ -78,31 +75,21 @@ public class TasksTabletPresenterTest {
     public void activatingTask_RefreshesList() {
         mTasksTabletPresenter.activateTask();
 
-        verify(mTasksPresenter).startTasksPresenter();
+        verify(mTasksPresenter).loadTasks(false);
     }
 
     @Test
     public void completingTask_RefreshesList() {
         mTasksTabletPresenter.completeTask();
 
-        verify(mTasksPresenter).startTasksPresenter();
+        verify(mTasksPresenter).loadTasks(false);
     }
 
     @Test
     public void editingTask_RefreshesList() {
         mTasksTabletPresenter.editTask();
 
-        verify(mTasksPresenter).startTasksPresenter();
-    }
-
-    @Test
-    public void clearCompletedTasksWithNoDetail() {
-        mTaskDetailPresenter = null;
-
-        mTasksTabletPresenter.clearCompletedTasks();
-        verimTaskDetailPresenter.setTaskId();
-
-        verify(mTasksNavigator, never()).removeDetailPane();
+        verify(mTasksPresenter).loadTasks(false);
     }
 
     @Test
@@ -110,6 +97,7 @@ public class TasksTabletPresenterTest {
         // If after the completed tasks are cleared and the task no longer exist, make sure the
         // detail pane is closed.
         Task task = new Task("Title1", "Description1");
+
         when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
@@ -118,7 +106,7 @@ public class TasksTabletPresenterTest {
                 eq(task.getId()), mGetTaskCallbackArgumentCaptor.capture());
         mGetTaskCallbackArgumentCaptor.getValue().onDataNotAvailable();
 
-        verify(mTasksNavigator).removeDetailPane();
+        verify(mTaskDetailPresenter).setTaskId(null);
     }
 
     @Test
@@ -126,15 +114,17 @@ public class TasksTabletPresenterTest {
         // If after the completed tasks are cleared but the task still exist, make sure the
         // detail pane is NOT closed.
         Task task = new Task("Title1", "Description1");
+
         when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
 
         verify(mTasksRepository).getTask(
                 eq(task.getId()), mGetTaskCallbackArgumentCaptor.capture());
-        mGetTaskCallbackArgumentCaptor.getValue().onTaskLoaded(new Task("Othertask", "OtherDesc"));
 
-        verify(mTasksNavigator, never()).removeDetailPane();
+        mGetTaskCallbackArgumentCaptor.getValue().onTaskLoaded(task);
+
+        verify(mTaskDetailPresenter, never()).setTaskId(task.getId());
     }
 
     @Test
@@ -144,8 +134,7 @@ public class TasksTabletPresenterTest {
 
         mTasksTabletPresenter.deleteTask();
 
-        verify(mTasksNavigator).removeDetailPane();
-        verify(mTasksPresenter).startTasksPresenter();
-        assertThat(mTasksTabletPresenter.getTaskDetailPresenter(), is(nullValue()));
+        verify(mTaskDetailPresenter).setTaskId(null);
+        verify(mTasksPresenter).loadTasks(false);
     }
 }

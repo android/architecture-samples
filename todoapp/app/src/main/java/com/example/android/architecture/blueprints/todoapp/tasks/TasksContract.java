@@ -67,9 +67,12 @@ public interface TasksContract {
 
     interface Presenter {
 
-        void onTasksResult(int requestCode, int resultCode);
-
+        /**
+         * @param forceUpdate reload data triggering a refresh from source of truth.
+         */
         void loadTasks(boolean forceUpdate);
+
+        void onTasksResult(int requestCode, int resultCode);
 
         void addNewTask();
 
@@ -84,7 +87,5 @@ public interface TasksContract {
         void setFiltering(TasksFilterType requestType);
 
         TasksFilterType getFiltering();
-
-        void startTasksPresenter();
     }
 }

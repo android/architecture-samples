@@ -47,7 +47,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     }
 
     @Override
-    public void startTaskDetailPresenter() {
+    public void loadTask() {
         if (mTaskDetailView.isActive()) {
             openTask();
         }

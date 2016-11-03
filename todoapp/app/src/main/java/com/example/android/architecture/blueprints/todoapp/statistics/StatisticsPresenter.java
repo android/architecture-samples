@@ -44,7 +44,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     @Override
-    public void startStatisticsPresenter() {
+    public void loadStats() {
         loadStatistics();
     }
 
