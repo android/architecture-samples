@@ -16,13 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
@@ -40,25 +40,27 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    private final boolean mLoadData;
+
     /**
      * Creates a presenter for the add/edit view.
      *
      * @param taskId ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
      * @param addTaskView the add/edit view
+     * @param loadData whether data needs to be loaded or not (like after a rotation)
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+            @NonNull AddEditTaskContract.View addTaskView, boolean loadData) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-
-        mAddTaskView.setPresenter(this);
+        mLoadData = loadData;
     }
 
     @Override
     public void startAddEditTaskPresenter() {
-        if (!isNewTask()) {
+        if (!isNewTask() && mLoadData) {
             populateTask();
         }
     }

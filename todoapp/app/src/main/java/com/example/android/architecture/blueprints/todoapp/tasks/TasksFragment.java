@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -48,6 +46,8 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
@@ -105,11 +105,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
-
-        // Retain the fragment to persist the presenter and its state.
-        // This means that it won't be recreated on a configuration change, but
-        // it's dangerous as it can produce bugs and leaks. Use it wisely.
-        setRetainInstance(true);
 
         // Set up tasks view
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);

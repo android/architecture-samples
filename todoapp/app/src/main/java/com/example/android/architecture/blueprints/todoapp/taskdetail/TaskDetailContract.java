@@ -61,5 +61,9 @@ public interface TaskDetailContract {
         void activateTask();
 
         void startTaskDetailPresenter();
+
+        void setTaskId(String taskId);
+
+        String getTaskId();
     }
 }

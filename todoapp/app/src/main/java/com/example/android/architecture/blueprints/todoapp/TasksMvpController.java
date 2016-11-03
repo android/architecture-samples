@@ -16,17 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class that creates fragments (MVP views) and makes the necessary connections between them.
@@ -35,132 +39,73 @@ public class TasksMvpController {
 
     private final FragmentActivity mFragmentActivity;
 
+    // Null task ID means there's no task selected (or in phone mode)
+    @Nullable private final String mTaskId;
+
     private TasksTabletPresenter mTasksTabletPresenter;
 
     private TasksPresenter mTasksPresenter;
 
-    private TaskDetailPresenter mTaskDetailPresenter;
+    // Force factory method, prevent direct instantiation:
+    private TasksMvpController(
+            @NonNull FragmentActivity fragmentActivity, @Nullable String taskId) {
+        mFragmentActivity = fragmentActivity;
+        mTaskId = taskId;
+    }
 
     /**
      * Creates a controller for a task view for phones or tablets.
      * @param fragmentActivity the context activity
      * @return a TasksMvpController
      */
-    public static TasksMvpController createTasksView(@NonNull FragmentActivity fragmentActivity) {
+    public static TasksMvpController createTasksView(
+            @NonNull FragmentActivity fragmentActivity, @Nullable String taskId) {
         checkNotNull(fragmentActivity);
-        TasksMvpController tasksMvpController = new TasksMvpController(fragmentActivity);
+
+        TasksMvpController tasksMvpController =
+                new TasksMvpController(fragmentActivity, taskId);
+
         tasksMvpController.initTasksView();
         return tasksMvpController;
-    }
-
-    /**
-     * Creates a controller for a task detail view for phones or tablets.
-     * @param fragmentActivity the context activity
-     * @return a TasksMvpController
-     */
-    public static TasksMvpController createTaskDetailView(
-            @NonNull FragmentActivity fragmentActivity, String taskId) {
-        checkNotNull(fragmentActivity);
-        TasksMvpController tasksMvpController = new TasksMvpController(fragmentActivity);
-        tasksMvpController.initTaskDetailView(taskId);
-        return tasksMvpController;
-    }
-
-    // Force factory method, prevent direct instantiation:
-    private TasksMvpController(@NonNull FragmentActivity fragmentActivity) {
-        mFragmentActivity = fragmentActivity;
     }
 
     private void initTasksView() {
         if (isTablet()) {
             createTabletElements();
         } else {
-            TasksFragment tasksFragment = findOrCreateTasksFragment();
-            if (tasksFragment.getPresenter() != null) {
-                mTasksPresenter = (TasksPresenter) tasksFragment.getPresenter();
-            } else {
-                mTasksPresenter = createListPresenter(tasksFragment);
-            }
-            tasksFragment.setPresenter(mTasksPresenter);
+            createPhoneElements();
         }
     }
 
-    private void initTaskDetailView(String taskId) {
-        TaskDetailFragment taskDetailFragment = findOrCreateTaskDetailFragment(taskId);
-        mTaskDetailPresenter = createTaskDetailPresenter(taskId, taskDetailFragment);
-        taskDetailFragment.setPresenter(mTaskDetailPresenter);
-    }
-
-    public TasksPresenter getTasksPresenter() {
-        return mTasksPresenter;
-    }
-
-    public TaskDetailPresenter getTaskDetailPresenter() {
-        return mTaskDetailPresenter;
-    }
-
-    /**
-     * To be called in tablet mode when a new detail view is requested.
-     * @param taskId the ID of the task
-     * @return the fragment to be added to the UI
-     */
-    public TaskDetailFragment createDetailViewForTablet(String taskId) {
-        // Create the View
-        TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(taskId);
-
-        // Create the Presenter
-        TaskDetailPresenter taskDetailPresenter = createTaskDetailPresenter(taskId,
-                taskDetailFragment);
-
-        // Wire presenters
-        mTasksTabletPresenter.setTaskDetailPresenter(taskDetailPresenter);
-        taskDetailFragment.setPresenter(mTasksTabletPresenter);
-        return taskDetailFragment;
+    private void createPhoneElements() {
+        TasksFragment tasksFragment = findOrCreateTasksFragment(R.id.contentFrame);
+        mTasksPresenter = createListPresenter(tasksFragment);
+        tasksFragment.setPresenter(mTasksPresenter);
     }
 
     private void createTabletElements() {
-        TasksFragment tasksFragment = findOrCreateTasksFragment();
+        // Fragment 1: List
+        TasksFragment tasksFragment = findOrCreateTasksFragment(R.id.contentFrame_list);
+        mTasksPresenter = createListPresenter(tasksFragment);
 
-        // TasksFragment is retained so let's reuse its presenter.
-        if (tasksFragment.getPresenter() != null) {
-            TasksTabletPresenter retainedPresenter =
-                    (TasksTabletPresenter) tasksFragment.getPresenter();
-            mTasksPresenter = retainedPresenter.getTasksPresenter();
-        } else {
-            mTasksPresenter = createListPresenter(tasksFragment);
-        }
+        // Fragment 2: Detail
+        TaskDetailFragment taskDetailFragment = findOrCreateTaskDetailFragmentForTablet();
+        TaskDetailPresenter taskDetailPresenter = createTaskDetailPresenter(taskDetailFragment);
 
+        // Fragments connect to their presenters through a tablet presenter:
         mTasksTabletPresenter = new TasksTabletPresenter(
                 Injection.provideTasksRepository(mFragmentActivity),
-                new TasksTabletNavigator(mFragmentActivity, this),
                 mTasksPresenter);
 
         tasksFragment.setPresenter(mTasksTabletPresenter);
-
-        // TaskDetailFragment is retained, so let's reuse its presenter.
-        TaskDetailFragment taskDetailFragment = getDetailFragment();
-        if (taskDetailFragment != null && taskDetailFragment.isAdded()) {
-
-            if (taskDetailFragment.getPresenter() instanceof TasksTabletPresenter) {
-                TasksTabletPresenter retainedPresenter =
-                        (TasksTabletPresenter) taskDetailFragment.getPresenter();
-
-                TaskDetailPresenter retainedTaskDetailPresenter =
-                        retainedPresenter.getTaskDetailPresenter();
-
-                mTasksTabletPresenter.setTaskDetailPresenter(retainedTaskDetailPresenter);
-
-                // Replace retained presenter with new one.
-                taskDetailFragment.setPresenter(mTasksTabletPresenter);
-            }
-        }
+        taskDetailFragment.setPresenter(mTasksTabletPresenter);
+        mTasksTabletPresenter.setTaskDetailPresenter(taskDetailPresenter);
     }
 
     @NonNull
-    private TaskDetailPresenter createTaskDetailPresenter(
-            String taskId, TaskDetailFragment taskDetailFragment) {
+    private TaskDetailPresenter createTaskDetailPresenter(TaskDetailFragment taskDetailFragment) {
         return new TaskDetailPresenter(
-                taskId,
+                mTaskId,
                 Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
                 taskDetailFragment);
     }
@@ -174,9 +119,9 @@ public class TasksMvpController {
     }
 
     @NonNull
-    private TasksFragment findOrCreateTasksFragment() {
+    private TasksFragment findOrCreateTasksFragment(@IdRes int fragmentId) {
         TasksFragment tasksFragment =
-                (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+                (TasksFragment) getFragmentById(fragmentId);
         if (tasksFragment == null) {
             // Create the fragment
             tasksFragment = TasksFragment.newInstance();
@@ -187,21 +132,32 @@ public class TasksMvpController {
     }
 
     @NonNull
-    private TaskDetailFragment findOrCreateTaskDetailFragment(String taskId) {
+    private TaskDetailFragment findOrCreateTaskDetailFragmentForTablet() {
         TaskDetailFragment taskDetailFragment =
-                (TaskDetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+                (TaskDetailFragment) getFragmentById(R.id.contentFrame_detail);
         if (taskDetailFragment == null) {
             // Create the fragment
-            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
+            taskDetailFragment = TaskDetailFragment.newInstance();
             ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), taskDetailFragment, R.id.contentFrame);
+                    getSupportFragmentManager(), taskDetailFragment, R.id.contentFrame_detail);
         }
         return taskDetailFragment;
     }
 
-    private TaskDetailFragment getDetailFragment() {
-        return (TaskDetailFragment) mFragmentActivity.getSupportFragmentManager().findFragmentById(
-                R.id.contentFrame_detail);
+    private Fragment getFragmentById(int contentFrame_detail) {
+        return getSupportFragmentManager().findFragmentById(contentFrame_detail);
+    }
+
+    public void setFiltering(TasksFilterType filtering) {
+        mTasksPresenter.setFiltering(filtering);
+    }
+
+    public TasksFilterType getFiltering() {
+        return mTasksPresenter.getFiltering();
+    }
+
+    public String getTaskId() {
+        return mTaskId;
     }
 
     private FragmentManager getSupportFragmentManager() {

@@ -16,14 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
@@ -41,7 +41,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     public TaskDetailPresenter(@Nullable String taskId,
             @NonNull TasksRepository tasksRepository,
             @NonNull TaskDetailContract.View taskDetailView) {
-        this.mTaskId = taskId;
+        mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
     }
@@ -147,5 +147,13 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Nullable
     public String getTaskId() {
         return mTaskId;
+    }
+
+    @Override
+    public void setTaskId(@Nullable String taskId) {
+        mTaskId = taskId;
+        if (mTaskId == null) {
+            mTaskDetailView.showMissingTask();
+        }
     }
 }

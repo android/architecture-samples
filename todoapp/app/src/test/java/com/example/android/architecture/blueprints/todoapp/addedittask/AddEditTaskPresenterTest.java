@@ -65,7 +65,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, true);
 
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -78,7 +78,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView,true);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.saveTask("", "");
@@ -90,7 +90,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, true);
 
         // When the presenter is asked to save an existing task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -105,7 +105,7 @@ public class AddEditTaskPresenterTest {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+                mTasksRepository, mAddEditTaskView, true);
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.populateTask();

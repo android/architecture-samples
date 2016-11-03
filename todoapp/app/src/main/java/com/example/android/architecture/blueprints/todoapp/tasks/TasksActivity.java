@@ -37,7 +37,11 @@ public class TasksActivity extends AppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
+    private static final String CURRENT_TASK_ID_KEY = "CURRENT_TASK_ID_KEY";
+
     private DrawerLayout mDrawerLayout;
+
+    private TasksMvpController tasksMvpTabletController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +63,30 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
+        // Load previously saved state, if available.
+        String taskId = null;
+        TasksFilterType currentFiltering = null;
+        if (savedInstanceState != null) {
+            currentFiltering =
+                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            taskId = savedInstanceState.getString(CURRENT_TASK_ID_KEY);
+        }
+
         // Create a TasksMvpController every time, even after rotation.
-        TasksMvpController.createTasksView(this);
+        tasksMvpTabletController = TasksMvpController.createTasksView(this, taskId);
+        if (currentFiltering != null) {
+            tasksMvpTabletController.setFiltering(currentFiltering);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(CURRENT_FILTERING_KEY,
+                tasksMvpTabletController.getFiltering());
+        outState.putString(CURRENT_TASK_ID_KEY,
+                tasksMvpTabletController.getTaskId());
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
