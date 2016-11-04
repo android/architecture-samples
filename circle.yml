@@ -5,11 +5,9 @@ machine:
 dependencies:
   pre:
     - sudo pip install -U crcmod
-  override:
-    - cd todoapp;
   post:
-    - ./gradlew :app:assembleDebug -PdisablePreDex
-    - ./gradlew :app:assembleDebugTest -PdisablePreDex
+    - cd todoapp;./gradlew :app:assembleMockDebug -PdisablePreDex
+    - cd todoapp;./gradlew :app:assembleMockDebugTest -PdisablePreDex
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project android-devrel-ci
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
@@ -18,6 +16,6 @@ dependencies:
 
 test:
   override:
-    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app app/build/outputs/apk/app-mockDebug.apk --test app/build/outputs/apk/app-mockDebug-test-unaligned.apk --results-bucket cloud-test-<PROJECT-ID>
+    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app todoapp/app/build/outputs/apk/app-mockDebug.apk --test todoapp/app/build/outputs/apk/app-mockDebug-test-unaligned.apk --results-bucket cloud-test-<PROJECT-ID>
   post:
     - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
