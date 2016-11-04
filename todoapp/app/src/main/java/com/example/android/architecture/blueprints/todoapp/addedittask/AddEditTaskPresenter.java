@@ -55,7 +55,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-        mIsDataMissing = shouldLoadDataFromRepo;q
+        mIsDataMissing = shouldLoadDataFromRepo;
     }
 
     @Override
