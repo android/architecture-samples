@@ -4,13 +4,20 @@ machine:
 
 dependencies:
   pre:
-    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-24.0.2,android-24,extra-android-m2repository"
+    - sudo pip install -U crcmod
   override:
     - cd todoapp;./gradlew dependencies
   post:
-    - rm -f ~/.gradle/caches/modules-2/modules-2.lock
+    - ./gradlew :app:assembleDebug -PdisablePreDex
+    - ./gradlew :app:assembleDebugTest -PdisablePreDex
+    - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
+    - sudo /opt/google-cloud-sdk/bin/gcloud config set project android-devrel-ci
+    - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+    - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components install beta
+    - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account travis-ci-for-blueprints@android-devrel-ci.iam.gserviceaccount.com --key-file ${HOME}/client-secret.json
 
 test:
   override:
-    - cd todoapp;./gradlew test
-    - cp -r todoapp/app/build/test-results/* $CIRCLE_TEST_REPORTS
+    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app app/build/outputs/apk/app-mockDebug.apk --test app/build/outputs/apk/app-mockDebug-test-unaligned.apk --results-bucket cloud-test-<PROJECT-ID>
+  post:
+    - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
