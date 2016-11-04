@@ -23,6 +23,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.view.Gravity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.TestUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,8 +104,10 @@ public class AppNavigationTest {
         onView(withId(R.id.drawer_layout))
                 .check(matches(isClosed(Gravity.LEFT))); // Left Drawer should be closed.
 
-        // Open Drawer
-        onView(withContentDescription("Navigate up")).perform(click());
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription(TestUtils.getToolbarNavigationContentDescription(
+                    mActivityTestRule.getActivity(), R.id.toolbar)))
+                .perform(click());
 
         // Check if drawer is open
         onView(withId(R.id.drawer_layout))

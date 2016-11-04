@@ -126,7 +126,7 @@ public class TasksMvpController {
             // Create the fragment
             tasksFragment = TasksFragment.newInstance();
             ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
+                    getSupportFragmentManager(), tasksFragment, fragmentId);
         }
         return tasksFragment;
     }
