@@ -27,6 +27,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -115,11 +117,13 @@ public class AddEditTaskPresenterTest {
 
         // Then the task repository is queried and the view updated
         verify(mTasksRepository).getTask(eq(testTask.getId()), mGetTaskCallbackCaptor.capture());
+        assertThat(mAddEditTaskPresenter.isDataMissing(), is(true));
 
         // Simulate callback
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
 
         verify(mAddEditTaskView).setTitle(testTask.getTitle());
         verify(mAddEditTaskView).setDescription(testTask.getDescription());
+        assertThat(mAddEditTaskPresenter.isDataMissing(), is(false));
     }
 }
