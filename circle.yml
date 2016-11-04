@@ -10,7 +10,7 @@ dependencies:
   post:
     - cd todoapp;./gradlew :app:assembleDebug -PdisablePreDex
     - cd todoapp;./gradlew :app:assembleAndroidTest -PdisablePreDex
-    - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
+    - echo ${GCLOUD_SERVICE_KEY} | base64 --decode > ${HOME}/client-secret.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project android-devrel-ci
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components install beta
