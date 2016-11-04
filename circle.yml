@@ -1,0 +1,16 @@
+machine:
+  java:
+    version: oraclejdk8
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-24.0.2,android-24,extra-android-m2repository"
+  override:
+    - cd todoapp;./gradlew dependencies
+  post:
+    - rm -f ~/.gradle/caches/modules-2/modules-2.lock
+
+test:
+  override:
+    - cd todoapp;./gradlew test
+    - cp -r todoapp/app/build/test-results/* $CIRCLE_TEST_REPORTS
