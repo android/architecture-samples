@@ -6,7 +6,7 @@ dependencies:
   pre:
     - sudo pip install -U crcmod
   override:
-    - cd todoapp;./gradlew dependencies
+    - cd todoapp;
   post:
     - ./gradlew :app:assembleDebug -PdisablePreDex
     - ./gradlew :app:assembleDebugTest -PdisablePreDex
