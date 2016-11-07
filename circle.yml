@@ -18,6 +18,6 @@ dependencies:
 
 test:
   override:
-    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app todoapp/app/build/outputs/apk/app-mock-debug.apk --test todoapp/app/build/outputs/apk/app-mock-debug-androidTest.apk -d Nexus5X,Nexus10 -v 22 -l fr --results-bucket cloud-test-android-devrel-ci
+    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app todoapp/app/build/outputs/apk/app-mock-debug.apk --test todoapp/app/build/outputs/apk/app-mock-debug-androidTest.apk -d Nexus5X,Nexus10 -v 21,25 -l fr --results-bucket cloud-test-android-devrel-ci
   post:
     - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-android-devrel-ci | tail -1` $CIRCLE_ARTIFACTS/ | true
