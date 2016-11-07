@@ -18,6 +18,6 @@ dependencies:
 
 test:
   override:
-    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app todoapp/app/build/outputs/apk/app-mockDebug.apk --test todoapp/app/build/outputs/apk/app-mockDebug-test-unaligned.apk --results-bucket cloud-test-<PROJECT-ID>
+    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app todoapp/app/build/outputs/apk/app-mockDebug.apk --test todoapp/app/build/outputs/apk/app-mockDebug-test-unaligned.apk --results-bucket cloud-test-android-devrel-ci
   post:
     - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1` $CIRCLE_ARTIFACTS/ | true
