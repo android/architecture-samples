@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
 /**
@@ -37,7 +36,7 @@ public interface AddEditTaskContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter {
 
         void saveTask(String title, String description);
 

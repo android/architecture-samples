@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -87,7 +88,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.loadTasks(false);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mPresenter.onTasksResult(requestCode, resultCode);
     }
 
     @Nullable
@@ -172,7 +173,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 mPresenter.loadTasks(true);
                 break;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -266,7 +267,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         showNoTasksViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false
+                true
         );
     }
 
@@ -289,7 +290,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTaskIcon.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
@@ -352,10 +353,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         return isAdded();
     }
 
+    public TasksContract.Presenter getPresenter() {
+        return mPresenter;
+    }
+
     private static class TasksAdapter extends BaseAdapter {
 
         private List<Task> mTasks;
+
         private TaskItemListener mItemListener;
+
+        private String selectedItem = null;
 
         public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
             setList(tasks);
@@ -387,7 +395,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int i, View view, final ViewGroup viewGroup) {
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
@@ -403,12 +411,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
-            } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
+
+            // On tablets, highlight the selected item.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                if (selectedItem != null && selectedItem.equals(task.getId())) {
+                    rowView.setActivated(true);
+                } else {
+                    rowView.setActivated(false);
+                }
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {
@@ -426,6 +436,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 @Override
                 public void onClick(View view) {
                     mItemListener.onTaskClick(task);
+                    selectedItem = task.getId();
+                    notifyDataSetInvalidated();
                 }
             });
 

@@ -44,22 +44,18 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    public TasksPresenter(
+            @NonNull TasksRepository tasksRepository,
+            @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
-
-        mTasksView.setPresenter(this);
     }
 
     @Override
-    public void start() {
-        loadTasks(false);
-    }
-
-    @Override
-    public void result(int requestCode, int resultCode) {
+    public void onTasksResult(int requestCode, int resultCode) {
         // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
             mTasksView.showSuccessfullySavedMessage();
         }
     }
@@ -72,8 +68,8 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
-     * @param showLoadingUI Pass in true to display a loading icon in the UI
+     * @param forceUpdate   whether to refresh the data in the {@link TasksDataSource}
+     * @param showLoadingUI whether to display a loading icon in the UI
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {

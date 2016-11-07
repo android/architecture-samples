@@ -40,26 +40,28 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    private final boolean mLoadData;
+
     /**
      * Creates a presenter for the add/edit view.
      *
      * @param taskId ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
      * @param addTaskView the add/edit view
+     * @param loadData whether data needs to be loaded or not (like after a rotation)
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+            @NonNull AddEditTaskContract.View addTaskView, boolean loadData) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-
-        mAddTaskView.setPresenter(this);
+        mLoadData = loadData;
     }
 
     @Override
-    public void start() {
-        if (!isNewTask()) {
-            populateTask();
+    public void populateTask() {
+        if (!isNewTask() && mLoadData) {
+            mTasksRepository.getTask(mTaskId, this);
         }
     }
 
@@ -70,14 +72,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         } else {
             updateTask(title, description);
         }
-    }
-
-    @Override
-    public void populateTask() {
-        if (isNewTask()) {
-            throw new RuntimeException("populateTask() was called but task is new.");
-        }
-        mTasksRepository.getTask(mTaskId, this);
     }
 
     @Override

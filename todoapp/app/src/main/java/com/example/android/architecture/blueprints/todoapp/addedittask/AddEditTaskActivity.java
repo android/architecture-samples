@@ -50,13 +50,12 @@ public class AddEditTaskActivity extends AppCompatActivity {
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
-        String taskId = null;
+        String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                taskId = getIntent().getStringExtra(
-                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
                 actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
                 bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
@@ -69,11 +68,16 @@ public class AddEditTaskActivity extends AppCompatActivity {
                     addEditTaskFragment, R.id.contentFrame);
         }
 
+        // Prevent the presenter from loading data from the repository if this is a config change.
+        boolean shouldLoadDataFromRepo = savedInstanceState == null;
+
         // Create the presenter
-        new AddEditTaskPresenter(
+        AddEditTaskPresenter addEditTaskPresenter = new AddEditTaskPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
+                addEditTaskFragment,
+                shouldLoadDataFromRepo);
+        addEditTaskFragment.setPresenter(addEditTaskPresenter);
     }
 
     @Override

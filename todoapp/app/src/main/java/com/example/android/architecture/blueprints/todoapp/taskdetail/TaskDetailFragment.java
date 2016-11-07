@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,12 +38,12 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Main UI for the task detail screen.
  */
 public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
-
-    public static final String ARGUMENT_TASK_ID = "TASK_ID";
 
     public static final int REQUEST_EDIT_TASK = 1;
 
@@ -57,18 +55,21 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     private CheckBox mDetailCompleteStatus;
 
-    public static TaskDetailFragment newInstance(String taskId) {
-        Bundle arguments = new Bundle();
-        arguments.putString(ARGUMENT_TASK_ID, taskId);
-        TaskDetailFragment fragment = new TaskDetailFragment();
-        fragment.setArguments(arguments);
-        return fragment;
+    private View mDetailLayout;
+
+    public static TaskDetailFragment newInstance() {
+        return new TaskDetailFragment();
+    }
+
+    @Override
+    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.loadTask();
     }
 
     @Nullable
@@ -80,24 +81,21 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
         mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
         mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+        mDetailLayout = root.findViewById(R.id.task_detail_layout);
 
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.editTask();
-            }
-        });
+        if (fab != null) { // Fab is null in tablet mode
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPresenter.editTask();
+                }
+            });
+        }
 
         return root;
-    }
-
-    @Override
-    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
     }
 
     @Override
@@ -105,6 +103,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 mPresenter.deleteTask();
+                return true;
+            case R.id.menu_edit: // tablet mode only
+                mPresenter.editTask();
                 return true;
         }
         return false;
@@ -134,12 +135,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void showDescription(String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
-    }
-
-    @Override
     public void showCompletionStatus(final boolean complete) {
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
@@ -164,7 +159,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showTaskDeleted() {
-        getActivity().finish();
+        // Close the activity if not in tablet mode.
+        if (getFragmentManager().findFragmentById(R.id.contentFrame_detail) == null) {
+            getActivity().finish();
+        }
     }
 
     public void showTaskMarkedComplete() {
@@ -183,25 +181,40 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         if (requestCode == REQUEST_EDIT_TASK) {
             // If the task was edited successfully, go back to the list.
             if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
+                if (getFragmentManager().findFragmentById(R.id.contentFrame_detail) == null) {
+                    getActivity().finish();
+                }
             }
         }
     }
 
     @Override
     public void showTitle(String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
         mDetailTitle.setText(title);
+        mDetailTitle.setVisibility(View.VISIBLE);
+        mDetailLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showDescription(String description) {
+        mDetailDescription.setText(description);
+        mDetailDescription.setVisibility(View.VISIBLE);
+        mDetailLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showMissingTask() {
         mDetailTitle.setText("");
-        mDetailDescription.setText(getString(R.string.no_data));
+        mDetailDescription.setText("");
+        mDetailLayout.setVisibility(View.GONE);
     }
 
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    public TaskDetailContract.Presenter getPresenter() {
+        return mPresenter;
     }
 }

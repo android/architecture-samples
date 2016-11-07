@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.collect.Lists;
-
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +31,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.List;
 
 /**
  * Unit tests for the implementation of {@link StatisticsPresenter}
@@ -79,7 +79,7 @@ public class StatisticsPresenterTest {
         TASKS.clear();
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.loadStats();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
@@ -98,7 +98,7 @@ public class StatisticsPresenterTest {
         // Given an initialized StatisticsPresenter with 1 active and 2 completed tasks
 
         // When loading of Tasks is requested
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.loadStats();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
@@ -115,7 +115,7 @@ public class StatisticsPresenterTest {
     @Test
     public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         // When statistics are loaded
-        mStatisticsPresenter.start();
+        mStatisticsPresenter.loadStats();
 
         // And tasks data isn't available
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());

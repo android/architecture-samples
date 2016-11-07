@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -45,7 +46,9 @@
             <ListView
                 android:id="@+id/tasks_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:listSelector="@drawable/touch_feedback"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -60,7 +63,8 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_assignment_turned_in_24dp" />
+                android:src="@drawable/ic_assignment_turned_in_24dp"
+                android:contentDescription="@string/no_tasks_all"/>
 
             <TextView
                 android:id="@+id/noTasksMain"

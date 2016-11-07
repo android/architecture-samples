@@ -55,17 +55,19 @@ public class TaskDetailActivity extends AppCompatActivity {
                 .findFragmentById(R.id.contentFrame);
 
         if (taskDetailFragment == null) {
-            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
+            taskDetailFragment = TaskDetailFragment.newInstance();
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     taskDetailFragment, R.id.contentFrame);
         }
 
         // Create the presenter
-        new TaskDetailPresenter(
+        TaskDetailPresenter taskDetailPresenter = new TaskDetailPresenter(
                 taskId,
                 Injection.provideTasksRepository(getApplicationContext()),
                 taskDetailFragment);
+
+        taskDetailFragment.setPresenter(taskDetailPresenter);
     }
 
     @Override

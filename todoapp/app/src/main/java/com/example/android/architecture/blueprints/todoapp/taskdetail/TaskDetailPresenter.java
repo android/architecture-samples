@@ -39,18 +39,18 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private String mTaskId;
 
     public TaskDetailPresenter(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository,
-                               @NonNull TaskDetailContract.View taskDetailView) {
-        this.mTaskId = taskId;
+            @NonNull TasksRepository tasksRepository,
+            @NonNull TaskDetailContract.View taskDetailView) {
+        mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
-
-        mTaskDetailView.setPresenter(this);
     }
 
     @Override
-    public void start() {
-        openTask();
+    public void loadTask() {
+        if (mTaskDetailView.isActive()) {
+            openTask();
+        }
     }
 
     private void openTask() {
@@ -58,8 +58,9 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showMissingTask();
             return;
         }
-
-        mTaskDetailView.setLoadingIndicator(true);
+        if (mTaskDetailView.isActive()) {
+            mTaskDetailView.setLoadingIndicator(true);
+        }
         mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
@@ -108,6 +109,10 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             return;
         }
         mTasksRepository.completeTask(mTaskId);
+        showTaskMarkedComplete();
+    }
+
+    public void showTaskMarkedComplete() {
         mTaskDetailView.showTaskMarkedComplete();
     }
 
@@ -137,5 +142,18 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showDescription(description);
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
+    }
+
+    @Nullable
+    public String getTaskId() {
+        return mTaskId;
+    }
+
+    @Override
+    public void setTaskId(@Nullable String taskId) {
+        mTaskId = taskId;
+        if (mTaskId == null) {
+            mTaskDetailView.showMissingTask();
+        }
     }
 }

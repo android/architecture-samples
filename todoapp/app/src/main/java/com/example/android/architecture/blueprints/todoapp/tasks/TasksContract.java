@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 
@@ -66,11 +65,14 @@ public interface TasksContract {
         void showFilteringPopUpMenu();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter {
 
-        void result(int requestCode, int resultCode);
-
+        /**
+         * @param forceUpdate reload data triggering a refresh from source of truth.
+         */
         void loadTasks(boolean forceUpdate);
+
+        void onTasksResult(int requestCode, int resultCode);
 
         void addNewTask();
 

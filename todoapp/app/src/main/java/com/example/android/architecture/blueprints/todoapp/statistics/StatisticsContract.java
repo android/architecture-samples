@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
 /**
@@ -35,7 +34,7 @@ public interface StatisticsContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
-
+    interface Presenter {
+        void loadStats();
     }
 }

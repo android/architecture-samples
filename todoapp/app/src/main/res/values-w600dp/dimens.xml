@@ -15,10 +15,5 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#455A64</color>
-    <color name="colorPrimaryDark">#263238</color>
-    <color name="colorAccent">#D50000</color>
-    <color name="touchFeedback">#CFD8DC</color>
-    <color name="selectedTask">#CFD8DC</color>
-    <color name="completedTaskBackground">#CCCCCC</color>
+    <dimen name="fab_margin">24dp</dimen>
 </resources>
