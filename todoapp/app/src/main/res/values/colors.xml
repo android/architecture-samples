@@ -18,11 +18,7 @@
     <color name="colorPrimary">#455A64</color>
     <color name="colorPrimaryDark">#263238</color>
     <color name="colorAccent">#D50000</color>
-
-    <drawable name="completedTaskBackground">#CCCCCC</drawable>
-
-    <drawable name="touchFeedback">#CFD8DC</drawable>
-
-    <drawable name="selectedTask">#CFD8DC</drawable>
-
+    <color name="touchFeedback">#CFD8DC</color>
+    <color name="selectedTask">#CFD8DC</color>
+    <color name="completedTaskBackground">#CCCCCC</color>
 </resources>

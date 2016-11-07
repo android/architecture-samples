@@ -18,5 +18,6 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--In tablet mode, enable selection of items -->
-    <item android:state_selected="true" android:drawable="@drawable/selectedTask" />
+    <item android:state_activated="true" android:drawable="@drawable/selectedTask" />
+    <item android:state_pressed="true" android:drawable="@color/touchFeedback" />
 </selector>

@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -411,15 +412,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
 
-            if (selectedItem != null && selectedItem.equals(task.getId())) {
-                //noinspection deprecation
-                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
-                        viewGroup.getContext(), R.drawable.selectedTask));
-
-            } else {
-                //noinspection deprecation
-                rowView.setBackgroundDrawable(ContextCompat.getDrawable(
-                        viewGroup.getContext(), R.drawable.touch_feedback));
+            // On tablets, highlight the selected item.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                if (selectedItem != null && selectedItem.equals(task.getId())) {
+                    rowView.setActivated(true);
+                } else {
+                    rowView.setActivated(false);
+                }
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {

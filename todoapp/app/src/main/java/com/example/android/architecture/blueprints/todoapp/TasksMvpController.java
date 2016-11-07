@@ -30,6 +30,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
+import static com.example.android.architecture.blueprints.todoapp.util.ActivityUtils.isTablet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -70,7 +71,7 @@ public class TasksMvpController {
     }
 
     private void initTasksView() {
-        if (isTablet()) {
+        if (isTablet(mFragmentActivity)) {
             createTabletElements();
         } else {
             createPhoneElements();
@@ -162,9 +163,5 @@ public class TasksMvpController {
 
     private FragmentManager getSupportFragmentManager() {
         return mFragmentActivity.getSupportFragmentManager();
-    }
-
-    private boolean isTablet() {
-        return mFragmentActivity.getResources().getBoolean(R.bool.isTablet);
     }
 }

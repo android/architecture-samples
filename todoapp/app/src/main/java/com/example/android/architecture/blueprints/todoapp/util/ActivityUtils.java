@@ -16,10 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+
+import com.example.android.architecture.blueprints.todoapp.R;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,6 +43,10 @@ public class ActivityUtils {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment);
         transaction.commit();
+    }
+
+    public static boolean isTablet(Context context) {
+        return context.getResources().getBoolean(R.bool.isTablet);
     }
 
 }
