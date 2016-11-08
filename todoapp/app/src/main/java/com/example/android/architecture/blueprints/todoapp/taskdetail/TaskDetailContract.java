@@ -47,6 +47,8 @@ public interface TaskDetailContract {
 
         void showTaskMarkedActive();
 
+        void updateMenuOptions();
+
         boolean isActive();
     }
 
@@ -62,8 +64,8 @@ public interface TaskDetailContract {
 
         void activateTask();
 
-        void setTaskId(String taskId);
+        void setDetailTaskId(String taskId);
 
-        String getTaskId();
+        String getDetailTaskId();
     }
 }

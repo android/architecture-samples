@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -98,7 +99,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.onTasksResult(requestCode, resultCode);
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
+            mPresenter.onTaskAdded();
+        }
     }
 
     @Nullable
@@ -121,7 +125,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -207,6 +211,11 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         popup.show();
     }
 
+    @Override
+    public void setSelectedTaskId(@Nullable String taskId) {
+        mListAdapter.setSelectedTaskId(taskId);
+    }
+
     /**
      * Listener for clicks on tasks in the ListView.
      */
@@ -214,6 +223,11 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         @Override
         public void onTaskClick(Task clickedTask) {
             mPresenter.openTaskDetails(clickedTask);
+        }
+
+        @Override
+        public void onLongTaskClick(Task task) {
+            mPresenter.editTask(task.getId());
         }
 
         @Override
@@ -363,7 +377,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
         private TaskItemListener mItemListener;
 
-        private String selectedItem = null;
+        private String mSelectedTaskId = null;
 
         public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
             setList(tasks);
@@ -373,6 +387,10 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         public void replaceData(List<Task> tasks) {
             setList(tasks);
             notifyDataSetChanged();
+        }
+
+        public void setSelectedTaskId(@Nullable String taskId) {
+            mSelectedTaskId = taskId;
         }
 
         private void setList(List<Task> tasks) {
@@ -414,7 +432,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             // On tablets, highlight the selected item.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                if (selectedItem != null && selectedItem.equals(task.getId())) {
+                if (mSelectedTaskId != null && mSelectedTaskId.equals(task.getId())) {
                     rowView.setActivated(true);
                 } else {
                     rowView.setActivated(false);
@@ -436,8 +454,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 @Override
                 public void onClick(View view) {
                     mItemListener.onTaskClick(task);
-                    selectedItem = task.getId();
+                    mSelectedTaskId = task.getId();
                     notifyDataSetInvalidated();
+                }
+            });
+
+            rowView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mItemListener.onLongTaskClick(task);
+                    return true;
                 }
             });
 
@@ -452,6 +478,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         void onCompleteTaskClick(Task completedTask);
 
         void onActivateTaskClick(Task activatedTask);
+
+        void onLongTaskClick(Task task);
     }
 
 }

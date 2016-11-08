@@ -37,7 +37,9 @@ public class TasksActivity extends AppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
-    private static final String CURRENT_TASK_ID_KEY = "CURRENT_TASK_ID_KEY";
+    private static final String CURRENT_DETAIL_TASK_ID_KEY = "CURRENT_DETAIL_TASK_ID_KEY";
+
+    private static final String CURRENT_ADDEDIT_TASK_ID_KEY = "CURRENT_ADDEDIT_TASK_ID_KEY";
 
     private DrawerLayout mDrawerLayout;
 
@@ -63,18 +65,27 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
+        // Create a TasksMvpController every time, even after rotation.
+        tasksMvpTabletController = TasksMvpController.createTasksView(this);
+
+        restoreState(savedInstanceState);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
         // Load previously saved state, if available.
-        String taskId = null;
+        String detailTaskId = null;
         TasksFilterType currentFiltering = null;
+        String addEditTaskId = null;
         if (savedInstanceState != null) {
             currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            taskId = savedInstanceState.getString(CURRENT_TASK_ID_KEY);
-        }
+            detailTaskId = savedInstanceState.getString(CURRENT_DETAIL_TASK_ID_KEY);
+            addEditTaskId = savedInstanceState.getString(CURRENT_ADDEDIT_TASK_ID_KEY);
 
-        // Create a TasksMvpController every time, even after rotation.
-        tasksMvpTabletController = TasksMvpController.createTasksView(this, taskId);
-        if (currentFiltering != null) {
+            // Prevent the presenter from loading data from the repository if this is a config change.
+            boolean shouldLoadDataFromRepo = savedInstanceState == null;
+            tasksMvpTabletController.restoreDetailTaskId(detailTaskId);
+            tasksMvpTabletController.restoreAddEditTaskId(addEditTaskId, false); // TODO wtf
             tasksMvpTabletController.setFiltering(currentFiltering);
         }
     }
@@ -83,8 +94,10 @@ public class TasksActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(CURRENT_FILTERING_KEY,
                 tasksMvpTabletController.getFiltering());
-        outState.putString(CURRENT_TASK_ID_KEY,
-                tasksMvpTabletController.getTaskId());
+        outState.putString(CURRENT_DETAIL_TASK_ID_KEY,
+                tasksMvpTabletController.getDetailTaskId());
+        outState.putString(CURRENT_ADDEDIT_TASK_ID_KEY,
+                tasksMvpTabletController.getAddEditTaskId());
 
         super.onSaveInstanceState(outState);
     }

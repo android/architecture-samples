@@ -16,10 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -52,12 +51,9 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void onTasksResult(int requestCode, int resultCode) {
+    public void onTaskAdded() {
         // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
-                && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
-        }
+        mTasksView.showSuccessfullySavedMessage();
     }
 
     @Override
@@ -190,6 +186,11 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
+    public void editTask(@NonNull String taskId) {
+        // no op from phone
+    }
+
+    @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
@@ -227,6 +228,11 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public TasksFilterType getFiltering() {
         return mCurrentFiltering;
+    }
+
+    @Override
+    public void setSelectedTaskId(@Nullable String taskId) {
+        mTasksView.setSelectedTaskId(taskId);
     }
 
 }

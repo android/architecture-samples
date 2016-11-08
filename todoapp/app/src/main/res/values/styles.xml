@@ -27,4 +27,9 @@
     </style>
 
     <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="DrawerLayoutFitWindows" >
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+
 </resources>

@@ -23,6 +23,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskPresenter;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType;
@@ -38,36 +40,110 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksMvpController {
 
+    public static final String ADD_EDIT_DIALOG_TAG = "ADD_EDIT_DIALOG_TAG";
+
     private final FragmentActivity mFragmentActivity;
 
-    // Null task ID means there's no task selected (or in phone mode)
-    @Nullable private final String mTaskId;
-
+    @Nullable
     private TasksTabletPresenter mTasksTabletPresenter;
 
     private TasksPresenter mTasksPresenter;
 
+    //@Nullable
+    //private AddEditTaskFragment mAddEditTaskFragment;
+
     // Force factory method, prevent direct instantiation:
-    private TasksMvpController(
-            @NonNull FragmentActivity fragmentActivity, @Nullable String taskId) {
+    private TasksMvpController(@NonNull FragmentActivity fragmentActivity) {
         mFragmentActivity = fragmentActivity;
-        mTaskId = taskId;
     }
 
     /**
      * Creates a controller for a task view for phones or tablets.
+     *
      * @param fragmentActivity the context activity
      * @return a TasksMvpController
      */
-    public static TasksMvpController createTasksView(
-            @NonNull FragmentActivity fragmentActivity, @Nullable String taskId) {
+    public static TasksMvpController createTasksView(@NonNull FragmentActivity fragmentActivity) {
         checkNotNull(fragmentActivity);
 
-        TasksMvpController tasksMvpController =
-                new TasksMvpController(fragmentActivity, taskId);
+        TasksMvpController tasksMvpController = new TasksMvpController(fragmentActivity);
 
         tasksMvpController.initTasksView();
         return tasksMvpController;
+    }
+
+    /**
+     * Shows the edit view for a new task.
+     */
+    public void addNewTask() {
+        showAddNewTaskDialogForTablet(null);
+    }
+
+    /**
+     * Shows the edit view for an existing task.
+     * @param taskId The task ID or null if
+     */
+    public void editTask(@NonNull String taskId) {
+        showAddNewTaskDialogForTablet(taskId);
+    }
+
+    /**
+     * Sets the current task ID for detail, used in a configuration change (rotation, etc.)
+     */
+    public void restoreDetailTaskId(@Nullable String taskId) {
+        if (isTablet(mFragmentActivity)) {
+            assert mTasksTabletPresenter != null; // In tablet mode it's never null
+            // Set the task ID on the detail presenter
+            mTasksTabletPresenter.setDetailTaskId(taskId);
+        }
+    }
+
+    /**
+     * Sets the current task ID for add/edit, used in a configuration change (rotation, etc.)
+     */
+    public void restoreAddEditTaskId(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
+        if (isTablet(mFragmentActivity)) {
+            // If the add/edit dialog is shown, recreate presenter
+            if (isAddEditDialogShown()) {
+                createAddEditDialogElements(taskId, shouldLoadDataFromRepo);
+            }
+        }
+    }
+
+    public TasksFilterType getFiltering() {
+        return mTasksPresenter.getFiltering();
+    }
+
+    public void setFiltering(@Nullable TasksFilterType filtering) {
+        if (filtering != null) {
+            mTasksPresenter.setFiltering(filtering);
+        }
+    }
+
+    @Nullable
+    public String getDetailTaskId() {
+        assert mTasksTabletPresenter != null;
+        return mTasksTabletPresenter.getDetailTaskId();
+    }
+
+    @Nullable
+    public String getAddEditTaskId() {
+        assert mTasksTabletPresenter != null;
+        return mTasksTabletPresenter.getAddEditTaskId();
+    }
+
+    private void showAddNewTaskDialogForTablet(@Nullable String taskId) {
+        AddEditTaskFragment addEditTaskFragment = createAddEditDialogElements(taskId, true);
+        addEditTaskFragment.show(getSupportFragmentManager(), ADD_EDIT_DIALOG_TAG);
+    }
+
+    private AddEditTaskFragment createAddEditDialogElements(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
+        assert mTasksTabletPresenter != null; // In tablet mode it's never null
+        AddEditTaskFragment addEditTaskFragment = findOrCreateAddEditTaskFragmentForTablet();
+        AddEditTaskPresenter presenter = createAddEditTaskPresenter(taskId, addEditTaskFragment, shouldLoadDataFromRepo);
+        mTasksTabletPresenter.setAddEditPresenter(presenter);
+        addEditTaskFragment.setPresenter(mTasksTabletPresenter);
+        return addEditTaskFragment;
     }
 
     private void initTasksView() {
@@ -96,7 +172,8 @@ public class TasksMvpController {
         // Fragments connect to their presenters through a tablet presenter:
         mTasksTabletPresenter = new TasksTabletPresenter(
                 Injection.provideTasksRepository(mFragmentActivity),
-                mTasksPresenter);
+                mTasksPresenter,
+                this);
 
         tasksFragment.setPresenter(mTasksTabletPresenter);
         taskDetailFragment.setPresenter(mTasksTabletPresenter);
@@ -106,17 +183,26 @@ public class TasksMvpController {
     @NonNull
     private TaskDetailPresenter createTaskDetailPresenter(TaskDetailFragment taskDetailFragment) {
         return new TaskDetailPresenter(
-                mTaskId,
+                null,
                 Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
                 taskDetailFragment);
     }
 
+    @NonNull
+    private AddEditTaskPresenter createAddEditTaskPresenter(@Nullable String taskId,
+            AddEditTaskFragment addEditTaskFragment, boolean shouldLoadDataFromRepo) {
+        assert mTasksTabletPresenter != null; // In tablet mode it's never null
+        return new AddEditTaskPresenter(
+                taskId,
+                Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
+                addEditTaskFragment, shouldLoadDataFromRepo);
+    }
+
+    @NonNull
     private TasksPresenter createListPresenter(TasksFragment tasksFragment) {
-        mTasksPresenter = new TasksPresenter(
+        return new TasksPresenter(
                 Injection.provideTasksRepository(mFragmentActivity.getApplicationContext()),
                 tasksFragment);
-
-        return mTasksPresenter;
     }
 
     @NonNull
@@ -145,23 +231,25 @@ public class TasksMvpController {
         return taskDetailFragment;
     }
 
+    @NonNull
+    private AddEditTaskFragment findOrCreateAddEditTaskFragmentForTablet() {
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
+                .findFragmentByTag(ADD_EDIT_DIALOG_TAG);
+        if (addEditTaskFragment == null) {
+            addEditTaskFragment = AddEditTaskFragment.newInstance();
+        }
+        return addEditTaskFragment;
+    }
+
     private Fragment getFragmentById(int contentFrame_detail) {
         return getSupportFragmentManager().findFragmentById(contentFrame_detail);
     }
 
-    public void setFiltering(TasksFilterType filtering) {
-        mTasksPresenter.setFiltering(filtering);
-    }
-
-    public TasksFilterType getFiltering() {
-        return mTasksPresenter.getFiltering();
-    }
-
-    public String getTaskId() {
-        return mTaskId;
-    }
-
     private FragmentManager getSupportFragmentManager() {
         return mFragmentActivity.getSupportFragmentManager();
+    }
+
+    private boolean isAddEditDialogShown() {
+        return getSupportFragmentManager().findFragmentByTag(ADD_EDIT_DIALOG_TAG) != null;
     }
 }

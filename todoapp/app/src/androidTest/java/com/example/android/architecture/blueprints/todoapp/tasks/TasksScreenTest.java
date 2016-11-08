@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.app.FragmentActivity;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 import android.view.View;
@@ -45,6 +46,7 @@ import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
@@ -53,6 +55,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.example.android.architecture.blueprints.todoapp.TasksMvpController.ADD_EDIT_DIALOG_TAG;
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.allOf;
@@ -151,7 +154,7 @@ public class TasksScreenTest {
                 closeSoftKeyboard()); // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(R.id.fab_edit_task_done)).perform(click());
+        clickOnDoneButton();
 
         // Verify task is displayed on screen in the task list.
         onView(withItemText(editTaskTitle)).check(matches(isDisplayed()));
@@ -454,7 +457,7 @@ public class TasksScreenTest {
                 closeSoftKeyboard()); // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(R.id.fab_edit_task_done)).perform(click());
+        clickOnDoneButton();
 
         // Verify task is displayed on screen in the task list.
         onView(withItemText(TITLE2)).check(matches(isDisplayed()));
@@ -489,7 +492,7 @@ public class TasksScreenTest {
                 closeSoftKeyboard()); // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(R.id.fab_edit_task_done)).perform(click());
+        clickOnDoneButton();
     }
 
     private void clickCheckBoxForTask(String title) {
@@ -514,6 +517,18 @@ public class TasksScreenTest {
         } else {
             // On tablet, click on menu item
             onView(withId(R.id.menu_edit)).perform(click());
+        }
+    }
+
+    private void clickOnDoneButton() {
+        // The add/edit form can be an AlertDialog (tablet) or a FAB (phone)
+        if (((FragmentActivity)TestUtils.getCurrentActivity())
+                .getSupportFragmentManager().findFragmentByTag(ADD_EDIT_DIALOG_TAG) != null) {
+            // On tablet, click on Ok button
+            onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+        } else {
+            // On phone click on FAB
+            onView(withId(R.id.fab_edit_task_done)).perform(click());
         }
     }
 }

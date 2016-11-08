@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -63,6 +64,8 @@ public interface TasksContract {
         boolean isActive();
 
         void showFilteringPopUpMenu();
+
+        void setSelectedTaskId(@Nullable String taskId);
     }
 
     interface Presenter {
@@ -72,11 +75,13 @@ public interface TasksContract {
          */
         void loadTasks(boolean forceUpdate);
 
-        void onTasksResult(int requestCode, int resultCode);
+        void onTaskAdded();
 
         void addNewTask();
 
         void openTaskDetails(@NonNull Task requestedTask);
+
+        void editTask(@NonNull String taskId);
 
         void completeTask(@NonNull Task completedTask);
 
@@ -87,5 +92,7 @@ public interface TasksContract {
         void setFiltering(TasksFilterType requestType);
 
         TasksFilterType getFiltering();
+
+        void setSelectedTaskId(@Nullable String taskId);
     }
 }

@@ -19,6 +19,8 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskContract;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskPresenter;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -33,34 +35,44 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Presenter for the tablet screen that can act as a Tasks Presenter and a Task Detail Presenter.
  */
-public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetailContract.Presenter {
+public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetailContract.Presenter,
+        AddEditTaskContract.Presenter {
 
-    @NonNull
-    private final TasksRepository mTasksRepository;
-    @NonNull
-    private TasksPresenter mTasksPresenter;
-    @Nullable
-    private TaskDetailPresenter mTaskDetailPresenter;
+    @NonNull private final TasksRepository mTasksRepository;
+
+    @NonNull private TasksPresenter mTasksPresenter;
+
+    private final TasksMvpController mTasksMvpController;
+
+    @Nullable private TaskDetailPresenter mTaskDetailPresenter;
+
+    @Nullable private AddEditTaskPresenter mAddEditPresenter;
 
     public TasksTabletPresenter(@NonNull TasksRepository tasksRepository,
-            @NonNull TasksPresenter tasksPresenter) {
+                                @NonNull TasksPresenter tasksPresenter,
+                                TasksMvpController tasksMvpController) {
         mTasksRepository = checkNotNull(tasksRepository);
         mTasksPresenter = checkNotNull(tasksPresenter);
-    }
-
-    @Nullable public TaskDetailPresenter getTaskDetailPresenter() {
-        return mTaskDetailPresenter;
+        mTasksMvpController = tasksMvpController;
     }
 
     public void setTaskDetailPresenter(TaskDetailPresenter taskDetailPresenter) {
         mTaskDetailPresenter = taskDetailPresenter;
     }
 
+    public void setAddEditPresenter(AddEditTaskPresenter addEditPresenter) {
+        mAddEditPresenter = addEditPresenter;
+    }
+
     /* TasksContract.Presenter methods can be called with or without a detail pane */
 
     @Override
-    public void onTasksResult(int requestCode, int resultCode) {
-        mTasksPresenter.onTasksResult(requestCode, resultCode);
+    public void onTaskAdded() {
+        mTasksPresenter.onTaskAdded();
+        if (mTaskDetailPresenter != null) {
+            mTaskDetailPresenter.loadTask();
+        }
+        mAddEditPresenter = null;
     }
 
     @Override
@@ -70,21 +82,26 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @Override
     public void addNewTask() {
-        mTasksPresenter.addNewTask();
+        mTasksMvpController.addNewTask();
     }
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
-        mTaskDetailPresenter.setTaskId(requestedTask.getId());
+        mTaskDetailPresenter.setDetailTaskId(requestedTask.getId());
         mTaskDetailPresenter.loadTask();
+    }
+
+    @Override
+    public void editTask(@NonNull String taskId) {
+        mTasksMvpController.editTask(taskId);
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
         mTasksPresenter.completeTask(completedTask);
         // Refresh detail view
-        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
-            if (mTaskDetailPresenter.getTaskId().equals(completedTask.getId())) {
+        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getDetailTaskId() != null) {
+            if (mTaskDetailPresenter.getDetailTaskId().equals(completedTask.getId())) {
                 mTaskDetailPresenter.loadTask();
             }
         }
@@ -94,8 +111,8 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     public void activateTask(@NonNull Task activeTask) {
         mTasksPresenter.activateTask(activeTask);
         // Refresh detail view
-        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getTaskId() != null) {
-            if (mTaskDetailPresenter.getTaskId().equals(activeTask.getId())) {
+        if (mTaskDetailPresenter != null && mTaskDetailPresenter.getDetailTaskId() != null) {
+            if (mTaskDetailPresenter.getDetailTaskId().equals(activeTask.getId())) {
                 mTaskDetailPresenter.loadTask();
             }
         }
@@ -107,20 +124,20 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
         // If task on detail has just been cleared, update it.
         if (mTaskDetailPresenter != null) {
-            String taskId = mTaskDetailPresenter.getTaskId();
+            String taskId = mTaskDetailPresenter.getDetailTaskId();
             if (taskId != null) {
                 mTasksRepository.getTask(taskId,
                         new TasksDataSource.GetTaskCallback() {
                             @Override
                             public void onTaskLoaded(Task task) {
                                 if (task == null) {
-                                    mTaskDetailPresenter.setTaskId(null);
+                                    mTaskDetailPresenter.setDetailTaskId(null);
                                 }
                             }
 
                             @Override
                             public void onDataNotAvailable() {
-                                mTaskDetailPresenter.setTaskId(null);
+                                mTaskDetailPresenter.setDetailTaskId(null);
                             }
                         });
             }
@@ -133,6 +150,11 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     }
 
     @Override
+    public void setSelectedTaskId(@Nullable String taskId) {
+        mTasksPresenter.setSelectedTaskId(taskId);
+    }
+
+    @Override
     public void setFiltering(TasksFilterType requestType) {
         mTasksPresenter.setFiltering(requestType);
     }
@@ -141,46 +163,89 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @Override
     public void editTask() {
-        mTaskDetailPresenter.editTask();
-        mTasksPresenter.loadTasks(false);
+        assert mTaskDetailPresenter != null; // Only called from detail view
+        mTasksMvpController.editTask(getDetailTaskId());
     }
 
     @Override
     public void deleteTask() {
-        if (mTaskDetailPresenter.getTaskId() != null) {
-            mTasksRepository.deleteTask(mTaskDetailPresenter.getTaskId());
+        assert mTaskDetailPresenter != null; // Only called from detail view
+        if (getDetailTaskId() != null) {
+            mTasksRepository.deleteTask(getDetailTaskId());
         }
-        mTaskDetailPresenter.setTaskId(null); // Show an empty detail view
+        mTaskDetailPresenter.setDetailTaskId(null); // Show an empty detail view
+        mTaskDetailPresenter.loadTask();
         mTasksPresenter.loadTasks(false); // Reload the list
     }
 
     @Override
     public void completeTask() {
+        assert mTaskDetailPresenter != null; // Only called from detail view
         mTaskDetailPresenter.completeTask();
         mTasksPresenter.loadTasks(false);
     }
 
     @Override
     public void activateTask() {
+        assert mTaskDetailPresenter != null; // Only called from detail view
         mTaskDetailPresenter.activateTask();
         mTasksPresenter.loadTasks(false);
     }
 
     @Override
     public void loadTask() {
+        assert mTaskDetailPresenter != null; // Only called from detail view
         mTaskDetailPresenter.loadTask();
     }
 
     @Override
-    public void setTaskId(String taskId) {
-        mTaskDetailPresenter.setTaskId(taskId);
+    public void setDetailTaskId(String taskId) {
+        if(mTaskDetailPresenter != null) {
+            mTaskDetailPresenter.setDetailTaskId(taskId);
+        }
+        mTasksPresenter.setSelectedTaskId(taskId);
     }
 
     @Override
-    public String getTaskId() {
-        if (mTaskDetailPresenter == null) {
-            return null;
+    public String getDetailTaskId() {
+        if (mTaskDetailPresenter != null) {
+            return mTaskDetailPresenter.getDetailTaskId();
         }
-        return mTaskDetailPresenter.getTaskId();
+        return null;
+    }
+
+    /* AddEditTaskContract.Presenter methods */
+
+    @Override
+    public void saveTask(String title, String description) {
+        if (mAddEditPresenter != null) {
+            mAddEditPresenter.saveTask(title, description);
+        }
+        mTasksPresenter.onTaskAdded();
+        mTasksPresenter.loadTasks(false);
+        if (mTaskDetailPresenter != null) {
+            mTaskDetailPresenter.loadTask();
+        }
+    }
+
+    @Override
+    public void populateTask() {
+        if (mAddEditPresenter != null) {
+            mAddEditPresenter.populateTask();
+        }
+    }
+
+    @Nullable
+    @Override
+    public String getAddEditTaskId() {
+        if (mAddEditPresenter != null) {
+            return mAddEditPresenter.getAddEditTaskId();
+        }
+        return null;
+    }
+
+    @Override
+    public void onAddEditStops() {
+        mAddEditPresenter = null;
     }
 }

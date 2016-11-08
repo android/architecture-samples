@@ -98,7 +98,7 @@ public class TasksTabletPresenterTest {
         // detail pane is closed.
         Task task = new Task("Title1", "Description1");
 
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
 
@@ -106,7 +106,7 @@ public class TasksTabletPresenterTest {
                 eq(task.getId()), mGetTaskCallbackArgumentCaptor.capture());
         mGetTaskCallbackArgumentCaptor.getValue().onDataNotAvailable();
 
-        verify(mTaskDetailPresenter).setTaskId(null);
+        verify(mTaskDetailPresenter).setDetailTaskId(null);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TasksTabletPresenterTest {
         // detail pane is NOT closed.
         Task task = new Task("Title1", "Description1");
 
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
 
@@ -124,17 +124,17 @@ public class TasksTabletPresenterTest {
 
         mGetTaskCallbackArgumentCaptor.getValue().onTaskLoaded(task);
 
-        verify(mTaskDetailPresenter, never()).setTaskId(task.getId());
+        verify(mTaskDetailPresenter, never()).setDetailTaskId(task.getId());
     }
 
     @Test
     public void deleteTask_removesPaneAndDetailPresenter() {
         Task task = new Task("Title1", "Description1");
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.deleteTask();
 
-        verify(mTaskDetailPresenter).setTaskId(null);
+        verify(mTaskDetailPresenter).setDetailTaskId(null);
         verify(mTasksPresenter).loadTasks(false);
     }
 }
