@@ -101,11 +101,11 @@ public class TasksMvpController {
     /**
      * Sets the current task ID for add/edit, used in a configuration change (rotation, etc.)
      */
-    public void restoreAddEditTaskId(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
+    public void restoreAddEditTaskId(@Nullable String taskId) {
         if (isTablet(mFragmentActivity)) {
             // If the add/edit dialog is shown, recreate presenter
             if (isAddEditDialogShown()) {
-                createAddEditDialogElements(taskId, shouldLoadDataFromRepo);
+                createAddEditDialogElements(taskId, false);
             }
         }
     }
@@ -122,14 +122,18 @@ public class TasksMvpController {
 
     @Nullable
     public String getDetailTaskId() {
-        assert mTasksTabletPresenter != null;
-        return mTasksTabletPresenter.getDetailTaskId();
+        if (mTasksTabletPresenter != null) {
+            return mTasksTabletPresenter.getDetailTaskId();
+        }
+        return null;
     }
 
     @Nullable
     public String getAddEditTaskId() {
-        assert mTasksTabletPresenter != null;
-        return mTasksTabletPresenter.getAddEditTaskId();
+        if (mTasksTabletPresenter != null) {
+            return mTasksTabletPresenter.getAddEditTaskId();
+        }
+        return null;
     }
 
     private void showAddNewTaskDialogForTablet(@Nullable String taskId) {

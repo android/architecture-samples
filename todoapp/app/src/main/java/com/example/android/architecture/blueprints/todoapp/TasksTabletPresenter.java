@@ -92,11 +92,6 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     }
 
     @Override
-    public void editTask(@NonNull String taskId) {
-        mTasksMvpController.editTask(taskId);
-    }
-
-    @Override
     public void completeTask(@NonNull Task completedTask) {
         mTasksPresenter.completeTask(completedTask);
         // Refresh detail view

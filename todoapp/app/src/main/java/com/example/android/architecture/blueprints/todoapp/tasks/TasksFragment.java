@@ -226,11 +226,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
 
         @Override
-        public void onLongTaskClick(Task task) {
-            mPresenter.editTask(task.getId());
-        }
-
-        @Override
         public void onCompleteTaskClick(Task completedTask) {
             mPresenter.completeTask(completedTask);
         }
@@ -459,14 +454,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 }
             });
 
-            rowView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    mItemListener.onLongTaskClick(task);
-                    return true;
-                }
-            });
-
             return rowView;
         }
     }
@@ -478,8 +465,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         void onCompleteTaskClick(Task completedTask);
 
         void onActivateTaskClick(Task activatedTask);
-
-        void onLongTaskClick(Task task);
     }
 
 }

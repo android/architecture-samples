@@ -48,6 +48,9 @@ public class TasksTabletPresenterTest {
     @Mock
     private TaskDetailPresenter mTaskDetailPresenter;
 
+    @Mock
+    private TasksMvpController mTasksMvpController;
+
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -66,7 +69,7 @@ public class TasksTabletPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mTasksTabletPresenter = new TasksTabletPresenter(
-                mTasksRepository, mTasksPresenter);
+                mTasksRepository, mTasksPresenter, mTasksMvpController);
 
         mTasksTabletPresenter.setTaskDetailPresenter(mTaskDetailPresenter);
     }
@@ -81,13 +84,6 @@ public class TasksTabletPresenterTest {
     @Test
     public void completingTask_RefreshesList() {
         mTasksTabletPresenter.completeTask();
-
-        verify(mTasksPresenter).loadTasks(false);
-    }
-
-    @Test
-    public void editingTask_RefreshesList() {
-        mTasksTabletPresenter.editTask();
 
         verify(mTasksPresenter).loadTasks(false);
     }

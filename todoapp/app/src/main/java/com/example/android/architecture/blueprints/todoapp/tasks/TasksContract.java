@@ -81,8 +81,6 @@ public interface TasksContract {
 
         void openTaskDetails(@NonNull Task requestedTask);
 
-        void editTask(@NonNull String taskId);
-
         void completeTask(@NonNull Task completedTask);
 
         void activateTask(@NonNull Task activeTask);

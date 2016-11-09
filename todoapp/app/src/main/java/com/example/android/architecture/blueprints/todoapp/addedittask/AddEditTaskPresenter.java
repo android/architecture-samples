@@ -71,11 +71,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         return mTaskId;
     }
 
-//    @Override
-//    public void setDetailTaskId(@Nullable String taskId) {
-//        mTaskId = taskId;
-//    }
-
     @Override
     public void onAddEditStops() {
         // No-op in phone mode.

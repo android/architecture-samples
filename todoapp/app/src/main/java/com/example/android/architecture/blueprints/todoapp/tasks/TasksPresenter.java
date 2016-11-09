@@ -186,11 +186,6 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void editTask(@NonNull String taskId) {
-        // no op from phone
-    }
-
-    @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);

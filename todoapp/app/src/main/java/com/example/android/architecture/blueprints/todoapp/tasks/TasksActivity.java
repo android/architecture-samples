@@ -43,7 +43,7 @@ public class TasksActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksMvpController tasksMvpTabletController;
+    private TasksMvpController mTasksMvpTabletController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +66,7 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create a TasksMvpController every time, even after rotation.
-        tasksMvpTabletController = TasksMvpController.createTasksView(this);
+        mTasksMvpTabletController = TasksMvpController.createTasksView(this);
 
         restoreState(savedInstanceState);
     }
@@ -83,21 +83,20 @@ public class TasksActivity extends AppCompatActivity {
             addEditTaskId = savedInstanceState.getString(CURRENT_ADDEDIT_TASK_ID_KEY);
 
             // Prevent the presenter from loading data from the repository if this is a config change.
-            boolean shouldLoadDataFromRepo = savedInstanceState == null;
-            tasksMvpTabletController.restoreDetailTaskId(detailTaskId);
-            tasksMvpTabletController.restoreAddEditTaskId(addEditTaskId, false); // TODO wtf
-            tasksMvpTabletController.setFiltering(currentFiltering);
+            mTasksMvpTabletController.restoreDetailTaskId(detailTaskId);
+            mTasksMvpTabletController.restoreAddEditTaskId(addEditTaskId);
+            mTasksMvpTabletController.setFiltering(currentFiltering);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(CURRENT_FILTERING_KEY,
-                tasksMvpTabletController.getFiltering());
+                mTasksMvpTabletController.getFiltering());
         outState.putString(CURRENT_DETAIL_TASK_ID_KEY,
-                tasksMvpTabletController.getDetailTaskId());
+                mTasksMvpTabletController.getDetailTaskId());
         outState.putString(CURRENT_ADDEDIT_TASK_ID_KEY,
-                tasksMvpTabletController.getAddEditTaskId());
+                mTasksMvpTabletController.getAddEditTaskId());
 
         super.onSaveInstanceState(outState);
     }

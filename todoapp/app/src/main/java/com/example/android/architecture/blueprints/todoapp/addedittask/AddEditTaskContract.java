@@ -46,8 +46,6 @@ public interface AddEditTaskContract {
 
         @Nullable String getAddEditTaskId();
 
-        //void setDetailTaskId(@Nullable String taskId);
-
         void onAddEditStops();
     }
 }
