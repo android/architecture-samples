@@ -49,7 +49,7 @@ public class TasksTabletPresenterTest {
     private TaskDetailPresenter mTaskDetailPresenter;
 
     @Mock
-    private TasksMvpController mTasksMvpController;
+    private TasksMvpTabletController mTasksMvpTabletController;
 
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
@@ -69,7 +69,7 @@ public class TasksTabletPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mTasksTabletPresenter = new TasksTabletPresenter(
-                mTasksRepository, mTasksPresenter, mTasksMvpController);
+                mTasksRepository, mTasksPresenter, mTasksMvpTabletController);
 
         mTasksTabletPresenter.setTaskDetailPresenter(mTaskDetailPresenter);
     }

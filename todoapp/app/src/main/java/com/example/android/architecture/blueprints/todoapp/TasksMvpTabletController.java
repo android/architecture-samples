@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Class that creates fragments (MVP views) and makes the necessary connections between them.
  */
-public class TasksMvpController {
+public class TasksMvpTabletController {
 
     public static final String ADD_EDIT_DIALOG_TAG = "ADD_EDIT_DIALOG_TAG";
 
@@ -49,27 +49,24 @@ public class TasksMvpController {
 
     private TasksPresenter mTasksPresenter;
 
-    //@Nullable
-    //private AddEditTaskFragment mAddEditTaskFragment;
-
     // Force factory method, prevent direct instantiation:
-    private TasksMvpController(@NonNull FragmentActivity fragmentActivity) {
+    private TasksMvpTabletController(@NonNull FragmentActivity fragmentActivity) {
         mFragmentActivity = fragmentActivity;
     }
 
     /**
-     * Creates a controller for a task view for phones or tablets.
+     * Creates a controller for a task view for tablets.
      *
      * @param fragmentActivity the context activity
      * @return a TasksMvpController
      */
-    public static TasksMvpController createTasksView(@NonNull FragmentActivity fragmentActivity) {
+    public static TasksMvpTabletController createTasksView(@NonNull FragmentActivity fragmentActivity) {
         checkNotNull(fragmentActivity);
 
-        TasksMvpController tasksMvpController = new TasksMvpController(fragmentActivity);
+        TasksMvpTabletController tasksMvpTabletController = new TasksMvpTabletController(fragmentActivity);
 
-        tasksMvpController.initTasksView();
-        return tasksMvpController;
+        tasksMvpTabletController.createTabletElements();
+        return tasksMvpTabletController;
     }
 
     /**
@@ -136,7 +133,7 @@ public class TasksMvpController {
         return null;
     }
 
-    private void showAddNewTaskDialogForTablet(@Nullable String taskId) {
+    private void  showAddNewTaskDialogForTablet(@Nullable String taskId) {
         AddEditTaskFragment addEditTaskFragment = createAddEditDialogElements(taskId, true);
         addEditTaskFragment.show(getSupportFragmentManager(), ADD_EDIT_DIALOG_TAG);
     }
@@ -148,20 +145,6 @@ public class TasksMvpController {
         mTasksTabletPresenter.setAddEditPresenter(presenter);
         addEditTaskFragment.setPresenter(mTasksTabletPresenter);
         return addEditTaskFragment;
-    }
-
-    private void initTasksView() {
-        if (isTablet(mFragmentActivity)) {
-            createTabletElements();
-        } else {
-            createPhoneElements();
-        }
-    }
-
-    private void createPhoneElements() {
-        TasksFragment tasksFragment = findOrCreateTasksFragment(R.id.contentFrame);
-        mTasksPresenter = createListPresenter(tasksFragment);
-        tasksFragment.setPresenter(mTasksPresenter);
     }
 
     private void createTabletElements() {

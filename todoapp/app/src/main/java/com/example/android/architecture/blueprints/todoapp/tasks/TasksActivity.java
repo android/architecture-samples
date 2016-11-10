@@ -28,9 +28,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.TasksMvpController;
+import com.example.android.architecture.blueprints.todoapp.TasksMvpTabletController;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
+import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 public class TasksActivity extends AppCompatActivity {
@@ -43,7 +45,9 @@ public class TasksActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksMvpController mTasksMvpTabletController;
+    private TasksMvpTabletController mTasksMvpTabletController;
+
+    private TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +68,33 @@ public class TasksActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
+        if (ActivityUtils.isTablet(this)) {
 
-        // Create a TasksMvpController every time, even after rotation.
-        mTasksMvpTabletController = TasksMvpController.createTasksView(this);
+            // Create a TasksMvpController every time, even after rotation.
+            mTasksMvpTabletController = TasksMvpTabletController.createTasksView(this);
 
+        } else {
+            //phone mode
+            createPhoneElements();
+            //restoreStatePhone();
+
+        }
         restoreState(savedInstanceState);
+    }
+
+    private void createPhoneElements() {
+
+        TasksFragment tasksFragment = (TasksFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+        if (tasksFragment == null) {
+            tasksFragment = TasksFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    tasksFragment, R.id.contentFrame);
+        }
+
+        mTasksPresenter = new TasksPresenter(
+                Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+        tasksFragment.setPresenter(mTasksPresenter);
     }
 
     private void restoreState(Bundle savedInstanceState) {
@@ -81,22 +107,26 @@ public class TasksActivity extends AppCompatActivity {
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             detailTaskId = savedInstanceState.getString(CURRENT_DETAIL_TASK_ID_KEY);
             addEditTaskId = savedInstanceState.getString(CURRENT_ADDEDIT_TASK_ID_KEY);
-
-            // Prevent the presenter from loading data from the repository if this is a config change.
-            mTasksMvpTabletController.restoreDetailTaskId(detailTaskId);
-            mTasksMvpTabletController.restoreAddEditTaskId(addEditTaskId);
-            mTasksMvpTabletController.setFiltering(currentFiltering);
+            if (ActivityUtils.isTablet(this)) {
+                // Prevent the presenter from loading data from the repository if this is a config change.
+                mTasksMvpTabletController.restoreDetailTaskId(detailTaskId);
+                mTasksMvpTabletController.restoreAddEditTaskId(addEditTaskId);
+                mTasksMvpTabletController.setFiltering(currentFiltering);
+            } else {
+                mTasksPresenter.setFiltering(currentFiltering);
+            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY,
-                mTasksMvpTabletController.getFiltering());
-        outState.putString(CURRENT_DETAIL_TASK_ID_KEY,
-                mTasksMvpTabletController.getDetailTaskId());
-        outState.putString(CURRENT_ADDEDIT_TASK_ID_KEY,
-                mTasksMvpTabletController.getAddEditTaskId());
+        if (mTasksMvpTabletController != null) {
+            outState.putSerializable(CURRENT_FILTERING_KEY, mTasksMvpTabletController.getFiltering());
+            outState.putString(CURRENT_DETAIL_TASK_ID_KEY, mTasksMvpTabletController.getDetailTaskId());
+            outState.putString(CURRENT_ADDEDIT_TASK_ID_KEY, mTasksMvpTabletController.getAddEditTaskId());
+        } else {
+            outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
+        }
 
         super.onSaveInstanceState(outState);
     }

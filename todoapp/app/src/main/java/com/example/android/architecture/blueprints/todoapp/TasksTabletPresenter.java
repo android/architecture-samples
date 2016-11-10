@@ -42,7 +42,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @NonNull private TasksPresenter mTasksPresenter;
 
-    private final TasksMvpController mTasksMvpController;
+    private final TasksMvpTabletController mTasksMvpTabletController;
 
     @Nullable private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -50,10 +50,10 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     public TasksTabletPresenter(@NonNull TasksRepository tasksRepository,
                                 @NonNull TasksPresenter tasksPresenter,
-                                TasksMvpController tasksMvpController) {
+                                TasksMvpTabletController tasksMvpTabletController) {
         mTasksRepository = checkNotNull(tasksRepository);
         mTasksPresenter = checkNotNull(tasksPresenter);
-        mTasksMvpController = tasksMvpController;
+        mTasksMvpTabletController = tasksMvpTabletController;
     }
 
     public void setTaskDetailPresenter(TaskDetailPresenter taskDetailPresenter) {
@@ -82,7 +82,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @Override
     public void addNewTask() {
-        mTasksMvpController.addNewTask();
+        mTasksMvpTabletController.addNewTask();
     }
 
     @Override
@@ -159,7 +159,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     @Override
     public void editTask() {
         assert mTaskDetailPresenter != null; // Only called from detail view
-        mTasksMvpController.editTask(getDetailTaskId());
+        mTasksMvpTabletController.editTask(getDetailTaskId());
     }
 
     @Override
