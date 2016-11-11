@@ -77,6 +77,16 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
+    public void onTaskSaved() {
+        // No-op in phone mode.
+    }
+
+    @Override
+    public boolean validateTask(String title, String description) {
+        return !(title.isEmpty() && description.isEmpty());
+    }
+
+    @Override
     public void saveTask(String title, String description) {
         if (isNewTask()) {
             createTask(title, description);

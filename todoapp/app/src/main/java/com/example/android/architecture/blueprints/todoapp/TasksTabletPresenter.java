@@ -216,7 +216,6 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         if (mAddEditPresenter != null) {
             mAddEditPresenter.saveTask(title, description);
         }
-        mTasksPresenter.onTaskAdded();
         mTasksPresenter.loadTasks(false);
         if (mTaskDetailPresenter != null) {
             mTaskDetailPresenter.loadTask();
@@ -242,5 +241,20 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
     @Override
     public void onAddEditStops() {
         mAddEditPresenter = null;
+    }
+
+    @Override
+    public void onTaskSaved() {
+        // On a phone we rely on the framework to pass messages (through Activity.RESULT_OK).
+        // In tablet mode, it's done through the tablet presenter.
+        onTaskAdded();
+    }
+
+    @Override
+    public boolean validateTask(String title, String description) {
+        if (mAddEditPresenter != null) {
+            return mAddEditPresenter.validateTask(title, description);
+        }
+        return false;
     }
 }

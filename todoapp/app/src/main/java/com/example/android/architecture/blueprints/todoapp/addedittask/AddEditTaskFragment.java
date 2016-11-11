@@ -30,6 +30,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -107,17 +108,32 @@ public class AddEditTaskFragment extends DialogFragment implements AddEditTaskCo
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             root.setFitsSystemWindows(false);
         }
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
                 .setView(root)
-                .setTitle("New task")
-                .setPositiveButton(R.string.add_task_dialog_save,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                saveTask();
-                            }
-                        })
+                .setTitle(R.string.new_task_dialog_title)
+                .setPositiveButton(R.string.add_task_dialog_save, null)
                 .create();
+
+        // Small hack to be able to show an error and intercept dialog dismiss.
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(final DialogInterface dialog) {
+
+                Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (validateTask()) {
+                            saveTask();
+                            dialog.dismiss();
+                        } else {
+                            showEmptyTaskError();
+                        }
+                    }
+                });
+            }
+        });
 
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
@@ -132,11 +148,11 @@ public class AddEditTaskFragment extends DialogFragment implements AddEditTaskCo
 
     @Override
     public void showTasksList() {
-        if (!getShowsDialog()) {
+        if (!getShowsDialog()) { // Phone mode
             getActivity().setResult(Activity.RESULT_OK);
             getActivity().finish();
-        } else {
-
+        } else { // Tablet
+            mPresenter.onTaskSaved();
         }
     }
 
@@ -163,5 +179,10 @@ public class AddEditTaskFragment extends DialogFragment implements AddEditTaskCo
 
     private void saveTask() {
         mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+    }
+
+    private boolean validateTask() {
+        return mPresenter.validateTask(
+                mTitle.getText().toString(), mDescription.getText().toString());
     }
 }

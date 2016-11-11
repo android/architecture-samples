@@ -47,5 +47,9 @@ public interface AddEditTaskContract {
         @Nullable String getAddEditTaskId();
 
         void onAddEditStops();
+
+        void onTaskSaved();
+
+        boolean validateTask(String title, String description);
     }
 }
