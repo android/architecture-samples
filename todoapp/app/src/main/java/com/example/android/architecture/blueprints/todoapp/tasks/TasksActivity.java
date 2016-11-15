@@ -68,22 +68,19 @@ public class TasksActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
+
+        // Create MVP elements for tablet or phone
         if (ActivityUtils.isTablet(this)) {
-
-            // Create a TasksMvpController every time, even after rotation.
             mTasksMvpTabletController = TasksMvpTabletController.createTasksView(this);
-
         } else {
-            //phone mode
             createPhoneElements();
-            //restoreStatePhone();
-
         }
+
+        // Restore state after config change
         restoreState(savedInstanceState);
     }
 
     private void createPhoneElements() {
-
         TasksFragment tasksFragment = (TasksFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {

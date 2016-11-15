@@ -38,14 +38,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Class that creates fragments (MVP views) and makes the necessary connections between them.
  */
-public class TasksMvpTabletController {
+public class TasksMvpTabletController implements TabletNavigator {
 
     public static final String ADD_EDIT_DIALOG_TAG = "ADD_EDIT_DIALOG_TAG";
 
     private final FragmentActivity mFragmentActivity;
 
-    @Nullable
-    private TasksTabletPresenter mTasksTabletPresenter;
+    @Nullable private TasksTabletPresenter mTasksTabletPresenter;
 
     private TasksPresenter mTasksPresenter;
 
@@ -60,26 +59,23 @@ public class TasksMvpTabletController {
      * @param fragmentActivity the context activity
      * @return a TasksMvpController
      */
-    public static TasksMvpTabletController createTasksView(@NonNull FragmentActivity fragmentActivity) {
+    public static TasksMvpTabletController createTasksView(
+            @NonNull FragmentActivity fragmentActivity) {
         checkNotNull(fragmentActivity);
 
-        TasksMvpTabletController tasksMvpTabletController = new TasksMvpTabletController(fragmentActivity);
+        TasksMvpTabletController tasksMvpTabletController = new TasksMvpTabletController(
+                fragmentActivity);
 
         tasksMvpTabletController.createTabletElements();
         return tasksMvpTabletController;
     }
 
-    /**
-     * Shows the edit view for a new task.
-     */
+    @Override
     public void addNewTask() {
         showAddNewTaskDialogForTablet(null);
     }
 
-    /**
-     * Shows the edit view for an existing task.
-     * @param taskId The task ID or null if
-     */
+    @Override
     public void editTask(@NonNull String taskId) {
         showAddNewTaskDialogForTablet(taskId);
     }
@@ -133,7 +129,7 @@ public class TasksMvpTabletController {
         return null;
     }
 
-    private void  showAddNewTaskDialogForTablet(@Nullable String taskId) {
+    private void showAddNewTaskDialogForTablet(@Nullable String taskId) {
         AddEditTaskFragment addEditTaskFragment = createAddEditDialogElements(taskId, true);
         addEditTaskFragment.show(getSupportFragmentManager(), ADD_EDIT_DIALOG_TAG);
     }
