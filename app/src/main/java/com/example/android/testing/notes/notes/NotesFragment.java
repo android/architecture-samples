@@ -168,7 +168,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
 
     @Override
     public void showAddNote() {
-        Intent intent = new Intent(getContext(),AddNoteActivity.class);
+        Intent intent = new Intent(getContext(), AddNoteActivity.class);
         startActivityForResult(intent, REQUEST_ADD_NOTE);
     }
 
