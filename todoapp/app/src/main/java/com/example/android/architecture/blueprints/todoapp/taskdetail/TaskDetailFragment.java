@@ -25,6 +25,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,13 +45,12 @@ import com.google.common.base.Preconditions;
 
 import rx.Completable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
@@ -63,16 +63,12 @@ public class TaskDetailFragment extends Fragment {
     @NonNull
     private static final int REQUEST_EDIT_TASK = 1;
 
-    @Nullable
     private TextView mLoadingProgress;
 
-    @Nullable
     private TextView mDetailTitle;
 
-    @Nullable
     private TextView mDetailDescription;
 
-    @Nullable
     private CheckBox mDetailCompleteStatus;
 
     @Nullable
@@ -107,39 +103,45 @@ public class TaskDetailFragment extends Fragment {
         mSubscription.add(getViewModel().getTask()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Task>() {
+                .subscribe(new Action1<Task>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showMissingTask();
-                    }
-
-                    @Override
-                    public void onNext(Task task) {
+                    public void call(Task task) {
                         showTask(task);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showMissingTask();
                     }
                 }));
 
         mSubscription.add(getViewModel().getLoadingIndicator()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
+                .subscribe(new Action1<Boolean>() {
                     @Override
-                    public void onCompleted() {
+                    public void call(Boolean active) {
+                        setLoadingIndicator(active);
                     }
-
+                }, new Action1<Throwable>() {
                     @Override
-                    public void onError(Throwable e) {
+                    public void call(Throwable throwable) {
                         showMissingTask();
                     }
+                }));
 
+        mSubscription.add(getViewModel().getSnackbarText()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void onNext(Boolean active) {
-                        setLoadingIndicator(active);
+                    public void call(String s) {
+                        showSnackbar(s);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e(TaskDetailFragment.class.getSimpleName(), throwable.getStackTrace().toString());
                     }
                 }));
     }
@@ -210,39 +212,47 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void setLoadingIndicator(boolean active) {
-        Preconditions.checkNotNull(mLoadingProgress);
-
         int visibility = active ? View.VISIBLE : View.GONE;
         mLoadingProgress.setVisibility(visibility);
     }
 
     private void hideDescription() {
-        Preconditions.checkNotNull(mDetailDescription);
-        getDetailDescription().setVisibility(View.GONE);
+        mDetailDescription.setVisibility(View.GONE);
     }
 
     private void hideTitle() {
-        getDetailTitle().setVisibility(View.GONE);
+        mDetailTitle.setVisibility(View.GONE);
     }
 
     private void showDescription(@NonNull String description) {
-        getDetailDescription().setVisibility(View.VISIBLE);
-        getDetailDescription().setText(description);
+        mDetailDescription.setVisibility(View.VISIBLE);
+        mDetailDescription.setText(description);
     }
 
     private void showCompletionStatus(final boolean complete) {
-        Preconditions.checkNotNull(mDetailCompleteStatus);
-
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            completeTask();
-                        } else {
-                            activateTask();
-                        }
+                        taskCheckChanged(isChecked);
+                    }
+                });
+    }
+
+    private void taskCheckChanged(final boolean checked) {
+        getViewModel().taskCheckChanged(checked)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        // nothing to do here
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showMissingTask();
                     }
                 });
     }
@@ -296,57 +306,8 @@ public class TaskDetailFragment extends Fragment {
         getActivity().finish();
     }
 
-    private void completeTask() {
-        getViewModel().completeTask()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Completable.CompletableSubscriber() {
-                    @Override
-                    public void onCompleted() {
-                        showTaskMarkedComplete();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showMissingTask();
-                    }
-
-                    @Override
-                    public void onSubscribe(Subscription d) {
-                        // nothing to do here
-                    }
-                });
-    }
-
-    private void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    private void activateTask() {
-        getViewModel().activateTask()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Completable.CompletableSubscriber() {
-                    @Override
-                    public void onCompleted() {
-                        showTaskMarkedActive();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showMissingTask();
-                    }
-
-                    @Override
-                    public void onSubscribe(Subscription d) {
-                        // nothing to do here
-                    }
-                });
-    }
-
-    private void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
+    private void showSnackbar(final String text) {
+        Snackbar.make(getView(), text, Snackbar.LENGTH_LONG)
                 .show();
     }
 
@@ -363,13 +324,13 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void showTitle(@NonNull String title) {
-        getDetailTitle().setVisibility(View.VISIBLE);
-        getDetailTitle().setText(title);
+        mDetailTitle.setVisibility(View.VISIBLE);
+        mDetailTitle.setText(title);
     }
 
     private void showMissingTask() {
-        getDetailTitle().setText("");
-        getDetailDescription().setText(getString(R.string.no_data));
+        mDetailTitle.setText("");
+        mDetailDescription.setText(getString(R.string.no_data));
     }
 
     @NonNull
@@ -380,16 +341,6 @@ public class TaskDetailFragment extends Fragment {
     @NonNull
     private CompositeSubscription getSubscription() {
         return Preconditions.checkNotNull(mSubscription);
-    }
-
-    @NonNull
-    private TextView getDetailTitle() {
-        return Preconditions.checkNotNull(mDetailTitle);
-    }
-
-    @NonNull
-    private TextView getDetailDescription() {
-        return Preconditions.checkNotNull(mDetailDescription);
     }
 
     @Nullable

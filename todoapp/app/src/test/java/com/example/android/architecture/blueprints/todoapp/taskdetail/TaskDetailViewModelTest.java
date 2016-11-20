@@ -1,7 +1,9 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,13 +23,20 @@ import static org.mockito.Mockito.when;
 public class TaskDetailViewModelTest {
 
     private static final Task TASK = new Task("TITLE", "DESCRIPTION");
+    private static final String ACTIVE = "task active";
+    private static final String COMPLETED = "task completed";
 
     @Mock
     private TasksRepository mTasksRepository;
 
+    @Mock
+    private BaseResourceProvider mResourceProvider;
+
     private TestSubscriber<Void> mTestSubscriber;
 
     private TestSubscriber<Task> mTaskTestSubscriber;
+
+    private TestSubscriber<String> mSnackbarTestSubscriber;
 
     private TaskDetailViewModel mViewModel;
 
@@ -37,14 +46,19 @@ public class TaskDetailViewModelTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        // Define what should be returned when resources are requested
+        when(mResourceProvider.getString(R.string.task_marked_complete)).thenReturn(COMPLETED);
+        when(mResourceProvider.getString(R.string.task_marked_active)).thenReturn(ACTIVE);
+
         mTestSubscriber = new TestSubscriber<>();
         mTaskTestSubscriber = new TestSubscriber<>();
+        mSnackbarTestSubscriber = new TestSubscriber<>();
     }
 
     @Test
     public void getLoadingIndicator_initiallyEmitsFalse() {
         // Get a reference to the class under test
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mResourceProvider);
 
         //When subscribing to the loading indicator
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
@@ -57,7 +71,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void getTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mResourceProvider);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
@@ -71,7 +85,7 @@ public class TaskDetailViewModelTest {
         // Given a task in the repository
         when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.just(TASK));
         // Get a reference to the class under test for the same task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
@@ -85,7 +99,7 @@ public class TaskDetailViewModelTest {
         // Given a task in the repository
         when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.just(TASK));
         // Get a reference to the class under test for the same task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
         //When subscribing to the loading indicator updates
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
@@ -101,7 +115,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void editTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mResourceProvider);
 
         // When subscribing to the editing of the task
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
@@ -114,7 +128,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void editTask_returnsCorrectData() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
         // When subscribing to the editing of the task
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
@@ -127,7 +141,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void deleteTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mResourceProvider);
 
         // When subscribing to the deletion of the task
         mViewModel.deleteTask().subscribe(mTestSubscriber);
@@ -139,7 +153,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void deleteTask_deletesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
         // When subscribing to the deletion of the task
         mViewModel.deleteTask().subscribe(mTestSubscriber);
@@ -151,24 +165,24 @@ public class TaskDetailViewModelTest {
     }
 
     @Test
-    public void completeTask_withInvalidTaskId() {
+    public void taskCheckChanged_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mResourceProvider);
 
-        // When subscribing to the completion of the task
-        mViewModel.completeTask().subscribe(mTestSubscriber);
+        // When subscribing to the task changed observer
+        mViewModel.taskCheckChanged(true).subscribe(mTestSubscriber);
 
         // An error is emitted
         mTestSubscriber.assertError(RuntimeException.class);
     }
 
     @Test
-    public void completeTask_completesTask() {
+    public void taskCheckChanged_true_completesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
-        // When subscribing to the completion of the task
-        mViewModel.completeTask().subscribe(mTestSubscriber);
+        // When subscribing to the task changed observer
+        mViewModel.taskCheckChanged(true).subscribe(mTestSubscriber);
 
         // The task is completed in the repository
         verify(mTasksRepository).completeTask(eq(TASK.getId()));
@@ -177,28 +191,44 @@ public class TaskDetailViewModelTest {
     }
 
     @Test
-    public void activateTask_withInvalidTaskId() {
-        // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository);
-
-        // When subscribing to the activation of the task
-        mViewModel.activateTask().subscribe(mTestSubscriber);
-
-        // An error is emitted
-        mTestSubscriber.assertError(RuntimeException.class);
-    }
-
-    @Test
-    public void activateTask_activatesTask() {
+    public void taskCheckChanged_false_activatesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository);
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
 
-        // When subscribing to the deletion of the task
-        mViewModel.activateTask().subscribe(mTestSubscriber);
+        // When subscribing to the task changed observer
+        mViewModel.taskCheckChanged(false).subscribe(mTestSubscriber);
 
-        // The task is deleted in the repository
+        // The task is activated in the repository
         verify(mTasksRepository).activateTask(eq(TASK.getId()));
         // The stream completes
         mTestSubscriber.assertCompleted();
+    }
+
+    @Test
+    public void taskCheckChanged_true_completesTask_showsSnackbarText() {
+        // Get a reference to the class under test for a task id
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
+
+        // When subscribed to the snackbar text emissions
+        mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
+        // and a task is marked as completed
+        mViewModel.taskCheckChanged(true).subscribe();
+
+        // A "Completed" snackbar text is emitted
+        mSnackbarTestSubscriber.assertValue(COMPLETED);
+    }
+
+    @Test
+    public void taskCheckChanged_false_activatesTask_showsSnackbarText() {
+        // Get a reference to the class under test for a task id
+        mViewModel = new TaskDetailViewModel(TASK.getId(), mTasksRepository, mResourceProvider);
+
+        // When subscribed to the snackbar text emissions
+        mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
+        // and a task is marked as active
+        mViewModel.taskCheckChanged(false).subscribe();
+
+        // An "Active" snackbar text is emitted
+        mSnackbarTestSubscriber.assertValue(ACTIVE);
     }
 }

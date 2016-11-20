@@ -67,6 +67,7 @@ public class Injection {
     public static TaskDetailViewModel provideTaskDetailsViewModel(
             @Nullable String taskId,
             @NonNull Context context) {
-        return new TaskDetailViewModel(taskId, provideTasksRepository(context));
+        return new TaskDetailViewModel(taskId, provideTasksRepository(context),
+                provideResourceProvider(context));
     }
 }

@@ -19,8 +19,10 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.google.common.base.Strings;
 
 import java.util.concurrent.Callable;
@@ -30,6 +32,7 @@ import rx.Observable;
 import rx.Single;
 import rx.functions.Action0;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,13 +49,22 @@ public class TaskDetailViewModel {
     private final String mTaskId;
 
     @NonNull
+    private final BaseResourceProvider mResourceProvider;
+
+    @NonNull
     private final BehaviorSubject<Boolean> mLoadingSubject;
 
+    @NonNull
+    private final PublishSubject<String> mSnackbarText;
+
     public TaskDetailViewModel(@Nullable String taskId,
-                               @NonNull TasksRepository tasksRepository) {
+                               @NonNull TasksRepository tasksRepository,
+                               @NonNull BaseResourceProvider resourceProvider) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
+        mResourceProvider = checkNotNull(resourceProvider, "resourceProvider cannot be null");
         mLoadingSubject = BehaviorSubject.create(false);
+        mSnackbarText = PublishSubject.create();
     }
 
     /**
@@ -81,12 +93,21 @@ public class TaskDetailViewModel {
                         mLoadingSubject.onNext(true);
                     }
                 })
-                .doOnCompleted(new Action0() {
+                .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
                         mLoadingSubject.onNext(false);
                     }
                 });
+    }
+
+    /**
+     * @return a stream that emits when a snackbar should be displayed. The stream contains the
+     * snackbar text
+     */
+    @NonNull
+    public Observable<String> getSnackbarText() {
+        return mSnackbarText.asObservable();
     }
 
     /**
@@ -125,40 +146,42 @@ public class TaskDetailViewModel {
     }
 
     /**
-     * Marks a task as completed in the repository. Emits when the task has been marked as
-     * completed. An error is emitted if the task id is invalid.
-     *
-     * @return a stream notifying about the marking of the task as completed
+     * Marks a task as active or completed in the repository. Emits when the task has been marked as
+     * active or completed. An error is emitted if the task id is invalid.
      */
     @NonNull
-    public Completable completeTask() {
+    public Completable taskCheckChanged(final boolean checked) {
         return Completable.fromAction(new Action0() {
             @Override
             public void call() {
                 if (Strings.isNullOrEmpty(mTaskId)) {
                     throw new RuntimeException("Task id null or empty");
                 }
-                mTasksRepository.completeTask(mTaskId);
+                if (checked) {
+                    completeTask();
+                } else {
+                    activateTask();
+                }
             }
         });
     }
 
     /**
-     * Marks a task as active in the repository. Emits when the task has been marked as
-     * active. An error is emitted if the task id is invalid.
-     *
-     * @return a stream notifying about the marking of the task as active
+     * Marks a task as completed in the repository.
      */
     @NonNull
-    public Completable activateTask() {
-        return Completable.fromAction(new Action0() {
-            @Override
-            public void call() {
-                if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new RuntimeException("Task id null or empty");
-                }
-                mTasksRepository.activateTask(mTaskId);
-            }
-        });
+    private void completeTask() {
+        mTasksRepository.completeTask(mTaskId);
+        mSnackbarText.onNext(mResourceProvider.getString(R.string.task_marked_complete));
     }
+
+    /**
+     * Marks a task as active in the repository.
+     */
+    @NonNull
+    private void activateTask() {
+        mTasksRepository.activateTask(mTaskId);
+        mSnackbarText.onNext(mResourceProvider.getString(R.string.task_marked_active));
+    }
+
 }
