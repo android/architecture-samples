@@ -57,14 +57,16 @@ public class Injection {
     }
 
     @NonNull
-    public static TaskDetailViewModel provideTaskDetailsViewModel(@Nullable String taskId,
-                                                                  @NonNull Context context) {
-        return new TaskDetailViewModel(taskId, provideTasksRepository(context));
+    public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
+        return new StatisticsViewModel(provideTasksRepository(context),
+                provideResourceProvider(context));
     }
 
     @NonNull
-    public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
-        return new StatisticsViewModel(provideTasksRepository(context),
+    public static TaskDetailViewModel provideTaskDetailsViewModel(
+            @Nullable String taskId,
+            @NonNull Context context) {
+        return new TaskDetailViewModel(taskId, provideTasksRepository(context),
                 provideResourceProvider(context));
     }
 }
