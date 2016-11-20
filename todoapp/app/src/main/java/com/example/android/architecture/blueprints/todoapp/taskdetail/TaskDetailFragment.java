@@ -43,9 +43,7 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.google.common.base.Preconditions;
 
-import rx.Completable;
 import rx.SingleSubscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -241,7 +239,7 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void taskCheckChanged(final boolean checked) {
-        getViewModel().taskCheckChanged(checked)
+        getSubscription().add(getViewModel().taskCheckChanged(checked)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action0() {
@@ -254,29 +252,24 @@ public class TaskDetailFragment extends Fragment {
                     public void call(Throwable throwable) {
                         showMissingTask();
                     }
-                });
+                }));
     }
 
     private void deleteTask() {
-        getViewModel().deleteTask()
+        getSubscription().add(getViewModel().deleteTask()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Completable.CompletableSubscriber() {
+                .subscribe(new Action0() {
                     @Override
-                    public void onCompleted() {
+                    public void call() {
                         showTaskDeleted();
                     }
-
+                }, new Action1<Throwable>() {
                     @Override
-                    public void onError(Throwable e) {
+                    public void call(Throwable throwable) {
                         showMissingTask();
                     }
-
-                    @Override
-                    public void onSubscribe(Subscription d) {
-                        // nothing to do here
-                    }
-                });
+                }));
     }
 
     private void editTask() {
