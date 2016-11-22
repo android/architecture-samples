@@ -22,11 +22,11 @@ import android.support.annotation.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Strings;
 
 import rx.Observer;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

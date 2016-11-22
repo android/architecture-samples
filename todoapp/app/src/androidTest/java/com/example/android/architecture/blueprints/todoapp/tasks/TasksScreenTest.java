@@ -91,7 +91,7 @@ public class TasksScreenTest {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
                     Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                        .deleteAllTasks();
+                            .deleteAllTasks();
                 }
             };
 

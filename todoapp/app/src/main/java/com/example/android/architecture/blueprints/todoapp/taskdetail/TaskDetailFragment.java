@@ -41,8 +41,6 @@ import com.google.common.base.Preconditions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Main UI for the task detail screen.
  */
