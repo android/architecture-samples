@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -434,6 +435,7 @@ public class TasksScreenTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 21) // Blinking cursor after rotation breaks this in API 19
     public void orientationChange_DuringEdit() throws IllegalStateException {
         // Add a completed task
         createTask(TITLE1, DESCRIPTION);
@@ -443,6 +445,37 @@ public class TasksScreenTest {
 
         // Click on the edit task button
         startEditTask();
+
+        // Rotate the screen
+        TestUtils.rotateOrientation(getCurrentActivity());
+
+        // Edit task title and description
+        onView(withId(R.id.add_task_title))
+                .perform(replaceText(TITLE2), closeSoftKeyboard()); // Type new task title
+        onView(withId(R.id.add_task_description)).perform(replaceText(DESCRIPTION),
+                closeSoftKeyboard()); // Type new task description and close the keyboard
+
+        // Save the task
+        onView(withId(R.id.fab_edit_task_done)).perform(click());
+
+        // Verify task is displayed on screen in the task list.
+        onView(withItemText(TITLE2)).check(matches(isDisplayed()));
+
+        // Verify previous task is not displayed
+        onView(withItemText(TITLE1)).check(doesNotExist());
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 21) // Blinking cursor after rotation breaks this in API 19
+    public void orientationChange_DuringEdit_NoDuplicate() throws IllegalStateException {
+        // Add a completed task
+        createTask(TITLE1, DESCRIPTION);
+
+        // Open the task in details view
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the edit task button
+        onView(withId(R.id.fab_edit_task)).perform(click());
 
         // Rotate the screen
         TestUtils.rotateOrientation(getCurrentActivity());

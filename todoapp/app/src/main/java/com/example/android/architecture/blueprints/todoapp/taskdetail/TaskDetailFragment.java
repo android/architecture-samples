@@ -151,7 +151,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void showEditTask(String taskId) {
+    public void showEditTask(@NonNull String taskId) {
         Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
         intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
         startActivityForResult(intent, REQUEST_EDIT_TASK);
@@ -189,7 +189,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void showTitle(String title) {
+    public void showTitle(@NonNull String title) {
         mDetailTitle.setText(title);
         mDetailTitle.setVisibility(View.VISIBLE);
         mDetailLayout.setVisibility(View.VISIBLE);
