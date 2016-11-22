@@ -475,7 +475,7 @@ public class TasksScreenTest {
         onView(withText(TITLE1)).perform(click());
 
         // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click());
+        startEditTask();
 
         // Rotate the screen
         TestUtils.rotateOrientation(getCurrentActivity());
