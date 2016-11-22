@@ -21,6 +21,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
+import com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksTabletNavigator;
+import com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksTabletPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +51,7 @@ public class TasksTabletPresenterTest {
     private TaskDetailPresenter mTaskDetailPresenter;
 
     @Mock
-    private TabletNavigator mTabletNavigator;
+    private TasksTabletNavigator mTabletNavigator;
 
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to

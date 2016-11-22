@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp;
+package com.example.android.architecture.blueprints.todoapp.tasks.tablet;
 
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -23,6 +23,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskPresenter;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment;
@@ -38,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Class that creates fragments (MVP views) and makes the necessary connections between them.
  */
-public class TasksMvpTabletController implements TabletNavigator {
+public class TasksMvpTabletController {
 
     public static final String ADD_EDIT_DIALOG_TAG = "ADD_EDIT_DIALOG_TAG";
 
@@ -68,16 +70,6 @@ public class TasksMvpTabletController implements TabletNavigator {
 
         tasksMvpTabletController.createTabletElements();
         return tasksMvpTabletController;
-    }
-
-    @Override
-    public void addNewTask() {
-        showAddNewTaskDialogForTablet(null);
-    }
-
-    @Override
-    public void editTask(@NonNull String taskId) {
-        showAddNewTaskDialogForTablet(taskId);
     }
 
     /**
@@ -129,12 +121,7 @@ public class TasksMvpTabletController implements TabletNavigator {
         return null;
     }
 
-    private void showAddNewTaskDialogForTablet(@Nullable String taskId) {
-        AddEditTaskFragment addEditTaskFragment = createAddEditDialogElements(taskId, true);
-        addEditTaskFragment.show(getSupportFragmentManager(), ADD_EDIT_DIALOG_TAG);
-    }
-
-    private AddEditTaskFragment createAddEditDialogElements(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
+    AddEditTaskFragment createAddEditDialogElements(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
         assert mTasksTabletPresenter != null; // In tablet mode it's never null
         AddEditTaskFragment addEditTaskFragment = findOrCreateAddEditTaskFragmentForTablet();
         AddEditTaskPresenter presenter = createAddEditTaskPresenter(taskId, addEditTaskFragment, shouldLoadDataFromRepo);
@@ -156,7 +143,7 @@ public class TasksMvpTabletController implements TabletNavigator {
         mTasksTabletPresenter = new TasksTabletPresenter(
                 Injection.provideTasksRepository(mFragmentActivity),
                 mTasksPresenter,
-                this);
+                new TasksTabletNavigator(getSupportFragmentManager(), this));
 
         tasksFragment.setPresenter(mTasksTabletPresenter);
         taskDetailFragment.setPresenter(mTasksTabletPresenter);

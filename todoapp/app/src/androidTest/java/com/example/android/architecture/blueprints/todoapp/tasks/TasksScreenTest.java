@@ -55,7 +55,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.example.android.architecture.blueprints.todoapp.TasksMvpTabletController.ADD_EDIT_DIALOG_TAG;
+import static com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksMvpTabletController.ADD_EDIT_DIALOG_TAG;
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.allOf;

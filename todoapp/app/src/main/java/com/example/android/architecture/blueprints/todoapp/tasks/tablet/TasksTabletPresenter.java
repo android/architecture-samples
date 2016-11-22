@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp;
+package com.example.android.architecture.blueprints.todoapp.tasks.tablet;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,7 +42,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     @NonNull private TasksPresenter mTasksPresenter;
 
-    @NonNull private final TabletNavigator mTabletNavigator;
+    @NonNull private final TasksTabletNavigator mTabletNavigator;
 
     @Nullable private TaskDetailPresenter mTaskDetailPresenter;
 
@@ -50,7 +50,7 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
 
     public TasksTabletPresenter(@NonNull TasksRepository tasksRepository,
                                 @NonNull TasksPresenter tasksPresenter,
-                                @NonNull TabletNavigator tabletNavigator) {
+                                @NonNull TasksTabletNavigator tabletNavigator) {
         mTasksRepository = checkNotNull(tasksRepository);
         mTasksPresenter = checkNotNull(tasksPresenter);
         mTabletNavigator = checkNotNull(tabletNavigator);
