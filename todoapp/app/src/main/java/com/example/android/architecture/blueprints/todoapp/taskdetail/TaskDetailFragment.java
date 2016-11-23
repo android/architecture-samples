@@ -94,12 +94,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.editTask();
-            }
-        });
+        fab.setOnClickListener(__ -> mPresenter.editTask());
 
         return root;
     }
@@ -155,14 +150,11 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            mPresenter.completeTask();
-                        } else {
-                            mPresenter.activateTask();
-                        }
+                (buttonView, isChecked) -> {
+                    if (isChecked) {
+                        mPresenter.completeTask();
+                    } else {
+                        mPresenter.activateTask();
                     }
                 });
     }
