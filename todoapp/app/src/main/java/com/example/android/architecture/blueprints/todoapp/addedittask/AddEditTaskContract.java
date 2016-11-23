@@ -51,5 +51,7 @@ public interface AddEditTaskContract {
         void onTaskSaved();
 
         boolean validateTask(String title, String description);
+
+        boolean isDataMissing();
     }
 }

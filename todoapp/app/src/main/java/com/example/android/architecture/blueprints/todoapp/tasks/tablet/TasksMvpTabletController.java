@@ -49,6 +49,7 @@ public class TasksMvpTabletController {
     @Nullable private TasksTabletPresenter mTasksTabletPresenter;
 
     private TasksPresenter mTasksPresenter;
+    private boolean addEditpresente;
 
     // Force factory method, prevent direct instantiation:
     private TasksMvpTabletController(@NonNull FragmentActivity fragmentActivity) {
@@ -86,11 +87,11 @@ public class TasksMvpTabletController {
     /**
      * Sets the current task ID for add/edit, used in a configuration change (rotation, etc.)
      */
-    public void restoreAddEditTaskId(@Nullable String taskId) {
+    public void restoreAddEditTaskId(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
         if (isTablet(mFragmentActivity)) {
             // If the add/edit dialog is shown, recreate presenter
             if (isAddEditDialogShown()) {
-                createAddEditDialogElements(taskId, false);
+                createAddEditDialogElements(taskId, shouldLoadDataFromRepo);
             }
         }
     }
@@ -121,10 +122,16 @@ public class TasksMvpTabletController {
         return null;
     }
 
-    AddEditTaskFragment createAddEditDialogElements(@Nullable String taskId, boolean shouldLoadDataFromRepo) {
+    public boolean isDataMissing() {
+        return mTasksTabletPresenter.isDataMissing();
+    }
+
+    AddEditTaskFragment createAddEditDialogElements(
+            @Nullable String taskId, boolean shouldLoadDataFromRepo) {
         assert mTasksTabletPresenter != null; // In tablet mode it's never null
         AddEditTaskFragment addEditTaskFragment = findOrCreateAddEditTaskFragmentForTablet();
-        AddEditTaskPresenter presenter = createAddEditTaskPresenter(taskId, addEditTaskFragment, shouldLoadDataFromRepo);
+        AddEditTaskPresenter presenter = createAddEditTaskPresenter(
+                taskId, addEditTaskFragment, shouldLoadDataFromRepo);
         mTasksTabletPresenter.setAddEditPresenter(presenter);
         addEditTaskFragment.setPresenter(mTasksTabletPresenter);
         return addEditTaskFragment;

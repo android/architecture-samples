@@ -35,6 +35,8 @@ import com.example.android.architecture.blueprints.todoapp.statistics.Statistics
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity.SHOULD_LOAD_DATA_FROM_REPO_KEY;
+
 public class TasksActivity extends AppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
@@ -99,15 +101,18 @@ public class TasksActivity extends AppCompatActivity {
         String detailTaskId = null;
         TasksFilterType currentFiltering = null;
         String addEditTaskId = null;
+        boolean shouldLoadDataFromRepo = true;
         if (savedInstanceState != null) {
             currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             detailTaskId = savedInstanceState.getString(CURRENT_DETAIL_TASK_ID_KEY);
             addEditTaskId = savedInstanceState.getString(CURRENT_ADDEDIT_TASK_ID_KEY);
+            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY);
             if (ActivityUtils.isTablet(this)) {
                 // Prevent the presenter from loading data from the repository if this is a config change.
                 mTasksMvpTabletController.restoreDetailTaskId(detailTaskId);
-                mTasksMvpTabletController.restoreAddEditTaskId(addEditTaskId);
+                mTasksMvpTabletController.restoreAddEditTaskId(
+                        addEditTaskId, shouldLoadDataFromRepo);
                 mTasksMvpTabletController.setFiltering(currentFiltering);
             } else {
                 mTasksPresenter.setFiltering(currentFiltering);
@@ -118,9 +123,15 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mTasksMvpTabletController != null) {
-            outState.putSerializable(CURRENT_FILTERING_KEY, mTasksMvpTabletController.getFiltering());
-            outState.putString(CURRENT_DETAIL_TASK_ID_KEY, mTasksMvpTabletController.getDetailTaskId());
-            outState.putString(CURRENT_ADDEDIT_TASK_ID_KEY, mTasksMvpTabletController.getAddEditTaskId());
+            outState.putSerializable(
+                    CURRENT_FILTERING_KEY, mTasksMvpTabletController.getFiltering());
+            outState.putString(
+                    CURRENT_DETAIL_TASK_ID_KEY, mTasksMvpTabletController.getDetailTaskId());
+            outState.putString(
+                    CURRENT_ADDEDIT_TASK_ID_KEY, mTasksMvpTabletController.getAddEditTaskId());
+            // Save the state so that next time we know if we need to refresh data.
+            outState.putBoolean(
+                    SHOULD_LOAD_DATA_FROM_REPO_KEY, mTasksMvpTabletController.isDataMissing());
         } else {
             outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
         }

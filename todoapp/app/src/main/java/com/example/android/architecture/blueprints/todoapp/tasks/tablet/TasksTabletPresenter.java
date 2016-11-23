@@ -257,4 +257,12 @@ public class TasksTabletPresenter implements TasksContract.Presenter, TaskDetail
         }
         return false;
     }
+
+    @Override
+    public boolean isDataMissing() {
+        if (mAddEditPresenter != null) {
+            return mAddEditPresenter.isDataMissing();
+        }
+        return true;
+    }
 }
