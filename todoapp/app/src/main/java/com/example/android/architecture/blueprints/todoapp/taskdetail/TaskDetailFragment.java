@@ -117,6 +117,19 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean showMenuOptions = mPresenter.getDetailTaskId() != null;
+        menu.findItem(R.id.menu_delete).setVisible(showMenuOptions);
+        // "Edit" is only visible on tablet
+        MenuItem menuEditItem = menu.findItem(R.id.menu_edit);
+        if (menuEditItem != null) {
+            menuEditItem.setVisible(showMenuOptions);
+        }
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public void setLoadingIndicator(boolean active) {
         if (active) {
             mDetailTitle.setText("");
@@ -177,6 +190,11 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
+    public void updateMenuOptions() {
+        getActivity().supportInvalidateOptionsMenu();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT_TASK) {
             // If the task was edited successfully, go back to the list.
@@ -207,6 +225,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mDetailTitle.setText("");
         mDetailDescription.setText("");
         mDetailLayout.setVisibility(View.GONE);
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override

@@ -147,18 +147,16 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             mTaskDetailView.showDescription(description);
         }
         mTaskDetailView.showCompletionStatus(task.isCompleted());
+        mTaskDetailView.updateMenuOptions();
     }
 
     @Nullable
-    public String getTaskId() {
+    public String getDetailTaskId() {
         return mTaskId;
     }
 
     @Override
-    public void setTaskId(@Nullable String taskId) {
+    public void setDetailTaskId(@Nullable String taskId) {
         mTaskId = taskId;
-        if (mTaskId == null) {
-            mTaskDetailView.showMissingTask();
-        }
     }
 }

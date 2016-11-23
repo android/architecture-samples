@@ -21,6 +21,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenter;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksPresenter;
+import com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksTabletNavigator;
+import com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksTabletPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +50,9 @@ public class TasksTabletPresenterTest {
     @Mock
     private TaskDetailPresenter mTaskDetailPresenter;
 
+    @Mock
+    private TasksTabletNavigator mTabletNavigator;
+
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
@@ -66,7 +71,7 @@ public class TasksTabletPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mTasksTabletPresenter = new TasksTabletPresenter(
-                mTasksRepository, mTasksPresenter);
+                mTasksRepository, mTasksPresenter, mTabletNavigator);
 
         mTasksTabletPresenter.setTaskDetailPresenter(mTaskDetailPresenter);
     }
@@ -86,19 +91,12 @@ public class TasksTabletPresenterTest {
     }
 
     @Test
-    public void editingTask_RefreshesList() {
-        mTasksTabletPresenter.editTask();
-
-        verify(mTasksPresenter).loadTasks(false);
-    }
-
-    @Test
     public void clearCompletedTask_CompleteTaskOpen() {
         // If after the completed tasks are cleared and the task no longer exist, make sure the
         // detail pane is closed.
         Task task = new Task("Title1", "Description1");
 
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
 
@@ -106,7 +104,7 @@ public class TasksTabletPresenterTest {
                 eq(task.getId()), mGetTaskCallbackArgumentCaptor.capture());
         mGetTaskCallbackArgumentCaptor.getValue().onDataNotAvailable();
 
-        verify(mTaskDetailPresenter).setTaskId(null);
+        verify(mTaskDetailPresenter).setDetailTaskId(null);
     }
 
     @Test
@@ -115,7 +113,7 @@ public class TasksTabletPresenterTest {
         // detail pane is NOT closed.
         Task task = new Task("Title1", "Description1");
 
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.clearCompletedTasks();
 
@@ -124,17 +122,17 @@ public class TasksTabletPresenterTest {
 
         mGetTaskCallbackArgumentCaptor.getValue().onTaskLoaded(task);
 
-        verify(mTaskDetailPresenter, never()).setTaskId(task.getId());
+        verify(mTaskDetailPresenter, never()).setDetailTaskId(task.getId());
     }
 
     @Test
     public void deleteTask_removesPaneAndDetailPresenter() {
         Task task = new Task("Title1", "Description1");
-        when(mTaskDetailPresenter.getTaskId()).thenReturn(task.getId());
+        when(mTaskDetailPresenter.getDetailTaskId()).thenReturn(task.getId());
 
         mTasksTabletPresenter.deleteTask();
 
-        verify(mTaskDetailPresenter).setTaskId(null);
+        verify(mTaskDetailPresenter).setDetailTaskId(null);
         verify(mTasksPresenter).loadTasks(false);
     }
 }

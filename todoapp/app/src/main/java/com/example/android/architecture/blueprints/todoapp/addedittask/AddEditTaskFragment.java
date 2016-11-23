@@ -17,15 +17,20 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -35,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+public class AddEditTaskFragment extends DialogFragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
@@ -70,24 +75,70 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
-            }
-        });
+        if (fab != null) {
+            fab.setImageResource(R.drawable.ic_done);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveTask();
+                }
+            });
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.addtask_frag, container, false);
+        if (getShowsDialog()) {
+            return super.onCreateView(inflater, container, savedInstanceState);
+        } else {
+            View root = inflater.inflate(R.layout.addtask_frag, container, false);
+            mTitle = (TextView) root.findViewById(R.id.add_task_title);
+            mDescription = (TextView) root.findViewById(R.id.add_task_description);
+            setHasOptionsMenu(true);
+            return root;
+        }
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        View root = getActivity().getLayoutInflater().inflate(R.layout.addtask_frag, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            root.setFitsSystemWindows(false);
+        }
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                .setView(root)
+                .setTitle(R.string.new_task_dialog_title)
+                .setPositiveButton(R.string.add_task_dialog_save, null)
+                .create();
+
+        // Small hack to be able to show an error and intercept dialog dismiss.
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(final DialogInterface dialog) {
+
+                Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (validateTask()) {
+                            saveTask();
+                            dialog.dismiss();
+                        } else {
+                            showEmptyTaskError();
+                        }
+                    }
+                });
+            }
+        });
+
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
-        setHasOptionsMenu(true);
-        return root;
+        return alertDialog;
+
     }
 
     @Override
@@ -97,8 +148,12 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
+        if (!getShowsDialog()) { // Phone mode
+            getActivity().setResult(Activity.RESULT_OK);
+            getActivity().finish();
+        } else { // Tablet
+            mPresenter.onTaskSaved();
+        }
     }
 
     @Override
@@ -114,5 +169,20 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public void onStop() {
+        mPresenter.onAddEditStops();
+        super.onStop();
+    }
+
+    private void saveTask() {
+        mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+    }
+
+    private boolean validateTask() {
+        return mPresenter.validateTask(
+                mTitle.getText().toString(), mDescription.getText().toString());
     }
 }

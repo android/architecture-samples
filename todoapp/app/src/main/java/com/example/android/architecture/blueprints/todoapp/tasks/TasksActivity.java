@@ -28,20 +28,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.TasksMvpController;
+import com.example.android.architecture.blueprints.todoapp.tasks.tablet.TasksMvpTabletController;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
+import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity.SHOULD_LOAD_DATA_FROM_REPO_KEY;
 
 public class TasksActivity extends AppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
-    private static final String CURRENT_TASK_ID_KEY = "CURRENT_TASK_ID_KEY";
+    private static final String CURRENT_DETAIL_TASK_ID_KEY = "CURRENT_DETAIL_TASK_ID_KEY";
+
+    private static final String CURRENT_ADDEDIT_TASK_ID_KEY = "CURRENT_ADDEDIT_TASK_ID_KEY";
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksMvpController tasksMvpTabletController;
+    private TasksMvpTabletController mTasksMvpTabletController;
+
+    private TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,28 +71,70 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
+        // Create MVP elements for tablet or phone
+        if (ActivityUtils.isTablet(this)) {
+            mTasksMvpTabletController = TasksMvpTabletController.createTasksView(this);
+        } else {
+            createPhoneElements();
+        }
+
+        // Restore state after config change
+        restoreState(savedInstanceState);
+    }
+
+    private void createPhoneElements() {
+        TasksFragment tasksFragment = (TasksFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+        if (tasksFragment == null) {
+            tasksFragment = TasksFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    tasksFragment, R.id.contentFrame);
+        }
+
+        mTasksPresenter = new TasksPresenter(
+                Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+        tasksFragment.setPresenter(mTasksPresenter);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
         // Load previously saved state, if available.
-        String taskId = null;
+        String detailTaskId = null;
         TasksFilterType currentFiltering = null;
+        String addEditTaskId = null;
+        boolean shouldLoadDataFromRepo = true;
         if (savedInstanceState != null) {
             currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            taskId = savedInstanceState.getString(CURRENT_TASK_ID_KEY);
-        }
-
-        // Create a TasksMvpController every time, even after rotation.
-        tasksMvpTabletController = TasksMvpController.createTasksView(this, taskId);
-        if (currentFiltering != null) {
-            tasksMvpTabletController.setFiltering(currentFiltering);
+            detailTaskId = savedInstanceState.getString(CURRENT_DETAIL_TASK_ID_KEY);
+            addEditTaskId = savedInstanceState.getString(CURRENT_ADDEDIT_TASK_ID_KEY);
+            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY);
+            if (ActivityUtils.isTablet(this)) {
+                // Prevent the presenter from loading data from the repository if this is a config change.
+                mTasksMvpTabletController.restoreDetailTaskId(detailTaskId);
+                mTasksMvpTabletController.restoreAddEditTaskId(
+                        addEditTaskId, shouldLoadDataFromRepo);
+                mTasksMvpTabletController.setFiltering(currentFiltering);
+            } else {
+                mTasksPresenter.setFiltering(currentFiltering);
+            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY,
-                tasksMvpTabletController.getFiltering());
-        outState.putString(CURRENT_TASK_ID_KEY,
-                tasksMvpTabletController.getTaskId());
+        if (mTasksMvpTabletController != null) {
+            outState.putSerializable(
+                    CURRENT_FILTERING_KEY, mTasksMvpTabletController.getFiltering());
+            outState.putString(
+                    CURRENT_DETAIL_TASK_ID_KEY, mTasksMvpTabletController.getDetailTaskId());
+            outState.putString(
+                    CURRENT_ADDEDIT_TASK_ID_KEY, mTasksMvpTabletController.getAddEditTaskId());
+            // Save the state so that next time we know if we need to refresh data.
+            outState.putBoolean(
+                    SHOULD_LOAD_DATA_FROM_REPO_KEY, mTasksMvpTabletController.isDataMissing());
+        } else {
+            outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
+        }
 
         super.onSaveInstanceState(outState);
     }

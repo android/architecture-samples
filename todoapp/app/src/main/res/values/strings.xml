@@ -56,5 +56,7 @@
     <string name="no_tasks_completed">You have no completed TO-DOs!</string>
     <string name="no_tasks_add">Add a TO-DO item +</string>
     <string name="refresh">Refresh</string>
+    <string name="add_task_dialog_save">Save</string>
+    <string name="new_task_dialog_title">New task</string>
 
 </resources>

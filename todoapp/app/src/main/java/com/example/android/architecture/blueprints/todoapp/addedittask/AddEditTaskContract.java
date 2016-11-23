@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.support.annotation.Nullable;
+
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 
 /**
@@ -41,6 +43,14 @@ public interface AddEditTaskContract {
         void saveTask(String title, String description);
 
         void populateTask();
+
+        @Nullable String getAddEditTaskId();
+
+        void onAddEditStops();
+
+        void onTaskSaved();
+
+        boolean validateTask(String title, String description);
 
         boolean isDataMissing();
     }
