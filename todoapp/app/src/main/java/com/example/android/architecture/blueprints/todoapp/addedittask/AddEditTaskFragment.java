@@ -73,13 +73,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.saveTask(mTitle.getText().toString(),
-                        mDescription.getText().toString());
-            }
-        });
+        fab.setOnClickListener(__ -> mPresenter.saveTask(mTitle.getText().toString(),
+                mDescription.getText().toString()));
     }
 
     @Nullable
