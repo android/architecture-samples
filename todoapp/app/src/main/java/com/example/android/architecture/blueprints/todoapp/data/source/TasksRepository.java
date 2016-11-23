@@ -118,7 +118,8 @@ public class TasksRepository implements TasksDataSource {
             // Query the local storage if available. If not, query the network.
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
             return Observable.concat(localTasks, remoteTasks)
-                    .filter(tasks -> !tasks.isEmpty()).first();
+                    .filter(tasks -> !tasks.isEmpty())
+                    .first();
         }
     }
 
