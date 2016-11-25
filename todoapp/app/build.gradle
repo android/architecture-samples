@@ -25,6 +25,7 @@ android {
 
     buildTypes {
         debug {
+            // Minifying the variant used for tests is not supported when using Jack.
             minifyEnabled false
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
             useProguard false
