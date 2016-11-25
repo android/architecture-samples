@@ -23,7 +23,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
-import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -99,23 +98,25 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        Subscription subscription = mTasksRepository
+        mSubscriptions.add(mTasksRepository
                 .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .subscribe(task -> {
-                    if (mAddTaskView.isActive()) {
-                        mAddTaskView.setTitle(task.getTitle());
-                        mAddTaskView.setDescription(task.getDescription());
+                .subscribe(
+                        // onNext
+                        task -> {
+                            if (mAddTaskView.isActive()) {
+                                mAddTaskView.setTitle(task.getTitle());
+                                mAddTaskView.setDescription(task.getDescription());
 
-                        mIsDataMissing = false;
-                    }
-                }, __ -> {
-                    if (mAddTaskView.isActive()) {
-                        mAddTaskView.showEmptyTaskError();
-                    }
-                });
-        mSubscriptions.add(subscription);
+                                mIsDataMissing = false;
+                            }
+                        }, // onError
+                        __ -> {
+                            if (mAddTaskView.isActive()) {
+                                mAddTaskView.showEmptyTaskError();
+                            }
+                        }));
     }
 
     @Override
