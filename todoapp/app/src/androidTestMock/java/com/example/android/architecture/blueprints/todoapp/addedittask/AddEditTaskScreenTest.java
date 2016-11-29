@@ -16,18 +16,20 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.allOf;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -72,17 +74,16 @@ public class AddEditTaskScreenTest {
     }
 
     @Test
-    public void errorShownOnEmptyTask() {
-        // Add task title and description
-        onView(withId(R.id.add_task_title)).perform(typeText(""));
-        onView(withId(R.id.add_task_description)).perform(typeText(""),
+    public void emptyTask_isNotSaved() {
+        // Add invalid title and description combination
+        onView(withId(R.id.add_task_title)).perform(clearText());
+        onView(withId(R.id.add_task_description)).perform(clearText(),
                 closeSoftKeyboard());
-        // Save the task
+        // Try to save the task
         onView(withId(R.id.fab_edit_task_done)).perform(click());
 
-        // Verify empty tasks snackbar is shown
-        String emptyTaskMessageText = getTargetContext().getString(R.string.empty_task_message);
-        onView(withText(emptyTaskMessageText)).check(matches(isDisplayed()));
+        // Verify that the activity is still displayed (a correct task would close it).
+        onView(withId(R.id.add_task_title)).check(matches(isDisplayed()));
     }
 
     /**
