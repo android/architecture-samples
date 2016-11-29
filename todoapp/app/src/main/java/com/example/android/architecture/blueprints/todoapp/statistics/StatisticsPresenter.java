@@ -90,8 +90,12 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
-                .subscribe(stats -> mStatisticsView.showStatistics(stats.first, stats.second),
+                .subscribe(
+                        // onNext
+                        stats -> mStatisticsView.showStatistics(stats.first, stats.second),
+                        // onError
                         throwable -> mStatisticsView.showLoadingStatisticsError(),
+                        // onCompleted
                         () -> mStatisticsView.setProgressIndicator(false));
         mSubscriptions.add(subscription);
     }
