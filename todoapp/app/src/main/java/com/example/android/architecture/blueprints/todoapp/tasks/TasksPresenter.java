@@ -213,7 +213,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
         mTasksView.showTaskMarkedComplete();
-        loadTasks(false, false);
+        // loadTasks(false, false);
     }
 
     @Override
@@ -221,14 +221,14 @@ public class TasksPresenter implements TasksContract.Presenter {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         mTasksView.showTaskMarkedActive();
-        loadTasks(false, false);
+        // loadTasks(false, false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mTasksView.showCompletedTasksCleared();
-        loadTasks(false, false);
+        loadTasks(false, true);
     }
 
     /**
