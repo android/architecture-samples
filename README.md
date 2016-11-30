@@ -68,6 +68,10 @@ Handling of the working threads is done with the help of RxJava's `Scheduler`s. 
 * [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 * [SqlBrite](https://github.com/square/sqlbrite)
 
+### Java 8 Compatibility
+
+This project uses [lambda expressions](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html) extensively, one of the features of [Java 8](https://developer.android.com/guide/platform/j8-jack.html). To check out how the translation to lambdas was made, check out [this commit](https://github.com/googlesamples/android-architecture/pull/240/commits/929f63e3657be8705679c46c75e2625dc44a5b28), where lambdas and the Jack compiler were enabled.
+
 ## Features
 
 ### Complexity - understandability

@@ -118,12 +118,8 @@ public class TasksRepository implements TasksDataSource {
             // Query the local storage if available. If not, query the network.
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
             return Observable.concat(localTasks, remoteTasks)
-                    .filter(new Func1<List<Task>, Boolean>() {
-                        @Override
-                        public Boolean call(List<Task> tasks) {
-                            return !tasks.isEmpty();
-                        }
-                    }).first();
+                    .filter(tasks -> !tasks.isEmpty())
+                    .first();
         }
     }
 
@@ -133,12 +129,7 @@ public class TasksRepository implements TasksDataSource {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
                         return Observable.from(tasks)
-                                .doOnNext(new Action1<Task>() {
-                                    @Override
-                                    public void call(Task task) {
-                                        mCachedTasks.put(task.getId(), task);
-                                    }
-                                })
+                                .doOnNext(task -> mCachedTasks.put(task.getId(), task))
                                 .toList();
                     }
                 });
@@ -150,21 +141,13 @@ public class TasksRepository implements TasksDataSource {
                 .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
-                        return Observable.from(tasks).doOnNext(new Action1<Task>() {
-                            @Override
-                            public void call(Task task) {
-                                mTasksLocalDataSource.saveTask(task);
-                                mCachedTasks.put(task.getId(), task);
-                            }
+                        return Observable.from(tasks).doOnNext(task -> {
+                            mTasksLocalDataSource.saveTask(task);
+                            mCachedTasks.put(task.getId(), task);
                         }).toList();
                     }
                 })
-                .doOnCompleted(new Action0() {
-                    @Override
-                    public void call() {
-                        mCacheIsDirty = false;
-                    }
-                });
+                .doOnCompleted(() -> mCacheIsDirty = false);
     }
 
     @Override
@@ -272,23 +255,17 @@ public class TasksRepository implements TasksDataSource {
         Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
         Observable<Task> remoteTask = mTasksRemoteDataSource
                 .getTask(taskId)
-                .doOnNext(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        mTasksLocalDataSource.saveTask(task);
-                        mCachedTasks.put(task.getId(), task);
-                    }
+                .doOnNext(task -> {
+                    mTasksLocalDataSource.saveTask(task);
+                    mCachedTasks.put(task.getId(), task);
                 });
 
         return Observable.concat(localTask, remoteTask).first()
-                .map(new Func1<Task, Task>() {
-                    @Override
-                    public Task call(Task task) {
-                        if (task == null) {
-                            throw new NoSuchElementException("No task found with taskId " + taskId);
-                        }
-                        return task;
+                .map(task -> {
+                    if (task == null) {
+                        throw new NoSuchElementException("No task found with taskId " + taskId);
                     }
+                    return task;
                 });
     }
 
@@ -330,12 +307,7 @@ public class TasksRepository implements TasksDataSource {
     Observable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
         return mTasksLocalDataSource
                 .getTask(taskId)
-                .doOnNext(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        mCachedTasks.put(taskId, task);
-                    }
-                })
+                .doOnNext(task -> mCachedTasks.put(taskId, task))
                 .first();
     }
 }

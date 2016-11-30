@@ -29,9 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 import java.util.List;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscription;
-import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -121,47 +119,32 @@ public class TasksPresenter implements TasksContract.Presenter {
                         return Observable.from(tasks);
                     }
                 })
-                .filter(new Func1<Task, Boolean>() {
-                    @Override
-                    public Boolean call(Task task) {
-                        switch (mCurrentFiltering) {
-                            case ACTIVE_TASKS:
-                                return task.isActive();
-                            case COMPLETED_TASKS:
-                                return task.isCompleted();
-                            case ALL_TASKS:
-                            default:
-                                return true;
-                        }
+                .filter(task -> {
+                    switch (mCurrentFiltering) {
+                        case ACTIVE_TASKS:
+                            return task.isActive();
+                        case COMPLETED_TASKS:
+                            return task.isCompleted();
+                        case ALL_TASKS:
+                        default:
+                            return true;
                     }
                 })
                 .toList()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                            EspressoIdlingResource.decrement(); // Set app as idle.
-                        }
+                .doOnTerminate(() -> {
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                        EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
-                .subscribe(new Observer<List<Task>>() {
-                    @Override
-                    public void onCompleted() {
-                        mTasksView.setLoadingIndicator(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mTasksView.showLoadingTasksError();
-                    }
-
-                    @Override
-                    public void onNext(List<Task> tasks) {
-                        processTasks(tasks);
-                    }
-                });
+                .subscribe(
+                        // onNext
+                        this::processTasks,
+                        // onError
+                        throwable -> mTasksView.showLoadingTasksError(),
+                        // onCompleted
+                        () -> mTasksView.setLoadingIndicator(false));
         mSubscriptions.add(subscription);
     }
 

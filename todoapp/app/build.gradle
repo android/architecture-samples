@@ -12,11 +12,21 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+
+        jackOptions {
+            enabled true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
         debug {
-            minifyEnabled true
+            // Minifying the variant used for tests is not supported when using Jack.
+            minifyEnabled false
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

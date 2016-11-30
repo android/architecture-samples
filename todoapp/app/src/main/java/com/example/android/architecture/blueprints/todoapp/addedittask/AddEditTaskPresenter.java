@@ -23,8 +23,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
-import rx.Observer;
-import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -100,34 +98,25 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
-        Subscription subscription = mTasksRepository
+        mSubscriptions.add(mTasksRepository
                 .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .subscribe(new Observer<Task>() {
-                    @Override
-                    public void onCompleted() {
+                .subscribe(
+                        // onNext
+                        task -> {
+                            if (mAddTaskView.isActive()) {
+                                mAddTaskView.setTitle(task.getTitle());
+                                mAddTaskView.setDescription(task.getDescription());
 
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (mAddTaskView.isActive()) {
-                            mAddTaskView.showEmptyTaskError();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(Task task) {
-                        if (mAddTaskView.isActive()) {
-                            mAddTaskView.setTitle(task.getTitle());
-                            mAddTaskView.setDescription(task.getDescription());
-
-                            mIsDataMissing = false;
-                        }
-                    }
-                });
-        mSubscriptions.add(subscription);
+                                mIsDataMissing = false;
+                            }
+                        }, // onError
+                        __ -> {
+                            if (mAddTaskView.isActive()) {
+                                mAddTaskView.showEmptyTaskError();
+                            }
+                        }));
     }
 
     @Override

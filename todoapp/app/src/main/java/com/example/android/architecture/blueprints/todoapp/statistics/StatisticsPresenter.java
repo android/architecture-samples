@@ -24,14 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
-import java.util.List;
-
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -84,57 +78,25 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
         Observable<Task> tasks = mTasksRepository
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
-                    @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
-                    }
-                });
-        Observable<Integer> completedTasks = tasks.filter(new Func1<Task, Boolean>() {
-            @Override
-            public Boolean call(Task task) {
-                return task.isCompleted();
-            }
-        }).count();
-        Observable<Integer> activeTasks = tasks.filter(new Func1<Task, Boolean>() {
-            @Override
-            public Boolean call(Task task) {
-                return task.isActive();
-            }
-        }).count();
+                .flatMap(Observable::from);
+        Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
+        Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
         Subscription subscription = Observable
-                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, Pair<Integer, Integer>>() {
-                    @Override
-                    public Pair<Integer, Integer> call(Integer completed, Integer active) {
-                        return Pair.create(active, completed);
-                    }
-                })
+                .zip(completedTasks, activeTasks, (completed, active) -> Pair.create(active, completed))
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                            EspressoIdlingResource.decrement(); // Set app as idle.
-                        }
+                .doOnTerminate(() -> {
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                        EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
-                .subscribe(new Action1<Pair<Integer, Integer>>() {
-                    @Override
-                    public void call(Pair<Integer, Integer> stats) {
-                        mStatisticsView.showStatistics(stats.first, stats.second);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mStatisticsView.showLoadingStatisticsError();
-                    }
-                }, new Action0() {
-                    @Override
-                    public void call() {
-                        mStatisticsView.setProgressIndicator(false);
-                    }
-                });
+                .subscribe(
+                        // onNext
+                        stats -> mStatisticsView.showStatistics(stats.first, stats.second),
+                        // onError
+                        throwable -> mStatisticsView.showLoadingStatisticsError(),
+                        // onCompleted
+                        () -> mStatisticsView.setProgressIndicator(false));
         mSubscriptions.add(subscription);
     }
 }

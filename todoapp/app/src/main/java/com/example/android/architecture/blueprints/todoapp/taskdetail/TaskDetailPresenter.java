@@ -24,8 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.google.common.base.Strings;
 
-import rx.Observer;
-import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -81,27 +79,18 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
 
         mTaskDetailView.setLoadingIndicator(true);
-        Subscription subscription = mTasksRepository
+        mSubscriptions.add(mTasksRepository
                 .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .subscribe(new Observer<Task>() {
-                    @Override
-                    public void onCompleted() {
-                        mTaskDetailView.setLoadingIndicator(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Task task) {
-                        showTask(task);
-                    }
-                });
-        mSubscriptions.add(subscription);
+                .subscribe(
+                        // onNext
+                        this::showTask,
+                        // onError
+                        throwable -> {
+                        },
+                        // onCompleted
+                        () -> mTaskDetailView.setLoadingIndicator(false)));
     }
 
     @Override
