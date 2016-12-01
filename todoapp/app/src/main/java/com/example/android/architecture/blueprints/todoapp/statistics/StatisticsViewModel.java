@@ -27,9 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.util.providers.BaseRe
 import java.util.List;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -74,39 +72,18 @@ public class StatisticsViewModel {
                         return Observable.from(tasks);
                     }
                 });
-        Observable<Integer> completedTasks = tasks.filter(new Func1<Task, Boolean>() {
-            @Override
-            public Boolean call(Task task) {
-                return task.isCompleted();
-            }
-        }).count();
-        Observable<Integer> activeTasks = tasks.filter(new Func1<Task, Boolean>() {
-            @Override
-            public Boolean call(Task task) {
-                return task.isActive();
-            }
-        }).count();
+        Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
+        Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
 
         return Observable
-                .zip(completedTasks, activeTasks, new Func2<Integer, Integer, String>() {
-                    @Override
-                    public String call(Integer completed, Integer active) {
-                        return getStatisticsString(active, completed);
-                    }
+                .zip(completedTasks,
+                        activeTasks,
+                        (completed, active) -> getStatisticsString(active, completed))
+                .doOnSubscribe(() -> {
+                    // the progress indicator should be visible
+                    mProgressIndicatorSubject.onNext(true);
                 })
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        // the progress indicator should be visible
-                        mProgressIndicatorSubject.onNext(true);
-                    }
-                })
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        mProgressIndicatorSubject.onNext(false);
-                    }
-                });
+                .doOnTerminate(() -> mProgressIndicatorSubject.onNext(false));
     }
 
     @NonNull
