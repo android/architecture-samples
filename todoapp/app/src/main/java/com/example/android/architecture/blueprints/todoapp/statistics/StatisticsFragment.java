@@ -29,7 +29,6 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.google.common.base.Preconditions;
 
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -38,7 +37,6 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class StatisticsFragment extends Fragment {
 
-    @Nullable
     private TextView mStatisticsTV;
 
     @Nullable
@@ -86,32 +84,20 @@ public class StatisticsFragment extends Fragment {
         mSubscription.add(mViewModel.getProgressIndicator()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean active) {
-                        setProgressIndicator(active);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showLoadingStatisticsError();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::setProgressIndicator,
+                        // onError
+                        __ -> showLoadingStatisticsError()));
 
         mSubscription.add(mViewModel.getStatistics()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String statistics) {
-                        showStatistics(statistics);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showLoadingStatisticsError();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::showStatistics,
+                        // onError
+                        throwable -> showLoadingStatisticsError()));
     }
 
     private void unbindViewModel() {
@@ -122,20 +108,16 @@ public class StatisticsFragment extends Fragment {
 
     private void setProgressIndicator(boolean active) {
         if (active) {
-            getStatisticsTextView().setText(getString(R.string.loading));
+            mStatisticsTV.setText(getString(R.string.loading));
         }
     }
 
     private void showStatistics(@NonNull String statistics) {
-        getStatisticsTextView().setText(statistics);
+        mStatisticsTV.setText(statistics);
     }
 
     private void showLoadingStatisticsError() {
-        getStatisticsTextView().setText(getResources().getString(R.string.statistics_error));
+        mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
     }
 
-    @NonNull
-    private TextView getStatisticsTextView() {
-        return Preconditions.checkNotNull(mStatisticsTV);
-    }
 }
