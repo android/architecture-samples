@@ -33,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
@@ -45,8 +44,6 @@ import com.google.common.base.Preconditions;
 
 import rx.SingleSubscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -54,6 +51,8 @@ import rx.subscriptions.CompositeSubscription;
  * Main UI for the task detail screen.
  */
 public class TaskDetailFragment extends Fragment {
+
+    private static final String TAG = TaskDetailFragment.class.getSimpleName();
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
@@ -101,47 +100,29 @@ public class TaskDetailFragment extends Fragment {
         mSubscription.add(getViewModel().getTask()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Task>() {
-                    @Override
-                    public void call(Task task) {
-                        showTask(task);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showMissingTask();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::showTask,
+                        // onError
+                        __ -> showMissingTask()));
 
         mSubscription.add(getViewModel().getLoadingIndicator()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean active) {
-                        setLoadingIndicator(active);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showMissingTask();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::setLoadingIndicator,
+                        // onError
+                        __ -> showMissingTask()));
 
         mSubscription.add(getViewModel().getSnackbarText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        showSnackbar(s);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Log.e(TaskDetailFragment.class.getSimpleName(), throwable.getStackTrace().toString());
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::showSnackbar,
+                        // onError
+                        throwable -> Log.e(TAG, "Unable to display snackbar text", throwable)));
     }
 
     private void unbindViewModel() {
@@ -163,12 +144,7 @@ public class TaskDetailFragment extends Fragment {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editTask();
-            }
-        });
+        fab.setOnClickListener(__ -> editTask());
 
         mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getContext());
 
@@ -230,46 +206,31 @@ public class TaskDetailFragment extends Fragment {
     private void showCompletionStatus(final boolean complete) {
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        taskCheckChanged(isChecked);
-                    }
-                });
+                (buttonView, isChecked) -> taskCheckChanged(isChecked));
     }
 
     private void taskCheckChanged(final boolean checked) {
         getSubscription().add(getViewModel().taskCheckChanged(checked)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        // nothing to do here
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showMissingTask();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        () -> {
+                            // nothing to do here
+                        },
+                        // onError
+                        throwable -> showMissingTask()));
     }
 
     private void deleteTask() {
         getSubscription().add(getViewModel().deleteTask()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        showTaskDeleted();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showMissingTask();
-                    }
-                }));
+                .subscribe(
+                        // onNext
+                        this::showTaskDeleted,
+                        // onError
+                        __ -> showMissingTask()));
     }
 
     private void editTask() {

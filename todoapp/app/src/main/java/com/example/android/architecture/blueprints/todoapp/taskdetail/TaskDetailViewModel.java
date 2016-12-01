@@ -25,12 +25,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.google.common.base.Strings;
 
-import java.util.concurrent.Callable;
-
 import rx.Completable;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Action0;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -87,18 +84,8 @@ public class TaskDetailViewModel {
         }
 
         return mTasksRepository.getTask(mTaskId)
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        mLoadingSubject.onNext(true);
-                    }
-                })
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        mLoadingSubject.onNext(false);
-                    }
-                });
+                .doOnSubscribe(() -> mLoadingSubject.onNext(true))
+                .doOnTerminate(() -> mLoadingSubject.onNext(false));
     }
 
     /**
@@ -115,14 +102,11 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Single<String> editTask() {
-        return Single.fromCallable(new Callable<String>() {
-            @Override
-            public String call() {
-                if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new RuntimeException("Task id null or empty");
-                }
-                return mTaskId;
+        return Single.fromCallable(() -> {
+            if (Strings.isNullOrEmpty(mTaskId)) {
+                throw new RuntimeException("Task id null or empty");
             }
+            return mTaskId;
         });
     }
 
@@ -134,14 +118,11 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable deleteTask() {
-        return Completable.fromAction(new Action0() {
-            @Override
-            public void call() {
-                if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new RuntimeException("Task id null or empty");
-                }
-                mTasksRepository.deleteTask(mTaskId);
+        return Completable.fromAction(() -> {
+            if (Strings.isNullOrEmpty(mTaskId)) {
+                throw new RuntimeException("Task id null or empty");
             }
+            mTasksRepository.deleteTask(mTaskId);
         });
     }
 
@@ -151,17 +132,14 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable taskCheckChanged(final boolean checked) {
-        return Completable.fromAction(new Action0() {
-            @Override
-            public void call() {
-                if (Strings.isNullOrEmpty(mTaskId)) {
-                    throw new RuntimeException("Task id null or empty");
-                }
-                if (checked) {
-                    completeTask();
-                } else {
-                    activateTask();
-                }
+        return Completable.fromAction(() -> {
+            if (Strings.isNullOrEmpty(mTaskId)) {
+                throw new RuntimeException("Task id null or empty");
+            }
+            if (checked) {
+                completeTask();
+            } else {
+                activateTask();
             }
         });
     }
