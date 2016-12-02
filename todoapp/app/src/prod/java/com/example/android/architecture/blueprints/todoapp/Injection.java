@@ -18,12 +18,16 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.ResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
 
@@ -35,17 +39,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Injection {
 
+    @NonNull
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
         checkNotNull(context);
         return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
                 TasksLocalDataSource.getInstance(context, provideSchedulerProvider()));
     }
 
+    @NonNull
     public static BaseSchedulerProvider provideSchedulerProvider() {
         return SchedulerProvider.getInstance();
     }
 
+    @NonNull
+    public static BaseResourceProvider provideResourceProvider(@NonNull Context context) {
+        return new ResourceProvider(context);
+    }
+
+    @NonNull
     public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
-        return new StatisticsViewModel(provideTasksRepository(context));
+        return new StatisticsViewModel(provideTasksRepository(context),
+                provideResourceProvider(context));
+    }
+
+    @NonNull
+    public static TaskDetailViewModel provideTaskDetailsViewModel(
+            @Nullable String taskId,
+            @NonNull Context context) {
+        return new TaskDetailViewModel(taskId, provideTasksRepository(context),
+                provideResourceProvider(context));
     }
 }

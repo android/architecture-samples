@@ -18,7 +18,6 @@ import java.util.List;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.when;
 public class StatisticsViewModelTest {
 
     private static final String NO_TASKS = "no tasks";
-    private static final String ACTIVE_COMPLETED_TASKS = "Active tasks: %1$d \n Completed tasks: %2$d";
 
     private List<Task> mTasks;
 

@@ -23,26 +23,37 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
+    <TextView
+        android:id="@+id/loading_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/loading"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+
     <CheckBox
         android:id="@+id/task_detail_complete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/loading_progress"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
     <TextView
         android:id="@+id/task_detail_title"
-        android:layout_toRightOf="@id/task_detail_complete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/loading_progress"
+        android:layout_toRightOf="@id/task_detail_complete"
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
         android:id="@+id/task_detail_description"
-        android:layout_toRightOf="@id/task_detail_complete"
-        android:layout_below="@id/task_detail_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/task_detail_title"
+        android:layout_toRightOf="@id/task_detail_complete"
         android:text="Medium Text"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
