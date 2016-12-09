@@ -33,7 +33,6 @@ import android.view.ViewGroup;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
 
@@ -48,7 +47,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     private TaskdetailFragBinding mViewDataBinding;
 
-    private TaskDetailContract.Presenter mPresenter;
+    private TaskDetailViewModel mViewModel;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -58,23 +57,21 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return fragment;
     }
 
-
-    @Override
-    public void setPresenter(TaskDetailContract.Presenter presenter) {
-        mPresenter = presenter;
+    public void setPresenter(TaskDetailViewModel taskViewModel) {
+        mViewModel = taskViewModel;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewDataBinding.setPresenter(mPresenter);
+        mViewDataBinding.setViewmodel(mViewModel);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mViewModel.start(getArguments().getString(ARGUMENT_TASK_ID));
     }
 
     @Nullable
@@ -112,7 +109,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-                mPresenter.deleteTask();
+
+                mViewModel.deleteTask();
                 return true;
         }
         return false;
@@ -133,18 +131,18 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             }
         }
     }
-
-    @Override
-    public void showTask(Task task) {
-        mViewDataBinding.setTask(task);
-    }
-
-    @Override
-    public void showError() {
-        // If an error occurred, simply show an empty task.
-        Task emptyTask = new Task("", getString(R.string.no_data));
-        mViewDataBinding.setTask(emptyTask);
-    }
+//
+//    @Override
+//    public void showTask(Task task) {
+//        mViewDataBinding.setTask(task);
+//    }
+//
+//    @Override
+//    public void showError() {
+//        // If an error occurred, simply show an empty task.
+//        Task emptyTask = new Task("", getString(R.string.no_data));
+//        mViewDataBinding.setTask(emptyTask);
+//    }
 
     @Override
     public void showTaskDeleted() {

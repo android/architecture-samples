@@ -33,7 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity" />
+        <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity"  android:exported="true"/>
         <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
         <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
     </application>

@@ -30,17 +30,20 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
-public class TasksActivity extends AppCompatActivity {
+public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
     private DrawerLayout mDrawerLayout;
 
-    private TasksPresenter mTasksPresenter;
+    private TasksViewModel mTasksViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,25 +75,26 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        mTasksPresenter = new TasksPresenter(Injection.provideTasksRepository(
-                getApplicationContext()), tasksFragment);
+//        mTasksPresenter = new TasksPresenter(Injection.provideTasksRepository(
+//                getApplicationContext()), tasksFragment);
 
-        TasksViewModel tasksViewModel =
-                new TasksViewModel(getApplicationContext(), mTasksPresenter);
+        mTasksViewModel = new TasksViewModel(
+                Injection.provideTasksRepository(getApplicationContext()),
+                getApplicationContext(), this);
 
-        tasksFragment.setViewModel(tasksViewModel);
+        tasksFragment.setViewModel(mTasksViewModel);
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
             TasksFilterType currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mTasksPresenter.setFiltering(currentFiltering);
+            mTasksViewModel.setFiltering(currentFiltering);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
+        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksViewModel.getFiltering());
 
         super.onSaveInstanceState(outState);
     }
@@ -136,5 +140,19 @@ public class TasksActivity extends AppCompatActivity {
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    public void openTaskDetails(String taskId) {
+        Intent intent = new Intent(this, TaskDetailActivity.class);
+        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
+        startActivity(intent);
+
+    }
+
+    @Override
+    public void addNewTask() {
+        Intent intent = new Intent(this, AddEditTaskActivity.class);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
     }
 }

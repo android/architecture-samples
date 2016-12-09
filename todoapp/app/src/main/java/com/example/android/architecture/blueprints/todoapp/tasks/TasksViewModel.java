@@ -16,15 +16,27 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
-
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
+import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
+import com.example.android.architecture.blueprints.todoapp.BoundSnackBar;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
 
 /**
  * Exposes the data to be used in the {@link TasksContract.View}.
@@ -35,20 +47,45 @@ import com.example.android.architecture.blueprints.todoapp.R;
  */
 public class TasksViewModel extends BaseObservable {
 
-    int mTaskListSize = 0;
+    private final TasksRepository mTasksRepository;
 
-    private final TasksContract.Presenter mPresenter;
+    private final TasksNavigator mNavigator;
+    
+    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
+
+    public final ObservableList<Task> items = new ObservableArrayList<>();
+
+    private boolean mFirstLoad = true;
+
+    public final ObservableBoolean isDataLoading = new ObservableBoolean(false);
+
+    public final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
+
+    public final ObservableField<BoundSnackBar> snackbar = new ObservableField<>();
 
     private Context mContext;
 
-    public TasksViewModel(Context context, TasksContract.Presenter presenter) {
+    public TasksViewModel(TasksRepository repository, Context context, TasksNavigator navigator) {
         mContext = context;
-        mPresenter = presenter;
+        mTasksRepository = repository;
+        mNavigator = navigator;
+        snackbar.set(new BoundSnackBar());
+    }
+//
+//    public void showMessage(@NonNull String msg) {
+//        checkNotNull(msg);
+//        View snackBarView = mSnackBarView.get();
+//        checkNotNull(snackBarView);
+//        Snackbar.make(snackBarView, msg, Snackbar.LENGTH_SHORT);
+//    }
+
+    public void start() {
+        loadTasks(false);
     }
 
     @Bindable
     public String getCurrentFilteringLabel() {
-        switch (mPresenter.getFiltering()) {
+        switch (mCurrentFiltering) {
             case ALL_TASKS:
                 return mContext.getResources().getString(R.string.label_all);
             case ACTIVE_TASKS:
@@ -61,7 +98,7 @@ public class TasksViewModel extends BaseObservable {
 
     @Bindable
     public String getNoTasksLabel() {
-        switch (mPresenter.getFiltering()) {
+        switch (mCurrentFiltering) {
             case ALL_TASKS:
                 return mContext.getResources().getString(R.string.no_tasks_all);
             case ACTIVE_TASKS:
@@ -74,7 +111,7 @@ public class TasksViewModel extends BaseObservable {
 
     @Bindable
     public Drawable getNoTaskIconRes() {
-        switch (mPresenter.getFiltering()) {
+        switch (mCurrentFiltering) {
             case ALL_TASKS:
                 return mContext.getResources().getDrawable(R.drawable.ic_assignment_turned_in_24dp);
             case ACTIVE_TASKS:
@@ -87,20 +124,115 @@ public class TasksViewModel extends BaseObservable {
 
     @Bindable
     public boolean getTasksAddViewVisible() {
-        return mPresenter.getFiltering() == ALL_TASKS;
+        return mCurrentFiltering == ALL_TASKS;
     }
 
     @Bindable
-    public boolean isNotEmpty() {
-        return mTaskListSize > 0;
+    public boolean isEmpty() {
+        return items.isEmpty();
     }
 
-    public void setTaskListSize(int taskListSize) {
-        mTaskListSize = taskListSize;
-        notifyPropertyChanged(BR.noTaskIconRes);
-        notifyPropertyChanged(BR.noTasksLabel);
-        notifyPropertyChanged(BR.currentFilteringLabel);
-        notifyPropertyChanged(BR.notEmpty);
-        notifyPropertyChanged(BR.tasksAddViewVisible);
+
+    public void loadTasks(boolean forceUpdate) {
+        // Simplification for sample: a network reload will be forced on first load.
+        loadTasks(forceUpdate || mFirstLoad, true);
+        mFirstLoad = false;
     }
+
+    /**
+     * Sets the current task filtering type.
+     *
+     * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or
+     *                    {@link TasksFilterType#ACTIVE_TASKS}
+     */
+    public void setFiltering(TasksFilterType requestType) {
+        mCurrentFiltering = requestType;
+    }
+
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
+    }
+
+    public void clearCompletedTasks() {
+        mTasksRepository.clearCompletedTasks();
+        snackbar.get().showMessage(mContext.getResources().getString(R.string.completed_tasks_cleared));
+        loadTasks(false, false);
+    }
+
+    /**
+     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
+     * @param showLoadingUI Pass in true to display a loading icon in the UI
+     */
+    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
+        if (showLoadingUI) {
+            isDataLoading.set(true);
+        }
+        if (forceUpdate) {
+
+            mTasksRepository.refreshTasks();
+        }
+
+        // The network request might be handled in a different thread so make sure Espresso knows
+        // that the app is busy until the response is handled.
+        EspressoIdlingResource.increment(); // App is busy until further notice
+
+        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                List<Task> tasksToShow = new ArrayList<Task>();
+
+                // This callback may be called twice, once for the cache and once for loading
+                // the data from the server API, so we check before decrementing, otherwise
+                // it throws "Counter has been corrupted!" exception.
+                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                    EspressoIdlingResource.decrement(); // Set app as idle.
+                }
+
+                // We filter the tasks based on the requestType
+                for (Task task : tasks) {
+                    switch (mCurrentFiltering) {
+                        case ALL_TASKS:
+                            tasksToShow.add(task);
+                            break;
+                        case ACTIVE_TASKS:
+                            if (task.isActive()) {
+                                tasksToShow.add(task);
+                            }
+                            break;
+                        case COMPLETED_TASKS:
+                            if (task.isCompleted()) {
+                                tasksToShow.add(task);
+                            }
+                            break;
+                        default:
+                            tasksToShow.add(task);
+                            break;
+                    }
+                }
+                if (showLoadingUI) {
+                    isDataLoading.set(false);
+                }
+                isDataLoadingError.set(false);
+
+                items.clear();
+                items.addAll(tasksToShow);
+                notifyPropertyChanged(BR.empty);
+                notifyPropertyChanged(BR.viewmodel);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                isDataLoadingError.set(true);
+            }
+        });
+    }
+
+    /**
+     * Called by Data Binding library.
+     */
+    public void addNewTask() {
+        mNavigator.addNewTask();
+    }
+
 }

@@ -14,31 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.addedittask;
-
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 /**
- * This specifies the contract between the view and the presenter.
+ * TODO: javadoc
  */
-public interface AddEditTaskContract {
 
-    interface View {
+public interface TaskDetailNavigator {
 
-        void showEmptyTaskError();
-
-        void showTasksList();
-
-        void setTask(Task task);
-
-        boolean isActive();
-    }
-
-    interface Presenter extends BasePresenter {
-
-        void saveTask(String title, String description);
-
-        void populateTask();
-    }
+    void onTaskDeleted();
 }

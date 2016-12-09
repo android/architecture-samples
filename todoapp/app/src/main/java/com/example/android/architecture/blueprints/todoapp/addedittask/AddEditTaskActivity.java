@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
@@ -31,7 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends AppCompatActivity {
+public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
 
     public static final int REQUEST_ADD_TASK = 1;
 
@@ -68,11 +69,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
                     addEditTaskFragment, R.id.contentFrame);
         }
 
-        // Create the presenter
-        new AddEditTaskPresenter(
-                taskId,
+        addEditTaskFragment.setViewModel(new AddEditTaskViewModel(
                 Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment);
+                this));
     }
 
     @Override
@@ -84,5 +83,11 @@ public class AddEditTaskActivity extends AppCompatActivity {
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    public void onTaskSaved() {
+        setResult(Activity.RESULT_OK);
+        finish();
     }
 }

@@ -14,34 +14,18 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.taskdetail;
+package com.example.android.architecture.blueprints.todoapp;
 
-/**
- * This specifies the contract between the view and the presenter.
- */
-public interface TaskDetailContract {
+import android.databinding.BindingAdapter;
+import android.view.View;
 
-    interface View {
+public class SnackBarDataBinding {
 
-        //void showTask(Task task);
-
-        //void showError();
-
-        void showTaskDeleted();
-
-        void showTaskMarkedComplete();
-
-        void showTaskMarkedActive();
-
-        boolean isActive();
+    /**
+     * TODO
+     */
+    @BindingAdapter("app:snackbar")
+    public static void setSnackBarView(View view, final BoundSnackBar snackbar) {
+        snackbar.setSnackBarView(view);
     }
-//
-//    interface Presenter extends BasePresenter {
-//
-//        void getTask();
-//
-//        void deleteTask();
-//
-//        void completeChanged(Task task, boolean isChecked);
-//    }
 }

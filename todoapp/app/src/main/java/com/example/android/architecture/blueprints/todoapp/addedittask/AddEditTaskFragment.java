@@ -26,7 +26,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -41,11 +40,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.Presenter mPresenter;
-
-    private TextView mTitle;
-
-    private TextView mDescription;
+    private AddEditTaskViewModel mViewModel;
 
     private AddtaskFragBinding mViewDataBinding;
 
@@ -60,12 +55,15 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        if (getArguments() != null) {
+            mViewModel.start(getArguments().getString(ARGUMENT_EDIT_TASK_ID));
+        } else {
+            mViewModel.start(null);
+        }
     }
 
-    @Override
-    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void setViewModel(@NonNull AddEditTaskViewModel viewModel) {
+        mViewModel = checkNotNull(viewModel);
     }
 
     @Override
@@ -78,7 +76,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+                mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
             }
         });
     }
@@ -89,9 +87,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
         mViewDataBinding = AddtaskFragBinding.bind(root);
-
-        mTitle = mViewDataBinding.addTaskTitle;
-        mDescription = mViewDataBinding.addTaskDescription;
+        mViewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -100,7 +96,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public void showEmptyTaskError() {
-        Snackbar.make(mTitle, getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getActivity().findViewById(android.R.id.content),
+                getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -111,7 +108,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public void setTask(Task task) {
-        mViewDataBinding.setTask(task);
+        //mViewDataBinding.setViewmodel(task);
     }
 
     @Override

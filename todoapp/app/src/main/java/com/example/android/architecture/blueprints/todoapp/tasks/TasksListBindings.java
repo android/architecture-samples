@@ -16,36 +16,27 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.databinding.BindingAdapter;
+import android.widget.ListView;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
+import java.util.List;
 
 /**
- * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
- * Fragment's actions listener.
+ * TODO: javadoc
  */
-public class TasksItemActionHandler {
 
-    private TasksContract.Presenter mListener;
+public class TasksListBindings {
 
-    public TasksItemActionHandler(TasksContract.Presenter listener) {
-        mListener = listener;
-    }
-
-    /**
-     * Called by the Data Binding library when the checkbox is toggled.
-     */
-    public void completeChanged(Task task, boolean isChecked) {
-        if (isChecked) {
-            mListener.completeTask(task);
-        } else {
-            mListener.activateTask(task);
+    @SuppressWarnings("unchecked")
+    @BindingAdapter("app:items")
+    public static void setItems(ListView listView, List<Task> items)
+    {
+        TasksFragment.TasksAdapter adapter = (TasksFragment.TasksAdapter) listView.getAdapter();
+        if (adapter != null)
+        {
+            adapter.replaceData(items);
         }
-    }
-
-    /**
-     * Called by the Data Binding library when the row is clicked.
-     */
-    public void taskClicked(Task task) {
-        mListener.openTaskDetails(task);
     }
 }

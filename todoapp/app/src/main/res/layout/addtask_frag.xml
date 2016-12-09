@@ -19,8 +19,8 @@
     <data>
 
         <variable
-            name="task"
-            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
+            name="viewmodel"
+            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
     </data>
 
 <ScrollView
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
-            android:text="@{task.title}"
+            android:text="@={viewmodel.title}"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:gravity="top"
-            android:text="@{task.description}"
+            android:text="@={viewmodel.description}"
             android:hint="@string/description_hint" />
 
     </LinearLayout>

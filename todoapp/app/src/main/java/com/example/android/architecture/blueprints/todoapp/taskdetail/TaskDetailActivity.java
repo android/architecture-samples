@@ -17,8 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,14 +24,14 @@ import android.support.v7.widget.Toolbar;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity {
+public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +59,20 @@ public class TaskDetailActivity extends AppCompatActivity {
                     taskDetailFragment, R.id.contentFrame);
         }
 
-        new TaskDetailPresenter(taskId, Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment);
+        taskDetailFragment.setPresenter(new TaskDetailViewModel(
+                getApplicationContext(),
+                Injection.provideTasksRepository(getApplicationContext()),
+                this));
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onTaskDeleted() {
+        finish();
     }
 }

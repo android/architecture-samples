@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -38,12 +36,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,13 +51,12 @@ import java.util.List;
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment implements TasksContract.View {
-
-    private TasksContract.Presenter mPresenter;
+public class TasksFragment extends Fragment {
 
     private TasksAdapter mListAdapter;
 
     private TasksViewModel mTasksViewModel;
+
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -68,19 +67,19 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mTasksViewModel.start();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
+            // TODO looks weird.
+            mTasksViewModel.snackbar.get().showMessage(getString(R.string.successfully_saved_task_message));
+        }
     }
 
     @Nullable
@@ -89,14 +88,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                              Bundle savedInstanceState) {
         TasksFragBinding tasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
 
-        tasksFragBinding.setTasks(mTasksViewModel);
+        tasksFragBinding.setView(this);
 
-        tasksFragBinding.setActionHandler(mPresenter);
+        tasksFragBinding.setViewmodel(mTasksViewModel);
 
         // Set up tasks view
         ListView listView = tasksFragBinding.tasksList;
 
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mPresenter);
+        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), (TaskItemNavigator) getActivity(),
+                Injection.provideTasksRepository(getContext().getApplicationContext()));
         listView.setAdapter(mListAdapter);
 
         // Set up floating action button
@@ -107,7 +107,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewTask();
+                mTasksViewModel.addNewTask();
             }
         });
 
@@ -132,13 +132,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
+                mTasksViewModel.clearCompletedTasks();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mTasksViewModel.loadTasks(true);
                 break;
         }
         return true;
@@ -161,16 +161,17 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+
+                        mTasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mTasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mPresenter.loadTasks(false);
+                mTasksViewModel.loadTasks(false);
                 return true;
             }
         });
@@ -178,7 +179,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         popup.show();
     }
 
-    @Override
     public void setLoadingIndicator(final boolean active) {
 
         if (getView() == null) {
@@ -198,45 +198,27 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     public void showTasks(List<Task> tasks) {
         mListAdapter.replaceData(tasks);
-        mTasksViewModel.setTaskListSize(tasks.size());
     }
 
-    @Override
     public void showSuccessfullySavedMessage() {
         showMessage(getString(R.string.successfully_saved_task_message));
     }
 
-    @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
+    public void showAddTask() {//todo
     }
 
-    @Override
-    public void showTaskDetailsUi(String taskId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
-    }
-
-    @Override
     public void showTaskMarkedComplete() {
         showMessage(getString(R.string.task_marked_complete));
     }
 
-    @Override
     public void showTaskMarkedActive() {
         showMessage(getString(R.string.task_marked_active));
     }
 
-    @Override
     public void showCompletedTasksCleared() {
         showMessage(getString(R.string.completed_tasks_cleared));
     }
 
-    @Override
     public void showLoadingTasksError() {
         showMessage(getString(R.string.loading_tasks_error));
     }
@@ -245,20 +227,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
-    @Override
     public boolean isActive() {
         return isAdded();
     }
 
-    private static class TasksAdapter extends BaseAdapter {
+    public static class TasksAdapter extends BaseAdapter {
+
+        private final TaskItemNavigator mTaskItemNavigator;
 
         private List<Task> mTasks;
 
-        private TasksContract.Presenter mUserActionsListener;
+        private TasksRepository mTasksRepository;
 
-        public TasksAdapter(List<Task> tasks, TasksContract.Presenter itemListener) {
+
+        public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
+                            TasksRepository tasksRepository) {
+            mTaskItemNavigator = taskItemNavigator;
+            mTasksRepository = tasksRepository;
             setList(tasks);
-            mUserActionsListener = itemListener;
         }
 
         public void replaceData(List<Task> tasks) {
@@ -295,16 +281,22 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
                 // Create the binding
                 binding = TaskItemBinding.inflate(inflater, viewGroup, false);
+
+                // Create view model
+                TaskItemViewModel taskItemViewModel =
+                        new TaskItemViewModel(
+                                viewGroup.getContext().getApplicationContext(),
+                                mTasksRepository,
+                                mTaskItemNavigator);
+                binding.setViewmodel(taskItemViewModel);
+                taskItemViewModel.start(task.getId());
             } else {
+                // Recycling view
                 binding = DataBindingUtil.getBinding(view);
+                TaskItemViewModel viewmodel = binding.getViewmodel();
+                viewmodel.start(task.getId());
             }
 
-            // We might be recycling the binding for another task, so update it.
-            // Create the action handler for the view
-            TasksItemActionHandler itemActionHandler =
-                    new TasksItemActionHandler(mUserActionsListener);
-            binding.setActionHandler(itemActionHandler);
-            binding.setTask(task);
             binding.executePendingBindings();
             return binding.getRoot();
         }
