@@ -16,6 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -26,21 +30,38 @@ import java.lang.ref.WeakReference;
 /**
  * TODO: javadoc
  */
-public class BoundSnackBar {
+public class SnackBarProxy {
 
     private static final String TAG = "BoundSnackBar";
 
-    private WeakReference<View> mSnackBarView = null;
+    private final WeakReference<View> mSnackBarView;
 
-    public void setSnackBarView(View snackBarView) {
+    private final Context mContext;
+
+    // Prevent direct instantiation.
+    private SnackBarProxy(Context context, View snackBarView){
+        mContext = context;
         mSnackBarView = new WeakReference<>(snackBarView);
     }
 
-    public void showMessage(String msg) {
+    public static SnackBarProxy getInstance(Activity activity, @IdRes int id) {
+        return new SnackBarProxy(activity.getApplicationContext(), activity.findViewById(id));
+    }
+
+    public void showMessage(@StringRes int string) {
+        showMessage(mContext.getString(string));
+    }
+
+    private void showMessage(String msg) {
         if (mSnackBarView == null) {
             Log.e(TAG, "Snackbar was not bound");
             return;
         }
+        if (mSnackBarView.get() == null) {
+            Log.e(TAG, "ERROR: Snackbar view is null");
+            return;
+        }
+
         Snackbar.make(mSnackBarView.get(), msg, Snackbar.LENGTH_SHORT).show();
     }
 }

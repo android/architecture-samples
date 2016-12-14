@@ -31,7 +31,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/list_item_padding"
         android:paddingTop="@dimen/list_item_padding"
-        app:snackbar="@{viewmodel.snackbar}"
         android:onClick="@{() -> viewmodel.taskClicked()}">
 
         <CheckBox

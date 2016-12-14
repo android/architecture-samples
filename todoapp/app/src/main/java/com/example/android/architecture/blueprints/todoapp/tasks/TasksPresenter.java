@@ -35,7 +35,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 //        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
 //        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
 //
-//        mTasksView.setPresenter(this);
+//        mTasksView.setViewModel(this);
 //    }
 //
 //    @Override
@@ -45,8 +45,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 //
 //    @Override
 //    public void result(int requestCode, int resultCode) {
-//        // If a task was successfully added, show snackbar
-//        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+//        // If a task was successfully added, show mSnackBar
+//        if (AddEditTaskActivity.REQUEST_CODE == requestCode && Activity.RESULT_OK == resultCode) {
 //            mTasksView.showSuccessfullySavedMessage();
 //        }
 //    }

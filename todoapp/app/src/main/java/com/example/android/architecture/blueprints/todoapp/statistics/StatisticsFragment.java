@@ -58,8 +58,7 @@ public class StatisticsFragment extends Fragment {
                              Bundle savedInstanceState) {
         mViewDataBinding = DataBindingUtil.inflate(
                 inflater, R.layout.statistics_frag, container, false);
-        View root = mViewDataBinding.getRoot();
-        return root;
+        return mViewDataBinding.getRoot();
     }
 
     @Override

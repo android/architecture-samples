@@ -35,7 +35,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 //        mTaskDetailView = view;
 //        mTaskId = taskId;
 //
-//        mTaskDetailView.setPresenter(this);
+//        mTaskDetailView.setViewModel(this);
 //    }
 //
 //

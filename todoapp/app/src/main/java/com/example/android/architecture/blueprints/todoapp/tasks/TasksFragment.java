@@ -16,16 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,10 +32,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
@@ -52,8 +48,6 @@ import java.util.List;
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
 public class TasksFragment extends Fragment {
-
-    private TasksAdapter mListAdapter;
 
     private TasksViewModel mTasksViewModel;
 
@@ -72,16 +66,6 @@ public class TasksFragment extends Fragment {
         mTasksViewModel.start();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
-                && Activity.RESULT_OK == resultCode) {
-            // TODO looks weird.
-            mTasksViewModel.snackbar.get().showMessage(getString(R.string.successfully_saved_task_message));
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,8 +79,11 @@ public class TasksFragment extends Fragment {
         // Set up tasks view
         ListView listView = tasksFragBinding.tasksList;
 
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), (TaskItemNavigator) getActivity(),
-                Injection.provideTasksRepository(getContext().getApplicationContext()));
+        TasksAdapter mListAdapter = new TasksAdapter(
+                new ArrayList<Task>(0),
+                (TaskItemNavigator) getActivity(),
+                Injection.provideTasksRepository(getContext().getApplicationContext()),
+                SnackBarProxy.getInstance(getActivity(), R.id.coordinatorLayout));
         listView.setAdapter(mListAdapter);
 
         // Set up floating action button
@@ -179,54 +166,6 @@ public class TasksFragment extends Fragment {
         popup.show();
     }
 
-    public void setLoadingIndicator(final boolean active) {
-
-        if (getView() == null) {
-            return;
-        }
-        final SwipeRefreshLayout srl =
-                (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
-
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
-            @Override
-            public void run() {
-                srl.setRefreshing(active);
-            }
-        });
-    }
-
-    public void showTasks(List<Task> tasks) {
-        mListAdapter.replaceData(tasks);
-    }
-
-    public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_task_message));
-    }
-
-    public void showAddTask() {//todo
-    }
-
-    public void showTaskMarkedComplete() {
-        showMessage(getString(R.string.task_marked_complete));
-    }
-
-    public void showTaskMarkedActive() {
-        showMessage(getString(R.string.task_marked_active));
-    }
-
-    public void showCompletedTasksCleared() {
-        showMessage(getString(R.string.completed_tasks_cleared));
-    }
-
-    public void showLoadingTasksError() {
-        showMessage(getString(R.string.loading_tasks_error));
-    }
-
-    private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
     public boolean isActive() {
         return isAdded();
     }
@@ -239,12 +178,15 @@ public class TasksFragment extends Fragment {
 
         private TasksRepository mTasksRepository;
 
+        private SnackBarProxy mSnackbar;
 
         public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
-                            TasksRepository tasksRepository) {
+                            TasksRepository tasksRepository, SnackBarProxy snackbar) {
             mTaskItemNavigator = taskItemNavigator;
             mTasksRepository = tasksRepository;
+            mSnackbar = snackbar;
             setList(tasks);
+
         }
 
         public void replaceData(List<Task> tasks) {
@@ -281,23 +223,19 @@ public class TasksFragment extends Fragment {
 
                 // Create the binding
                 binding = TaskItemBinding.inflate(inflater, viewGroup, false);
-
-                // Create view model
-                TaskItemViewModel taskItemViewModel =
-                        new TaskItemViewModel(
-                                viewGroup.getContext().getApplicationContext(),
-                                mTasksRepository,
-                                mTaskItemNavigator);
-                binding.setViewmodel(taskItemViewModel);
-                taskItemViewModel.start(task.getId());
             } else {
                 // Recycling view
                 binding = DataBindingUtil.getBinding(view);
-                TaskItemViewModel viewmodel = binding.getViewmodel();
-                viewmodel.start(task.getId());
             }
 
-            binding.executePendingBindings();
+            TaskItemViewModel viewmodel = new TaskItemViewModel(
+                    viewGroup.getContext().getApplicationContext(),
+                    mTasksRepository,
+                    mTaskItemNavigator, mSnackbar);
+            binding.setViewmodel(viewmodel);
+            viewmodel.start(task.getId());
+
+            //binding.executePendingBindings();
             return binding.getRoot();
         }
     }

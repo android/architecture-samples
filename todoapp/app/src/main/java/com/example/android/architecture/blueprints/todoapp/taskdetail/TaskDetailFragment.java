@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -31,8 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
 
@@ -57,7 +53,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return fragment;
     }
 
-    public void setPresenter(TaskDetailViewModel taskViewModel) {
+    public void setViewModel(TaskDetailViewModel taskViewModel) {
         mViewModel = taskViewModel;
     }
 
@@ -94,10 +90,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-                Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-                intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-                startActivityForResult(intent, REQUEST_EDIT_TASK);
+                mViewModel.startEditTask();
             }
         });
 
@@ -121,16 +114,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_TASK) {
-            // If the task was edited successfully, go back to the list.
-            if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
-                return;
-            }
-        }
-    }
 //
 //    @Override
 //    public void showTask(Task task) {

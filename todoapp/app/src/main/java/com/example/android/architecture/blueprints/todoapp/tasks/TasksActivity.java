@@ -30,11 +30,13 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
 
 public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
@@ -76,7 +78,9 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
         mTasksViewModel = new TasksViewModel(
                 Injection.provideTasksRepository(getApplicationContext()),
-                getApplicationContext(), this);
+                getApplicationContext(),
+                this,
+                SnackBarProxy.getInstance(this, R.id.coordinatorLayout));
 
         tasksFragment.setViewModel(mTasksViewModel);
 
@@ -139,16 +143,35 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If a task was successfully added, show mSnackBar
+        if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
+
+            switch (resultCode) {
+                case TaskDetailActivity.EDIT_RESULT_OK:
+                    mTasksViewModel.showMessage(R.string.successfully_saved_task_message);
+                    break;
+                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
+                    mTasksViewModel.showMessage(R.string.successfully_added_task_message);
+                    break;
+                case TaskDetailActivity.DELETE_RESULT_OK:
+                    mTasksViewModel.showMessage(R.string.successfully_deleted_task_message);
+                    break;
+            }
+        }
+    }
+
+    @Override
     public void openTaskDetails(String taskId) {
         Intent intent = new Intent(this, TaskDetailActivity.class);
         intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_CODE);
 
     }
 
     @Override
     public void addNewTask() {
         Intent intent = new Intent(this, AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_CODE);
     }
 }

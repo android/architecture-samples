@@ -16,16 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import android.databinding.BindingAdapter;
-import android.view.View;
-
-public class SnackBarDataBinding {
-
-    /**
-     * TODO
-     */
-    @BindingAdapter("app:snackbar")
-    public static void setSnackBarView(View view, final BoundSnackBar snackbar) {
-        snackbar.setSnackBarView(view);
-    }
-}
+//public class SnackBarDataBinding {
+//
+//    /**
+//     * TODO
+//     */
+//    @BindingAdapter("app:mSnackBar")
+//    public static void setSnackBarView(View view, final SnackBarProxy snackbar) {
+//        snackbar.setSnackBarView(view);
+//    }
+//}

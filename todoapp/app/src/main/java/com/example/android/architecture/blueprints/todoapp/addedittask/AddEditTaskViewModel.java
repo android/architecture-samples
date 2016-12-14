@@ -16,12 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.content.Context;
 import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
 import com.android.annotations.Nullable;
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -29,26 +31,32 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 /**
  *
  */
-public class AddEditTaskViewModel extends BaseObservable implements TasksDataSource.GetTaskCallback {
+public class AddEditTaskViewModel extends BaseObservable implements
+        TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
 
     private final TasksRepository mTasksRepository;
-
-    public final ObservableBoolean showEmptyTaskError = new ObservableBoolean();
 
     public final ObservableField<String> title = new ObservableField<>();
 
     public final ObservableField<String> description = new ObservableField<>();
+
+    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+
+    public final ObservableField<String> snackBarText = new ObservableField<>();
+
+    private final Context mContext;
 
     @Nullable
     private String mTaskId;
 
     private boolean mIsNewTask;
 
-    private boolean mIsDataLoading;
-
     private AddEditTaskNavigator mNavigator;
 
-    public AddEditTaskViewModel(TasksRepository tasksRepository, AddEditTaskNavigator taskDetailNavigator) {
+    public AddEditTaskViewModel(Context context,
+                                TasksRepository tasksRepository,
+                                AddEditTaskNavigator taskDetailNavigator) {
+        mContext = context;
         mTasksRepository = tasksRepository;
         mNavigator = taskDetailNavigator;
     }
@@ -60,49 +68,23 @@ public class AddEditTaskViewModel extends BaseObservable implements TasksDataSou
             mIsNewTask = true;
             return;
         }
-        mIsDataLoading = true;
+        dataLoading.set(true);
         mIsNewTask = false;
         mTasksRepository.getTask(taskId, this);
-    }
-//
-//    @Bindable
-//    public String getTitle() {
-//        if (mTask == null) {
-//            return "No data";
-//        }
-//        return mTask.getTitle();
-//    }
-//
-//    @Bindable
-//    public String getDescription() {
-//        if (mTask == null) {
-//            return "";
-//        }
-//        return mTask.getDescription();
-//    }
-
-//
-//    @Bindable
-//    public boolean isDataAvailable() {
-//        return mTask != null;
-//    }
-
-    @Bindable
-    public boolean isDataLoading() {
-        return mIsDataLoading;
     }
 
     @Override
     public void onTaskLoaded(Task task) {
         title.set(task.getTitle());
         description.set(task.getDescription());
-        mIsDataLoading = false;
+
+        dataLoading.set(false);
         notifyChange();
     }
 
     @Override
     public void onDataNotAvailable() {
-        mIsDataLoading = false;
+        dataLoading.set(false);
     }
 
     // Called when clicking on fab.
@@ -114,6 +96,11 @@ public class AddEditTaskViewModel extends BaseObservable implements TasksDataSou
         }
     }
 
+    @Override
+    public String getSnackBarText() {
+        return snackBarText.get();
+    }
+
     private boolean isNewTask() {
         return mIsNewTask;
     }
@@ -121,7 +108,7 @@ public class AddEditTaskViewModel extends BaseObservable implements TasksDataSou
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            showEmptyTaskError.set(true);
+            snackBarText.set(mContext.getString(R.string.empty_task_message));
         } else {
             mTasksRepository.saveTask(newTask);
             mNavigator.onTaskSaved();

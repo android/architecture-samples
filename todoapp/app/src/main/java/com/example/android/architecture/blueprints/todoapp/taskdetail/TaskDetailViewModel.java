@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.content.Context;
 
+import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
@@ -31,8 +32,8 @@ public class TaskDetailViewModel extends TaskViewModel {
     private final TaskDetailNavigator taskDetailNavigator;
 
     public TaskDetailViewModel(Context context, TasksRepository tasksRepository,
-                               TaskDetailNavigator taskDetailNavigator) {
-        super(context, tasksRepository);
+                               TaskDetailNavigator taskDetailNavigator, SnackBarProxy snackbar) {
+        super(context, tasksRepository, snackbar);
         this.taskDetailNavigator = taskDetailNavigator;
     }
 
@@ -42,5 +43,9 @@ public class TaskDetailViewModel extends TaskViewModel {
     public void deleteTask() {
         super.deleteTask();
         taskDetailNavigator.onTaskDeleted();
+    }
+
+    public void startEditTask() {
+        taskDetailNavigator.onStartEditTask();
     }
 }

@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
@@ -34,7 +33,9 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
  */
 public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
 
-    public static final int REQUEST_ADD_TASK = 1;
+    public static final int REQUEST_CODE = 1;
+
+    public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +49,8 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment =
-                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
 
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
 
@@ -70,6 +71,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
         }
 
         addEditTaskFragment.setViewModel(new AddEditTaskViewModel(
+                getApplicationContext(),
                 Injection.provideTasksRepository(getApplicationContext()),
                 this));
     }
@@ -87,7 +89,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
 
     @Override
     public void onTaskSaved() {
-        setResult(Activity.RESULT_OK);
+        setResult(ADD_EDIT_RESULT_OK);
         finish();
     }
 }

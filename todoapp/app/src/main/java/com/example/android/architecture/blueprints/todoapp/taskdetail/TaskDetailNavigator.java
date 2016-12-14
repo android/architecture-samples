@@ -23,4 +23,6 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 public interface TaskDetailNavigator {
 
     void onTaskDeleted();
+
+    void onStartEditTask();
 }

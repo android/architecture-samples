@@ -16,19 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,13 +34,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+public class AddEditTaskFragment extends Fragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
     private AddEditTaskViewModel mViewModel;
-
-    private AddtaskFragBinding mViewDataBinding;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -70,6 +66,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // FAB setup
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
@@ -79,14 +76,19 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
                 mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
             }
         });
+
+        // SnackBar setup
+        mViewModel.snackBarText.addOnPropertyChangedCallback(
+                new SnackBarChangedCallback(getView(), mViewModel));
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mViewDataBinding = AddtaskFragBinding.bind(root);
+        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
+        AddtaskFragBinding mViewDataBinding = AddtaskFragBinding.bind(root);
+
         mViewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
@@ -94,25 +96,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         return root;
     }
 
-    @Override
-    public void showEmptyTaskError() {
-        Snackbar.make(getActivity().findViewById(android.R.id.content),
-                getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
-    }
-
-    @Override
-    public void setTask(Task task) {
-        //mViewDataBinding.setViewmodel(task);
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
 }
+

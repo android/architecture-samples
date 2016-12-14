@@ -16,14 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+
+import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity.ADD_EDIT_RESULT_OK;
+import static com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment.REQUEST_EDIT_TASK;
 
 /**
  * Displays task details screen.
@@ -32,6 +39,9 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
+    public static final int DELETE_RESULT_OK = RESULT_FIRST_USER + 2;
+
+    public static final int EDIT_RESULT_OK = RESULT_FIRST_USER + 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +69,23 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
                     taskDetailFragment, R.id.contentFrame);
         }
 
-        taskDetailFragment.setPresenter(new TaskDetailViewModel(
+        taskDetailFragment.setViewModel(new TaskDetailViewModel(
                 getApplicationContext(),
                 Injection.provideTasksRepository(getApplicationContext()),
-                this));
+                this,
+                SnackBarProxy.getInstance(this, R.id.coordinatorLayout)));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT_TASK) {
+            // If the task was edited successfully, go back to the list.
+            if (resultCode == ADD_EDIT_RESULT_OK) {
+                // If the result comes from the add/edit screen, it's an edit.
+                setResult(EDIT_RESULT_OK);
+                finish();
+            }
+        }
     }
 
     @Override
@@ -73,6 +96,16 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     @Override
     public void onTaskDeleted() {
+        setResult(DELETE_RESULT_OK);
+        // If the task was deleted successfully, go back to the list.
         finish();
+    }
+
+    @Override
+    public void onStartEditTask() {
+        String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
+        Intent intent = new Intent(this, AddEditTaskActivity.class);
+        intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+        startActivityForResult(intent, REQUEST_EDIT_TASK);
     }
 }
