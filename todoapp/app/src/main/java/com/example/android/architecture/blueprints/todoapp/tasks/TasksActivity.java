@@ -74,10 +74,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
                     getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
 
-        // Create the presenter
-//        mTasksPresenter = new TasksPresenter(Injection.provideTasksRepository(
-//                getApplicationContext()), tasksFragment);
-
         mTasksViewModel = new TasksViewModel(
                 Injection.provideTasksRepository(getApplicationContext()),
                 getApplicationContext(), this);

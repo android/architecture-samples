@@ -57,7 +57,7 @@ public class TasksViewModel extends BaseObservable {
 
     private boolean mFirstLoad = true;
 
-    public final ObservableBoolean isDataLoading = new ObservableBoolean(false);
+    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
     public final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
 
@@ -166,7 +166,7 @@ public class TasksViewModel extends BaseObservable {
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            isDataLoading.set(true);
+            dataLoading.set(true);
         }
         if (forceUpdate) {
 
@@ -211,7 +211,7 @@ public class TasksViewModel extends BaseObservable {
                     }
                 }
                 if (showLoadingUI) {
-                    isDataLoading.set(false);
+                    dataLoading.set(false);
                 }
                 isDataLoadingError.set(false);
 

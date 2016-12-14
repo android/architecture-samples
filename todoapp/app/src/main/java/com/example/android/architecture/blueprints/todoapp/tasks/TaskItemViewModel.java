@@ -34,7 +34,7 @@ public class TaskItemViewModel extends TaskViewModel {
     public TaskItemViewModel(Context context, TasksRepository tasksRepository,
                              TaskItemNavigator itemNavigator) {
         super(context, tasksRepository);
-        this.taskItemNavigator = itemNavigator;
+        taskItemNavigator = itemNavigator;
     }
 
     /**

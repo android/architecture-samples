@@ -75,8 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:checked="@{viewmodel.completed}"
-                android:onCheckedChanged="@{(cb, isChecked) -> viewmodel.completeChanged(isChecked)}" />
+                android:checked="@={viewmodel.completed}" />
 
             <TextView
                 android:id="@+id/task_detail_title"
