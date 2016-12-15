@@ -36,16 +36,16 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@{stats.status}"
+        android:text="@string/loading"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:visibility="@{stats.showStatus ? View.VISIBLE : View.GONE}" />
+        android:visibility="@{stats.dataLoading ? View.VISIBLE : View.GONE}" />
 
     <LinearLayout
         android:id="@+id/statistics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="@{stats.showStatus ? View.GONE : View.VISIBLE}">
+        android:visibility="@{stats.dataLoading ? View.GONE : View.VISIBLE}">
 
         <TextView
             android:layout_width="match_parent"

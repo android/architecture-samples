@@ -21,13 +21,13 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
 import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.StringRes;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
+import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -45,32 +45,31 @@ import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFil
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends BaseObservable {
+public class TasksViewModel extends BaseObservable implements SnackBarChangedCallback.SnackBarViewModel {
 
     private final TasksRepository mTasksRepository;
 
     private final TasksNavigator mNavigator;
 
-    private final SnackBarProxy mSnackBarProxy;
-
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     public final ObservableList<Task> items = new ObservableArrayList<>();
-
-    private boolean mFirstLoad = true;
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
     public final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
 
+    public final ObservableField<String> snackBarText = new ObservableField<>();
 
     private Context mContext;
 
-    public TasksViewModel(TasksRepository repository, Context context, TasksNavigator navigator, SnackBarProxy snackBarProxy) {
+    public TasksViewModel(
+            TasksRepository repository,
+            Context context,
+            TasksNavigator navigator) {
         mContext = context;
         mTasksRepository = repository;
         mNavigator = navigator;
-        mSnackBarProxy = snackBarProxy;
     }
 
     public void start() {
@@ -126,14 +125,8 @@ public class TasksViewModel extends BaseObservable {
         return items.isEmpty();
     }
 
-    public void showMessage(@StringRes int id) {
-        mSnackBarProxy.showMessage(id);
-    }
-
     public void loadTasks(boolean forceUpdate) {
-        // Simplification for sample: a network reload will be forced on first load.
-        loadTasks(forceUpdate || mFirstLoad, true);
-        mFirstLoad = false;
+        loadTasks(forceUpdate, true);
     }
 
     /**
@@ -153,8 +146,13 @@ public class TasksViewModel extends BaseObservable {
 
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        mSnackBarProxy.showMessage(R.string.completed_tasks_cleared);
+        snackBarText.set(mContext.getString(R.string.completed_tasks_cleared));
         loadTasks(false, false);
+    }
+
+    @Override
+    public String getSnackBarText() {
+        return snackBarText.get();
     }
 
     /**

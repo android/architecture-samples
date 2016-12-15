@@ -32,7 +32,8 @@ public class SnackBarChangedCallback extends Observable.OnPropertyChangedCallbac
 
     private final SnackBarViewModel mViewModel;
 
-    public SnackBarChangedCallback(View descendantOfCoordinatorLayout, SnackBarViewModel viewModel) {
+    public SnackBarChangedCallback(View descendantOfCoordinatorLayout,
+                                   SnackBarViewModel viewModel) {
         mView = new WeakReference<>(descendantOfCoordinatorLayout);
         mViewModel = viewModel;
     }

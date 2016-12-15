@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,21 +28,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
 
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
+public class TaskDetailFragment extends Fragment {
 
     public static final String ARGUMENT_TASK_ID = "TASK_ID";
 
     public static final int REQUEST_EDIT_TASK = 1;
 
-    private TaskdetailFragBinding mViewDataBinding;
-
     private TaskDetailViewModel mViewModel;
+
+    private SnackBarChangedCallback mSnackBarChangedCallback;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -61,7 +61,21 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewDataBinding.setViewmodel(mViewModel);
+        // Set up floating action button
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.startEditTask();
+            }
+        });
+
+        // SnackBar setup
+        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
+        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+
     }
 
     @Override
@@ -77,22 +91,10 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
         View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
 
-        mViewDataBinding = TaskdetailFragBinding.bind(view);
+        TaskdetailFragBinding viewDataBinding = TaskdetailFragBinding.bind(view);
+        viewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
-
-        setRetainInstance(true);
-
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.startEditTask();
-            }
-        });
 
         return view;
     }
@@ -101,8 +103,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                String taskId = getArguments().getString(ARGUMENT_TASK_ID);
-
                 mViewModel.deleteTask();
                 return true;
         }
@@ -114,38 +114,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
     }
 
-//
-//    @Override
-//    public void showTask(Task task) {
-//        mViewDataBinding.setTask(task);
-//    }
-//
-//    @Override
-//    public void showError() {
-//        // If an error occurred, simply show an empty task.
-//        Task emptyTask = new Task("", getString(R.string.no_data));
-//        mViewDataBinding.setTask(emptyTask);
-//    }
-
     @Override
-    public void showTaskDeleted() {
-        getActivity().finish();
-    }
-
-    @Override
-    public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    @Override
-    public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
+    public void onDestroyView() {
+        super.onDestroyView();
+        mViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 }

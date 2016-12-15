@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.taskdetail;
+package com.example.android.architecture.blueprints.todoapp;
 
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.ObservableField;
 import android.util.Log;
 
 import com.android.annotations.Nullable;
-import com.example.android.architecture.blueprints.todoapp.BR;
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -34,13 +32,13 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * TODO
  */
 public abstract class TaskViewModel extends BaseObservable
-        implements TasksDataSource.GetTaskCallback {
+        implements TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
+
+    public final ObservableField<String> snackBarText = new ObservableField<>();
 
     private static final String TAG = "TaskViewModel";
 
     private final TasksRepository mTasksRepository;
-
-    public final SnackBarProxy mSnackBar;
 
     private final Context mContext;
 
@@ -49,10 +47,9 @@ public abstract class TaskViewModel extends BaseObservable
 
     private boolean mIsDataLoading; // TODO observable field?
 
-    public TaskViewModel(Context context, TasksRepository tasksRepository, SnackBarProxy mSnackbar) {
+    public TaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context;
         mTasksRepository = tasksRepository;
-        mSnackBar = mSnackbar;
     }
 
     public void start(String taskId) {
@@ -124,10 +121,10 @@ public abstract class TaskViewModel extends BaseObservable
         mTask.setCompleted(isChecked);
         if (isChecked) {
             mTasksRepository.completeTask(mTask);
-            mSnackBar.showMessage(R.string.task_marked_complete);
+            snackBarText.set(mContext.getResources().getString(R.string.task_marked_complete));
         } else {
             mTasksRepository.activateTask(mTask);
-            mSnackBar.showMessage(R.string.task_marked_active);
+            snackBarText.set(mContext.getResources().getString(R.string.task_marked_active));
         }
         notifyPropertyChanged(BR.completed);
     }
@@ -145,5 +142,10 @@ public abstract class TaskViewModel extends BaseObservable
     @Nullable
     protected String getTaskId() {
         return mTask.getId();
+    }
+
+    @Override
+    public String getSnackBarText() {
+        return snackBarText.get();
     }
 }

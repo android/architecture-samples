@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.content.Context;
 
-import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
+import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
@@ -32,8 +32,8 @@ public class TaskDetailViewModel extends TaskViewModel {
     private final TaskDetailNavigator taskDetailNavigator;
 
     public TaskDetailViewModel(Context context, TasksRepository tasksRepository,
-                               TaskDetailNavigator taskDetailNavigator, SnackBarProxy snackbar) {
-        super(context, tasksRepository, snackbar);
+                               TaskDetailNavigator taskDetailNavigator) {
+        super(context, tasksRepository);
         this.taskDetailNavigator = taskDetailNavigator;
     }
 

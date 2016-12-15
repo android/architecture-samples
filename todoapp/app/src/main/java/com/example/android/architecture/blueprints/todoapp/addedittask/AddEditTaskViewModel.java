@@ -29,10 +29,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- *
+ * ViewModel for the {@link AddEditTaskFragment}.
  */
 public class AddEditTaskViewModel extends BaseObservable implements
         TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
+
+    public final String TAG = "AddEditTaskViewModel";
 
     private final TasksRepository mTasksRepository;
 
@@ -51,25 +53,29 @@ public class AddEditTaskViewModel extends BaseObservable implements
 
     private boolean mIsNewTask;
 
-    private AddEditTaskNavigator mNavigator;
+    private AddEditTaskNavigator mNavigator; // TODO Weakreference
 
     public AddEditTaskViewModel(Context context,
                                 TasksRepository tasksRepository,
                                 AddEditTaskNavigator taskDetailNavigator) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mTasksRepository = tasksRepository;
         mNavigator = taskDetailNavigator;
     }
 
     public void start(String taskId) {
+        if (dataLoading.get()) {
+            // Already loading, ignore.
+            return;
+        }
         mTaskId = taskId;
         if (taskId == null) {
             // No need to populate, it's a new task
             mIsNewTask = true;
             return;
         }
-        dataLoading.set(true);
         mIsNewTask = false;
+        dataLoading.set(true);
         mTasksRepository.getTask(taskId, this);
     }
 

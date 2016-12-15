@@ -30,7 +30,6 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
@@ -79,8 +78,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         mTasksViewModel = new TasksViewModel(
                 Injection.provideTasksRepository(getApplicationContext()),
                 getApplicationContext(),
-                this,
-                SnackBarProxy.getInstance(this, R.id.coordinatorLayout));
+                this);
 
         tasksFragment.setViewModel(mTasksViewModel);
 
@@ -149,13 +147,16 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
             switch (resultCode) {
                 case TaskDetailActivity.EDIT_RESULT_OK:
-                    mTasksViewModel.showMessage(R.string.successfully_saved_task_message);
+                    mTasksViewModel.snackBarText.set(
+                            getString(R.string.successfully_saved_task_message));
                     break;
                 case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    mTasksViewModel.showMessage(R.string.successfully_added_task_message);
+                    mTasksViewModel.snackBarText.set(
+                            getString(R.string.successfully_added_task_message));
                     break;
                 case TaskDetailActivity.DELETE_RESULT_OK:
-                    mTasksViewModel.showMessage(R.string.successfully_deleted_task_message);
+                    mTasksViewModel.snackBarText.set(
+                            getString(R.string.successfully_deleted_task_message));
                     break;
             }
         }

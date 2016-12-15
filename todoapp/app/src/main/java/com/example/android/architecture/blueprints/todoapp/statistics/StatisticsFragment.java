@@ -16,11 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -32,13 +29,8 @@ import com.example.android.architecture.blueprints.todoapp.databinding.Statistic
 
 /**
  * Main UI for the statistics screen.
- * <p>
- * Note that this Fragment is not implementing {@link StatisticsContract.View},
- * but the {@link StatisticsViewModel} is.
  */
 public class StatisticsFragment extends Fragment {
-
-    private StatisticsPresenter mPresenter;
 
     private StatisticsFragBinding mViewDataBinding;
 
@@ -46,10 +38,6 @@ public class StatisticsFragment extends Fragment {
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
-    }
-
-    public void setPresenter(@NonNull StatisticsPresenter presenter) {
-        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -70,7 +58,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mStatisticsViewModel.start();
     }
 
     public void setViewModel(StatisticsViewModel statisticsViewModel) {

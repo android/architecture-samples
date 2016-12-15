@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.SnackBarProxy;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -72,8 +71,7 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         taskDetailFragment.setViewModel(new TaskDetailViewModel(
                 getApplicationContext(),
                 Injection.provideTasksRepository(getApplicationContext()),
-                this,
-                SnackBarProxy.getInstance(this, R.id.coordinatorLayout)));
+                this));
     }
 
     @Override

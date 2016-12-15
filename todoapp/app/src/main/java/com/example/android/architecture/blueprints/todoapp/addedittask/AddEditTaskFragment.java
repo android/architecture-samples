@@ -40,6 +40,8 @@ public class AddEditTaskFragment extends Fragment {
 
     private AddEditTaskViewModel mViewModel;
 
+    private SnackBarChangedCallback mSnackBarChangedCallback;
+
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
     }
@@ -78,8 +80,8 @@ public class AddEditTaskFragment extends Fragment {
         });
 
         // SnackBar setup
-        mViewModel.snackBarText.addOnPropertyChangedCallback(
-                new SnackBarChangedCallback(getView(), mViewModel));
+        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
+        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     @Nullable
@@ -96,5 +98,10 @@ public class AddEditTaskFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
 }
 
