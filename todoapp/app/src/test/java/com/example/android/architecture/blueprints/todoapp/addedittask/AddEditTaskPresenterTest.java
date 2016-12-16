@@ -16,11 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -31,6 +26,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -59,7 +59,8 @@ public class AddEditTaskPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter =
+                new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, true);
 
         // The presenter won't update the view unless it's active.
         when(mAddEditTaskView.isActive()).thenReturn(true);
@@ -78,7 +79,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Task is new (id is null)
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter =
+                new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView, true);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.saveTask("", "");
@@ -103,7 +105,7 @@ public class AddEditTaskPresenterTest {
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+                mTasksRepository, mAddEditTaskView, true);
 
         // When the presenter is asked to populate an existing task
         mAddEditTaskPresenter.populateTask();

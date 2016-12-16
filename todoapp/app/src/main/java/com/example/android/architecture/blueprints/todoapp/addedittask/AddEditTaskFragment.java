@@ -87,15 +87,18 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mViewDataBinding = AddtaskFragBinding.bind(root);
 
+        super.onCreateView(inflater, container, savedInstanceState);
+        if (mViewDataBinding == null) {
+            mViewDataBinding = AddtaskFragBinding.inflate(inflater, container, false);
+        }
         mTitle = mViewDataBinding.addTaskTitle;
         mDescription = mViewDataBinding.addTaskDescription;
 
         setHasOptionsMenu(true);
+        // Fragment is retained simply to persist the edits after rotation.
         setRetainInstance(true);
-        return root;
+        return mViewDataBinding.getRoot();
     }
 
     @Override

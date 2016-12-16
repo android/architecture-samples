@@ -40,25 +40,27 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    private boolean mIsDataMissing;
+
     /**
      * Creates a presenter for the add/edit view.
      *
      * @param taskId ID of the task to edit or null for a new task
      * @param tasksRepository a repository of data for tasks
      * @param addTaskView the add/edit view
+     * @param shouldLoadDataFromRepo whether data needs to be loaded or not (for config changes)
      */
     public AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksDataSource tasksRepository,
-            @NonNull AddEditTaskContract.View addTaskView) {
+            @NonNull AddEditTaskContract.View addTaskView, boolean shouldLoadDataFromRepo) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
-
-        mAddTaskView.setPresenter(this);
+        mIsDataMissing = shouldLoadDataFromRepo;
     }
 
     @Override
     public void start() {
-        if (!isNewTask()) {
+        if (!isNewTask() && mIsDataMissing) {
             populateTask();
         }
     }
@@ -86,6 +88,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView.isActive()) {
             mAddTaskView.setTask(task);
         }
+        mIsDataMissing = false;
     }
 
     @Override
@@ -94,6 +97,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    @Override
+    public boolean isDataMissing() {
+        return mIsDataMissing;
     }
 
     private boolean isNewTask() {
