@@ -53,14 +53,18 @@ public class AddEditTaskViewModel extends BaseObservable implements
 
     private boolean mIsNewTask;
 
-    private AddEditTaskNavigator mNavigator; // TODO Weakreference
+    private AddEditTaskNavigator mNavigator;
+
+    private boolean mIsDataMissing;
 
     public AddEditTaskViewModel(Context context,
                                 TasksRepository tasksRepository,
+                                boolean shouldLoadDataFromRepo,
                                 AddEditTaskNavigator taskDetailNavigator) {
         mContext = context.getApplicationContext();
         mTasksRepository = tasksRepository;
         mNavigator = taskDetailNavigator;
+        mIsDataMissing = shouldLoadDataFromRepo;
     }
 
     public void start(String taskId) {
@@ -72,6 +76,10 @@ public class AddEditTaskViewModel extends BaseObservable implements
         if (taskId == null) {
             // No need to populate, it's a new task
             mIsNewTask = true;
+            return;
+        }
+        if (!mIsDataMissing) {
+            // No need to populate, already have data.
             return;
         }
         mIsNewTask = false;

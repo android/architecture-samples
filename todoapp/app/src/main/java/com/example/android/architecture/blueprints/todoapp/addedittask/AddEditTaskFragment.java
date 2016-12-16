@@ -42,6 +42,8 @@ public class AddEditTaskFragment extends Fragment {
 
     private SnackBarChangedCallback mSnackBarChangedCallback;
 
+    private AddtaskFragBinding mViewDataBinding;
+
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
     }
@@ -89,13 +91,16 @@ public class AddEditTaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        AddtaskFragBinding mViewDataBinding = AddtaskFragBinding.bind(root);
+        if (mViewDataBinding == null) {
+            mViewDataBinding = AddtaskFragBinding.bind(root);
+        }
 
         mViewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
+        // Fragment is retained simply to persist the edits after rotation.
         setRetainInstance(true);
-        return root;
+        return mViewDataBinding.getRoot();
     }
 
     @Override
