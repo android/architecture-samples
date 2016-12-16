@@ -20,7 +20,6 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableField;
-import android.util.Log;
 
 import com.android.annotations.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -117,7 +116,6 @@ public abstract class TaskViewModel extends BaseObservable
 
 
     private void completeChanged(boolean isChecked) {
-        Log.d(TAG, "User completed/activated a task");
         mTask.setCompleted(isChecked);
         if (isChecked) {
             mTasksRepository.completeTask(mTask);
