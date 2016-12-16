@@ -53,10 +53,6 @@ public class TasksViewModelTest {
     @Mock
     private TasksNavigator mTasksNavigator;
 
-    /**3
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
     @Captor
     private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
 

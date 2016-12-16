@@ -44,9 +44,9 @@ import static org.mockito.Mockito.when;
  */
 public class TaskDetailViewModelTest {
 
-    public static final String TITLE_TEST = "title";
+    private static final String TITLE_TEST = "title";
 
-    public static final String DESCRIPTION_TEST = "description";
+    private static final String DESCRIPTION_TEST = "description";
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -60,10 +60,6 @@ public class TaskDetailViewModelTest {
     @Mock
     private TasksDataSource.GetTaskCallback mViewModelCallback;
 
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 

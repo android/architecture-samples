@@ -55,6 +55,7 @@ public class TaskItemViewModelTest {
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mLoadTasksCallbackCaptor;
 
     private TaskItemViewModel mTaskItemViewModel;
+
     private Task mTask;
 
     @Before

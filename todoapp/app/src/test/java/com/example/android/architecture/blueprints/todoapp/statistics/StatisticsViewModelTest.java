@@ -47,13 +47,8 @@ public class StatisticsViewModelTest {
     @Mock
     private TasksRepository mTasksRepository;
 
-    /**
-     * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
     @Captor
     private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mLoadTasksCallbackCaptor;
-
 
     private StatisticsViewModel mStatisticsViewModel;
 
