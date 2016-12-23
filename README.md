@@ -1,5 +1,7 @@
 # Android Architecture Blueprints [beta]
 
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/aab-logo.png" alt="Android Architecture Blueprints"/>
+
 The Android framework offers a lot of flexibility when it comes to defining how
 to organize and <em>architect</em> an Android app. This freedom, whilst very valuable, can also result in apps
 with large classes, inconsistent naming and architectures (or lack of) that can
@@ -28,15 +30,17 @@ more information.
   * [todo-mvp-clean/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) - Based on todo-mvp, uses concepts from Clean Architecture.
   * [todo-mvp-dagger/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) - Based on todo-mvp, uses Dagger2 for Dependency Injection
   * [todo-mvp-contentproviders/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) - Based on todo-mvp-loaders, fetches data using Loaders and uses Content Providers
-  
+  * [todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
+
 ### Samples in progress
-  * [dev-todo-mvp-rxjava/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-rxjava/) - Based on todo-mvp, uses RxJava for concurrency and data layer abstraction.
+  * [dev-todo-mvp-tablet/](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) - Based on todo-mvp, adds a master/detail view for tablets.
 
 Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
 
 ### External samples
-These are community contributions that may not be in sync with the rest of the branches.
+[External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches.
  * [todo-mvp-fragmentless/](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) - Based on todo-mvp, uses Android views instead of Fragments.
+ * [todo-mvp-conductor/](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) - Based on todo-mvp, uses the Conductor framework to refactor to a single Activity architecture.
 
 ### What does <em>beta</em> mean?
 
@@ -89,6 +93,8 @@ This project is **built by the community** and curated by Google and core mainta
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
+[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
+
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
@@ -98,4 +104,3 @@ This project is **built by the community** and curated by Google and core mainta
 [Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
 Want to be part of it? Read [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
-
