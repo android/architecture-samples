@@ -39,7 +39,7 @@ more information.
 | Project | Description |
 | ------------- | ------------- |
 | [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Based on todo-mvp, adds a master/detail view for tablets |
-| [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Based on todo-databinding, uses Model-View-ViewModel architecture |
+| [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | Based on todo-databinding, uses Model-View-ViewModel architecture |
 
 Also, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22) for planned samples.
 
