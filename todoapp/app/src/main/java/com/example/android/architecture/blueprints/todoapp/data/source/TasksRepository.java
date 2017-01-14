@@ -258,7 +258,9 @@ public class TasksRepository implements TasksDataSource {
                     mCachedTasks.put(task.getId(), task);
                 });
 
-        return Observable.concat(localTask, remoteTask).first()
+        return Observable.concat(localTask, remoteTask)
+                .filter(task -> task != null)
+                .first()
                 .map(task -> {
                     if (task == null) {
                         throw new NoSuchElementException("No task found with taskId " + taskId);
