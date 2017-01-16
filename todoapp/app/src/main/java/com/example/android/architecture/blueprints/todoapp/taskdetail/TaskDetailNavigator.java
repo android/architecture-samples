@@ -17,9 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 /**
- * TODO: javadoc
+ * Defines the navigation actions that can be called from the Details screen.
  */
-
 public interface TaskDetailNavigator {
 
     void onTaskDeleted();

@@ -39,7 +39,7 @@ import java.util.List;
 import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
 
 /**
- * Exposes the data to be used in the {@link TasksContract.View}.
+ * Exposes the data to be used in the task list screen.
  * <p>
  * {@link BaseObservable} implements a listener registration mechanism which is notified when a
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
@@ -57,9 +57,9 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    public final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
+    private final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
 
-    public final ObservableField<String> snackBarText = new ObservableField<>();
+    final ObservableField<String> snackBarText = new ObservableField<>();
 
     private Context mContext;
 

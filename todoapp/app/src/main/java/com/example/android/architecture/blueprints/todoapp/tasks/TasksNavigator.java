@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 /**
- * TODO: javadoc
+ * Defines the navigation actions that can be called from the task list screen.
  */
 public interface TasksNavigator {
 

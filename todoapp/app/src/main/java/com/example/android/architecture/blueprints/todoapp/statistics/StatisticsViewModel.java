@@ -43,10 +43,10 @@ public class StatisticsViewModel extends BaseObservable {
     public final ObservableBoolean error = new ObservableBoolean(false);
 
     @VisibleForTesting
-    public int mNumberOfActiveTasks = 0;
+    int mNumberOfActiveTasks = 0;
 
     @VisibleForTesting
-    protected int mNumberOfCompletedTasks = 0;
+    int mNumberOfCompletedTasks = 0;
 
     private Context mContext;
 

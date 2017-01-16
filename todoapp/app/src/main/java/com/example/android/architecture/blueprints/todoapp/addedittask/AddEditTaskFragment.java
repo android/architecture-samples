@@ -70,7 +70,17 @@ public class AddEditTaskFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // FAB setup
+        setupFabButton();
+
+        setupSnackBar();
+    }
+
+    private void setupSnackBar() {
+        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
+        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
+
+    private void setupFabButton() {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
@@ -80,10 +90,6 @@ public class AddEditTaskFragment extends Fragment {
                 mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
             }
         });
-
-        // SnackBar setup
-        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
-        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     @Nullable
@@ -109,4 +115,3 @@ public class AddEditTaskFragment extends Fragment {
         mViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 }
-

@@ -35,8 +35,6 @@ public abstract class TaskViewModel extends BaseObservable
 
     public final ObservableField<String> snackBarText = new ObservableField<>();
 
-    private static final String TAG = "TaskViewModel";
-
     private final TasksRepository mTasksRepository;
 
     private final Context mContext;
@@ -44,7 +42,7 @@ public abstract class TaskViewModel extends BaseObservable
     @Nullable
     private Task mTask;
 
-    private boolean mIsDataLoading; // TODO observable field?
+    private boolean mIsDataLoading;
 
     public TaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context;
@@ -114,6 +112,25 @@ public abstract class TaskViewModel extends BaseObservable
         mIsDataLoading = false;
     }
 
+    public void deleteTask() {
+        mTasksRepository.deleteTask(mTask.getId());
+    }
+
+    public void onRefresh() {
+        if (mTask != null) {
+            start(mTask.getId());
+        }
+    }
+
+    @Override
+    public String getSnackBarText() {
+        return snackBarText.get();
+    }
+
+    @Nullable
+    protected String getTaskId() {
+        return mTask.getId();
+    }
 
     private void completeChanged(boolean isChecked) {
         mTask.setCompleted(isChecked);
@@ -125,25 +142,5 @@ public abstract class TaskViewModel extends BaseObservable
             snackBarText.set(mContext.getResources().getString(R.string.task_marked_active));
         }
         notifyPropertyChanged(BR.completed);
-    }
-
-    public void deleteTask() {
-        mTasksRepository.deleteTask(mTask.getId());
-    }
-
-    public void onRefresh() {
-        if (mTask != null) {
-            start(mTask.getId());
-        }
-    }
-
-    @Nullable
-    protected String getTaskId() {
-        return mTask.getId();
-    }
-
-    @Override
-    public String getSnackBarText() {
-        return snackBarText.get();
     }
 }

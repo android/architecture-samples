@@ -34,10 +34,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 public class AddEditTaskViewModel extends BaseObservable implements
         TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
 
-    public final String TAG = "AddEditTaskViewModel";
-
-    private final TasksRepository mTasksRepository;
-
     public final ObservableField<String> title = new ObservableField<>();
 
     public final ObservableField<String> description = new ObservableField<>();
@@ -45,6 +41,8 @@ public class AddEditTaskViewModel extends BaseObservable implements
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
     public final ObservableField<String> snackBarText = new ObservableField<>();
+
+    private final TasksRepository mTasksRepository;
 
     private final Context mContext;
 
