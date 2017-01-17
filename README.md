@@ -10,7 +10,7 @@ You can use these samples as a learning reference, or as a starting point for cr
 
 ## Explore the samples
 
-Each sample app is hosted in it’s own repository branch. For more information, review each project's respective README file.
+Each sample app is hosted in it’s own repository branch. For more information, review each project's respective `README.md` file.
 
 ### Stable samples
 | Project | Description |
@@ -28,10 +28,10 @@ Each sample app is hosted in it’s own repository branch. For more information,
 
 | Project | Description |
 | ------------- | ------------- |
-| [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | This version adds a master/ detail view for tablets. |
+| [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | This version adds a master and detail view for tablets. |
 | [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | This version uses [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture. Note that this version is based on the TODO-MVP-DataBinding sample. |
 
-For information about planned samples, see "New sample" issues. ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
+For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
 
 ### External samples
 [External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches.
