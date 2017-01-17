@@ -38,8 +38,7 @@ For information about planned samples, see "New sample" issues. ["New sample" is
 
 | Project | Description |
 | ------------- | ------------- |
-| [todo-mvp-fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | This version uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.
- |
+| [todo-mvp-fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | This version uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
 | [todo-mvp-conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | This version uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
 
 ## Why a to-do app?
