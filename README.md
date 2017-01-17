@@ -34,7 +34,7 @@ Each sample app is hosted in it’s own repository branch. For more information,
 For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
 
 ### External samples
-[External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches.
+[External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches in this repository.
 
 | Project | Description |
 | ------------- | ------------- |
@@ -47,7 +47,7 @@ This app is designed to be simple enough that it can be understood quickly, but 
 
 The following screenshot illustrates the UI of the app.
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/tasks2.png" alt="Screenshot" width="160" style="display: inline; float: right"/>
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/tasks2.png" alt="A screenshot illustratrating the UI of the app" width="160" style="display: inline; float: right"/>
 
 ## Choose a sample for your app
 
@@ -66,7 +66,7 @@ For more information on choosing and comparing samples, see the following pages.
 
 ## Open a sample in Android Studio
 
-To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the todoapp/ directory in Android Studio. The following series of steps illustrate how to open the TODO-MVP sample.
+To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the `todoapp/` directory in Android Studio. The following series of steps illustrate how to open the TODO-MVP sample.
 
 **Note:** The master branch won't compile.
 
@@ -82,9 +82,9 @@ Checkout the TODO-MVP sample:
 git checkout todo-mvp
 ```
 
-**Note:** To review a different sample, replace todo-mvp with the name of project you want to check out.
+**Note:** To review a different sample, replace `todo-mvp` with the name of project you want to check out.
 
-Open the todoapp/ directory in Android Studio.
+Open the `todoapp/` directory in Android Studio.
 
   * In Android Studio open the `todoapp/` directory.
 
