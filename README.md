@@ -88,17 +88,17 @@ This project is **built by the community**, and curated by Google as well as oth
 
 ### External contributors
 
-[David González](http://github.com/malmstein) - Core developer (Content Providers sample)
+[David González](http://github.com/malmstein) - Core developer (Content provider sample)
 
-[Karumi](http://github.com/Karumi) - Developer (MVP Clean architecture sample)
+[Karumi](http://github.com/Karumi) - Developer (Clean Architecture sample)
 
 [Natalie Masse](http://github.com/freewheelnat) - Core developer
 
-[Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
+[Erik Hellman](https://github.com/ErikHellman) - Developer (RxJava sample)
 
-[Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
+[Saúl Molinero](https://github.com/saulmm) - Developer (Dagger sample)
 
-[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
+[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (RxJava sample)
 
 ### Googlers
 
