@@ -50,8 +50,6 @@ The following screenshot illustrates the UI of the app.
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/tasks2.png" alt="Screenshot" width="160" style="display: inline; float: right"/>
 
-Also, a similar project exists to compare JavaScript frameworks, called [TodoMVC](https://github.com/tastejs/todomvc).
-
 ## Choose a sample for your app
 
 Each sample has a README where you can find metrics and subjective assessments. A number of factors are worth considering when selecting a particular sample for your app, including:
