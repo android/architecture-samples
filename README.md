@@ -4,7 +4,7 @@
 
 The Android framework provides a lot of flexibility in deciding how to organize and <em>architect</em> an Android app. While this freedom is very valuable, it can also lead to apps with large classes, inconsistent naming schemes, as well as mismatching or missing architectures. These types of issues can make testing, maintaining and extending your apps difficult.
 
-Android Architecture Blueprints is designed to demonstrate potential solutions to help solve or avoid these common problems. This project implements the same app using a number of different architectural concepts and tools.
+Android Architecture Blueprints is designed to demonstrate strategies to help solve or avoid these common problems. This project implements the same app using a number of different architectural concepts and tools.
 
 You can use these samples as a learning reference, or as a starting point for creating your own apps. The focus of this project is on demonstrating how to structure your code, design your architecture, and the eventual impact of adopting these patterns on testing and maintaining your app. Note that there are many different ways to build apps using these architectures and tools. Your own particular priorities will impact how you choose to implement the concepts in these projects, so you should not consider these samples to be canonical examples. Also note that the UI of the sample app is deliberately kept simple.
 
@@ -66,15 +66,21 @@ For more information on choosing and comparing samples, see the following pages.
 
 ## Open a sample in Android Studio
 
-To open one of the samples in Android Studio, begin by first checking out one of the sample branches (master won't compile), and then open the todoapp/ directory in Android Studio. The following series of steps illustrate how to open the TODO-MVP sample.
+To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the todoapp/ directory in Android Studio. The following series of steps illustrate how to open the TODO-MVP sample.
+
+**Note:** The master branch won't compile.
 
 Clone the repository:
 
-`git clone git@github.com:googlesamples/android-architecture.git`
+```
+git clone git@github.com:googlesamples/android-architecture.git
+```
 
 Checkout the TODO-MVP sample:
   
-`git checkout todo-mvp`
+```
+git checkout todo-mvp
+```
 
 **Note:** To review a different sample, replace todo-mvp with the name of project you want to check out.
 
