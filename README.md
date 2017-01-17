@@ -70,13 +70,13 @@ To open one of the samples in Android Studio, begin by checking out one of the s
 
 **Note:** The master branch won't compile.
 
-1. Clone the repository:
+Clone the repository:
 
 ```
 git clone git@github.com:googlesamples/android-architecture.git
 ```
 
-2. Checkout the TODO-MVP sample:
+Checkout the TODO-MVP sample:
   
 ```
 git checkout todo-mvp
@@ -84,7 +84,7 @@ git checkout todo-mvp
 
 **Note:** To review a different sample, replace `todo-mvp` with the name of project you want to check out.
 
-3. Finally open the `todoapp/` directory in Android Studio.
+Finally open the `todoapp/` directory in Android Studio.
 
 ## Contributors
 
