@@ -51,7 +51,7 @@ The following screenshot illustrates the UI of the app.
 
 ## Choose a sample for your app
 
-Each sample has a README where you can find metrics and subjective assessments. A number of factors are worth considering when selecting a particular sample for your app, including:
+Each sample includes a dedicated `README.md` file where you can find related metrics, as well as subjective assessments and observations by contributors. A number of factors are worth considering when selecting a particular sample for your app, including:
 
 * The size of the app you are developing
 * The size and experience of your team
