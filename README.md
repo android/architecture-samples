@@ -74,7 +74,7 @@ Clone the repository:
 
 Checkout the TODO-MVP sample:
   
-`git checkout todo-mvp` (or replace `todo-mvp` with the project you want to check out)
+`git checkout todo-mvp`
 
 **Note:** To review a different sample, replace todo-mvp with the name of project you want to check out.
 
