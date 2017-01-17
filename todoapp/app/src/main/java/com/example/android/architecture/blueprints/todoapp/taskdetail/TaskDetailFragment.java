@@ -61,7 +61,17 @@ public class TaskDetailFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // Set up floating action button
+        setupFab();
+
+        setupSnackbar();
+    }
+
+    private void setupSnackbar() {
+        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
+        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
+
+    private void setupFab() {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
@@ -71,11 +81,6 @@ public class TaskDetailFragment extends Fragment {
                 mViewModel.startEditTask();
             }
         });
-
-        // SnackBar setup
-        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
-        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
-
     }
 
     @Override

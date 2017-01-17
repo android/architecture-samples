@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 
 
 /**
- * TODO
+ * Abstract class for View Models that expose a single {@link Task}.
  */
 public abstract class TaskViewModel extends BaseObservable
         implements TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
@@ -59,7 +59,7 @@ public abstract class TaskViewModel extends BaseObservable
     @Bindable
     public String getTitle() {
         if (mTask == null) {
-            return "No data";
+            return mContext.getString(R.string.no_data);
         }
         return mTask.getTitle();
     }
@@ -67,7 +67,7 @@ public abstract class TaskViewModel extends BaseObservable
     @Bindable
     public String getDescription() {
         if (mTask == null) {
-            return "";
+            return mContext.getString(R.string.no_data_description);
         }
         return mTask.getDescription();
     }

@@ -30,12 +30,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 public class TaskItemViewModel extends TaskViewModel
         implements SnackBarChangedCallback.SnackBarViewModel {
 
-    private final TaskItemNavigator taskItemNavigator;
+    private final TaskItemNavigator mTaskItemNavigator;
 
     public TaskItemViewModel(Context context, TasksRepository tasksRepository,
                              TaskItemNavigator itemNavigator) {
         super(context, tasksRepository);
-        taskItemNavigator = itemNavigator;
+        mTaskItemNavigator = itemNavigator;
     }
 
     /**
@@ -47,6 +47,6 @@ public class TaskItemViewModel extends TaskViewModel
             // Click happened before task was loaded, no-op.
             return;
         }
-        taskItemNavigator.openTaskDetails(taskId);
+        mTaskItemNavigator.openTaskDetails(taskId);
     }
 }

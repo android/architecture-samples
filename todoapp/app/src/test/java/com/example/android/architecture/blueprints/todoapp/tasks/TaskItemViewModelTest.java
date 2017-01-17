@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -41,6 +42,10 @@ import static org.mockito.Mockito.when;
  * Unit tests for the implementation of {@link TasksViewModel}
  */
 public class TaskItemViewModelTest {
+
+    private static final String NO_DATA_STRING = "NO_DATA_STRING";
+
+    private static final String NO_DATA_DESC_STRING = "NO_DATA_DESC_STRING";
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -70,6 +75,9 @@ public class TaskItemViewModelTest {
 
     @Before
     public void setupContext() {
+        when(mContext.getString(R.string.no_data)).thenReturn(NO_DATA_STRING);
+        when(mContext.getString(R.string.no_data_description)).thenReturn(NO_DATA_DESC_STRING);
+
         when(mContext.getResources()).thenReturn(mock(Resources.class));
     }
 
@@ -85,6 +93,17 @@ public class TaskItemViewModelTest {
     }
 
     @Test
+    public void nullTask_showsNoData() {
+        loadTaskIntoViewModel();
+
+        mLoadTasksCallbackCaptor.getValue().onTaskLoaded(null); // Trigger callback
+
+        // Then task detail UI is shown
+        assertEquals(mTaskItemViewModel.getTitle(), NO_DATA_STRING);
+        assertEquals(mTaskItemViewModel.getDescription(), NO_DATA_DESC_STRING);
+    }
+
+    @Test
     public void completeTask_ShowsTaskMarkedComplete() {
         loadTaskIntoViewModel();
 
@@ -96,7 +115,6 @@ public class TaskItemViewModelTest {
         // Then repository is called
         verify(mTasksRepository).completeTask(mTask);
     }
-
 
     @Test
     public void activateTask_ShowsTaskMarkedActive() {

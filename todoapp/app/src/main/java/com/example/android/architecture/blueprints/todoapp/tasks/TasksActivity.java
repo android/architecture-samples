@@ -142,24 +142,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If a task was successfully added, show mSnackBar
-        if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
-
-            switch (resultCode) {
-                case TaskDetailActivity.EDIT_RESULT_OK:
-                    mTasksViewModel.snackBarText.set(
-                            getString(R.string.successfully_saved_task_message));
-                    break;
-                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    mTasksViewModel.snackBarText.set(
-                            getString(R.string.successfully_added_task_message));
-                    break;
-                case TaskDetailActivity.DELETE_RESULT_OK:
-                    mTasksViewModel.snackBarText.set(
-                            getString(R.string.successfully_deleted_task_message));
-                    break;
-            }
-        }
+        mTasksViewModel.handleActivityResult(requestCode, resultCode);
     }
 
     @Override

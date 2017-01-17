@@ -24,15 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import java.util.List;
 
 /**
- * TODO: javadoc
+ * Contains {@link BindingAdapter}s for the {@link Task} list.
  */
-
 public class TasksListBindings {
 
     @SuppressWarnings("unchecked")
     @BindingAdapter("app:items")
-    public static void setItems(ListView listView, List<Task> items)
-    {
+    public static void setItems(ListView listView, List<Task> items) {
         TasksFragment.TasksAdapter adapter = (TasksFragment.TasksAdapter) listView.getAdapter();
         if (adapter != null)
         {

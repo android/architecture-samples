@@ -29,23 +29,23 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
  */
 public class TaskDetailViewModel extends TaskViewModel {
 
-    private final TaskDetailNavigator taskDetailNavigator;
+    private final TaskDetailNavigator mTaskDetailNavigator;
 
     public TaskDetailViewModel(Context context, TasksRepository tasksRepository,
                                TaskDetailNavigator taskDetailNavigator) {
         super(context, tasksRepository);
-        this.taskDetailNavigator = taskDetailNavigator;
+        mTaskDetailNavigator = taskDetailNavigator;
     }
 
     /**
-     * Called by the Data Binding library.
+     * Can be called by the Data Binding Library or the delete menu item.
      */
     public void deleteTask() {
         super.deleteTask();
-        taskDetailNavigator.onTaskDeleted();
+        mTaskDetailNavigator.onTaskDeleted();
     }
 
     public void startEditTask() {
-        taskDetailNavigator.onStartEditTask();
+        mTaskDetailNavigator.onStartEditTask();
     }
 }

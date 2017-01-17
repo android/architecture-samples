@@ -32,15 +32,13 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import java.util.List;
 
 /**
- * Exposes the data to be used in the {@link StatisticsFragment}.
- * <p>
- * Note that in this case the view model is also the view, not the fragment.
+ * Exposes the data to be used in the statistics screen.
  */
 public class StatisticsViewModel extends BaseObservable {
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    public final ObservableBoolean error = new ObservableBoolean(false);
+    final ObservableBoolean error = new ObservableBoolean(false);
 
     @VisibleForTesting
     int mNumberOfActiveTasks = 0;

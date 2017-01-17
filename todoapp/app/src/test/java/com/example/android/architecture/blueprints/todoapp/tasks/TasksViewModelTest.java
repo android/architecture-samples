@@ -17,10 +17,14 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Context;
+import android.content.res.Resources;
 
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -32,10 +36,14 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksViewModel}
@@ -72,6 +80,18 @@ public class TasksViewModelTest {
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+    }
+
+    @Before
+    public void setupContext() {
+        when(mContext.getString(R.string.successfully_saved_task_message))
+                .thenReturn("EDIT_RESULT_OK");
+        when(mContext.getString(R.string.successfully_added_task_message))
+                .thenReturn("ADD_EDIT_RESULT_OK");
+        when(mContext.getString(R.string.successfully_deleted_task_message))
+                .thenReturn("DELETE_RESULT_OK");
+
+        when(mContext.getResources()).thenReturn(mock(Resources.class));
     }
 
     @Test
@@ -152,5 +172,44 @@ public class TasksViewModelTest {
         // Then repository is called and the view is notified
         verify(mTasksRepository).clearCompletedTasks();
         verify(mTasksRepository).getTasks(any(LoadTasksCallback.class));
+    }
+
+    @Test
+    public void handleActivityResult_editOK() {
+        // When TaskDetailActivity sends a EDIT_RESULT_OK
+        mTasksViewModel.handleActivityResult(
+                AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.EDIT_RESULT_OK);
+
+        // Then the snackbar shows the correct message
+        assertThat(mTasksViewModel.getSnackBarText(), is("EDIT_RESULT_OK"));
+    }
+
+    @Test
+    public void handleActivityResult_addEditOK() {
+        // When AddEditTaskActivity sends a ADD_EDIT_RESULT_OK
+        mTasksViewModel.handleActivityResult(
+                AddEditTaskActivity.REQUEST_CODE, AddEditTaskActivity.ADD_EDIT_RESULT_OK);
+
+        // Then the snackbar shows the correct message
+        assertThat(mTasksViewModel.getSnackBarText(), is("ADD_EDIT_RESULT_OK"));
+    }
+
+    @Test
+    public void handleActivityResult_deleteOk() {
+        // When TaskDetailActivity sends a DELETE_RESULT_OK
+        mTasksViewModel.handleActivityResult(
+                AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.DELETE_RESULT_OK);
+
+        // Then the snackbar shows the correct message
+        assertThat(mTasksViewModel.getSnackBarText(), is("DELETE_RESULT_OK"));
+    }
+
+    @Test
+    public void getTasksAddViewVisible() {
+        // When the filter type is ALL_TASKS
+        mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
+
+        // Then the "Add task" action is visible
+        assertThat(mTasksViewModel.getTasksAddViewVisible(), is(true));
     }
 }

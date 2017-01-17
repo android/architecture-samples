@@ -20,6 +20,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -47,6 +48,10 @@ public class TaskDetailViewModelTest {
     private static final String TITLE_TEST = "title";
 
     private static final String DESCRIPTION_TEST = "description";
+
+    private static final String NO_DATA_STRING = "NO_DATA_STRING";
+
+    private static final String NO_DATA_DESC_STRING = "NO_DATA_DESC_STRING";
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -82,6 +87,8 @@ public class TaskDetailViewModelTest {
 
     @Before
     public void setupContext() {
+        when(mContext.getString(R.string.no_data)).thenReturn(NO_DATA_STRING);
+        when(mContext.getString(R.string.no_data_description)).thenReturn(NO_DATA_DESC_STRING);
         when(mContext.getResources()).thenReturn(mock(Resources.class));
     }
 
@@ -153,6 +160,10 @@ public class TaskDetailViewModelTest {
 
         // Then verify that data is not available
         assertFalse(mTaskDetailViewModel.isDataAvailable());
+
+        // Then task detail UI is shown
+        assertEquals(mTaskDetailViewModel.getTitle(), NO_DATA_STRING);
+        assertEquals(mTaskDetailViewModel.getDescription(), NO_DATA_DESC_STRING);
     }
 
     private void setupViewModelRepositoryCallback() {

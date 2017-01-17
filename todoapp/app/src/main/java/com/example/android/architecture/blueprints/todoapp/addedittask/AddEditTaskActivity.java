@@ -38,6 +38,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
     public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
     public static final String SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY";
+
     private AddEditTaskViewModel mViewModel;
 
     @Override

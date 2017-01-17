@@ -112,6 +112,26 @@ public class TasksFragment extends Fragment {
         mTasksViewModel = viewModel;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setupSnackbar();
+
+        setupFab();
+
+        setupListAdapter();
+
+        setupRefreshLayout();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // If the ViewModel
+        mTasksViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
+
     private void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
@@ -137,26 +157,12 @@ public class TasksFragment extends Fragment {
         popup.show();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        // Set up tasks view
-        ListView listView = mTasksFragBinding.tasksList;
-
-        // SnackBar setup
+    private void setupSnackbar() {
         mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mTasksViewModel);
         mTasksViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
 
-        TasksAdapter mListAdapter = new TasksAdapter(
-                new ArrayList<Task>(0),
-                (TaskItemNavigator) getActivity(),
-                Injection.provideTasksRepository(getContext().getApplicationContext()),
-                mSnackBarChangedCallback,
-                mTasksViewModel);
-        listView.setAdapter(mListAdapter);
-
-        // Set up floating action button
+    private void setupFab() {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
 
@@ -167,8 +173,22 @@ public class TasksFragment extends Fragment {
                 mTasksViewModel.addNewTask();
             }
         });
+    }
 
-        // Set up progress indicator
+    private void setupListAdapter() {
+        ListView listView =  mTasksFragBinding.tasksList;
+
+        TasksAdapter mListAdapter = new TasksAdapter(
+                new ArrayList<Task>(0),
+                (TaskItemNavigator) getActivity(),
+                Injection.provideTasksRepository(getContext().getApplicationContext()),
+                mSnackBarChangedCallback,
+                mTasksViewModel);
+        listView.setAdapter(mListAdapter);
+    }
+
+    private void setupRefreshLayout() {
+        ListView listView =  mTasksFragBinding.tasksList;
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout = mTasksFragBinding.refreshLayout;
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
@@ -177,27 +197,19 @@ public class TasksFragment extends Fragment {
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
-
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // If the ViewModel
-        mTasksViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     public static class TasksAdapter extends BaseAdapter {
 
         private final TaskItemNavigator mTaskItemNavigator;
 
-        private List<Task> mTasks;
-
-        private TasksRepository mTasksRepository;
-
         private final SnackBarChangedCallback mSnackBarChangedCallback;
 
         private final TasksViewModel mTasksViewModel;
+
+        private List<Task> mTasks;
+
+        private TasksRepository mTasksRepository;
 
         public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
                             TasksRepository tasksRepository,
@@ -213,11 +225,6 @@ public class TasksFragment extends Fragment {
 
         public void replaceData(List<Task> tasks) {
             setList(tasks);
-        }
-
-        private void setList(List<Task> tasks) {
-            mTasks = tasks;
-            notifyDataSetChanged();
         }
 
         @Override
@@ -266,9 +273,12 @@ public class TasksFragment extends Fragment {
             });
             viewmodel.start(task.getId());
 
-            //binding.executePendingBindings();
             return binding.getRoot();
         }
 
+        private void setList(List<Task> tasks) {
+            mTasks = tasks;
+            notifyDataSetChanged();
+        }
     }
 }

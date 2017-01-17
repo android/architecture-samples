@@ -28,9 +28,11 @@ import android.graphics.drawable.Drawable;
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
@@ -47,19 +49,19 @@ import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFil
  */
 public class TasksViewModel extends BaseObservable implements SnackBarChangedCallback.SnackBarViewModel {
 
-    private final TasksRepository mTasksRepository;
-
-    private final TasksNavigator mNavigator;
-
-    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
-
     public final ObservableList<Task> items = new ObservableArrayList<>();
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    private final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
-
     final ObservableField<String> snackBarText = new ObservableField<>();
+
+    private final TasksRepository mTasksRepository;
+
+    private final TasksNavigator mNavigator;
+
+    private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
+
+    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private Context mContext;
 
@@ -129,6 +131,10 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
         loadTasks(forceUpdate, true);
     }
 
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
+    }
+
     /**
      * Sets the current task filtering type.
      *
@@ -140,10 +146,6 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
         mCurrentFiltering = requestType;
     }
 
-    public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
-    }
-
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         snackBarText.set(mContext.getString(R.string.completed_tasks_cleared));
@@ -153,6 +155,32 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
     @Override
     public String getSnackBarText() {
         return snackBarText.get();
+    }
+
+    /**
+     * Called by the Data Binding library and the FAB's click listener.
+     */
+    public void addNewTask() {
+        mNavigator.addNewTask();
+    }
+
+    void handleActivityResult(int requestCode, int resultCode) {
+        if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
+            switch (resultCode) {
+                case TaskDetailActivity.EDIT_RESULT_OK:
+                    snackBarText.set(
+                            mContext.getString(R.string.successfully_saved_task_message));
+                    break;
+                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
+                    snackBarText.set(
+                            mContext.getString(R.string.successfully_added_task_message));
+                    break;
+                case TaskDetailActivity.DELETE_RESULT_OK:
+                    snackBarText.set(
+                            mContext.getString(R.string.successfully_deleted_task_message));
+                    break;
+            }
+        }
     }
 
     /**
@@ -208,7 +236,7 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
                 if (showLoadingUI) {
                     dataLoading.set(false);
                 }
-                isDataLoadingError.set(false);
+                mIsDataLoadingError.set(false);
 
                 items.clear();
                 items.addAll(tasksToShow);
@@ -218,16 +246,9 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
 
             @Override
             public void onDataNotAvailable() {
-                isDataLoadingError.set(true);
+                mIsDataLoadingError.set(true);
             }
         });
-    }
-
-    /**
-     * Called by Data Binding library.
-     */
-    public void addNewTask() {
-        mNavigator.addNewTask();
     }
 
 }
