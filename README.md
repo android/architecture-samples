@@ -94,7 +94,7 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [David González](http://github.com/malmstein) - Core developer (MVP Content Providers sample)
 
-[Karumi](http://github.com/Karumi) - Developer (MVP Clean Architecture sample)
+[Karumi](http://github.com/Karumi) - Developers (MVP Clean Architecture sample)
 
 [Natalie Masse](http://github.com/freewheelnat) - Core developer
 
