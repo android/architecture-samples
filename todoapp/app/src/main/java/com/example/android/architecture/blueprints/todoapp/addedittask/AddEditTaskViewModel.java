@@ -22,7 +22,7 @@ import android.databinding.ObservableField;
 
 import com.android.annotations.Nullable;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -36,7 +36,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * how to deal with more complex scenarios.
  */
 public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
-        SnackBarChangedCallback.SnackBarViewModel {
+        SnackbarChangedCallback.SnackBarViewModel {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -44,7 +44,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    public final ObservableField<String> snackBarText = new ObservableField<>();
+    public final ObservableField<String> snackbarText = new ObservableField<>();
 
     private final TasksRepository mTasksRepository;
 
@@ -112,9 +112,8 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
         }
     }
 
-    @Override
-    public String getSnackBarText() {
-        return snackBarText.get();
+    public String getSnackbarText() {
+        return snackbarText.get();
     }
 
     private boolean isNewTask() {
@@ -124,7 +123,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            snackBarText.set(mContext.getString(R.string.empty_task_message));
+            snackbarText.set(mContext.getString(R.string.empty_task_message));
         } else {
             mTasksRepository.saveTask(newTask);
             mNavigator.onTaskSaved();

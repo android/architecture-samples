@@ -22,14 +22,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,7 +42,7 @@ public class AddEditTaskFragment extends Fragment {
 
     private AddEditTaskViewModel mViewModel;
 
-    private SnackBarChangedCallback mSnackBarChangedCallback;
+    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private AddtaskFragBinding mViewDataBinding;
 
@@ -98,8 +97,8 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupSnackBar() {
-        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
-        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
+        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     private void setupFab() {

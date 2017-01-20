@@ -26,13 +26,13 @@ import java.lang.ref.WeakReference;
  * Callback to apply to a {@link android.databinding.ObservableField<String>} that shows a Snackbar
  * whenever the text is updated.
  */
-public class SnackBarChangedCallback extends Observable.OnPropertyChangedCallback {
+public class SnackbarChangedCallback extends Observable.OnPropertyChangedCallback {
 
     private final WeakReference<View> mView;
 
     private final SnackBarViewModel mViewModel;
 
-    public SnackBarChangedCallback(View descendantOfCoordinatorLayout,
+    public SnackbarChangedCallback(View descendantOfCoordinatorLayout,
                                    SnackBarViewModel viewModel) {
         mView = new WeakReference<>(descendantOfCoordinatorLayout);
         mViewModel = viewModel;
@@ -44,11 +44,11 @@ public class SnackBarChangedCallback extends Observable.OnPropertyChangedCallbac
             return;
         }
         Snackbar.make(mView.get(),
-                mViewModel.getSnackBarText(),
+                mViewModel.getSnackbarText(),
                 Snackbar.LENGTH_SHORT).show();
     }
 
     public interface SnackBarViewModel {
-        String getSnackBarText();
+        String getSnackbarText();
     }
 }

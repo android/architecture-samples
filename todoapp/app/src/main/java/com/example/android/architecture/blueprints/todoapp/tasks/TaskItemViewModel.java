@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Context;
 
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * Fragment's actions listener.
  */
 public class TaskItemViewModel extends TaskViewModel
-        implements SnackBarChangedCallback.SnackBarViewModel {
+        implements SnackbarChangedCallback.SnackBarViewModel {
 
     private final TaskItemNavigator mTaskItemNavigator;
 

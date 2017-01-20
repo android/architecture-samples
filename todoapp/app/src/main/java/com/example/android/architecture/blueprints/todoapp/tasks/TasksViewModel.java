@@ -27,7 +27,7 @@ import android.graphics.drawable.Drawable;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -47,13 +47,25 @@ import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFil
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends BaseObservable implements SnackBarChangedCallback.SnackBarViewModel {
+public class TasksViewModel extends BaseObservable implements SnackbarChangedCallback.SnackBarViewModel {
 
+    // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    final ObservableField<String> snackBarText = new ObservableField<>();
+    public final ObservableField<String> currentFilteringLabel = new ObservableField<>();
+
+    public final ObservableField<String> noTasksLabel = new ObservableField<>();
+
+    public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
+
+    public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
+
+    // This is a special Observable that will trigger a SnackBarChangedCallback when modified.
+    final ObservableField<String> snackbarText = new ObservableField<>();
+
+    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private final TasksRepository mTasksRepository;
 
@@ -61,9 +73,7 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
-    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
-
-    private Context mContext;
+    private Context mContext; // To avoid leaks, this must be an Application Context.
 
     public TasksViewModel(
             TasksRepository repository,
@@ -72,49 +82,13 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
         mNavigator = navigator;
+
+        // Set initial state
+        setFiltering(TasksFilterType.ALL_TASKS);
     }
 
     public void start() {
         loadTasks(false);
-    }
-
-    @Bindable
-    public String getCurrentFilteringLabel() {
-        switch (mCurrentFiltering) {
-            case ALL_TASKS:
-                return mContext.getString(R.string.label_all);
-            case ACTIVE_TASKS:
-                return mContext.getString(R.string.label_active);
-            case COMPLETED_TASKS:
-                return mContext.getString(R.string.label_completed);
-        }
-        return null;
-    }
-
-    @Bindable
-    public String getNoTasksLabel() {
-        switch (mCurrentFiltering) {
-            case ALL_TASKS:
-                return mContext.getResources().getString(R.string.no_tasks_all);
-            case ACTIVE_TASKS:
-                return mContext.getResources().getString(R.string.no_tasks_active);
-            case COMPLETED_TASKS:
-                return mContext.getResources().getString(R.string.no_tasks_completed);
-        }
-        return null;
-    }
-
-    @Bindable
-    public Drawable getNoTaskIconRes() {
-        switch (mCurrentFiltering) {
-            case ALL_TASKS:
-                return mContext.getResources().getDrawable(R.drawable.ic_assignment_turned_in_24dp);
-            case ACTIVE_TASKS:
-                return mContext.getResources().getDrawable(R.drawable.ic_check_circle_24dp);
-            case COMPLETED_TASKS:
-                return mContext.getResources().getDrawable(R.drawable.ic_verified_user_24dp);
-        }
-        return null;
     }
 
     @Bindable
@@ -131,10 +105,6 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
         loadTasks(forceUpdate, true);
     }
 
-    public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
-    }
-
     /**
      * Sets the current task filtering type.
      *
@@ -144,17 +114,41 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
      */
     public void setFiltering(TasksFilterType requestType) {
         mCurrentFiltering = requestType;
+
+        // Depending on the filter type, set the filtering label, icon drawables, etc.
+        switch (requestType) {
+            case ALL_TASKS:
+                currentFilteringLabel.set(mContext.getString(R.string.label_all));
+                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_all));
+                noTaskIconRes.set(mContext.getResources().getDrawable(
+                        R.drawable.ic_assignment_turned_in_24dp));
+                tasksAddViewVisible.set(true);
+                break;
+            case ACTIVE_TASKS:
+                currentFilteringLabel.set(mContext.getString(R.string.label_active));
+                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_active));
+                noTaskIconRes.set(mContext.getResources().getDrawable(
+                        R.drawable.ic_check_circle_24dp));
+                tasksAddViewVisible.set(false);
+                break;
+            case COMPLETED_TASKS:
+                currentFilteringLabel.set(mContext.getString(R.string.label_completed));
+                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_completed));
+                noTaskIconRes.set(mContext.getResources().getDrawable(
+                        R.drawable.ic_verified_user_24dp));
+                tasksAddViewVisible.set(false);
+                break;
+        }
     }
 
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        snackBarText.set(mContext.getString(R.string.completed_tasks_cleared));
+        snackbarText.set(mContext.getString(R.string.completed_tasks_cleared));
         loadTasks(false, false);
     }
 
-    @Override
-    public String getSnackBarText() {
-        return snackBarText.get();
+    public String getSnackbarText() {
+        return snackbarText.get();
     }
 
     /**
@@ -168,15 +162,15 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
         if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
             switch (resultCode) {
                 case TaskDetailActivity.EDIT_RESULT_OK:
-                    snackBarText.set(
+                    snackbarText.set(
                             mContext.getString(R.string.successfully_saved_task_message));
                     break;
                 case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    snackBarText.set(
+                    snackbarText.set(
                             mContext.getString(R.string.successfully_added_task_message));
                     break;
                 case TaskDetailActivity.DELETE_RESULT_OK:
-                    snackBarText.set(
+                    snackbarText.set(
                             mContext.getString(R.string.successfully_deleted_task_message));
                     break;
             }
@@ -240,8 +234,7 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
 
                 items.clear();
                 items.addAll(tasksToShow);
-                notifyPropertyChanged(BR.empty);
-                notifyPropertyChanged(BR.viewmodel);
+                notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
             }
 
             @Override

@@ -183,7 +183,7 @@ public class TasksViewModelTest {
                 AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.EDIT_RESULT_OK);
 
         // Then the snackbar shows the correct message
-        assertThat(mTasksViewModel.getSnackBarText(), is("EDIT_RESULT_OK"));
+        assertThat(mTasksViewModel.getSnackbarText(), is("EDIT_RESULT_OK"));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class TasksViewModelTest {
                 AddEditTaskActivity.REQUEST_CODE, AddEditTaskActivity.ADD_EDIT_RESULT_OK);
 
         // Then the snackbar shows the correct message
-        assertThat(mTasksViewModel.getSnackBarText(), is("ADD_EDIT_RESULT_OK"));
+        assertThat(mTasksViewModel.getSnackbarText(), is("ADD_EDIT_RESULT_OK"));
     }
 
     @Test
@@ -203,7 +203,7 @@ public class TasksViewModelTest {
                 AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.DELETE_RESULT_OK);
 
         // Then the snackbar shows the correct message
-        assertThat(mTasksViewModel.getSnackBarText(), is("DELETE_RESULT_OK"));
+        assertThat(mTasksViewModel.getSnackbarText(), is("DELETE_RESULT_OK"));
     }
 
     @Test

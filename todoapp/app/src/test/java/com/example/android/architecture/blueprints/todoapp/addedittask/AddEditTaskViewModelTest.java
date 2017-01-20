@@ -62,7 +62,7 @@ public class AddEditTaskViewModelTest {
 
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository, true, mock(AddEditTaskNavigator.class));
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AddEditTaskViewModelTest {
 
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository, true, mock(AddEditTaskNavigator.class));
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
 
 
         // When the ViewModel is asked to populate an existing task

@@ -91,19 +91,21 @@ public class TaskItemViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTaskLoaded(mTask); // Trigger callback
 
         // Then task detail UI is shown
-        assertEquals(mTaskItemViewModel.getTitle(), mTask.getTitle());
-        assertEquals(mTaskItemViewModel.getDescription(), mTask.getDescription());
+        assertEquals(mTaskItemViewModel.title.get(), mTask.getTitle());
+        assertEquals(mTaskItemViewModel.description.get(), mTask.getDescription());
     }
 
     @Test
     public void nullTask_showsNoData() {
         loadTaskIntoViewModel();
 
+        // Load something different from null first (otherwise the change callback doesn't run)
+        mLoadTasksCallbackCaptor.getValue().onTaskLoaded(mTask);
         mLoadTasksCallbackCaptor.getValue().onTaskLoaded(null); // Trigger callback
 
         // Then task detail UI is shown
-        assertEquals(mTaskItemViewModel.getTitle(), NO_DATA_STRING);
-        assertEquals(mTaskItemViewModel.getDescription(), NO_DATA_DESC_STRING);
+        assertEquals(mTaskItemViewModel.title.get(), NO_DATA_STRING);
+        assertEquals(mTaskItemViewModel.description.get(), NO_DATA_DESC_STRING);
     }
 
     @Test

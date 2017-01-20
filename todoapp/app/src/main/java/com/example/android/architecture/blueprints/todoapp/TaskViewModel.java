@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
 import android.databinding.ObservableField;
 
 import com.android.annotations.Nullable;
@@ -31,22 +32,40 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * Abstract class for View Models that expose a single {@link Task}.
  */
 public abstract class TaskViewModel extends BaseObservable
-        implements TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
+        implements TasksDataSource.GetTaskCallback, SnackbarChangedCallback.SnackBarViewModel {
 
-    public final ObservableField<String> snackBarText = new ObservableField<>();
+    public final ObservableField<String> snackbarText = new ObservableField<>();
+
+    public final ObservableField<String> title = new ObservableField<>();
+
+    public final ObservableField<String> description = new ObservableField<>();
+
+    private final ObservableField<Task> mTaskObservable = new ObservableField<>();
 
     private final TasksRepository mTasksRepository;
 
     private final Context mContext;
-
-    @Nullable
-    private Task mTask;
 
     private boolean mIsDataLoading;
 
     public TaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
+
+        // Exposed observables depend on the mTaskObservable observable:
+        mTaskObservable.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                Task task = mTaskObservable.get();
+                if (task != null) {
+                    title.set(task.getTitle());
+                    description.set(task.getDescription());
+                } else {
+                    title.set(mContext.getString(R.string.no_data));
+                    description.set(mContext.getString(R.string.no_data_description));
+                }
+            }
+        });
     }
 
     public void start(String taskId) {
@@ -56,34 +75,38 @@ public abstract class TaskViewModel extends BaseObservable
         }
     }
 
-    @Bindable
-    public String getTitle() {
-        if (mTask == null) {
-            return mContext.getString(R.string.no_data);
-        }
-        return mTask.getTitle();
+    public void setTask(Task task) {
+        mTaskObservable.set(task);
     }
 
-    @Bindable
-    public String getDescription() {
-        if (mTask == null) {
-            return mContext.getString(R.string.no_data_description);
-        }
-        return mTask.getDescription();
-    }
-
+    // "completed" is two-way bound, so in order to intercept the new value, use a @Bindable
+    // annotation and process it in the setter.
     @Bindable
     public boolean getCompleted() {
-        return mTask.isCompleted();
+        return mTaskObservable.get().isCompleted();
     }
 
     public void setCompleted(boolean completed) {
-        completeChanged(completed);
+        if (mIsDataLoading) {
+            return;
+        }
+        Task task = mTaskObservable.get();
+        // Update the entity
+        task.setCompleted(completed);
+
+        // Notify repository and user
+        if (completed) {
+            mTasksRepository.completeTask(task);
+            snackbarText.set(mContext.getResources().getString(R.string.task_marked_complete));
+        } else {
+            mTasksRepository.activateTask(task);
+            snackbarText.set(mContext.getResources().getString(R.string.task_marked_active));
+        }
     }
 
     @Bindable
     public boolean isDataAvailable() {
-        return mTask != null;
+        return mTaskObservable.get() != null;
     }
 
     @Bindable
@@ -91,56 +114,46 @@ public abstract class TaskViewModel extends BaseObservable
         return mIsDataLoading;
     }
 
+    // This could be an observable, but we save a call to Task.getTitleForList() if not needed.
     @Bindable
     public String getTitleForList() {
-        if (mTask == null) {
+        if (mTaskObservable.get() == null) {
             return "No data";
         }
-        return mTask.getTitleForList();
+        return mTaskObservable.get().getTitleForList();
     }
 
     @Override
     public void onTaskLoaded(Task task) {
-        mTask = task;
+        mTaskObservable.set(task);
         mIsDataLoading = false;
-        notifyChange();
+        notifyChange(); // For the @Bindable properties
     }
 
     @Override
     public void onDataNotAvailable() {
-        mTask = null;
+        mTaskObservable.set(null);
         mIsDataLoading = false;
     }
 
     public void deleteTask() {
-        mTasksRepository.deleteTask(mTask.getId());
-    }
-
-    public void onRefresh() {
-        if (mTask != null) {
-            start(mTask.getId());
+        if (mTaskObservable.get() != null) {
+            mTasksRepository.deleteTask(mTaskObservable.get().getId());
         }
     }
 
-    @Override
-    public String getSnackBarText() {
-        return snackBarText.get();
+    public void onRefresh() {
+        if (mTaskObservable.get() != null) {
+            start(mTaskObservable.get().getId());
+        }
+    }
+
+    public String getSnackbarText() {
+        return snackbarText.get();
     }
 
     @Nullable
     protected String getTaskId() {
-        return mTask.getId();
-    }
-
-    private void completeChanged(boolean isChecked) {
-        mTask.setCompleted(isChecked);
-        if (isChecked) {
-            mTasksRepository.completeTask(mTask);
-            snackBarText.set(mContext.getResources().getString(R.string.task_marked_complete));
-        } else {
-            mTasksRepository.activateTask(mTask);
-            snackBarText.set(mContext.getResources().getString(R.string.task_marked_active));
-        }
-        notifyPropertyChanged(BR.completed);
+        return mTaskObservable.get().getId();
     }
 }

@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
 
@@ -43,7 +43,7 @@ public class TaskDetailFragment extends Fragment {
 
     private TaskDetailViewModel mViewModel;
 
-    private SnackBarChangedCallback mSnackBarChangedCallback;
+    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -67,8 +67,8 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mViewModel);
-        mViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
+        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     private void setupFab() {
@@ -122,6 +122,6 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 }

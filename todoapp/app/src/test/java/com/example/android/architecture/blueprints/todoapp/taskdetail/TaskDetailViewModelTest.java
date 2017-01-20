@@ -99,8 +99,8 @@ public class TaskDetailViewModelTest {
         setupViewModelRepositoryCallback();
 
         // Then verify that the view was notified
-        assertEquals(mTaskDetailViewModel.getTitle(), mTask.getTitle());
-        assertEquals(mTaskDetailViewModel.getDescription(), mTask.getDescription());
+        assertEquals(mTaskDetailViewModel.title.get(), mTask.getTitle());
+        assertEquals(mTaskDetailViewModel.description.get(), mTask.getDescription());
     }
 
     @Test
@@ -164,8 +164,8 @@ public class TaskDetailViewModelTest {
         assertFalse(mTaskDetailViewModel.isDataAvailable());
 
         // Then task detail UI is shown
-        assertEquals(mTaskDetailViewModel.getTitle(), NO_DATA_STRING);
-        assertEquals(mTaskDetailViewModel.getDescription(), NO_DATA_DESC_STRING);
+        assertEquals(mTaskDetailViewModel.title.get(), NO_DATA_STRING);
+        assertEquals(mTaskDetailViewModel.description.get(), NO_DATA_DESC_STRING);
     }
 
     private void setupViewModelRepositoryCallback() {

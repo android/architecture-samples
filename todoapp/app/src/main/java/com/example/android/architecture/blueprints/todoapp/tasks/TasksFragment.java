@@ -36,7 +36,7 @@ import android.widget.ListView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
-import com.example.android.architecture.blueprints.todoapp.SnackBarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
@@ -52,7 +52,7 @@ public class TasksFragment extends Fragment {
 
     private TasksViewModel mTasksViewModel;
 
-    private SnackBarChangedCallback mSnackBarChangedCallback;
+    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private TasksFragBinding mTasksFragBinding;
 
@@ -129,7 +129,7 @@ public class TasksFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         // If the ViewModel
-        mTasksViewModel.snackBarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     private void showFilteringPopUpMenu() {
@@ -158,8 +158,8 @@ public class TasksFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mSnackBarChangedCallback = new SnackBarChangedCallback(getView(), mTasksViewModel);
-        mTasksViewModel.snackBarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mTasksViewModel);
+        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
     private void setupFab() {
@@ -182,7 +182,6 @@ public class TasksFragment extends Fragment {
                 new ArrayList<Task>(0),
                 (TaskItemNavigator) getActivity(),
                 Injection.provideTasksRepository(getContext().getApplicationContext()),
-                mSnackBarChangedCallback,
                 mTasksViewModel);
         listView.setAdapter(mListAdapter);
     }
@@ -203,8 +202,6 @@ public class TasksFragment extends Fragment {
 
         private final TaskItemNavigator mTaskItemNavigator;
 
-        private final SnackBarChangedCallback mSnackBarChangedCallback;
-
         private final TasksViewModel mTasksViewModel;
 
         private List<Task> mTasks;
@@ -213,11 +210,9 @@ public class TasksFragment extends Fragment {
 
         public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
                             TasksRepository tasksRepository,
-                            SnackBarChangedCallback snackBarChangedCallback,
                             TasksViewModel tasksViewModel) {
             mTaskItemNavigator = taskItemNavigator;
             mTasksRepository = tasksRepository;
-            mSnackBarChangedCallback = snackBarChangedCallback;
             mTasksViewModel = tasksViewModel;
             setList(tasks);
 
@@ -264,14 +259,14 @@ public class TasksFragment extends Fragment {
             binding.setViewmodel(viewmodel);
             // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the
             // fragment's.
-            viewmodel.snackBarText.addOnPropertyChangedCallback(
+            viewmodel.snackbarText.addOnPropertyChangedCallback(
                     new Observable.OnPropertyChangedCallback() {
                 @Override
                 public void onPropertyChanged(Observable observable, int i) {
-                    mTasksViewModel.snackBarText.set(viewmodel.getSnackBarText());
+                    mTasksViewModel.snackbarText.set(viewmodel.getSnackbarText());
                 }
             });
-            viewmodel.start(task.getId());
+            viewmodel.setTask(task);
 
             return binding.getRoot();
         }
