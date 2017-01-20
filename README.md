@@ -4,13 +4,13 @@
 
 The Android framework provides a lot of flexibility in deciding how to organize and <em>architect</em> an Android app. While this freedom is very valuable, it can also lead to apps with large classes, inconsistent naming schemes, as well as mismatching or missing architectures. These types of issues can make testing, maintaining and extending your apps difficult.
 
-Android Architecture Blueprints is designed to demonstrate strategies to help solve or avoid these common problems. This project implements the same app using a number of different architectural concepts and tools.
+Android Architecture Blueprints demonstrates strategies to help solve or avoid these common problems. This project implements the same app using different architectural concepts and tools.
 
-You can use these samples as a learning reference, or as a starting point for creating your own apps. The focus of this project is on demonstrating how to structure your code, design your architecture, and the eventual impact of adopting these patterns on testing and maintaining your app. Note that there are many different ways to build apps using these architectures and tools. Your own particular priorities will impact how you choose to implement the concepts in these projects, so you should not consider these samples to be canonical examples. Also note that the UI of the sample app is deliberately kept simple.
+You can use these samples as a learning reference, or as a starting point for creating your own apps. The focus of this project is on demonstrating how to structure your code, design your architecture, and the eventual impact of adopting these patterns on testing and maintaining your app. You can use the techniques demonstrated here in many different ways to build apps. Your own particular priorities will impact how you implement the concepts in these projects, so you should not consider these samples to be canonical examples. To ensure the focus in kept on the aims described above, the app uses a simple UI.
 
 ## Explore the samples
 
-Each sample app is hosted in it’s own repository branch. For more information, review each project's respective `README.md` file.
+This project hosts each sample app in separate repository branches. For more information, see the `README.md` file in each branch.
 
 ### Stable samples
 | Project | Description |
@@ -51,7 +51,7 @@ The following screenshot illustrates the UI of the app.
 
 ## Choose a sample for your app
 
-Each sample includes a dedicated `README.md` file where you can find related metrics, as well as subjective assessments and observations by contributors. A number of factors are worth considering when selecting a particular sample for your app, including:
+Each sample includes a dedicated `README.md` file where you can find related metrics, as well as subjective assessments and observations by contributors. The following factors are worth considering when selecting a particular sample for your app:
 
 * The size of the app you are developing
 * The size and experience of your team
