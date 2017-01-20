@@ -4,16 +4,16 @@
 
 The Android framework provides a lot of flexibility in deciding how to organize and <em>architect</em> an Android app. While this freedom is very valuable, it can also lead to apps with large classes, inconsistent naming schemes, as well as mismatching or missing architectures. These types of issues can make testing, maintaining and extending your apps difficult.
 
-Android Architecture Blueprints demonstrates strategies to help solve or avoid these common problems. This project implements the same app using different architectural concepts and tools.
+The Android Architecture Blueprints project demonstrates strategies to help solve or avoid these common problems. This project implements the same app using different architectural concepts and tools.
 
-You can use these samples as a learning reference, or as a starting point for creating your own apps. The focus of this project is on demonstrating how to structure your code, design your architecture, and the eventual impact of adopting these patterns on testing and maintaining your app. You can use the techniques demonstrated here in many different ways to build apps. Your own particular priorities will impact how you implement the concepts in these projects, so you should not consider these samples to be canonical examples. To ensure the focus in kept on the aims described above, the app uses a simple UI.
+You can use the samples in this project as a learning reference, or as a starting point for creating your own apps. The focus of this project is on demonstrating how to structure your code, design your architecture, and the eventual impact of adopting these patterns on testing and maintaining your app. You can use the techniques demonstrated here in many different ways to build apps. Your own particular priorities will impact how you implement the concepts in these projects, so you should not consider these samples to be canonical examples. To ensure the focus in kept on the aims described above, the app uses a simple UI.
 
 ## Explore the samples
 
 This project hosts each sample app in separate repository branches. For more information, see the `README.md` file in each branch.
 
 ### Stable samples
-| Project | Description |
+| Sample | Description |
 | ------------- | ------------- |
 | [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) | This version demonstrates a basic [Model-View-Presenter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) architecture and provides a foundation on which the other samples are built. This sample also acts as a reference point for comparing and contrasting the other samples in this project. |
 | [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) | This version fetches data using the [Loaders API](https://developer.android.com/guide/components/loaders.html). |
@@ -26,7 +26,7 @@ This project hosts each sample app in separate repository branches. For more inf
 
 ### Samples in progress
 
-| Project | Description |
+| Sample | Description |
 | ------------- | ------------- |
 | [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | This version adds a master and detail view for tablets. |
 | [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | This version uses [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture. Note that this version is based on the TODO-MVP-DataBinding sample. |
@@ -36,14 +36,14 @@ For information about planned samples, see ["New sample" issues](https://github.
 ### External samples
 [External samples](https://github.com/googlesamples/android-architecture/wiki/External-samples) are variants that may not be in sync with the rest of the branches in this repository.
 
-| Project | Description |
+| Sample | Description |
 | ------------- | ------------- |
 | [todo-mvp-fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | This version uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
 | [todo-mvp-conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | This version uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
 
 ## Why a to-do app?
 
-This app is designed to be simple enough that it can be understood quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
+The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
 
 The following screenshot illustrates the UI of the app.
 
@@ -82,7 +82,7 @@ Checkout the TODO-MVP sample:
 git checkout todo-mvp
 ```
 
-**Note:** To review a different sample, replace `todo-mvp` with the name of project you want to check out.
+**Note:** To review a different sample, replace `todo-mvp` with the name of sample you want to check out.
 
 Finally open the `todoapp/` directory in Android Studio.
 
@@ -92,17 +92,17 @@ This project is **built by the community**, and curated by Google as well as oth
 
 ### External contributors
 
-[David González](http://github.com/malmstein) - Core developer (Content provider sample)
+[David González](http://github.com/malmstein) - Core developer (MVP Content Providers sample)
 
-[Karumi](http://github.com/Karumi) - Developer (Clean Architecture sample)
+[Karumi](http://github.com/Karumi) - Developer (MVP Clean Architecture sample)
 
 [Natalie Masse](http://github.com/freewheelnat) - Core developer
 
-[Erik Hellman](https://github.com/ErikHellman) - Developer (RxJava sample)
+[Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
 
-[Saúl Molinero](https://github.com/saulmm) - Developer (Dagger sample)
+[Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
-[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (RxJava sample)
+[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
 
 ### Googlers
 
