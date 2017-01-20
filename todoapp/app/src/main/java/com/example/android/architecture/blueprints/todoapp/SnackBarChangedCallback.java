@@ -40,6 +40,9 @@ public class SnackBarChangedCallback extends Observable.OnPropertyChangedCallbac
 
     @Override
     public void onPropertyChanged(Observable observable, int i) {
+        if (mView.get() == null) {
+            return;
+        }
         Snackbar.make(mView.get(),
                 mViewModel.getSnackBarText(),
                 Snackbar.LENGTH_SHORT).show();
