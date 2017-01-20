@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,6 +29,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -36,43 +38,9 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
  */
 public class StatisticsActivity extends AppCompatActivity {
 
+    public static final String STATS_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
+
     private DrawerLayout mDrawerLayout;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.statistics_act);
-
-        // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.setTitle(R.string.statistics_title);
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
-
-        // Set up the navigation drawer.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
-        }
-
-        StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.contentFrame);
-        if (statisticsFragment == null) {
-            statisticsFragment = StatisticsFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    statisticsFragment, R.id.contentFrame);
-        }
-
-        StatisticsViewModel statisticsViewModel = new StatisticsViewModel(getApplicationContext(),
-                Injection.provideTasksRepository(getApplicationContext()));
-
-        statisticsFragment.setViewModel(statisticsViewModel);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -83,6 +51,80 @@ public class StatisticsActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.statistics_act);
+
+        setupToolbar();
+
+        setupNavigationDrawer();
+
+        StatisticsFragment statisticsFragment = findOrCreateViewFragment();
+
+        StatisticsViewModel statisticsViewModel = findOrCreateViewModel();
+
+        // Link View and ViewModel
+        statisticsFragment.setViewModel(statisticsViewModel);
+    }
+
+    @NonNull
+    private StatisticsViewModel findOrCreateViewModel() {
+        // In a configuration change we might have a ViewModel present. It's retained using the
+        // Fragment Manager.
+        @SuppressWarnings("unchecked")
+        ViewModelHolder<StatisticsViewModel> retainedViewModel =
+                (ViewModelHolder<StatisticsViewModel>) getSupportFragmentManager()
+                        .findFragmentByTag(STATS_VIEWMODEL_TAG);
+
+        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
+            // If the model was retained, return it.
+            return retainedViewModel.getViewmodel();
+        } else {
+            // There is no ViewModel yet, create it.
+            StatisticsViewModel viewModel = new StatisticsViewModel(getApplicationContext(),
+                    Injection.provideTasksRepository(getApplicationContext()));
+
+            // and bind it to this Activity's lifecycle using the Fragment Manager.
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(),
+                    ViewModelHolder.createContainer(viewModel),
+                    STATS_VIEWMODEL_TAG);
+            return viewModel;
+        }
+    }
+
+    @NonNull
+    private StatisticsFragment findOrCreateViewFragment() {
+        StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
+        if (statisticsFragment == null) {
+            statisticsFragment = StatisticsFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    statisticsFragment, R.id.contentFrame);
+        }
+        return statisticsFragment;
+    }
+
+    private void setupNavigationDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (navigationView != null) {
+            setupDrawerContent(navigationView);
+        }
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(R.string.statistics_title);
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {

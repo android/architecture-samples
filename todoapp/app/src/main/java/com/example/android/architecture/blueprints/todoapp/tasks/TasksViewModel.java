@@ -69,7 +69,7 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
             TasksRepository repository,
             Context context,
             TasksNavigator navigator) {
-        mContext = context;
+        mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
         mNavigator = navigator;
     }
@@ -82,11 +82,11 @@ public class TasksViewModel extends BaseObservable implements SnackBarChangedCal
     public String getCurrentFilteringLabel() {
         switch (mCurrentFiltering) {
             case ALL_TASKS:
-                return mContext.getResources().getString(R.string.label_all);
+                return mContext.getString(R.string.label_all);
             case ACTIVE_TASKS:
-                return mContext.getResources().getString(R.string.label_active);
+                return mContext.getString(R.string.label_active);
             case COMPLETED_TASKS:
-                return mContext.getResources().getString(R.string.label_completed);
+                return mContext.getString(R.string.label_completed);
         }
         return null;
     }

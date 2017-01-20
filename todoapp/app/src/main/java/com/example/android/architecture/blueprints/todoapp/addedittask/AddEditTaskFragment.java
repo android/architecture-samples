@@ -21,6 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +76,25 @@ public class AddEditTaskFragment extends Fragment {
         setupFab();
 
         setupSnackBar();
+
+        setupActionBar();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
+        if (mViewDataBinding == null) {
+            mViewDataBinding = AddtaskFragBinding.bind(root);
+        }
+
+        mViewDataBinding.setViewmodel(mViewModel);
+
+        setHasOptionsMenu(true);
+        setRetainInstance(false);
+
+        return mViewDataBinding.getRoot();
     }
 
     private void setupSnackBar() {
@@ -92,26 +114,12 @@ public class AddEditTaskFragment extends Fragment {
         });
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        if (mViewDataBinding == null) {
-            mViewDataBinding = AddtaskFragBinding.bind(root);
+    private void setupActionBar() {
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (getArguments() != null) {
+            actionBar.setTitle(R.string.edit_task);
+        } else {
+            actionBar.setTitle(R.string.add_task);
         }
-
-        mViewDataBinding.setViewmodel(mViewModel);
-
-        setHasOptionsMenu(true);
-        // Fragment is retained simply to persist the edits after rotation.
-        setRetainInstance(true);
-        return mViewDataBinding.getRoot();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mViewModel.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 }

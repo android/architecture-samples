@@ -73,6 +73,8 @@ public class TasksViewModelTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
+        setupContext();
+
         // Get a reference to the class under test
         mTasksViewModel = new TasksViewModel(
                 mTasksRepository, mContext, mTasksNavigator);
@@ -82,8 +84,8 @@ public class TasksViewModelTest {
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
     }
 
-    @Before
-    public void setupContext() {
+    private void setupContext() {
+        when(mContext.getApplicationContext()).thenReturn(mContext);
         when(mContext.getString(R.string.successfully_saved_task_message))
                 .thenReturn("EDIT_RESULT_OK");
         when(mContext.getString(R.string.successfully_added_task_message))

@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.IdlingResource;
@@ -30,6 +31,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
@@ -39,33 +41,57 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
-    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
     private DrawerLayout mDrawerLayout;
 
-    private TasksViewModel mTasksViewModel;
+    public static final String TASKS_VIEWMODEL_TAG = "TASKS_VIEWMODEL_TAG";
 
+    private TasksViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tasks_act);
 
-        // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
+        setupToolbar();
 
-        // Set up the navigation drawer.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
+        setupNavigationDrawer();
+
+        TasksFragment tasksFragment = findOrCreateViewFragment();
+
+        mViewModel = findOrCreateViewModel();
+
+        // Link View and ViewModel
+        tasksFragment.setViewModel(mViewModel);
+    }
+
+    private TasksViewModel findOrCreateViewModel() {
+        // In a configuration change we might have a ViewModel present. It's retained using the
+        // Fragment Manager.
+        @SuppressWarnings("unchecked")
+        ViewModelHolder<TasksViewModel> retainedViewModel =
+                (ViewModelHolder<TasksViewModel>) getSupportFragmentManager()
+                        .findFragmentByTag(TASKS_VIEWMODEL_TAG);
+
+        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
+            // If the model was retained, return it.
+            return retainedViewModel.getViewmodel();
+        } else {
+            // There is no ViewModel yet, create it.
+            TasksViewModel viewModel = new TasksViewModel(
+                    Injection.provideTasksRepository(getApplicationContext()),
+                    getApplicationContext(),
+                    this);
+            // and bind it to this Activity's lifecycle using the Fragment Manager.
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(),
+                    ViewModelHolder.createContainer(viewModel),
+                    TASKS_VIEWMODEL_TAG);
+            return viewModel;
         }
+    }
 
+    @NonNull
+    private TasksFragment findOrCreateViewFragment() {
         TasksFragment tasksFragment =
                 (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {
@@ -74,27 +100,24 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
-
-        mTasksViewModel = new TasksViewModel(
-                Injection.provideTasksRepository(getApplicationContext()),
-                getApplicationContext(),
-                this);
-
-        tasksFragment.setViewModel(mTasksViewModel);
-
-        // Load previously saved state, if available.
-        if (savedInstanceState != null) {
-            TasksFilterType currentFiltering =
-                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mTasksViewModel.setFiltering(currentFiltering);
-        }
+        return tasksFragment;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksViewModel.getFiltering());
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
+    }
 
-        super.onSaveInstanceState(outState);
+    private void setupNavigationDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (navigationView != null) {
+            setupDrawerContent(navigationView);
+        }
     }
 
     @Override
@@ -142,7 +165,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mTasksViewModel.handleActivityResult(requestCode, resultCode);
+        mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
     @Override

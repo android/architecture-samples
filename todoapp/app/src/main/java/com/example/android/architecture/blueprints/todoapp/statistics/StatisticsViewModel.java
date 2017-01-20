@@ -20,9 +20,9 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
 import android.support.annotation.VisibleForTesting;
 
-import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -33,6 +33,11 @@ import java.util.List;
 
 /**
  * Exposes the data to be used in the statistics screen.
+ * <p>
+ * This ViewModel uses both {@link ObservableField}s ({@link ObservableBoolean}s in this case) and
+ * {@link Bindable} getters. The values in {@link ObservableField}s are used directly in the layout,
+ * whereas the {@link Bindable} getters allow us to add some logic to it. This is
+ * preferable to having logic in the XML layout.
  */
 public class StatisticsViewModel extends BaseObservable {
 
@@ -77,8 +82,6 @@ public class StatisticsViewModel extends BaseObservable {
                 if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                     EspressoIdlingResource.decrement(); // Set app as idle.
                 }
-                dataLoading.set(false);
-                error.set(false);
 
                 computeStats(tasks);
             }
@@ -90,21 +93,19 @@ public class StatisticsViewModel extends BaseObservable {
         });
     }
     /**
-     * Returns a string showing the number of active tasks.
+     * Returns a String showing the number of active tasks.
      */
     @Bindable
     public String getNumberOfActiveTasks() {
-        return mContext.getResources().getString(R.string.statistics_active_tasks) + " " +
-                mNumberOfActiveTasks;
+        return mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks);
     }
 
     /**
-     * Returns a string showing the number of completed tasks.
+     * Returns a String showing the number of completed tasks.
      */
     @Bindable
     public String getNumberOfCompletedTasks() {
-        return mContext.getResources().getString(R.string.statistics_completed_tasks) + " " +
-                mNumberOfActiveTasks;
+        return mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks);
     }
 
     /**
@@ -130,8 +131,17 @@ public class StatisticsViewModel extends BaseObservable {
             }
         }
         mNumberOfActiveTasks = active;
-        notifyPropertyChanged(BR.numberOfCompletedTasks);
         mNumberOfCompletedTasks = completed;
-        notifyPropertyChanged(BR.numberOfActiveTasks);
+
+        // There are multiple @Bindable fields in this ViewModel, calling notifyChange() will
+        // update all the UI elements that depend on them.
+        notifyChange();
+
+        // To update just one of them and avoid unnecessary UI updates,
+        // use notifyPropertyChanged(BR.field)
+
+        // Observable fields don't need to be notified. set() will trigger an update.
+        dataLoading.set(false);
+        error.set(false);
     }
 }

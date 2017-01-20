@@ -18,12 +18,14 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -38,6 +40,8 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
+    public static final String TASKDETAIL_VIEWMODEL_TAG = "TASKDETAIL_VIEWMODEL_TAG";
+
     public static final int DELETE_RESULT_OK = RESULT_FIRST_USER + 2;
 
     public static final int EDIT_RESULT_OK = RESULT_FIRST_USER + 3;
@@ -48,13 +52,46 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
         setContentView(R.layout.taskdetail_act);
 
-        // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowHomeEnabled(true);
+        setupToolbar();
 
+        TaskDetailFragment taskDetailFragment = findOrCreateViewFragment();
+
+        TaskDetailViewModel taskViewModel = findOrCreateViewModel();
+
+        // Link View and ViewModel
+        taskDetailFragment.setViewModel(taskViewModel);
+    }
+
+    @NonNull
+    private TaskDetailViewModel findOrCreateViewModel() {
+        // In a configuration change we might have a ViewModel present. It's retained using the
+        // Fragment Manager.
+        @SuppressWarnings("unchecked")
+        ViewModelHolder<TaskDetailViewModel> retainedViewModel =
+                (ViewModelHolder<TaskDetailViewModel>) getSupportFragmentManager()
+                        .findFragmentByTag(TASKDETAIL_VIEWMODEL_TAG);
+
+        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
+            // If the model was retained, return it.
+            return retainedViewModel.getViewmodel();
+        } else {
+            // There is no ViewModel yet, create it.
+            TaskDetailViewModel viewModel = new TaskDetailViewModel(
+                    getApplicationContext(),
+                    Injection.provideTasksRepository(getApplicationContext()),
+                    this);
+
+            // and bind it to this Activity's lifecycle using the Fragment Manager.
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(),
+                    ViewModelHolder.createContainer(viewModel),
+                    TASKDETAIL_VIEWMODEL_TAG);
+            return viewModel;
+        }
+    }
+
+    @NonNull
+    private TaskDetailFragment findOrCreateViewFragment() {
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
@@ -67,11 +104,15 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     taskDetailFragment, R.id.contentFrame);
         }
+        return taskDetailFragment;
+    }
 
-        taskDetailFragment.setViewModel(new TaskDetailViewModel(
-                getApplicationContext(),
-                Injection.provideTasksRepository(getApplicationContext()),
-                this));
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
     }
 
     @Override

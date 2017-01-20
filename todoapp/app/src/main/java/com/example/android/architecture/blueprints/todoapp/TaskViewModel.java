@@ -45,7 +45,7 @@ public abstract class TaskViewModel extends BaseObservable
     private boolean mIsDataLoading;
 
     public TaskViewModel(Context context, TasksRepository tasksRepository) {
-        mContext = context;
+        mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
     }
 

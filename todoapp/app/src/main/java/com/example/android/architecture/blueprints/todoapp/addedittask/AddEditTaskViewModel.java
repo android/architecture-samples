@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.content.Context;
-import android.databinding.BaseObservable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
@@ -29,10 +28,15 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 /**
- * ViewModel for the {@link AddEditTaskFragment}.
+ * ViewModel for the Add/Edit screen.
+ * <p>
+ * This ViewModel only exposes {@link ObservableField}s, so it doesn't need to extend
+ * {@link android.databinding.BaseObservable} and updates are notified automatically. See
+ * {@link com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel} for
+ * how to deal with more complex scenarios.
  */
-public class AddEditTaskViewModel extends BaseObservable implements
-        TasksDataSource.GetTaskCallback, SnackBarChangedCallback.SnackBarViewModel {
+public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
+        SnackBarChangedCallback.SnackBarViewModel {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -44,7 +48,7 @@ public class AddEditTaskViewModel extends BaseObservable implements
 
     private final TasksRepository mTasksRepository;
 
-    private final Context mContext;
+    private final Context mContext;  // To avoid leaks, this must be an Application Context.
 
     @Nullable
     private String mTaskId;
@@ -53,16 +57,14 @@ public class AddEditTaskViewModel extends BaseObservable implements
 
     private AddEditTaskNavigator mNavigator;
 
-    private boolean mIsDataMissing;
+    private boolean mIsDataLoaded = false;
 
     public AddEditTaskViewModel(Context context,
                                 TasksRepository tasksRepository,
-                                boolean shouldLoadDataFromRepo,
                                 AddEditTaskNavigator taskDetailNavigator) {
-        mContext = context.getApplicationContext();
+        mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
         mNavigator = taskDetailNavigator;
-        mIsDataMissing = shouldLoadDataFromRepo;
     }
 
     public void start(String taskId) {
@@ -76,7 +78,7 @@ public class AddEditTaskViewModel extends BaseObservable implements
             mIsNewTask = true;
             return;
         }
-        if (!mIsDataMissing) {
+        if (mIsDataLoaded) {
             // No need to populate, already have data.
             return;
         }
@@ -89,9 +91,11 @@ public class AddEditTaskViewModel extends BaseObservable implements
     public void onTaskLoaded(Task task) {
         title.set(task.getTitle());
         description.set(task.getDescription());
-
         dataLoading.set(false);
-        notifyChange();
+        mIsDataLoaded = true;
+
+        // Note that there's no need to notify that the values changed because we're using
+        // ObservableFields.
     }
 
     @Override
