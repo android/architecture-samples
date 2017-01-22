@@ -16,65 +16,88 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.Task;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+public class AddEditTaskFragment extends Fragment {
+
+    private static final String TAG = AddEditTaskFragment.class.getSimpleName();
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
-
-    private AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
     private TextView mDescription;
 
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
+    private AddEditTaskViewModel mViewModel;
+
+    private CompositeSubscription mSubscription = new CompositeSubscription();
+
+    public static AddEditTaskFragment newInstance(String taskId) {
+        Bundle arguments = new Bundle();
+        arguments.putString(ARGUMENT_EDIT_TASK_ID, taskId);
+        AddEditTaskFragment fragment = new AddEditTaskFragment();
+        fragment.setArguments(arguments);
+        return fragment;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        bindViewModel();
     }
 
     @Override
     public void onPause() {
+        unbindViewModel();
         super.onPause();
-        mPresenter.unsubscribe();
     }
 
-    @Override
-    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    private void bindViewModel() {
+        mSubscription = new CompositeSubscription();
+
+        mSubscription.add(mViewModel.getSnackbarText()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::showSnackbar,
+                        // onError
+                        __ -> Log.e(TAG, "Error retrieving snackbar text")));
+
+        mSubscription.add(mViewModel.getTask()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::setTask,
+                        // onError
+                        __ -> Log.e(TAG, "Error retrieving the task")));
+
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(__ -> mPresenter.saveTask(mTitle.getText().toString(),
-                mDescription.getText().toString()));
+    private void unbindViewModel() {
+        mSubscription.unsubscribe();
     }
 
     @Nullable
@@ -85,32 +108,44 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mTitle = (TextView) root.findViewById(R.id.add_task_title);
         mDescription = (TextView) root.findViewById(R.id.add_task_description);
         setHasOptionsMenu(true);
+
+        setupFab();
+
+        mViewModel = Injection.provideAddEditTaskViewModel(getTaskId(), getActivity());
+
         return root;
     }
 
-    @Override
-    public void showEmptyTaskError() {
-        Snackbar.make(mTitle, getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show();
+    private void setupFab() {
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        fab.setImageResource(R.drawable.ic_done);
+        fab.setOnClickListener(__ -> mViewModel.saveTask(mTitle.getText().toString(),
+                mDescription.getText().toString()));
     }
 
-    @Override
-    public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
+    private void showSnackbar(@StringRes Integer textId) {
+        Snackbar.make(mTitle, textId, Snackbar.LENGTH_LONG).show();
     }
 
-    @Override
-    public void setTitle(String title) {
+    private void setTask(Task task) {
+        setTitle(task.getTitle());
+        setDescription(task.getDescription());
+    }
+
+    private void setTitle(String title) {
         mTitle.setText(title);
     }
 
-    @Override
-    public void setDescription(String description) {
+    private void setDescription(String description) {
         mDescription.setText(description);
     }
 
-    @Override
-    public boolean isActive() {
-        return isAdded();
+    private String getTaskId() {
+        if (getArguments() != null) {
+            return getArguments().getString(ARGUMENT_EDIT_TASK_ID);
+        }
+        return null;
+
     }
 }
