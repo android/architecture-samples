@@ -35,7 +35,7 @@ public class AddEditTaskViewModel {
     @Nullable
     private String mTaskId;
 
-    public AddEditTaskViewModel(String taskId, @NonNull TasksRepository tasksRepository,
+    public AddEditTaskViewModel(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
                                 @NonNull BaseNavigationProvider navigationProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
         mNavigationProvider = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
@@ -95,9 +95,6 @@ public class AddEditTaskViewModel {
     }
 
     private void updateTask(String title, String description) {
-        if (isNewTask()) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
         mNavigationProvider.finishActivityWithResult(Activity.RESULT_OK); // After an edit, go back to the list.
     }

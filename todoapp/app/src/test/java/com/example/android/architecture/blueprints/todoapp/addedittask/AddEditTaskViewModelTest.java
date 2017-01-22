@@ -1,5 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.app.Activity;
+
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -15,6 +17,9 @@ import java.io.InvalidObjectException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -68,7 +73,7 @@ public class AddEditTaskViewModelTest {
     public void getTask_returnsCorrectData() {
         // Given a task in the repository
         when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.just(TASK));
-        // Get a reference to the class under test for the same task id
+        // Get a reference to the class under test for a task id
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
 
         // When subscribing to the task
@@ -82,15 +87,94 @@ public class AddEditTaskViewModelTest {
     public void getTask_whenRepositoryReturnsError_snackbarEmits() {
         // Given a task in the repository
         when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.error(new Exception()));
-        // Get a reference to the class under test for the same task id
+        // Get a reference to the class under test for a task id
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
         // With subscribed to the snackbar
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
-        
+
         // The correct resource id is emitted
         mSnackbarTestSubscriber.assertValue(R.string.empty_task_message);
+    }
+
+    @Test
+    public void saveTask_whenNoTask_createsTask() {
+        // Get a reference to the class under test for a null task id
+        mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
+
+        // When saving a task
+        mViewModel.saveTask("title", "description");
+
+        // The task is saved in repository
+        verify(mTasksRepository).saveTask(any(Task.class));
+    }
+
+    @Test
+    public void saveTask_whenNoTask_finishesActivity() {
+        // Get a reference to the class under test for a null task id
+        mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
+
+        // When saving a task
+        mViewModel.saveTask("title", "description");
+
+        // The Activity finishes with result
+        verify(mNavigationProvider).finishActivityWithResult(Activity.RESULT_OK);
+    }
+
+    @Test
+    public void saveTask_withEmptyTitleAndDescription_doesntSaveTask() {
+        // Get a reference to the class under test for a null task id
+        mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
+
+        // When saving an invalid task
+        mViewModel.saveTask("", "");
+
+        // The invalid task is not saved in repository
+        verify(mTasksRepository, never()).saveTask(any(Task.class));
+    }
+
+    @Test
+    public void saveTask_withEmptyTitleAndDescription_triggersSnackbar() {
+        // Get a reference to the class under test for a null task id
+        mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
+        // With subscribed to snackbar text
+        mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
+
+        // When saving an invalid task
+        mViewModel.saveTask("", "");
+
+        // The snackbar text emits with empty message
+        mSnackbarTestSubscriber.assertValue(R.string.empty_task_message);
+    }
+
+    @Test
+    public void saveTask_withExistingTaskId_savesTask() {
+        // Get a reference to the class under test for a task id
+        mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
+
+        // When saving the task with new title and new description
+        String newTitle = "new title";
+        String newDescription = "new description";
+        mViewModel.saveTask(newTitle, newDescription);
+
+        // The updated task is saved in the repository
+        Task expected = new Task(newTitle, newDescription, TASK.getId());
+        verify(mTasksRepository).saveTask(expected);
+    }
+
+    @Test
+    public void saveTask_withExistingTaskId_finishesActivity() {
+        // Get a reference to the class under test for a task id
+        mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
+
+        // When saving the task with new title and new description
+        String newTitle = "new title";
+        String newDescription = "new description";
+        mViewModel.saveTask(newTitle, newDescription);
+
+        // The Activity finishes with result
+        verify(mNavigationProvider).finishActivityWithResult(Activity.RESULT_OK);
     }
 }

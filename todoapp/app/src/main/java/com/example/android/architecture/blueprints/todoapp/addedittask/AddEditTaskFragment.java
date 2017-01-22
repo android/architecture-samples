@@ -41,9 +41,9 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class AddEditTaskFragment extends Fragment {
 
-    private static final String TAG = AddEditTaskFragment.class.getSimpleName();
-
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
+
+    private static final String TAG = AddEditTaskFragment.class.getSimpleName();
 
     private TextView mTitle;
 
@@ -120,8 +120,11 @@ public class AddEditTaskFragment extends Fragment {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(__ -> mViewModel.saveTask(mTitle.getText().toString(),
-                mDescription.getText().toString()));
+        fab.setOnClickListener(__ -> saveTask());
+    }
+
+    private void saveTask() {
+        mViewModel.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
     }
 
     private void showSnackbar(@StringRes Integer textId) {
