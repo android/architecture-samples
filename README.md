@@ -15,21 +15,21 @@ This project hosts each sample app in separate repository branches. For more inf
 ### Stable samples
 | Sample | Description |
 | ------------- | ------------- |
-| [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) | This version demonstrates a basic [Model-View-Presenter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) architecture and provides a foundation on which the other samples are built. This sample also acts as a reference point for comparing and contrasting the other samples in this project. |
-| [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) | This version fetches data using the [Loaders API](https://developer.android.com/guide/components/loaders.html). |
-| [todo-databinding](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) | This version uses the [Data Binding Library](https://developer.android.com/topic/libraries/data-binding/index.html). |
-| [todo-mvp-clean](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) | This version uses concepts from [Clean Architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html). |
-| [todo-mvp-dagger](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) | This version uses [Dagger2](https://google.github.io/dagger/) to add support for [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection). |
-[todo-mvp-contentproviders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) | This version fetches data using the Loaders API, and also makes use of [content providers](https://developer.android.com/guide/topics/providers/content-providers.html). This version is based on the TODO-MVP-Loaders sample. |
-| [todo-mvp-rxjava](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) | This version uses [RxJava](https://github.com/ReactiveX/RxJava) to implement concurrency, and abstract the data layer. |
+| [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/) | Demonstrates a basic [Model-View-Presenter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) architecture and provides a foundation on which the other samples are built. This sample also acts as a reference point for comparing and contrasting the other samples in this project. |
+| [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders/) | Fetches data using the [Loaders API](https://developer.android.com/guide/components/loaders.html). |
+| [todo-databinding](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) | Uses the [Data Binding Library](https://developer.android.com/topic/libraries/data-binding/index.html). |
+| [todo-mvp-clean](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/) | Uses concepts from [Clean Architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html). |
+| [todo-mvp-dagger](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) | Uses [Dagger2](https://google.github.io/dagger/) to add support for [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection). |
+[todo-mvp-contentproviders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) | Based on the todo-mvp-loaders sample, this version fetches data using the Loaders API, and also makes use of [content providers](https://developer.android.com/guide/topics/providers/content-providers.html). |
+| [todo-mvp-rxjava](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) | Uses [RxJava](https://github.com/ReactiveX/RxJava) to implement concurrency, and abstract the data layer. |
 
 
 ### Samples in progress
 
 | Sample | Description |
 | ------------- | ------------- |
-| [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | This version adds a master and detail view for tablets. |
-| [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | This version uses [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture. This version is based on the TODO-DataBinding sample. |
+| [dev-todo-mvp-tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Adds a master and detail view for tablets. |
+| [dev-todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture.|
 
 For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
 
@@ -38,14 +38,14 @@ For information about planned samples, see ["New sample" issues](https://github.
 
 | Sample | Description |
 | ------------- | ------------- |
-| [todo-mvp-fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | This version uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
-| [todo-mvp-conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | This version uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
+| [todo-mvp-fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | Uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
+| [todo-mvp-conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | Uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
 
 ## Why a to-do app?
 
 The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
 
-The following screenshot illustrates the UI of the app.
+The following screenshot illustrates the UI of the app:
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/tasks2.png" alt="A screenshot illustratrating the UI of the app" width="160" style="display: inline; float: right"/>
 
@@ -60,15 +60,15 @@ Each sample includes a dedicated `README.md` file where you can find related met
 * Whether you need to support multiple platforms
 * Your preference for the compactness of your codebase
 
-For more information on choosing and comparing samples, see the following pages.
+For more information on choosing and comparing samples, see the following pages:
 * [Samples at a glance](https://github.com/googlesamples/android-architecture/wiki/Samples-at-a-glance)
 * [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
 
 ## Open a sample in Android Studio
 
-To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the `todoapp/` directory in Android Studio. The following series of steps illustrate how to open the TODO-MVP sample.
+To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the `todoapp/` directory in Android Studio. The following series of steps illustrate how to open the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp) sample.
 
-**Note:** The master branch won't compile.
+**Note:** The master branch does not compile.
 
 Clone the repository:
 
@@ -76,7 +76,7 @@ Clone the repository:
 git clone git@github.com:googlesamples/android-architecture.git
 ```
 
-Checkout the TODO-MVP sample:
+Checkout the todo-mvp sample:
   
 ```
 git checkout todo-mvp
