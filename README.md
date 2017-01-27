@@ -1,109 +1,69 @@
-# TODO-MVP
+# todo-mvp
 
-### Summary
+This version of the app is called todo-mvp, and provides a foundation for other samples in this project. The sample aims to:
 
-This sample is the base for many of the variants. It showcases a simple
-implementation of the Model-View-Presenter pattern with no architectural
-frameworks. It uses manual dependency injection to provide a repository with
-local and remote data sources. Asynchronous tasks are handled with callbacks.
+* Provide a basic [Model-View-Presenter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) architecture without using any architectural frameworks.
+* Act as a reference point for comparing and contrasting the other samples in this project.
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Diagram"/>
+**Note:** This project uses the following naming convention, across all repository branches, to distinguish between View classes and MVP views:
 
-Note: in a MVP context, the term "view" is overloaded:
+* "Android View" refers to the [android.view.View](https://developer.android.com/reference/android/view/View.html) class.
+* The view that receives commands from a presenter in MVP, is referred to as "view".
 
-  * The class android.view.View will be referred to as "Android View"
-  * The view that receives commands from a presenter in MVP, will be simply called
-"view".
+### What you need
 
-### Fragments
+Before exploring this sample, you might find it useful to familiarize yourself with the following topics:
 
-It uses fragments for two reasons:
+* The [project README](https://github.com/googlesamples/android-architecture/tree/master)
+* The [MVP](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) architecture
+  
+The todo-mvp sample uses the following dependencies:
+* [Common Android support libraries](https://developer.android.com/topic/libraries/support-library/index.html) -  Packages in the com.android.support.* namespace provide backwards compatibility and other features.
+* [Android Testing Support Library](https://developer.android.com/topic/libraries/testing-support-library/index.html) -  A framework used to support UI tests, using both Espresso, and AndroidJUnitRunner.
+* [Mockito](http://site.mockito.org/) - A mocking framework used to implement unit tests.
+* [Guava](https://github.com/google/guava) - A set of core libraries for Java by Google, commonly used in Android apps.
 
-  * The separation between Activity and Fragment fits nicely with this
-implementation of MVP: the Activity is the overall controller that creates and
-connects views and presenters.
-  * Tablet layout or screens with multiple views take advantage of the Fragments
-framework.
+### Designing the app
 
-### Key concepts
+All versions of the Android Blueprints app include the same common features in a simple to-do type app. The app consists of four UI screens: 
+* Tasks - Used to manage a list of tasks.
+* TaskDetail - Used to read or delete a task.
+* AddEditTask - Used to create or edit tasks.
+* Statistics - Displays statistics related to tasks.
 
-There are four features in the app:
+In this version of the app, as well as other versions based on it, each screen is implemented using the following classes and interfaces:
 
-  * <code>Tasks</code>
-  * <code>TaskDetail</code>
-  * <code>AddEditTask</code>
-  * <code>Statistics</code>
+* A contract class which defines the connection between the view and the presenter.
+* An [Activity](https://developer.android.com/reference/android/app/Activity.html) which creates fragments and presenters.
+* A [Fragment](https://developer.android.com/reference/android/app/Fragment.html) which implements the view interface.
+* A presenter which implements the presenter interface in the corresponding contract.
 
-Each feature has:
+A presenter typically hosts business logic associated with a particular feature, and the corresponding view handles the Android UI work. The view contains almost no logic; it converts the presenter's commands to UI actions, and listens for user actions, which are then passed to the presenter.
 
-  * A contract defining the view and the presenter
-  * An Activity which is responsible for the creation of fragments and presenters
-  * A Fragment which implements the view interface. 
-  * A presenter which implements the presenter interface
+### Implementing the app
 
-In general, the business logic lives in the presenter and relies on the view to
-do the Android UI work. 
+Each version of the app implements the same features using a different approach to showcase and contrast a variety of architectural designs. For example, this version takes the following approaches to solving common implementation questions:
 
-The view contains almost no logic: it converts the presenter's commands to UI
-actions and listens to user actions, which are passed to the presenter. 
+* This sample uses [product flavors](https://developer.android.com/studio/build/build-variants.html) to replace modules at compile time, providing fake data for both manual and automated testing. 
+* This version uses callbacks to handle asynchronous tasks. 
 
-Contracts are interfaces used to define the connection between views and
-presenters.
+Notice also in the following illustration that this version of the app uses fragments, and this is for two reasons:
 
-### Dependencies
+* The use of both [activities](https://developer.android.com/guide/components/activities/index.html) and [fragments](https://developer.android.com/guide/components/fragments.html) allows for a better separation of concerns which compliments this implementation of MVP. In this version of the app, the Activity is the overall controller which creates and connects views and presenters.
+* The use of fragments supports tablet layouts or UI screens with multiple views.
 
-  * Common Android support libraries (<code>com.android.support.\*)</code>
-  * Android Testing Support Library (Espresso, AndroidJUnitRunner…)
-  * Mockito
-  * Guava (null checking)
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Illustration of the MVP architechture for this version of the app."/>
 
-## Features
+This version of the app includes a number of unit tests which cover presenters, repositories, and data sources. The sample also includes UI tests, that rely on fake data, and are faciliated by dependency injection to provide fake modules. For more information on using dependency injection to faciliate testing, see [Leveraging product flavors in Android Studio for hermetic testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 
-### Complexity - understandability
+### Maintaining the app
 
-#### Use of architectural frameworks/libraries/tools: 
+This sample includes classes and interfaces, such as presenters and contracts, that increase the number of lines of code compared to more traditional projects that do not make use of a particular architecture. Before making changes to this version, you should be familiar with the implementation details of an MVP architecture.
 
-None 
+The table below summarizes the amount of code used to implement this version of the app. You can use it as a basis for comparison with similar tables provided for each of the other samples in this project.
 
-#### Conceptual complexity 
-
-Low, as it's a pure MVP implementation for Android
-
-### Testability
-
-#### Unit testing
-
-High, presenters are unit tested as well as repositories and data sources.
-
-#### UI testing
-
-High, injection of fake modules allow for testing with fake data
-
-### Code metrics
-
-Compared to a traditional project with no architecture in place, this sample
-introduces additional classes and interfaces: presenters, a repository,
-contracts, etc. So lines of code and number of classes are higher in MVP.
-
-
-```
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-Java                            46           1075           1451           3451
-XML                             34             97            337            601
--------------------------------------------------------------------------------
-SUM:                            80           1172           1788           4052
--------------------------------------------------------------------------------
-```
-### Maintainability
-
-#### Ease of amending or adding a feature
-
-High. 
-
-#### Learning cost
-
-Low. Features are easy to find and the responsibilities are clear. Developers
-don't need to be familiar with any external dependency to work on the project.
-
+| Language      | Number of files | Blank lines | Comment lines | Lines of code |
+| ------------- | --------------- | ----------- | ------------- | ------------- |
+| **Java**      |               46|         1075|           1451|           3451|
+| **XML**       |               34|           97|            337|            601|
+| **Total**     |               80|         1172|           1788|           4052|
