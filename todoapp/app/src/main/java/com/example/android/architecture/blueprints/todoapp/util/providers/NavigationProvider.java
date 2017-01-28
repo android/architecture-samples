@@ -1,6 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.util.providers;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import java.lang.ref.WeakReference;
 
@@ -20,5 +21,11 @@ public class NavigationProvider implements BaseNavigationProvider {
     public void finishActivityWithResult(int resultCode) {
         mActivity.get().setResult(resultCode);
         mActivity.get().finish();
+    }
+
+    @Override
+    public void startActivityForResult(Class cls, int requestCode) {
+        Intent intent = new Intent(mActivity.get(), cls);
+        mActivity.get().startActivityForResult(intent, requestCode);
     }
 }

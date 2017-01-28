@@ -12,4 +12,12 @@ public interface BaseNavigationProvider {
      * @param resultCode the result code to be set when finishing the Activity.
      */
     void finishActivityWithResult(int resultCode);
+
+    /**
+     * Start a new Activity for a result.
+     *
+     * @param cls         the Activity class to be opened.
+     * @param requestCode the request code that will be passed to the opened Activity.
+     */
+    void startActivityForResult(Class cls, int requestCode);
 }

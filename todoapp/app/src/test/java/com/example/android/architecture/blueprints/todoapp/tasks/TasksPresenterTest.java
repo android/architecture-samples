@@ -81,9 +81,9 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Then progress indicator is shown
-        verify(mTasksView).setLoadingIndicator(true);
+        verify(mTasksView).setProgressIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
-        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).setProgressIndicator(false);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Then progress indicator is hidden and active tasks are shown in UI
-        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).setProgressIndicator(false);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
-        verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView).setProgressIndicator(false);
     }
 
     @Test

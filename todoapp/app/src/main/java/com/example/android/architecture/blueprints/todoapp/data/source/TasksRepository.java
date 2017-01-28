@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -103,6 +104,7 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public Observable<List<Task>> getTasks() {
+        Log.d("flo", "flo getting tasks");
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
             return Observable.from(mCachedTasks.values()).toList();

@@ -18,14 +18,15 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,22 +40,28 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment implements TasksContract.View {
+public class TasksFragment extends Fragment {
 
-    private TasksContract.Presenter mPresenter;
+    private static final String TAG = TasksFragment.class.getSimpleName();
+
+    private TasksViewModel mViewModel;
 
     private TasksAdapter mListAdapter;
 
@@ -70,6 +77,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private TextView mFilteringLabelView;
 
+    private CompositeSubscription mSubscription = new CompositeSubscription();
+
     public TasksFragment() {
         // Requires empty public constructor
     }
@@ -79,37 +88,87 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mListAdapter = new TasksAdapter(new ArrayList<>(0), mItemListener);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        bindViewModel();
     }
 
     @Override
     public void onPause() {
+        unbindViewModel();
         super.onPause();
-        mPresenter.unsubscribe();
     }
 
-    @Override
-    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    private void bindViewModel() {
+        mSubscription = new CompositeSubscription();
+
+        mSubscription.add(mViewModel.getTasks()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        this::showTasks,
+                        //onError
+                        error -> Log.e(TAG, "Error loading tasks", error)
+                ));
+        mSubscription.add(mViewModel.getSnackbarMessage()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        this::showSnackbar,
+                        //onError
+                        error -> Log.d(TAG, "Error showing snackbar", error)
+                ));
+
+        mSubscription.add(mViewModel.getProgressIndicator()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        this::setProgressIndicator,
+                        //onError
+                        error -> Log.d(TAG, "Error showing progress indicator", error)
+                ));
+
+        mSubscription.add(mViewModel.getFilter()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        this::setFilterLabel,
+                        //onError
+                        error -> Log.d(TAG, "Error setting filter label", error)
+                ));
+
+        mSubscription.add(mViewModel.getNoTasks()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        this::showNoTasks,
+                        //onError
+                        error -> Log.d(TAG, "Error handling no tasks", error)
+                ));
+    }
+
+    private void unbindViewModel() {
+        mSubscription.unsubscribe();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+//        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mListAdapter = new TasksAdapter(new ArrayList<>(0), mItemListener);
+
+        mViewModel = Injection.provideTasksViewModel(getActivity());
+
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
         // Set up tasks view
@@ -123,16 +182,18 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
         mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
         mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
-        mNoTaskAddView.setOnClickListener(__ -> showAddTask());
+        mNoTaskAddView.setOnClickListener(__ -> mViewModel.addNewTask());
 
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
+        setupFabButton();
 
-        fab.setImageResource(R.drawable.ic_add);
-        fab.setOnClickListener(__ -> mPresenter.addNewTask());
+        setupSwipeRefreshLayout(root, listView);
 
-        // Set up progress indicator
+        setHasOptionsMenu(true);
+
+        return root;
+    }
+
+    private void setupSwipeRefreshLayout(View root, ListView listView) {
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
                 (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(
@@ -143,24 +204,28 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
 
-        swipeRefreshLayout.setOnRefreshListener(() -> mPresenter.loadTasks(false));
+        swipeRefreshLayout.setOnRefreshListener(() -> mViewModel.updateTasks());
+    }
 
-        setHasOptionsMenu(true);
+    private void setupFabButton() {
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
 
-        return root;
+        fab.setImageResource(R.drawable.ic_add);
+        fab.setOnClickListener(__ -> mViewModel.addNewTask());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
+                mViewModel.clearCompletedTasks();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mViewModel.forceUpdateTasks();
                 break;
         }
         return true;
@@ -172,24 +237,22 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public void showFilteringPopUpMenu() {
+    private void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.active:
-                    mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                    mViewModel.filter(TasksFilterType.ACTIVE_TASKS);
                     break;
                 case R.id.completed:
-                    mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                    mViewModel.filter(TasksFilterType.COMPLETED_TASKS);
                     break;
                 default:
-                    mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                    mViewModel.filter(TasksFilterType.ALL_TASKS);
                     break;
             }
-            mPresenter.loadTasks(false);
             return true;
         });
 
@@ -202,22 +265,21 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mPresenter.openTaskDetails(clickedTask);
+//            mPresenter.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mPresenter.completeTask(completedTask);
+//            mPresenter.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mPresenter.activateTask(activatedTask);
+//            mPresenter.activateTask(activatedTask);
         }
     };
 
-    @Override
-    public void setLoadingIndicator(final boolean active) {
+    private void setProgressIndicator(final boolean active) {
 
         if (getView() == null) {
             return;
@@ -229,7 +291,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         srl.post(() -> srl.setRefreshing(active));
     }
 
-    @Override
     public void showTasks(List<Task> tasks) {
         mListAdapter.replaceData(tasks);
 
@@ -237,69 +298,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTasksView.setVisibility(View.GONE);
     }
 
-    @Override
-    public void showNoActiveTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_active),
-                R.drawable.ic_check_circle_24dp,
-                false
-        );
-    }
-
-    @Override
-    public void showNoTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_all),
-                R.drawable.ic_assignment_turned_in_24dp,
-                false
-        );
-    }
-
-    @Override
-    public void showNoCompletedTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_completed),
-                R.drawable.ic_verified_user_24dp,
-                false
-        );
-    }
-
-    @Override
     public void showSuccessfullySavedMessage() {
         showMessage(getString(R.string.successfully_saved_task_message));
     }
 
-    private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
+    private void showNoTasks(NoTasksModel model) {
         mTasksView.setVisibility(View.GONE);
         mNoTasksView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        mNoTaskMainView.setText(model.getText());
+        mNoTaskIcon.setImageResource(model.getIcon());
+        mNoTaskAddView.setVisibility(model.isShowAdd() ? View.VISIBLE : View.GONE);
+
     }
 
-    @Override
-    public void showActiveFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_active));
+    private void setFilterLabel(@StringRes int text) {
+        mFilteringLabelView.setText(text);
     }
 
-    @Override
-    public void showCompletedFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
-    }
-
-    @Override
-    public void showAllFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_all));
-    }
-
-    @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
-    }
-
-    @Override
     public void showTaskDetailsUi(String taskId) {
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
@@ -308,31 +324,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         startActivity(intent);
     }
 
-    @Override
-    public void showTaskMarkedComplete() {
-        showMessage(getString(R.string.task_marked_complete));
-    }
-
-    @Override
-    public void showTaskMarkedActive() {
-        showMessage(getString(R.string.task_marked_active));
-    }
-
-    @Override
-    public void showCompletedTasksCleared() {
-        showMessage(getString(R.string.completed_tasks_cleared));
-    }
-
-    @Override
-    public void showLoadingTasksError() {
-        showMessage(getString(R.string.loading_tasks_error));
-    }
-
     private void showMessage(String message) {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
-    @Override
+    private void showSnackbar(@StringRes int message) {
+        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+    }
+
     public boolean isActive() {
         return isAdded();
     }
