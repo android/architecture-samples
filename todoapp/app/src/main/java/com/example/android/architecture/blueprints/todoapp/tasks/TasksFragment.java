@@ -33,8 +33,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -43,7 +41,6 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +48,6 @@ import java.util.List;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
@@ -158,14 +153,14 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        mPresenter.result(requestCode, resultCode);
+        mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mListAdapter = new TasksAdapter(new ArrayList<>(0), mItemListener);
+        mListAdapter = new TasksAdapter(new ArrayList<>(0));
 
         mViewModel = Injection.provideTasksViewModel(getActivity());
 
@@ -177,20 +172,21 @@ public class TasksFragment extends Fragment {
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
-        // Set up  no tasks view
-        mNoTasksView = root.findViewById(R.id.noTasks);
-        mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
-        mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
-        mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
-        mNoTaskAddView.setOnClickListener(__ -> mViewModel.addNewTask());
-
+        setupNoTasksView(root);
         setupFabButton();
-
         setupSwipeRefreshLayout(root, listView);
 
         setHasOptionsMenu(true);
 
         return root;
+    }
+
+    private void setupNoTasksView(View root) {
+        mNoTasksView = root.findViewById(R.id.noTasks);
+        mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
+        mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
+        mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
+        mNoTaskAddView.setOnClickListener(__ -> mViewModel.addNewTask());
     }
 
     private void setupSwipeRefreshLayout(View root, ListView listView) {
@@ -259,47 +255,21 @@ public class TasksFragment extends Fragment {
         popup.show();
     }
 
-    /**
-     * Listener for clicks on tasks in the ListView.
-     */
-    TaskItemListener mItemListener = new TaskItemListener() {
-        @Override
-        public void onTaskClick(Task clickedTask) {
-//            mPresenter.openTaskDetails(clickedTask);
-        }
-
-        @Override
-        public void onCompleteTaskClick(Task completedTask) {
-//            mPresenter.completeTask(completedTask);
-        }
-
-        @Override
-        public void onActivateTaskClick(Task activatedTask) {
-//            mPresenter.activateTask(activatedTask);
-        }
-    };
-
     private void setProgressIndicator(final boolean active) {
-
         if (getView() == null) {
             return;
         }
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
-
         // Make sure setRefreshing() is called after the layout is done with everything else.
         srl.post(() -> srl.setRefreshing(active));
     }
 
-    public void showTasks(List<Task> tasks) {
+    private void showTasks(List<TaskItem> tasks) {
         mListAdapter.replaceData(tasks);
 
         mTasksView.setVisibility(View.VISIBLE);
         mNoTasksView.setVisibility(View.GONE);
-    }
-
-    public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_task_message));
     }
 
     private void showNoTasks(NoTasksModel model) {
@@ -316,106 +286,7 @@ public class TasksFragment extends Fragment {
         mFilteringLabelView.setText(text);
     }
 
-    public void showTaskDetailsUi(String taskId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
-    }
-
-    private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
     private void showSnackbar(@StringRes int message) {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
-
-    public boolean isActive() {
-        return isAdded();
-    }
-
-    private static class TasksAdapter extends BaseAdapter {
-
-        private List<Task> mTasks;
-        private TaskItemListener mItemListener;
-
-        public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
-            setList(tasks);
-            mItemListener = itemListener;
-        }
-
-        public void replaceData(List<Task> tasks) {
-            setList(tasks);
-            notifyDataSetChanged();
-        }
-
-        private void setList(List<Task> tasks) {
-            mTasks = checkNotNull(tasks);
-        }
-
-        @Override
-        public int getCount() {
-            return mTasks.size();
-        }
-
-        @Override
-        public Task getItem(int i) {
-            return mTasks.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View rowView = view;
-            if (rowView == null) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.task_item, viewGroup, false);
-            }
-
-            final Task task = getItem(i);
-
-            TextView titleTV = (TextView) rowView.findViewById(R.id.title);
-            titleTV.setText(task.getTitleForList());
-
-            CheckBox completeCB = (CheckBox) rowView.findViewById(R.id.complete);
-
-            // Active/completed task UI
-            completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
-            } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
-            }
-
-            completeCB.setOnClickListener(__ -> {
-                if (!task.isCompleted()) {
-                    mItemListener.onCompleteTaskClick(task);
-                } else {
-                    mItemListener.onActivateTaskClick(task);
-                }
-            });
-
-            rowView.setOnClickListener(__ -> mItemListener.onTaskClick(task));
-
-            return rowView;
-        }
-    }
-
-    public interface TaskItemListener {
-
-        void onTaskClick(Task clickedTask);
-
-        void onCompleteTaskClick(Task completedTask);
-
-        void onActivateTaskClick(Task activatedTask);
-    }
-
 }

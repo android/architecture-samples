@@ -6,7 +6,7 @@ import android.support.annotation.StringRes;
 /**
  * The string and image that should be displayed when there are no tasks.
  */
-public class NoTasksModel {
+final class NoTasksModel {
 
     @StringRes
     private int mText;

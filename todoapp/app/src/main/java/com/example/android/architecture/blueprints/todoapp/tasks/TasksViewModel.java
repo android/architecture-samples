@@ -1,5 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Activity;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.util.Pair;
@@ -17,12 +19,13 @@ import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
+import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * ViewModel for the list of tasks.
  */
-public class TasksViewModel {
+public final class TasksViewModel {
 
     private static final String TAG = TasksViewModel.class.getSimpleName();
 
@@ -62,21 +65,26 @@ public class TasksViewModel {
      * @return the list of tasks.
      */
     @NonNull
-    public Observable<List<Task>> getTasks() {
+    public Observable<List<TaskItem>> getTasks() {
+        return getTaskItems()
+                .doOnSubscribe(() -> mProgressIndicatorSubject.onNext(true))
+                .doOnNext(__ -> mProgressIndicatorSubject.onNext(false))
+                .doOnError(__ -> mSnackbarText.onNext(R.string.loading_tasks_error))
+                .doOnNext(this::handleTasks)
+                .filter(tasks -> !tasks.isEmpty());
+    }
+
+    private Observable<List<TaskItem>> getTaskItems() {
         return Observable.combineLatest(getTasksFromRepo(),
                 mFilter,
                 Pair::create)
                 .flatMap(pair -> Observable.from(pair.first)
                         .filter(task -> shouldFilterTask(task, pair.second))
-                        .toList())
-                .doOnSubscribe(() -> mProgressIndicatorSubject.onNext(true))
-                .doOnNext(__ -> mProgressIndicatorSubject.onNext(false))
-                .doOnNext(this::handleTasks)
-                .doOnError(__ -> mSnackbarText.onNext(R.string.loading_tasks_error))
-                .filter(List::isEmpty);
+                        .map(this::constructTaskItem)
+                        .toList());
     }
 
-    private void handleTasks(List<Task> tasks) {
+    private void handleTasks(List<TaskItem> tasks) {
         if (tasks.isEmpty()) {
             mFilter.map(this::getNoTasksModel)
                     .subscribe(
@@ -90,11 +98,14 @@ public class TasksViewModel {
     private NoTasksModel getNoTasksModel(TasksFilterType mCurrentFiltering) {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                return new NoTasksModel(R.string.no_tasks_active, R.drawable.ic_check_circle_24dp, false);
+                return new NoTasksModel(R.string.no_tasks_active,
+                        R.drawable.ic_check_circle_24dp, false);
             case COMPLETED_TASKS:
-                return new NoTasksModel(R.string.no_tasks_completed, R.drawable.ic_verified_user_24dp, false);
+                return new NoTasksModel(R.string.no_tasks_completed,
+                        R.drawable.ic_verified_user_24dp, false);
             default:
-                return new NoTasksModel(R.string.no_tasks_all, R.drawable.ic_assignment_turned_in_24dp, true);
+                return new NoTasksModel(R.string.no_tasks_all,
+                        R.drawable.ic_assignment_turned_in_24dp, true);
         }
     }
 
@@ -113,6 +124,42 @@ public class TasksViewModel {
                 .flatMap(__ -> mTasksRepository.getTasks());
     }
 
+    @NonNull
+    private TaskItem constructTaskItem(Task task) {
+        @DrawableRes int background = task.isCompleted()
+                ? R.drawable.list_completed_touch_feedback
+                : R.drawable.touch_feedback;
+
+        return new TaskItem(task, background,
+                () -> handleTaskTaped(task),
+                checked -> handleTaskChecked(task, checked));
+    }
+
+    private void handleTaskTaped(Task task) {
+        mNavigationProvider.startActivityWithExtra(AddEditTaskActivity.class,
+                ARGUMENT_EDIT_TASK_ID, task.getId());
+    }
+
+    private void handleTaskChecked(Task task, boolean checked) {
+        if (checked) {
+            completeTask(task);
+        } else {
+            activateTask(task);
+        }
+        mTriggerForceUpdate.onNext(false);
+    }
+
+    private void completeTask(Task completedTask) {
+        mTasksRepository.completeTask(completedTask);
+        mSnackbarText.onNext(R.string.task_marked_complete);
+    }
+
+    private void activateTask(Task activeTask) {
+        mTasksRepository.activateTask(activeTask);
+        mSnackbarText.onNext(R.string.task_marked_active);
+    }
+
+
     private void forceRefreshTasks(boolean force) {
         if (force) {
             mTasksRepository.refreshTasks();
@@ -123,6 +170,7 @@ public class TasksViewModel {
      * Trigger a force update of the tasks.
      */
     public void forceUpdateTasks() {
+        mProgressIndicatorSubject.onNext(true);
         mTriggerForceUpdate.onNext(true);
     }
 
@@ -137,7 +185,22 @@ public class TasksViewModel {
      * Open the {@link AddEditTaskActivity}
      */
     public void addNewTask() {
-        mNavigationProvider.startActivityForResult(AddEditTaskActivity.class, AddEditTaskActivity.REQUEST_ADD_TASK);
+        mNavigationProvider.startActivityForResult(AddEditTaskActivity.class,
+                AddEditTaskActivity.REQUEST_ADD_TASK);
+    }
+
+    /**
+     * Handle the response received on onActivityResult.
+     *
+     * @param requestCode the request with which the Activity was opened.
+     * @param resultCode  the result of the Activity.
+     */
+    public void handleActivityResult(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
+            mSnackbarText.onNext(R.string.successfully_saved_task_message);
+        }
     }
 
     @NonNull
@@ -185,17 +248,26 @@ public class TasksViewModel {
         return mFilter.map(this::getFilterText);
     }
 
+    /**
+     * Clear the list of completed tasks and refresh the list.
+     */
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         mSnackbarText.onNext(R.string.completed_tasks_cleared);
         mTriggerForceUpdate.onNext(false);
     }
 
+    /**
+     * @return a stream of string ids that should be displayed in the snackbar.
+     */
     @NonNull
     public Observable<Integer> getSnackbarMessage() {
         return mSnackbarText.asObservable();
     }
 
+    /**
+     * @return a stream that emits true if the progress indicator should be displayed, false otherwise.
+     */
     @NonNull
     public Observable<Boolean> getProgressIndicator() {
         return mProgressIndicatorSubject.asObservable();

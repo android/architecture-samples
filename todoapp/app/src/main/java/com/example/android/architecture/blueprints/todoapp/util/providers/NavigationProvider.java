@@ -8,8 +8,7 @@ import java.lang.ref.WeakReference;
 /**
  * Implementation of the {@link BaseNavigationProvider}.
  */
-
-public class NavigationProvider implements BaseNavigationProvider {
+public final class NavigationProvider implements BaseNavigationProvider {
 
     private final WeakReference<Activity> mActivity;
 
@@ -27,5 +26,12 @@ public class NavigationProvider implements BaseNavigationProvider {
     public void startActivityForResult(Class cls, int requestCode) {
         Intent intent = new Intent(mActivity.get(), cls);
         mActivity.get().startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startActivityWithExtra(Class cls, String extraKey, String extraValue) {
+        Intent intent = new Intent(mActivity.get(), cls);
+        intent.putExtra(extraKey, extraValue);
+        mActivity.get().startActivity(intent);
     }
 }
