@@ -126,7 +126,7 @@ public class TasksFragment extends Fragment {
                         error -> Log.d(TAG, "Error showing progress indicator", error)
                 ));
 
-        mSubscription.add(mViewModel.getFilter()
+        mSubscription.add(mViewModel.getFilterText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

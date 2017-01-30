@@ -1,8 +1,10 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Activity;
 import android.support.annotation.DrawableRes;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
@@ -20,6 +22,8 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS;
+import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
+import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
@@ -48,6 +52,8 @@ public class TasksViewModelTest {
 
     private TestSubscriber<Integer> mSnackbarTextSubscriber;
 
+    private TestSubscriber<Integer> mFilterTextSubscriber;
+
     @Before
     public void setupTasksPresenter() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
@@ -65,6 +71,7 @@ public class TasksViewModelTest {
         mNoTasksSubscriber = new TestSubscriber<>();
         mProgressIndicatorSubscriber = new TestSubscriber<>();
         mSnackbarTextSubscriber = new TestSubscriber<>();
+        mFilterTextSubscriber = new TestSubscriber<>();
     }
 
     @Test
@@ -196,6 +203,124 @@ public class TasksViewModelTest {
         // The tasks are refreshed first the first time when subscribed and then when
         // calling forceUpdateTasks
         verify(mTasksRepository, times(2)).refreshTasks();
+    }
+
+    @Test
+    public void getNoTasksModel_emits_whenNoTasks_withFilterAll() {
+        // Given that we are subscribed to the no tasks stream
+        mViewModel.getNoTasks().subscribe(mNoTasksSubscriber);
+        // Given that the task repository returns empty task list
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
+
+        // When subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+
+        // NoTasks emits
+        mNoTasksSubscriber.assertValueCount(1);
+        NoTasksModel model = mNoTasksSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getText(), R.string.no_tasks_all);
+        assertEquals(model.getIcon(), R.drawable.ic_assignment_turned_in_24dp);
+        assertEquals(model.isShowAdd(), true);
+    }
+
+    @Test
+    public void getNoTasksModel_emits_whenNoTasks_withFilterActive() {
+        // Given that we are subscribed to the no tasks stream
+        mViewModel.getNoTasks().subscribe(mNoTasksSubscriber);
+        // Given that the filtering is active
+        mViewModel.filter(ACTIVE_TASKS);
+        // Given that the task repository returns empty task list
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
+
+        // When subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+
+        // NoTasks emits
+        mNoTasksSubscriber.assertValueCount(1);
+        NoTasksModel model = mNoTasksSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getText(), R.string.no_tasks_active);
+        assertEquals(model.getIcon(), R.drawable.ic_check_circle_24dp);
+        assertEquals(model.isShowAdd(), false);
+    }
+
+    @Test
+    public void getNoTasksModel_emits_whenNoTasks_withFilterCompleted() {
+        // Given that we are subscribed to the no tasks stream
+        mViewModel.getNoTasks().subscribe(mNoTasksSubscriber);
+        // Given that the filtering is completed
+        mViewModel.filter(COMPLETED_TASKS);
+        // Given that the task repository returns empty task list
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
+
+        // When subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+
+        // NoTasks emits
+        mNoTasksSubscriber.assertValueCount(1);
+        NoTasksModel model = mNoTasksSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getText(), R.string.no_tasks_completed);
+        assertEquals(model.getIcon(), R.drawable.ic_verified_user_24dp);
+        assertEquals(model.isShowAdd(), false);
+    }
+
+    @Test
+    public void snackbarEmits_whenTaskAdded_withResultOk() {
+        //Given that we are subscribed to the snackbar text
+        mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
+
+        // When handling activity result for a task added successfully
+        mViewModel.handleActivityResult(AddEditTaskActivity.REQUEST_ADD_TASK, Activity.RESULT_OK);
+
+        // The snackbar text emits correct value
+        mSnackbarTextSubscriber.assertValue(R.string.successfully_saved_task_message);
+    }
+
+    @Test
+    public void snackbarEmits_whenTaskAdded_withResultCanceled() {
+        //Given that we are subscribed to the snackbar text
+        mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
+
+        // When handling activity result for a task canceled
+        mViewModel.handleActivityResult(AddEditTaskActivity.REQUEST_ADD_TASK, Activity.RESULT_CANCELED);
+
+        // The snackbar text does not emit
+        mSnackbarTextSubscriber.assertNoValues();
+    }
+
+    @Test
+    public void filterText_emits_whenFilterAllSet() {
+        // Given that we are subscribed to the filter text
+        mViewModel.getFilterText().subscribe(mFilterTextSubscriber);
+
+        // When setting the filter to all
+        mViewModel.filter(ALL_TASKS);
+
+        // The filter text emits correct value
+        mFilterTextSubscriber.assertValues(R.string.label_all);
+    }
+
+    @Test
+    public void filterText_emits_whenFilterActiveSet() {
+        // Given that we are subscribed to the filter text
+        mViewModel.getFilterText().subscribe(mFilterTextSubscriber);
+
+        // When setting the filter to active
+        mViewModel.filter(ACTIVE_TASKS);
+
+        // The filter text emits correct value
+        mFilterTextSubscriber.assertValues(R.string.label_all, R.string.label_active);
+    }
+
+    @Test
+    public void filterText_emits_whenFilterCompletedSet() {
+        // Given that we are subscribed to the filter text
+        mViewModel.getFilterText().subscribe(mFilterTextSubscriber);
+
+        // When setting the filter to completed
+        mViewModel.filter(COMPLETED_TASKS);
+
+        // The filter text emits correct value
+        mFilterTextSubscriber.assertValues(R.string.label_all, R.string.label_completed);
     }
 
     private void assertTaskItems(List<TaskItem> items) {

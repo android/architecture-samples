@@ -244,8 +244,9 @@ public final class TasksViewModel {
      * @return the filter text.
      */
     @NonNull
-    public Observable<Integer> getFilter() {
-        return mFilter.map(this::getFilterText);
+    public Observable<Integer> getFilterText() {
+        return mFilter.map(this::getFilterText)
+                .distinctUntilChanged();
     }
 
     /**
