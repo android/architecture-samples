@@ -16,20 +16,19 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,15 +36,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+public class AddEditTaskFragment extends Fragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.Presenter mPresenter;
+    private AddEditTaskViewModel mViewModel;
 
-    private TextView mTitle;
-
-    private TextView mDescription;
+    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private AddtaskFragBinding mViewDataBinding;
 
@@ -60,65 +57,68 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        if (getArguments() != null) {
+            mViewModel.start(getArguments().getString(ARGUMENT_EDIT_TASK_ID));
+        } else {
+            mViewModel.start(null);
+        }
     }
 
-    @Override
-    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void setViewModel(@NonNull AddEditTaskViewModel viewModel) {
+        mViewModel = checkNotNull(viewModel);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
-            }
-        });
+        setupFab();
+
+        setupSnackBar();
+
+        setupActionBar();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        super.onCreateView(inflater, container, savedInstanceState);
+        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
         if (mViewDataBinding == null) {
-            mViewDataBinding = AddtaskFragBinding.inflate(inflater, container, false);
+            mViewDataBinding = AddtaskFragBinding.bind(root);
         }
-        mTitle = mViewDataBinding.addTaskTitle;
-        mDescription = mViewDataBinding.addTaskDescription;
+
+        mViewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
-        // Fragment is retained simply to persist the edits after rotation.
-        setRetainInstance(true);
+        setRetainInstance(false);
+
         return mViewDataBinding.getRoot();
     }
 
-    @Override
-    public void showEmptyTaskError() {
-        Snackbar.make(mTitle, getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show();
+    private void setupSnackBar() {
+        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
+        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 
-    @Override
-    public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
-        getActivity().finish();
+    private void setupFab() {
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        fab.setImageResource(R.drawable.ic_done);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
+            }
+        });
     }
 
-    @Override
-    public void setTask(Task task) {
-        mViewDataBinding.setTask(task);
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
+    private void setupActionBar() {
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (getArguments() != null) {
+            actionBar.setTitle(R.string.edit_task);
+        } else {
+            actionBar.setTitle(R.string.add_task);
+        }
     }
 }

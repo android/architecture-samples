@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.ActionBar;
@@ -25,19 +26,37 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends AppCompatActivity {
+public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
 
-    public static final int REQUEST_ADD_TASK = 1;
+    public static final int REQUEST_CODE = 1;
 
-    public static final String SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY";
+    public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
-    private AddEditTaskPresenter mAddEditTaskPresenter;
+    public static final String ADD_EDIT_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    public void onTaskSaved() {
+        setResult(ADD_EDIT_RESULT_OK);
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,60 +70,59 @@ public class AddEditTaskActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment =
-                (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        AddEditTaskFragment addEditTaskFragment = findOrCreateViewFragment();
 
-        String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+        AddEditTaskViewModel viewModel = findOrCreateViewModel();
+
+        // Link View and ViewModel
+        addEditTaskFragment.setViewModel(viewModel);
+    }
+
+    @NonNull
+    private AddEditTaskFragment findOrCreateViewFragment() {
+        // View Fragment
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame);
 
         if (addEditTaskFragment == null) {
             addEditTaskFragment = AddEditTaskFragment.newInstance();
 
-            if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                actionBar.setTitle(R.string.edit_task);
-                Bundle bundle = new Bundle();
-                bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-                addEditTaskFragment.setArguments(bundle);
-            } else {
-                actionBar.setTitle(R.string.add_task);
-            }
+            // Send the task ID to the fragment
+            Bundle bundle = new Bundle();
+            bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
+                    getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID));
+            addEditTaskFragment.setArguments(bundle);
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
+        return addEditTaskFragment;
+    }
 
-        boolean shouldLoadDataFromRepo = true;
+    private AddEditTaskViewModel findOrCreateViewModel() {
+        // In a configuration change we might have a ViewModel present. It's retained using the
+        // Fragment Manager.
+        @SuppressWarnings("unchecked")
+        ViewModelHolder<AddEditTaskViewModel> retainedViewModel =
+                (ViewModelHolder<AddEditTaskViewModel>) getSupportFragmentManager()
+                        .findFragmentByTag(ADD_EDIT_VIEWMODEL_TAG);
 
-        // Prevent the presenter from loading data from the repository if this is a config change.
-        if (savedInstanceState != null) {
-            // Data might not have loaded when the config change happen, so we saved the state.
-            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY);
+        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
+            // If the model was retained, return it.
+            return retainedViewModel.getViewmodel();
+        } else {
+            // There is no ViewModel yet, create it.
+            AddEditTaskViewModel viewModel = new AddEditTaskViewModel(
+                    getApplicationContext(),
+                    Injection.provideTasksRepository(getApplicationContext()),
+                    this);
+
+            // and bind it to this Activity's lifecycle using the Fragment Manager.
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(),
+                    ViewModelHolder.createContainer(viewModel),
+                    ADD_EDIT_VIEWMODEL_TAG);
+            return viewModel;
         }
-
-        // Create the presenter
-        mAddEditTaskPresenter = new AddEditTaskPresenter(
-                taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment,
-                shouldLoadDataFromRepo);
-
-        addEditTaskFragment.setPresenter(mAddEditTaskPresenter);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // Save the state so that next time we know if we need to refresh data.
-        outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, mAddEditTaskPresenter.isDataMissing());
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
     }
 }

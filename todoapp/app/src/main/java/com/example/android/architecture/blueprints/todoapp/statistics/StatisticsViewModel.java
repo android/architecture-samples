@@ -17,111 +17,131 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Context;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
+import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.List;
 
 /**
- * Exposes the data to be used in the {@link StatisticsContract.View}.
+ * Exposes the data to be used in the statistics screen.
  * <p>
- * Note that in this case the view model is also the view, not the fragment.
+ * This ViewModel uses both {@link ObservableField}s ({@link ObservableBoolean}s in this case) and
+ * {@link Bindable} getters. The values in {@link ObservableField}s are used directly in the layout,
+ * whereas the {@link Bindable} getters allow us to add some logic to it. This is
+ * preferable to having logic in the XML layout.
  */
-public class StatisticsViewModel implements StatisticsContract.View {
+public class StatisticsViewModel extends BaseObservable {
 
-    private int mNumberOfCompletedTasks = 0;
+    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    private int mNumberOfActiveTasks = 0;
+    final ObservableBoolean error = new ObservableBoolean(false);
+
+    @VisibleForTesting
+    int mNumberOfActiveTasks = 0;
+
+    @VisibleForTesting
+    int mNumberOfCompletedTasks = 0;
 
     private Context mContext;
 
-    private boolean mIsLoading;
+    private final TasksRepository mTasksRepository;
 
-    private boolean mError;
 
-    public StatisticsViewModel(Context context) {
+    public StatisticsViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context;
-        mIsLoading = true;
-        mError = false;
+        mTasksRepository = tasksRepository;
     }
 
+    public void start() {
+        loadStatistics();
+    }
+
+    public void loadStatistics() {
+        dataLoading.set(true);
+
+        // The network request might be handled in a different thread so make sure Espresso knows
+        // that the app is busy until the response is handled.
+        EspressoIdlingResource.increment(); // App is busy until further notice
+
+        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+
+                // This callback may be called twice, once for the cache and once for loading
+                // the data from the server API, so we check before decrementing, otherwise
+                // it throws "Counter has been corrupted!" exception.
+                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                    EspressoIdlingResource.decrement(); // Set app as idle.
+                }
+
+                computeStats(tasks);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                error.set(true);
+            }
+        });
+    }
     /**
-     * Returns a string showing the number of active tasks.
+     * Returns a String showing the number of active tasks.
      */
+    @Bindable
     public String getNumberOfActiveTasks() {
-        return mContext.getResources().getString(R.string.statistics_active_tasks) + " " +
-                mNumberOfActiveTasks;
+        return mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks);
     }
 
     /**
-     * Returns a string showing the number of completed tasks.
+     * Returns a String showing the number of completed tasks.
      */
+    @Bindable
     public String getNumberOfCompletedTasks() {
-        return mContext.getResources().getString(R.string.statistics_completed_tasks) + " " +
-                mNumberOfCompletedTasks;
+        return mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks);
     }
 
     /**
      * Controls whether the stats are shown or a "No data" message.
      */
+    @Bindable
     public boolean isEmpty() {
         return mNumberOfActiveTasks + mNumberOfCompletedTasks == 0;
     }
 
     /**
-     * Returns a string with the current status to show to the user.
+     * Called when new data is ready.
      */
-    public String getStatus() {
-        if (mError) {
-            return mContext.getResources().getString(R.string.loading_tasks_error);
-        }
-        if (mIsLoading) {
-            return mContext.getResources().getString(R.string.loading);
-        }
-        return null;
-    }
-
-    /**
-     * Controls whether the status view is shown in case there's an error or data is still loading.
-     */
-    public boolean showStatus() {
-        return mError || mIsLoading;
-    }
-
-    /**
-     * Method from {@link StatisticsContract.View} that controls whether a Loading message should be
-     * displayed.
-     */
-    @Override
-    public void setProgressIndicator(boolean active) {
-        mIsLoading = active;
-    }
-
-    /**
-     * Method from {@link StatisticsContract.View} called when new data is ready.
-     */
-    @Override
-    public void displayStatistics(List<Task> tasks) {
-        mNumberOfCompletedTasks = 0;
-        mNumberOfActiveTasks = 0;
+    private void computeStats(List<Task> tasks) {
+        int completed = 0;
+        int active = 0;
 
         for (Task task : tasks) {
             if (task.isCompleted()) {
-                mNumberOfCompletedTasks += 1;
+                completed += 1;
             } else {
-                mNumberOfActiveTasks += 1;
+                active += 1;
             }
         }
-        mIsLoading = false;
-    }
+        mNumberOfActiveTasks = active;
+        mNumberOfCompletedTasks = completed;
 
-    /**
-     * Method from {@link StatisticsContract.View} called when there was an error loading data.
-     */
-    @Override
-    public void showLoadingStatisticsError() {
-        mError = true;
-        mIsLoading = false;
+        // There are multiple @Bindable fields in this ViewModel, calling notifyChange() will
+        // update all the UI elements that depend on them.
+        notifyChange();
+
+        // To update just one of them and avoid unnecessary UI updates,
+        // use notifyPropertyChanged(BR.field)
+
+        // Observable fields don't need to be notified. set() will trigger an update.
+        dataLoading.set(false);
+        error.set(false);
     }
 }

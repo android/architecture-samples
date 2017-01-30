@@ -13,37 +13,32 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
-            name="task"
-            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
-
-        <variable
-            name="actionHandler"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksItemActionHandler" />
+            name="viewmodel"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TaskItemViewModel" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:background="@{task.isCompleted ? @drawable/list_completed_touch_feedback : @drawable/touch_feedback}"
+        android:background="@{viewmodel.completed ? @drawable/list_completed_touch_feedback : @drawable/touch_feedback}"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/list_item_padding"
         android:paddingTop="@dimen/list_item_padding"
-        android:onClick="@{() -> actionHandler.taskClicked(task)}">
+        android:onClick="@{() -> viewmodel.taskClicked()}">
 
         <CheckBox
             android:id="@+id/complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:checked="@{task.isCompleted}"
-            android:onCheckedChanged="@{(cb, isChecked) -> actionHandler.completeChanged(task, isChecked)}" />
+            android:checked="@={viewmodel.completed}"/>
 
         <TextView
             android:id="@+id/title"
@@ -52,6 +47,6 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:text="@{task.titleForList}" />
+            android:text="@{viewmodel.titleForList}" />
     </LinearLayout>
 </layout>

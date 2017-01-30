@@ -16,36 +16,37 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import android.content.Context;
+
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
+import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 
 /**
  * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
  * Fragment's actions listener.
  */
-public class TasksItemActionHandler {
+public class TaskItemViewModel extends TaskViewModel
+        implements SnackbarChangedCallback.SnackBarViewModel {
 
-    private TasksContract.Presenter mListener;
+    private final TaskItemNavigator mTaskItemNavigator;
 
-    public TasksItemActionHandler(TasksContract.Presenter listener) {
-        mListener = listener;
-    }
-
-    /**
-     * Called by the Data Binding library when the checkbox is toggled.
-     */
-    public void completeChanged(Task task, boolean isChecked) {
-        if (isChecked) {
-            mListener.completeTask(task);
-        } else {
-            mListener.activateTask(task);
-        }
+    public TaskItemViewModel(Context context, TasksRepository tasksRepository,
+                             TaskItemNavigator itemNavigator) {
+        super(context, tasksRepository);
+        mTaskItemNavigator = itemNavigator;
     }
 
     /**
      * Called by the Data Binding library when the row is clicked.
      */
-    public void taskClicked(Task task) {
-        mListener.openTaskDetails(task);
+    public void taskClicked() {
+        String taskId = getTaskId();
+        if (taskId == null) {
+            // Click happened before task was loaded, no-op.
+            return;
+        }
+        mTaskItemNavigator.openTaskDetails(taskId);
     }
 }

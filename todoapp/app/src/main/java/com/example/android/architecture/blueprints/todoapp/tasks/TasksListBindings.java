@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.addedittask;
+package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
-import com.example.android.architecture.blueprints.todoapp.BaseView;
+import android.databinding.BindingAdapter;
+import android.widget.ListView;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
+import java.util.List;
+
 /**
- * This specifies the contract between the view and the presenter.
+ * Contains {@link BindingAdapter}s for the {@link Task} list.
  */
-public interface AddEditTaskContract {
+public class TasksListBindings {
 
-    interface View extends BaseView<Presenter> {
-
-        void showEmptyTaskError();
-
-        void showTasksList();
-
-        void setTask(Task task);
-
-        boolean isActive();
-    }
-
-    interface Presenter extends BasePresenter {
-
-        void saveTask(String title, String description);
-
-        void populateTask();
-
-        boolean isDataMissing();
+    @SuppressWarnings("unchecked")
+    @BindingAdapter("app:items")
+    public static void setItems(ListView listView, List<Task> items) {
+        TasksFragment.TasksAdapter adapter = (TasksFragment.TasksAdapter) listView.getAdapter();
+        if (adapter != null)
+        {
+            adapter.replaceData(items);
+        }
     }
 }

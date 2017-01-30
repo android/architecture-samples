@@ -34,14 +34,28 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     private static TasksRemoteDataSource INSTANCE;
 
-    private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
+    private static final int SERVICE_LATENCY_IN_MILLIS = 2000;
 
     private final static Map<String, Task> TASKS_SERVICE_DATA;
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
-        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.");
-        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
+        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.", "0");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "1");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "2");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "3");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "4");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "5");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "6");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "7");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "8");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "12");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "13");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "14");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "15");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "16");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "17");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "18");
     }
 
     public static TasksRemoteDataSource getInstance() {
@@ -54,8 +68,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     // Prevent direct instantiation.
     private TasksRemoteDataSource() {}
 
-    private static void addTask(String title, String description) {
-        Task newTask = new Task(title, description);
+    private static void addTask(String title, String description, String id) {
+        Task newTask = new Task(title, description, id);
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 

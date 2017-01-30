@@ -16,6 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+
+import android.content.Context;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -27,21 +30,20 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for the implementation of {@link AddEditTaskPresenter}.
+ * Unit tests for the implementation of {@link AddEditTaskViewModel}.
  */
-public class AddEditTaskPresenterTest {
+public class AddEditTaskViewModelTest {
 
     @Mock
     private TasksRepository mTasksRepository;
-
-    @Mock
-    private AddEditTaskContract.View mAddEditTaskView;
 
     /**
      * {@link ArgumentCaptor} is a powerful Mockito API to capture argument values and use them to
@@ -50,65 +52,39 @@ public class AddEditTaskPresenterTest {
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
-    private AddEditTaskPresenter mAddEditTaskPresenter;
+    private AddEditTaskViewModel mAddEditTaskViewModel;
 
     @Before
-    public void setupAddEditTaskPresenter() {
+    public void setupAddEditTaskViewModel() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mAddEditTaskPresenter =
-                new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView, true);
-
-        // The presenter won't update the view unless it's active.
-        when(mAddEditTaskView.isActive()).thenReturn(true);
+        mAddEditTaskViewModel = new AddEditTaskViewModel(
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
     }
 
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
-        // When the presenter is asked to save a task
-        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
+        // When the ViewModel is asked to save a task
+        mAddEditTaskViewModel.saveTask("New Task Title", "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
-        verify(mAddEditTaskView).showTasksList(); // shown in the UI
-    }
-
-    @Test
-    public void saveTask_emptyTaskShowsErrorUi() {
-        // Task is new (id is null)
-        mAddEditTaskPresenter =
-                new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView, true);
-
-        // When the presenter is asked to save an empty task
-        mAddEditTaskPresenter.saveTask("", "");
-
-        // Then an empty not error is shown in the UI
-        verify(mAddEditTaskView).showEmptyTaskError();
-    }
-
-    @Test
-    public void saveExistingTaskToRepository_showsSuccessMessageUi() {
-        // When the presenter is asked to save an existing task
-        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
-
-        // Then a task is saved in the repository and the view updated
-        verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
-        verify(mAddEditTaskView).showTasksList(); // shown in the UI
     }
 
     @Test
     public void populateTask_callsRepoAndUpdatesView() {
-        Task testTask = new Task("TITLE", "DESCRIPTION");
+        Task testTask = new Task("TITLE", "DESCRIPTION", "1");
 
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView, true);
+        mAddEditTaskViewModel = new AddEditTaskViewModel(
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
 
-        // When the presenter is asked to populate an existing task
-        mAddEditTaskPresenter.populateTask();
+
+        // When the ViewModel is asked to populate an existing task
+        mAddEditTaskViewModel.start(testTask.getId());
 
         // Then the task repository is queried and the view updated
         verify(mTasksRepository).getTask(eq(testTask.getId()), mGetTaskCallbackCaptor.capture());
@@ -116,6 +92,8 @@ public class AddEditTaskPresenterTest {
         // Simulate callback
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
 
-        verify(mAddEditTaskView).setTask(testTask);
+        // Verify the fields were updated
+        assertThat(mAddEditTaskViewModel.title.get(), is(testTask.getTitle()));
+        assertThat(mAddEditTaskViewModel.description.get(), is(testTask.getDescription()));
     }
 }

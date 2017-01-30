@@ -16,18 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,12 +33,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
+import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,13 +48,13 @@ import java.util.List;
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment implements TasksContract.View {
-
-    private TasksContract.Presenter mPresenter;
-
-    private TasksAdapter mListAdapter;
+public class TasksFragment extends Fragment {
 
     private TasksViewModel mTasksViewModel;
+
+    private SnackbarChangedCallback mSnackBarChangedCallback;
+
+    private TasksFragBinding mTasksFragBinding;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -68,62 +65,24 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mTasksViewModel.start();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        TasksFragBinding tasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
+        mTasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
 
-        tasksFragBinding.setTasks(mTasksViewModel);
+        mTasksFragBinding.setView(this);
 
-        tasksFragBinding.setActionHandler(mPresenter);
-
-        // Set up tasks view
-        ListView listView = tasksFragBinding.tasksList;
-
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mPresenter);
-        listView.setAdapter(mListAdapter);
-
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
-
-        fab.setImageResource(R.drawable.ic_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.addNewTask();
-            }
-        });
-
-        // Set up progress indicator
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout = tasksFragBinding.refreshLayout;
-        swipeRefreshLayout.setColorSchemeColors(
-                ContextCompat.getColor(getActivity(), R.color.colorPrimary),
-                ContextCompat.getColor(getActivity(), R.color.colorAccent),
-                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
-        );
-        // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        mTasksFragBinding.setViewmodel(mTasksViewModel);
 
         setHasOptionsMenu(true);
 
-        View root = tasksFragBinding.getRoot();
+        View root = mTasksFragBinding.getRoot();
 
         return root;
     }
@@ -132,13 +91,13 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
+                mTasksViewModel.clearCompletedTasks();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mTasksViewModel.loadTasks(true);
                 break;
         }
         return true;
@@ -153,6 +112,26 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mTasksViewModel = viewModel;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setupSnackbar();
+
+        setupFab();
+
+        setupListAdapter();
+
+        setupRefreshLayout();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // If the ViewModel
+        mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
+
     private void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
@@ -161,16 +140,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mTasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mTasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mPresenter.loadTasks(false);
+                mTasksViewModel.loadTasks(false);
                 return true;
             }
         });
@@ -178,96 +157,69 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         popup.show();
     }
 
-    @Override
-    public void setLoadingIndicator(final boolean active) {
+    private void setupSnackbar() {
+        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mTasksViewModel);
+        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    }
 
-        if (getView() == null) {
-            return;
-        }
-        final SwipeRefreshLayout srl =
-                (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
+    private void setupFab() {
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
 
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
+        fab.setImageResource(R.drawable.ic_add);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                srl.setRefreshing(active);
+            public void onClick(View v) {
+                mTasksViewModel.addNewTask();
             }
         });
     }
 
-    public void showTasks(List<Task> tasks) {
-        mListAdapter.replaceData(tasks);
-        mTasksViewModel.setTaskListSize(tasks.size());
+    private void setupListAdapter() {
+        ListView listView =  mTasksFragBinding.tasksList;
+
+        TasksAdapter mListAdapter = new TasksAdapter(
+                new ArrayList<Task>(0),
+                (TaskItemNavigator) getActivity(),
+                Injection.provideTasksRepository(getContext().getApplicationContext()),
+                mTasksViewModel);
+        listView.setAdapter(mListAdapter);
     }
 
-    @Override
-    public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_task_message));
+    private void setupRefreshLayout() {
+        ListView listView =  mTasksFragBinding.tasksList;
+        final ScrollChildSwipeRefreshLayout swipeRefreshLayout = mTasksFragBinding.refreshLayout;
+        swipeRefreshLayout.setColorSchemeColors(
+                ContextCompat.getColor(getActivity(), R.color.colorPrimary),
+                ContextCompat.getColor(getActivity(), R.color.colorAccent),
+                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
+        );
+        // Set the scrolling view in the custom SwipeRefreshLayout.
+        swipeRefreshLayout.setScrollUpChild(listView);
     }
 
-    @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
-    }
+    public static class TasksAdapter extends BaseAdapter {
 
-    @Override
-    public void showTaskDetailsUi(String taskId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
-    }
+        private final TaskItemNavigator mTaskItemNavigator;
 
-    @Override
-    public void showTaskMarkedComplete() {
-        showMessage(getString(R.string.task_marked_complete));
-    }
-
-    @Override
-    public void showTaskMarkedActive() {
-        showMessage(getString(R.string.task_marked_active));
-    }
-
-    @Override
-    public void showCompletedTasksCleared() {
-        showMessage(getString(R.string.completed_tasks_cleared));
-    }
-
-    @Override
-    public void showLoadingTasksError() {
-        showMessage(getString(R.string.loading_tasks_error));
-    }
-
-    private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
-
-    private static class TasksAdapter extends BaseAdapter {
+        private final TasksViewModel mTasksViewModel;
 
         private List<Task> mTasks;
 
-        private TasksContract.Presenter mUserActionsListener;
+        private TasksRepository mTasksRepository;
 
-        public TasksAdapter(List<Task> tasks, TasksContract.Presenter itemListener) {
+        public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
+                            TasksRepository tasksRepository,
+                            TasksViewModel tasksViewModel) {
+            mTaskItemNavigator = taskItemNavigator;
+            mTasksRepository = tasksRepository;
+            mTasksViewModel = tasksViewModel;
             setList(tasks);
-            mUserActionsListener = itemListener;
+
         }
 
         public void replaceData(List<Task> tasks) {
             setList(tasks);
-        }
-
-        private void setList(List<Task> tasks) {
-            mTasks = tasks;
-            notifyDataSetChanged();
         }
 
         @Override
@@ -296,17 +248,32 @@ public class TasksFragment extends Fragment implements TasksContract.View {
                 // Create the binding
                 binding = TaskItemBinding.inflate(inflater, viewGroup, false);
             } else {
+                // Recycling view
                 binding = DataBindingUtil.getBinding(view);
             }
 
-            // We might be recycling the binding for another task, so update it.
-            // Create the action handler for the view
-            TasksItemActionHandler itemActionHandler =
-                    new TasksItemActionHandler(mUserActionsListener);
-            binding.setActionHandler(itemActionHandler);
-            binding.setTask(task);
-            binding.executePendingBindings();
+            final TaskItemViewModel viewmodel = new TaskItemViewModel(
+                    viewGroup.getContext().getApplicationContext(),
+                    mTasksRepository,
+                    mTaskItemNavigator);
+            binding.setViewmodel(viewmodel);
+            // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the
+            // fragment's.
+            viewmodel.snackbarText.addOnPropertyChangedCallback(
+                    new Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(Observable observable, int i) {
+                    mTasksViewModel.snackbarText.set(viewmodel.getSnackbarText());
+                }
+            });
+            viewmodel.setTask(task);
+
             return binding.getRoot();
+        }
+
+        private void setList(List<Task> tasks) {
+            mTasks = tasks;
+            notifyDataSetChanged();
         }
     }
 }

@@ -14,29 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.statistics;
-
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-
-import java.util.List;
+package com.example.android.architecture.blueprints.todoapp.tasks;
 
 /**
- * This specifies the contract between the view and the presenter.
+ * Defines the navigation actions that can be called from the task list screen.
  */
-public interface StatisticsContract {
+public interface TasksNavigator {
 
-    interface View {
-
-        void setProgressIndicator(boolean active);
-
-        void displayStatistics(List<Task> tasks);
-
-        void showLoadingStatisticsError();
-    }
-
-    interface Presenter extends BasePresenter {
-
-        void loadStatistics();
-    }
+    void addNewTask();
 }
