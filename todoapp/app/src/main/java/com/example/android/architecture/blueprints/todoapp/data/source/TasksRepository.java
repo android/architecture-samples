@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static android.os.Looper.getMainLooper;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Thread.currentThread;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -104,7 +104,7 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public Observable<List<Task>> getTasks() {
-        Log.d("flo", "flo getting tasks");
+        Log.d("flo", "flo getting tasks on thread UI? " + getMainLooper().getThread().equals(currentThread()));
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
             return Observable.from(mCachedTasks.values()).toList();
