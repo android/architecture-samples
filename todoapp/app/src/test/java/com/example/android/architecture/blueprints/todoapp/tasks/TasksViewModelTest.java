@@ -5,9 +5,9 @@ import android.support.annotation.DrawableRes;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.collect.Lists;
 
@@ -118,7 +118,7 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void geTasks_emits_whenTasks() {
+    public void getTasks_emits_whenTasks() {
         // Given that the task repository returns tasks
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
 
@@ -345,8 +345,8 @@ public class TasksViewModelTest {
         taskItem.getOnClickAction().call();
 
         // The AddEditTaskActivity is opened with the correct request code
-        verify(mNavigationProvider).startActivityWithExtra(eq(AddEditTaskActivity.class),
-                eq(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID), eq(ACTIVE_TASK.getId()));
+        verify(mNavigationProvider).startActivityWithExtra(eq(TaskDetailActivity.class),
+                eq(TaskDetailActivity.EXTRA_TASK_ID), eq(ACTIVE_TASK.getId()));
     }
 
     @Test
@@ -444,7 +444,7 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void clearCompletedTask_clearsCompletedTasksInRepository(){
+    public void clearCompletedTask_clearsCompletedTasksInRepository() {
         // When clearing completed tasks
         mViewModel.clearCompletedTasks();
 
@@ -453,7 +453,7 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void clearCompletedTask_snackbarMessageIsEmitted(){
+    public void clearCompletedTask_snackbarMessageIsEmitted() {
         // Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
 
@@ -465,7 +465,7 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void clearCompletedTask_triggersGetTasksEmission(){
+    public void clearCompletedTask_triggersGetTasksEmission() {
 
         // When clearing completed tasks
         mViewModel.clearCompletedTasks();

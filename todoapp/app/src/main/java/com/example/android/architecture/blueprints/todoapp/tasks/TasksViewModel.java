@@ -11,6 +11,7 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 
 import java.util.List;
@@ -19,7 +20,6 @@ import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
-import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -136,8 +136,8 @@ public final class TasksViewModel {
     }
 
     private void handleTaskTaped(Task task) {
-        mNavigationProvider.startActivityWithExtra(AddEditTaskActivity.class,
-                ARGUMENT_EDIT_TASK_ID, task.getId());
+        mNavigationProvider.startActivityWithExtra(TaskDetailActivity.class,
+                TaskDetailActivity.EXTRA_TASK_ID, task.getId());
     }
 
     private void handleTaskChecked(Task task, boolean checked) {

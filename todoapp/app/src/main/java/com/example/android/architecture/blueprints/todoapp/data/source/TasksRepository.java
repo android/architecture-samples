@@ -104,7 +104,6 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public Observable<List<Task>> getTasks() {
-        Log.d("flo", "flo getting tasks on thread UI? " + getMainLooper().getThread().equals(currentThread()));
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
             return Observable.from(mCachedTasks.values()).toList();
