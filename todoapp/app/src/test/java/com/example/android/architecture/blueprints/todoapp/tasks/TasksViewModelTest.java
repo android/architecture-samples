@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
@@ -26,6 +27,7 @@ import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFil
 import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +36,9 @@ import static org.mockito.Mockito.when;
  * Unit test for {@link TasksViewModel}
  */
 public class TasksViewModelTest {
+
+    private static Task ACTIVE_TASK = new Task("title", "description");
+    private static Task COMPLETED_TASK = new Task("title", "description", true);
     private static List<Task> TASKS;
 
     @Mock
@@ -321,6 +326,152 @@ public class TasksViewModelTest {
 
         // The filter text emits correct value
         mFilterTextSubscriber.assertValues(R.string.label_all, R.string.label_completed);
+    }
+
+    @Test
+    public void taskItem_tapAction_opensActivity() {
+        // Given a task
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(ACTIVE_TASK);
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+        // And list of task items is emitted
+        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0);
+        TaskItem taskItem = items.get(0);
+
+        // When triggering the click action
+        taskItem.getOnClickAction().call();
+
+        // The AddEditTaskActivity is opened with the correct request code
+        verify(mNavigationProvider).startActivityWithExtra(eq(AddEditTaskActivity.class),
+                eq(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID), eq(ACTIVE_TASK.getId()));
+    }
+
+    @Test
+    public void taskItem_withActiveTask_tapCheck_completesTask() {
+        // Given a active task
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(ACTIVE_TASK);
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+        // And list of task items is emitted
+        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0);
+        TaskItem taskItem = items.get(0);
+
+        // When triggering the check
+        taskItem.getOnCheckAction().call(true);
+
+        // The task is marked as completed
+        mTasksRepository.completeTask(ACTIVE_TASK);
+    }
+
+    @Test
+    public void taskItem_withActiveTask_tapCheck_snackbarMessageIsEmitted() {
+        // Given a active task
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(ACTIVE_TASK);
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        //Given that we are subscribed to the snackbar text
+        mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+        // And list of task items is emitted
+        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0);
+        TaskItem taskItem = items.get(0);
+
+        // When triggering the check
+        taskItem.getOnCheckAction().call(true);
+
+        // The snackbar emits a message
+        mSnackbarTextSubscriber.assertValue(R.string.task_marked_complete);
+    }
+
+    @Test
+    public void taskItem_withCompletedTask_tapCheck_activatesTask() {
+        // Given a completed task
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(COMPLETED_TASK);
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+        // And list of task items is emitted
+        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0);
+        TaskItem taskItem = items.get(0);
+
+        // When triggering the check
+        taskItem.getOnCheckAction().call(false);
+
+        // The task is marked as active
+        mTasksRepository.activateTask(COMPLETED_TASK);
+    }
+
+    @Test
+    public void taskItem_withCompletedTask_tapCheck_snackbarMessageIsEmitted() {
+        // Given a completed task
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(COMPLETED_TASK);
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        //Given that we are subscribed to the snackbar text
+        mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
+        // And list of task items is emitted
+        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0);
+        TaskItem taskItem = items.get(0);
+
+        // When triggering the check
+        taskItem.getOnCheckAction().call(false);
+
+        // The snackbar emits a message
+        mSnackbarTextSubscriber.assertValue(R.string.task_marked_active);
+    }
+
+    @Test
+    public void addTask_opensActivity() {
+        // When adding a new task
+        mViewModel.addNewTask();
+
+        // The AddEditTaskActivity is opened with the correct request code
+        verify(mNavigationProvider).startActivityForResult(eq(AddEditTaskActivity.class),
+                eq(AddEditTaskActivity.REQUEST_ADD_TASK));
+    }
+
+    @Test
+    public void clearCompletedTask_clearsCompletedTasksInRepository(){
+        // When clearing completed tasks
+        mViewModel.clearCompletedTasks();
+
+        // The completed tasks are cleared in the repository
+        verify(mTasksRepository).clearCompletedTasks();
+    }
+
+    @Test
+    public void clearCompletedTask_snackbarMessageIsEmitted(){
+        // Given that we are subscribed to the snackbar text
+        mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
+
+        // When clearing completed tasks
+        mViewModel.clearCompletedTasks();
+
+        // A snackbar text is emitted
+        mSnackbarTextSubscriber.assertValue(R.string.completed_tasks_cleared);
+    }
+
+    @Test
+    public void clearCompletedTask_triggersGetTasksEmission(){
+
+        // When clearing completed tasks
+        mViewModel.clearCompletedTasks();
+
+        // The completed tasks are cleared in the repository
+        verify(mTasksRepository).clearCompletedTasks();
     }
 
     private void assertTaskItems(List<TaskItem> items) {
