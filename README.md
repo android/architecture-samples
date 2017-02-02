@@ -58,7 +58,7 @@ This version of the app includes a number of unit tests which cover presenters, 
 
 ### Maintaining the app
 
-This sample includes classes and interfaces, such as presenters and contracts, that increase the number of lines of code compared to more traditional projects that do not make use of a particular architecture. Before making changes to this version, you should be familiar with the implementation details of an MVP architecture.
+This sample includes classes and interfaces, such as presenters and contracts, that increase the number of lines of code compared to more traditional projects that do not make use of a particular architecture.
 
 The table below summarizes the amount of code used to implement this version of the app. You can use it as a basis for comparison with similar tables provided for each of the other samples in this project.
 
