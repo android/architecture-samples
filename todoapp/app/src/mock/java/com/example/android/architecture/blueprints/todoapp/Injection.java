@@ -93,6 +93,6 @@ public class Injection {
     public static TasksViewModel provideTasksViewModel(@NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         return new TasksViewModel(provideTasksRepository(appContext),
-                provideNavigationProvider(activity));
+                provideNavigationProvider(activity), provideSchedulerProvider());
     }
 }

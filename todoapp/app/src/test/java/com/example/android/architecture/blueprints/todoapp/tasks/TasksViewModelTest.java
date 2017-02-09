@@ -9,6 +9,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -66,7 +67,8 @@ public class TasksViewModelTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mViewModel = new TasksViewModel(mTasksRepository, mNavigationProvider);
+        mViewModel = new TasksViewModel(mTasksRepository, mNavigationProvider,
+                new ImmediateSchedulerProvider());
 
         // We subscribe the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
@@ -466,7 +468,6 @@ public class TasksViewModelTest {
 
     @Test
     public void clearCompletedTask_triggersGetTasksEmission() {
-
         // When clearing completed tasks
         mViewModel.clearCompletedTasks();
 

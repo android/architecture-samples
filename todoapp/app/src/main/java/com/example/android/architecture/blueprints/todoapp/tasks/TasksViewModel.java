@@ -1,9 +1,12 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -13,6 +16,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
 
@@ -27,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class TasksViewModel {
 
+    @VisibleForTesting
+    static final String FILTER_KEY = "filter";
     private static final String TAG = TasksViewModel.class.getSimpleName();
 
     @NonNull
@@ -34,6 +40,9 @@ public final class TasksViewModel {
 
     @NonNull
     private final BaseNavigationProvider mNavigationProvider;
+
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
 
     @NonNull
     private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
@@ -51,9 +60,12 @@ public final class TasksViewModel {
     private final PublishSubject<NoTasksModel> mNoTasks;
 
     public TasksViewModel(@NonNull TasksRepository tasksRepository,
-                          @NonNull BaseNavigationProvider navigationProvider) {
+                          @NonNull BaseNavigationProvider navigationProvider,
+                          @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
         mNavigationProvider = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
+
         mProgressIndicatorSubject = BehaviorSubject.create(false);
         mFilter = BehaviorSubject.create(TasksFilterType.ALL_TASKS);
         mTriggerForceUpdate = BehaviorSubject.create(true);
@@ -120,6 +132,7 @@ public final class TasksViewModel {
     @NonNull
     private Observable<List<Task>> getTasksFromRepo() {
         return mTriggerForceUpdate
+                .observeOn(mSchedulerProvider.computation())
                 .doOnNext(this::forceRefreshTasks)
                 .flatMap(__ -> mTasksRepository.getTasks());
     }
@@ -238,6 +251,28 @@ public final class TasksViewModel {
      */
     public void filter(TasksFilterType filter) {
         mFilter.onNext(filter);
+    }
+
+    /**
+     * Restore the state of the view based on a bundle.
+     *
+     * @param bundle the bundle containing the state.
+     */
+    public void restoreState(@Nullable Bundle bundle) {
+        if (bundle != null && bundle.containsKey(FILTER_KEY)) {
+            TasksFilterType filterType = (TasksFilterType) bundle.getSerializable(FILTER_KEY);
+            mFilter.onNext(filterType);
+        }
+    }
+
+    /**
+     * @return the state of the view that needs to be saved.
+     */
+    @NonNull
+    public Bundle getStateToSave() {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(FILTER_KEY, mFilter.getValue());
+        return bundle;
     }
 
     /**

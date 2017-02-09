@@ -163,6 +163,7 @@ public class TasksFragment extends Fragment {
         mListAdapter = new TasksAdapter(new ArrayList<>(0));
 
         mViewModel = Injection.provideTasksViewModel(getActivity());
+        mViewModel.restoreState(savedInstanceState);
 
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
@@ -210,6 +211,13 @@ public class TasksFragment extends Fragment {
         fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(__ -> mViewModel.addNewTask());
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putAll(mViewModel.getStateToSave());
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
