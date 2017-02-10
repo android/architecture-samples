@@ -35,6 +35,12 @@ public class AddEditTaskViewModel {
     @Nullable
     private String mTaskId;
 
+    @Nullable
+    private String mRestoredTitle;
+
+    @Nullable
+    private String mRestoredDescription;
+
     public AddEditTaskViewModel(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
                                 @NonNull BaseNavigationProvider navigationProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
@@ -59,11 +65,31 @@ public class AddEditTaskViewModel {
     @NonNull
     public Observable<Task> getTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
+
             return Observable.error(new InvalidObjectException("Task id null or empty"));
         }
         return mTasksRepository
                 .getTask(mTaskId)
+                .map(this::restoreTask)
                 .doOnError(__ -> showSnackbar(R.string.empty_task_message));
+    }
+
+    /**
+     * Sets the restored state.
+     *
+     * @param title       the restored title.
+     * @param description the restored description.
+     */
+    public void setRestoredState(@Nullable String title, @Nullable String description) {
+        mRestoredTitle = title;
+        mRestoredDescription = description;
+    }
+
+    private Task restoreTask(Task task) {
+        String title = mRestoredTitle != null ? mRestoredTitle : task.getTitle();
+        String description = mRestoredDescription != null ? mRestoredDescription : task.getDescription();
+
+        return new Task(title, description, task.getId());
     }
 
     /**

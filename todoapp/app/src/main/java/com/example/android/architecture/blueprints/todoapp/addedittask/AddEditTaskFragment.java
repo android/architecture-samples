@@ -43,6 +43,8 @@ public class AddEditTaskFragment extends Fragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
+    private static final String TASK_TITLE_KEY = "title";
+    private static final String TASK_DESCRIPTION_KEY = "description";
     private static final String TAG = AddEditTaskFragment.class.getSimpleName();
 
     private TextView mTitle;
@@ -112,8 +114,24 @@ public class AddEditTaskFragment extends Fragment {
         setupFab();
 
         mViewModel = Injection.provideAddEditTaskViewModel(getTaskId(), getActivity());
+        restoreData(savedInstanceState);
 
         return root;
+    }
+
+    private void restoreData(@Nullable Bundle bundle) {
+        if (bundle == null) {
+            return;
+        }
+        mViewModel.setRestoredState(bundle.getString(TASK_TITLE_KEY),
+                bundle.getString(TASK_DESCRIPTION_KEY));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(TASK_TITLE_KEY, mTitle.getText().toString());
+        outState.putString(TASK_DESCRIPTION_KEY, mDescription.getText().toString());
+        super.onSaveInstanceState(outState);
     }
 
     private void setupFab() {
