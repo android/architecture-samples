@@ -11,8 +11,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.base.Strings;
 
-import java.io.InvalidObjectException;
-
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -65,8 +63,8 @@ public class AddEditTaskViewModel {
     @NonNull
     public Observable<Task> getTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-
-            return Observable.error(new InvalidObjectException("Task id null or empty"));
+            // new task. nothing to do here.
+            return Observable.empty();
         }
         return mTasksRepository
                 .getTask(mTaskId)
