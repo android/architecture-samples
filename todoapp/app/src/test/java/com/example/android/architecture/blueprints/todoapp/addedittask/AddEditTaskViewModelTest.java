@@ -17,6 +17,7 @@ import java.io.InvalidObjectException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -176,5 +177,47 @@ public class AddEditTaskViewModelTest {
 
         // The Activity finishes with result
         verify(mNavigationProvider).finishActivityWithResult(Activity.RESULT_OK);
+    }
+
+    @Test
+    public void restoreTask_withTitleUpdated() {
+        // Given a task in the repository
+        when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.just(TASK));
+        // Get a reference to the class under test for a task id
+        mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
+
+        // When setting a restore title
+        String restoredTitle = "new title";
+        mViewModel.setRestoredState(restoredTitle, null);
+        // When that we are subscribing to the task
+        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+
+        // The emitted task has the restored title
+        Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertEquals(task.getTitle(), restoredTitle);
+        // And all the initial values of the task
+        assertEquals(task.getId(), TASK.getId());
+        assertEquals(task.getDescription(), TASK.getDescription());
+    }
+
+    @Test
+    public void restoreTask_withDescriptionUpdated() {
+        // Given a task in the repository
+        when(mTasksRepository.getTask(TASK.getId())).thenReturn(Observable.just(TASK));
+        // Get a reference to the class under test for a task id
+        mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigationProvider);
+
+        // When setting a restore description
+        String restoredDescription = "new description";
+        mViewModel.setRestoredState(null, restoredDescription);
+        // When that we are subscribing to the task
+        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+
+        // The emitted task has the restored description
+        Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertEquals(task.getDescription(), restoredDescription);
+        // And all the initial values of the task
+        assertEquals(task.getId(), TASK.getId());
+        assertEquals(task.getTitle(), TASK.getTitle());
     }
 }
