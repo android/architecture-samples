@@ -82,16 +82,36 @@ public class TaskDetailFragment extends Fragment {
         return fragment;
     }
 
+    @Nullable
     @Override
-    public void onResume() {
-        super.onResume();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
+        setHasOptionsMenu(true);
+        mLoadingProgress = (TextView) root.findViewById(R.id.loading_progress);
+        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
+        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
+        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+
+        setupFab();
+
+        mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getContext());
         bindViewModel();
+
+        return root;
+    }
+
+    private void setupFab() {
+        FloatingActionButton fab =
+                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+
+        fab.setOnClickListener(__ -> editTask());
     }
 
     @Override
-    public void onPause() {
+    public void onDestroyView() {
         unbindViewModel();
-        super.onPause();
+        super.onDestroyView();
     }
 
     private void bindViewModel() {
@@ -127,28 +147,6 @@ public class TaskDetailFragment extends Fragment {
 
     private void unbindViewModel() {
         getSubscription().unsubscribe();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
-        setHasOptionsMenu(true);
-        mLoadingProgress = (TextView) root.findViewById(R.id.loading_progress);
-        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
-        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
-
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
-
-        fab.setOnClickListener(__ -> editTask());
-
-        mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getContext());
-
-        return root;
     }
 
     @Override

@@ -16,17 +16,22 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.NavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.ResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
@@ -68,5 +73,25 @@ public class Injection {
             @NonNull Context context) {
         return new TaskDetailViewModel(taskId, provideTasksRepository(context),
                 provideResourceProvider(context));
+    }
+
+    @NonNull
+    public static BaseNavigationProvider provideNavigationProvider(@NonNull Activity activity) {
+        return new NavigationProvider(activity);
+    }
+
+    @NonNull
+    public static AddEditTaskViewModel provideAddEditTaskViewModel(@Nullable String taskId,
+                                                                   @NonNull Activity activity) {
+        Context appContext = activity.getApplicationContext();
+        return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
+                provideNavigationProvider(activity));
+    }
+
+    @NonNull
+    public static TasksViewModel provideTasksViewModel(@NonNull Activity activity) {
+        Context appContext = activity.getApplicationContext();
+        return new TasksViewModel(provideTasksRepository(appContext),
+                provideNavigationProvider(activity), provideSchedulerProvider());
     }
 }

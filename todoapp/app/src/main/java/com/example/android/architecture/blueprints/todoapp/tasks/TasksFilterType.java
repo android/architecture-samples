@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 /**
  * Used with the filter spinner in the tasks list.
  */
-public enum TasksFilterType {
+enum TasksFilterType {
     /**
      * Do not filter tasks.
      */

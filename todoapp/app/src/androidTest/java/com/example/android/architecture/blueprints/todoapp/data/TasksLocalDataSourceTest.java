@@ -188,4 +188,24 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.getTask("1").subscribe(testSubscriber);
         testSubscriber.assertValue(null);
     }
+
+    @Test
+    public void getTask_emits_whenNewTaskSaved() {
+        // Given that we are subscribed to the list of tasks
+        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
+        mLocalDataSource.getTasks().subscribe(testSubscriber);
+
+        // When adding a new task
+        Task newTask = new Task(TITLE, "");
+        mLocalDataSource.saveTask(newTask);
+
+        // 2 emissions are registered
+        testSubscriber.assertValueCount(2);
+        // The first one is an empty list, because the local data source was empty
+        assertThat(testSubscriber.getOnNextEvents().get(0).isEmpty(), is(true));
+        // The 2nd one is a list containing the added task
+        List<Task> tasks = testSubscriber.getOnNextEvents().get(1);
+        assertThat(tasks.size(), is(1));
+        assertThat(tasks.get(0), is(newTask));
+    }
 }

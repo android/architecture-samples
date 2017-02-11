@@ -49,31 +49,23 @@ public class StatisticsFragment extends Fragment {
         return new StatisticsFragment();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = Injection.provideStatisticsViewModel(getContext());
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
+
+        mViewModel = Injection.provideStatisticsViewModel(getContext());
+        bindViewModel();
+
         return root;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        bindViewModel();
-    }
-
-    @Override
-    public void onPause() {
+    public void onDestroyView() {
         unbindViewModel();
-        super.onPause();
+        super.onDestroyView();
     }
 
     private void bindViewModel() {

@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
