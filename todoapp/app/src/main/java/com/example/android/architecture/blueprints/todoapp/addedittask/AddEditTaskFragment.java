@@ -63,17 +63,30 @@ public class AddEditTaskFragment extends Fragment {
         return fragment;
     }
 
+    @Nullable
     @Override
-    public void onResume() {
-        super.onResume();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.addtask_frag, container, false);
+        mTitle = (TextView) root.findViewById(R.id.add_task_title);
+        mDescription = (TextView) root.findViewById(R.id.add_task_description);
+        setHasOptionsMenu(true);
+
+        setupFab();
+
+        mViewModel = Injection.provideAddEditTaskViewModel(getTaskId(), getActivity());
+        restoreData(savedInstanceState);
         bindViewModel();
+
+        return root;
     }
 
     @Override
-    public void onPause() {
+    public void onDestroyView() {
         unbindViewModel();
-        super.onPause();
+        super.onDestroyView();
     }
+
 
     private void bindViewModel() {
         mSubscription = new CompositeSubscription();
@@ -100,23 +113,6 @@ public class AddEditTaskFragment extends Fragment {
 
     private void unbindViewModel() {
         mSubscription.unsubscribe();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_task_title);
-        mDescription = (TextView) root.findViewById(R.id.add_task_description);
-        setHasOptionsMenu(true);
-
-        setupFab();
-
-        mViewModel = Injection.provideAddEditTaskViewModel(getTaskId(), getActivity());
-        restoreData(savedInstanceState);
-
-        return root;
     }
 
     private void restoreData(@Nullable Bundle bundle) {

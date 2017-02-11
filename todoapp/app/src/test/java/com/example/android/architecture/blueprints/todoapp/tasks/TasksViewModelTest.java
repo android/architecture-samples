@@ -60,6 +60,8 @@ public class TasksViewModelTest {
 
     private TestSubscriber<Integer> mFilterTextSubscriber;
 
+    private TestSubscriber<Void> mCompletableSubscriber;
+
     @Before
     public void setupTasksPresenter() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
@@ -79,6 +81,7 @@ public class TasksViewModelTest {
         mProgressIndicatorSubscriber = new TestSubscriber<>();
         mSnackbarTextSubscriber = new TestSubscriber<>();
         mFilterTextSubscriber = new TestSubscriber<>();
+        mCompletableSubscriber = new TestSubscriber<>();
     }
 
     @Test
@@ -116,6 +119,7 @@ public class TasksViewModelTest {
         // When subscribed to the tasks
         mViewModel.getTasks().subscribe(mTasksSubscriber);
 
+        // The snackbar emits an error message
         mSnackbarTextSubscriber.assertValue(R.string.loading_tasks_error);
     }
 
@@ -447,9 +451,11 @@ public class TasksViewModelTest {
 
     @Test
     public void clearCompletedTask_clearsCompletedTasksInRepository() {
-        // When clearing completed tasks
-        mViewModel.clearCompletedTasks();
+        // When subscribing to the clearing of completed tasks
+        mViewModel.clearCompletedTasks().subscribe(mCompletableSubscriber);
 
+        // The Observable completes
+        mCompletableSubscriber.assertCompleted();
         // The completed tasks are cleared in the repository
         verify(mTasksRepository).clearCompletedTasks();
     }
@@ -460,7 +466,7 @@ public class TasksViewModelTest {
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
 
         // When clearing completed tasks
-        mViewModel.clearCompletedTasks();
+        mViewModel.clearCompletedTasks().subscribe();
 
         // A snackbar text is emitted
         mSnackbarTextSubscriber.assertValue(R.string.completed_tasks_cleared);
@@ -468,11 +474,16 @@ public class TasksViewModelTest {
 
     @Test
     public void clearCompletedTask_triggersGetTasksEmission() {
-        // When clearing completed tasks
-        mViewModel.clearCompletedTasks();
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasks().subscribe(mTasksSubscriber);
 
-        // The completed tasks are cleared in the repository
-        verify(mTasksRepository).clearCompletedTasks();
+        // When clearing completed tasks
+        mViewModel.clearCompletedTasks().subscribe();
+
+        // The mTasksSubscriber emits an initial value and then emits again
+        mTasksSubscriber.assertValueCount(2);
     }
 
     private void assertTaskItems(List<TaskItem> items) {

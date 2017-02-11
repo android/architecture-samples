@@ -40,6 +40,8 @@ public class AddEditTaskViewModelTest {
 
     private TestSubscriber<Integer> mSnackbarTestSubscriber;
 
+    private TestSubscriber<Void> mCompletableTestSubscriber;
+
     private AddEditTaskViewModel mViewModel;
 
     @Before
@@ -50,24 +52,25 @@ public class AddEditTaskViewModelTest {
 
         mTaskTestSubscriber = new TestSubscriber<>();
         mSnackbarTestSubscriber = new TestSubscriber<>();
+        mCompletableTestSubscriber = new TestSubscriber<>();
     }
 
     @Test
-    public void getTask_withNullTaskId_emitsError() {
+    public void getTask_withNullTaskId_doesNotEmit() {
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
 
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
-        mTaskTestSubscriber.assertError(InvalidObjectException.class);
+        mTaskTestSubscriber.assertNoValues();
     }
 
     @Test
-    public void getTask_withEmptyTaskId_emitsError() {
+    public void getTask_withEmptyTaskId_doesNotEmit() {
         mViewModel = new AddEditTaskViewModel("", mTasksRepository, mNavigationProvider);
 
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
-        mTaskTestSubscriber.assertError(InvalidObjectException.class);
+        mTaskTestSubscriber.assertNoValues();
     }
 
     @Test
@@ -106,10 +109,12 @@ public class AddEditTaskViewModelTest {
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
 
         // When saving a task
-        mViewModel.saveTask("title", "description");
+        mViewModel.saveTask("title", "description").subscribe(mCompletableTestSubscriber);
 
         // The task is saved in repository
         verify(mTasksRepository).saveTask(any(Task.class));
+        // The completable completes
+        mCompletableTestSubscriber.assertCompleted();
     }
 
     @Test
@@ -118,7 +123,7 @@ public class AddEditTaskViewModelTest {
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigationProvider);
 
         // When saving a task
-        mViewModel.saveTask("title", "description");
+        mViewModel.saveTask("title", "description").subscribe();
 
         // The Activity finishes with result
         verify(mNavigationProvider).finishActivityWithResult(Activity.RESULT_OK);
@@ -144,7 +149,7 @@ public class AddEditTaskViewModelTest {
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
 
         // When saving an invalid task
-        mViewModel.saveTask("", "");
+        mViewModel.saveTask("", "").subscribe();
 
         // The snackbar text emits with empty message
         mSnackbarTestSubscriber.assertValue(R.string.empty_task_message);
@@ -158,7 +163,7 @@ public class AddEditTaskViewModelTest {
         // When saving the task with new title and new description
         String newTitle = "new title";
         String newDescription = "new description";
-        mViewModel.saveTask(newTitle, newDescription);
+        mViewModel.saveTask(newTitle, newDescription).subscribe();
 
         // The updated task is saved in the repository
         Task expected = new Task(newTitle, newDescription, TASK.getId());
@@ -173,10 +178,12 @@ public class AddEditTaskViewModelTest {
         // When saving the task with new title and new description
         String newTitle = "new title";
         String newDescription = "new description";
-        mViewModel.saveTask(newTitle, newDescription);
+        mViewModel.saveTask(newTitle, newDescription).subscribe(mCompletableTestSubscriber);
 
         // The Activity finishes with result
         verify(mNavigationProvider).finishActivityWithResult(Activity.RESULT_OK);
+        // The completable completes
+        mCompletableTestSubscriber.assertCompleted();
     }
 
     @Test

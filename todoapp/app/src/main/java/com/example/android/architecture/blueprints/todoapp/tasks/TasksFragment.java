@@ -82,16 +82,43 @@ public class TasksFragment extends Fragment {
         return new TasksFragment();
     }
 
+
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mViewModel.handleActivityResult(requestCode, resultCode);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        mListAdapter = new TasksAdapter(new ArrayList<>(0));
+
+        View root = inflater.inflate(R.layout.tasks_frag, container, false);
+
+        // Set up tasks view
+        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
+        listView.setAdapter(mListAdapter);
+        mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
+        mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
+
+        setupNoTasksView(root);
+        setupFabButton();
+        setupSwipeRefreshLayout(root, listView);
+
+        setHasOptionsMenu(true);
+
+        mViewModel = Injection.provideTasksViewModel(getActivity());
+        mViewModel.restoreState(savedInstanceState);
         bindViewModel();
+
+        return root;
     }
 
     @Override
-    public void onPause() {
+    public void onDestroyView() {
         unbindViewModel();
-        super.onPause();
+        super.onDestroyView();
     }
 
     private void bindViewModel() {
@@ -149,37 +176,6 @@ public class TasksFragment extends Fragment {
 
     private void unbindViewModel() {
         mSubscription.unsubscribe();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mViewModel.handleActivityResult(requestCode, resultCode);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mListAdapter = new TasksAdapter(new ArrayList<>(0));
-
-        mViewModel = Injection.provideTasksViewModel(getActivity());
-        mViewModel.restoreState(savedInstanceState);
-
-        View root = inflater.inflate(R.layout.tasks_frag, container, false);
-
-        // Set up tasks view
-        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
-        listView.setAdapter(mListAdapter);
-        mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
-        mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
-
-        setupNoTasksView(root);
-        setupFabButton();
-        setupSwipeRefreshLayout(root, listView);
-
-        setHasOptionsMenu(true);
-
-        return root;
     }
 
     private void setupNoTasksView(View root) {
