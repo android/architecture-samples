@@ -35,8 +35,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 public class TasksActivity extends AppCompatActivity {
 
-    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
     private DrawerLayout mDrawerLayout;
 
     @Override
@@ -67,21 +65,6 @@ public class TasksActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
-
-
-        // Load previously saved state, if available.
-//        if (savedInstanceState != null) {
-//            TasksFilterType currentFiltering =
-//                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-//            mTasksPresenter.setFiltering(currentFiltering);
-//        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-//        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
-
-        super.onSaveInstanceState(outState);
     }
 
     @Override

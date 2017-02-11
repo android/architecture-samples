@@ -9,8 +9,9 @@ import rx.functions.Action1;
 
 /**
  * A task that should be displayed as an item in a list of tasks.
- * Contains the task, the action that should be triggered when taping on the task and when
- * checking or unchecking a task and the background that should be used for this task.
+ * Contains the task, the action that should be triggered when taping on the task, the action that
+ * should be triggered when checking or unchecking a task and the background that should be used for
+ * this task.
  */
 final class TaskItem {
 

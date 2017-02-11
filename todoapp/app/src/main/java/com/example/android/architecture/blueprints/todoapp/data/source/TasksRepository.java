@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -32,9 +31,7 @@ import java.util.NoSuchElementException;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static android.os.Looper.getMainLooper;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.Thread.currentThread;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
