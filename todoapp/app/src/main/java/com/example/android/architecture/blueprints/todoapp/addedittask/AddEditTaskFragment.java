@@ -85,7 +85,7 @@ public class AddEditTaskFragment extends Fragment {
                         // onNext
                         this::showSnackbar,
                         // onError
-                        __ -> Log.e(TAG, "Error retrieving snackbar text")));
+                        throwable -> Log.e(TAG, "Error retrieving snackbar text", throwable)));
 
         mSubscription.add(mViewModel.getTask()
                 .subscribeOn(Schedulers.computation())
@@ -94,7 +94,7 @@ public class AddEditTaskFragment extends Fragment {
                         // onNext
                         this::setTask,
                         // onError
-                        __ -> Log.e(TAG, "Error retrieving the task")));
+                        throwable -> Log.e(TAG, "Error retrieving the task", throwable)));
 
     }
 
@@ -142,7 +142,17 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void saveTask() {
-        mViewModel.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+        mSubscription.add(mViewModel.saveTask(mTitle.getText().toString(),
+                mDescription.getText().toString())
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        () -> {
+                            // nothing to do here
+                        },
+                        // onError
+                        throwable -> Log.e(TAG, "Error saving task", throwable)));
     }
 
     private void showSnackbar(@StringRes Integer textId) {

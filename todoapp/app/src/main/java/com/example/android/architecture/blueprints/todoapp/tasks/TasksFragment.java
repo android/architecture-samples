@@ -223,7 +223,7 @@ public class TasksFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mViewModel.clearCompletedTasks();
+                clearCompletedTasks();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
@@ -233,6 +233,20 @@ public class TasksFragment extends Fragment {
                 break;
         }
         return true;
+    }
+
+    private void clearCompletedTasks() {
+        mSubscription.add(mViewModel.clearCompletedTasks()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onNext
+                        () -> {
+                            // nothing to do here
+                        },
+                        //onError
+                        error -> Log.d(TAG, "Error clearing completed tasks", error)
+                ));
     }
 
     @Override

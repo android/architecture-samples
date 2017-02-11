@@ -20,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -287,7 +288,12 @@ public final class TasksViewModel {
     /**
      * Clear the list of completed tasks and refresh the list.
      */
-    public void clearCompletedTasks() {
+    @NonNull
+    public Completable clearCompletedTasks() {
+        return Completable.fromAction(this::clearCompletedTasksAndNotify);
+    }
+
+    private void clearCompletedTasksAndNotify() {
         mTasksRepository.clearCompletedTasks();
         mSnackbarText.onNext(R.string.completed_tasks_cleared);
         mTriggerForceUpdate.onNext(false);

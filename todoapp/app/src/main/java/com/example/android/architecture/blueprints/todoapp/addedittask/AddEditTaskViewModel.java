@@ -11,6 +11,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.base.Strings;
 
+import rx.Completable;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -96,7 +97,11 @@ public class AddEditTaskViewModel {
      * @param title       title of the task
      * @param description description of the task
      */
-    public void saveTask(String title, String description) {
+    public Completable saveTask(String title, String description) {
+        return Completable.fromAction(() -> createUpdateTask(title, description));
+    }
+
+    private void createUpdateTask(String title, String description) {
         if (isNewTask()) {
             createTask(title, description);
         } else {
