@@ -287,6 +287,8 @@ public final class TasksViewModel {
 
     /**
      * Clear the list of completed tasks and refresh the list.
+     *
+     * @return a Completable that emits when the tasks are cleared or error.
      */
     @NonNull
     public Completable clearCompletedTasks() {
