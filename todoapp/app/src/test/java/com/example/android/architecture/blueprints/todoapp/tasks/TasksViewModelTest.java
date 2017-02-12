@@ -324,9 +324,7 @@ public class TasksViewModelTest {
     @Test
     public void taskItem_tapAction_opensActivity() {
         // Given a task
-        withTaskInRepository(ACTIVE_TASK);
-        // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         // And list of task items is emitted
         List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
         TaskItem taskItem = items.get(0);
@@ -342,9 +340,7 @@ public class TasksViewModelTest {
     @Test
     public void taskItem_withActiveTask_tapCheck_completesTask() {
         // Given a active task
-        withTaskInRepository(ACTIVE_TASK);
-        // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         // And list of task items is emitted
         List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
         TaskItem taskItem = items.get(0);
@@ -359,11 +355,9 @@ public class TasksViewModelTest {
     @Test
     public void taskItem_withActiveTask_tapCheck_snackbarMessageIsEmitted() {
         // Given a active task
-        withTaskInRepository(ACTIVE_TASK);
+        withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         //Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
-        // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
         // And list of task items is emitted
         List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
         TaskItem taskItem = items.get(0);
@@ -378,9 +372,7 @@ public class TasksViewModelTest {
     @Test
     public void taskItem_withCompletedTask_tapCheck_activatesTask() {
         // Given a completed task
-        withTaskInRepository(COMPLETED_TASK);
-        // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        withTaskInRepositoryAndSubscribed(COMPLETED_TASK);
         // And list of task items is emitted
         List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
         TaskItem taskItem = items.get(0);
@@ -395,11 +387,9 @@ public class TasksViewModelTest {
     @Test
     public void taskItem_withCompletedTask_tapCheck_snackbarMessageIsEmitted() {
         // Given a completed task
-        withTaskInRepository(COMPLETED_TASK);
+        withTaskInRepositoryAndSubscribed(COMPLETED_TASK);
         //Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
-        // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
         // And list of task items is emitted
         List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
         TaskItem taskItem = items.get(0);
@@ -494,11 +484,12 @@ public class TasksViewModelTest {
         assertNotNull(taskItem.getOnClickAction());
     }
 
-    private void withTaskInRepository(Task task) {
+    private void withTaskInRepositoryAndSubscribed(Task task) {
         List<Task> tasks = new ArrayList<>();
         tasks.add(task);
         // Given that the task repository returns tasks
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
-
+        // Given that we are subscribed to the tasks
+        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
     }
 }

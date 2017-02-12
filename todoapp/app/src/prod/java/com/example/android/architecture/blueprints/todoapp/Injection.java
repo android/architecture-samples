@@ -70,9 +70,10 @@ public class Injection {
     @NonNull
     public static TaskDetailViewModel provideTaskDetailsViewModel(
             @Nullable String taskId,
-            @NonNull Context context) {
-        return new TaskDetailViewModel(taskId, provideTasksRepository(context),
-                provideResourceProvider(context));
+            @NonNull Activity activity) {
+        Context appContext = activity.getApplicationContext();
+        return new TaskDetailViewModel(taskId, provideTasksRepository(appContext),
+                provideNavigationProvider(activity));
     }
 
     @NonNull

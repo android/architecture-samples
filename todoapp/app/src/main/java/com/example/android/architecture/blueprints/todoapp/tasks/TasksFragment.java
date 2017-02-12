@@ -85,6 +85,7 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("flo", "flo on activity result");
         mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
@@ -110,15 +111,20 @@ public class TasksFragment extends Fragment {
 
         mViewModel = Injection.provideTasksViewModel(getActivity());
         mViewModel.restoreState(savedInstanceState);
-        bindViewModel();
 
         return root;
     }
 
     @Override
-    public void onDestroyView() {
+    public void onResume() {
+        super.onResume();
+        bindViewModel();
+    }
+
+    @Override
+    public void onPause() {
         unbindViewModel();
-        super.onDestroyView();
+        super.onPause();
     }
 
     private void bindViewModel() {
