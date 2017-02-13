@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.base.Strings;
 
 import rx.Completable;
@@ -46,20 +46,20 @@ public class TaskDetailViewModel {
     private final String mTaskId;
 
     @NonNull
-    private final BaseResourceProvider mResourceProvider;
+    private final BaseNavigationProvider mNavigationProvider;
 
     @NonNull
     private final BehaviorSubject<Boolean> mLoadingSubject;
 
     @NonNull
-    private final PublishSubject<String> mSnackbarText;
+    private final PublishSubject<Integer> mSnackbarText;
 
     public TaskDetailViewModel(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
-                               @NonNull BaseResourceProvider resourceProvider) {
+                               @NonNull BaseNavigationProvider navigationProvider) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
-        mResourceProvider = checkNotNull(resourceProvider, "resourceProvider cannot be null");
+        mNavigationProvider = checkNotNull(navigationProvider, "navigationProvider cannot be null");
         mLoadingSubject = BehaviorSubject.create(false);
         mSnackbarText = PublishSubject.create();
     }
@@ -73,19 +73,29 @@ public class TaskDetailViewModel {
     }
 
     /**
-     * @return a stream containing the task retrieved from the repository. An error will be emitted
+     * @return a stream containing the task model. An error will be emitted
      * if the task id is invalid. The loading is updated before retrieving the task and when the
      * task has been retrieved.
      */
     @NonNull
-    public Observable<Task> getTask() {
+    public Observable<TaskModel> getTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             return Observable.error(new Exception("Task id null or empty"));
         }
 
         return mTasksRepository.getTask(mTaskId)
+                .map(this::createModel)
                 .doOnSubscribe(() -> mLoadingSubject.onNext(true))
                 .doOnTerminate(() -> mLoadingSubject.onNext(false));
+    }
+
+    @NonNull
+    private TaskModel createModel(Task task) {
+        boolean isTitleVisible = !Strings.isNullOrEmpty(task.getTitle());
+        boolean isDescriptionVisible = !Strings.isNullOrEmpty(task.getDescription());
+
+        return new TaskModel(isTitleVisible, task.getTitle(), isDescriptionVisible,
+                task.getDescription(), task.isCompleted());
     }
 
     /**
@@ -93,7 +103,7 @@ public class TaskDetailViewModel {
      * snackbar text
      */
     @NonNull
-    public Observable<String> getSnackbarText() {
+    public Observable<Integer> getSnackbarText() {
         return mSnackbarText.asObservable();
     }
 
@@ -123,6 +133,7 @@ public class TaskDetailViewModel {
                 throw new RuntimeException("Task id null or empty");
             }
             mTasksRepository.deleteTask(mTaskId);
+            mNavigationProvider.finishActivity();
         });
     }
 
@@ -150,7 +161,7 @@ public class TaskDetailViewModel {
     @NonNull
     private void completeTask() {
         mTasksRepository.completeTask(mTaskId);
-        mSnackbarText.onNext(mResourceProvider.getString(R.string.task_marked_complete));
+        mSnackbarText.onNext(R.string.task_marked_complete);
     }
 
     /**
@@ -159,7 +170,7 @@ public class TaskDetailViewModel {
     @NonNull
     private void activateTask() {
         mTasksRepository.activateTask(mTaskId);
-        mSnackbarText.onNext(mResourceProvider.getString(R.string.task_marked_active));
+        mSnackbarText.onNext(R.string.task_marked_active);
     }
 
 }

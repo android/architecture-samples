@@ -17,6 +17,11 @@ public final class NavigationProvider implements BaseNavigationProvider {
     }
 
     @Override
+    public void finishActivity() {
+        mActivity.get().finish();
+    }
+
+    @Override
     public void finishActivityWithResult(int resultCode) {
         mActivity.get().setResult(resultCode);
         mActivity.get().finish();

@@ -21,10 +21,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,7 +39,6 @@ import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.google.common.base.Preconditions;
 
 import rx.SingleSubscriber;
@@ -95,7 +94,7 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getContext());
+        mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getActivity());
         bindViewModel();
 
         return root;
@@ -122,7 +121,7 @@ public class TaskDetailFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::showTask,
+                        this::setupView,
                         // onError
                         __ -> showMissingTask()));
 
@@ -165,40 +164,20 @@ public class TaskDetailFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void showTask(@NonNull Task task) {
-        String title = task.getTitle();
-        String description = task.getDescription();
+    private void setupView(TaskModel model) {
+        int titleVisibility = model.isShowTitle() ? View.VISIBLE : View.GONE;
+        int descriptionVisibility = model.isShowDescription() ? View.VISIBLE : View.GONE;
 
-        if (TextUtils.isEmpty(title)) {
-            hideTitle();
-        } else {
-            showTitle(title);
-        }
-
-        if (TextUtils.isEmpty(description)) {
-            hideDescription();
-        } else {
-            showDescription(description);
-        }
-        showCompletionStatus(task.isCompleted());
+        mDetailTitle.setVisibility(titleVisibility);
+        mDetailTitle.setText(model.getTitle());
+        mDetailDescription.setVisibility(descriptionVisibility);
+        mDetailDescription.setText(model.getDescription());
+        showCompletionStatus(model.isChecked());
     }
 
-    private void setLoadingIndicator(boolean active) {
-        int visibility = active ? View.VISIBLE : View.GONE;
+    private void setLoadingIndicator(boolean isVisible) {
+        int visibility = isVisible ? View.VISIBLE : View.GONE;
         mLoadingProgress.setVisibility(visibility);
-    }
-
-    private void hideDescription() {
-        mDetailDescription.setVisibility(View.GONE);
-    }
-
-    private void hideTitle() {
-        mDetailTitle.setVisibility(View.GONE);
-    }
-
-    private void showDescription(@NonNull String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
     }
 
     private void showCompletionStatus(final boolean complete) {
@@ -226,7 +205,9 @@ public class TaskDetailFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::showTaskDeleted,
+                        () -> {
+                            //nothing to do here
+                        },
                         // onError
                         __ -> showMissingTask()));
     }
@@ -254,11 +235,7 @@ public class TaskDetailFragment extends Fragment {
         startActivityForResult(intent, REQUEST_EDIT_TASK);
     }
 
-    private void showTaskDeleted() {
-        getActivity().finish();
-    }
-
-    private void showSnackbar(final String text) {
+    private void showSnackbar(@StringRes int text) {
         Snackbar.make(getView(), text, Snackbar.LENGTH_LONG)
                 .show();
     }
@@ -273,11 +250,6 @@ public class TaskDetailFragment extends Fragment {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void showTitle(@NonNull String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
-        mDetailTitle.setText(title);
     }
 
     private void showMissingTask() {

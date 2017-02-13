@@ -85,6 +85,7 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("flo", "flo on activity result");
         mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
@@ -110,26 +111,31 @@ public class TasksFragment extends Fragment {
 
         mViewModel = Injection.provideTasksViewModel(getActivity());
         mViewModel.restoreState(savedInstanceState);
-        bindViewModel();
 
         return root;
     }
 
     @Override
-    public void onDestroyView() {
+    public void onResume() {
+        super.onResume();
+        bindViewModel();
+    }
+
+    @Override
+    public void onPause() {
         unbindViewModel();
-        super.onDestroyView();
+        super.onPause();
     }
 
     private void bindViewModel() {
         mSubscription = new CompositeSubscription();
 
-        mSubscription.add(mViewModel.getTasks()
+        mSubscription.add(mViewModel.getTasksModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         //onNext
-                        this::showTasks,
+                        this::setupView,
                         //onError
                         error -> Log.e(TAG, "Error loading tasks", error)
                 ));
@@ -162,20 +168,24 @@ public class TasksFragment extends Fragment {
                         //onError
                         error -> Log.d(TAG, "Error setting filter label", error)
                 ));
-
-        mSubscription.add(mViewModel.getNoTasks()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        //onNext
-                        this::showNoTasks,
-                        //onError
-                        error -> Log.d(TAG, "Error handling no tasks", error)
-                ));
     }
 
     private void unbindViewModel() {
         mSubscription.unsubscribe();
+    }
+
+    private void setupView(TasksModel model) {
+        int tasksListVisiblity = model.isTasksListVisible() ? View.VISIBLE : View.GONE;
+        int noTasksViewVisibility = model.isNoTasksViewVisible() ? View.VISIBLE : View.GONE;
+        mTasksView.setVisibility(tasksListVisiblity);
+        mNoTasksView.setVisibility(noTasksViewVisibility);
+
+        if (model.isTasksListVisible()) {
+            showTasks(model.getItemList());
+        }
+        if (model.isNoTasksViewVisible() && model.getNoTasksModel() != null) {
+            showNoTasks(model.getNoTasksModel());
+        }
     }
 
     private void setupNoTasksView(View root) {
@@ -285,15 +295,9 @@ public class TasksFragment extends Fragment {
 
     private void showTasks(List<TaskItem> tasks) {
         mListAdapter.replaceData(tasks);
-
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
     }
 
     private void showNoTasks(NoTasksModel model) {
-        mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
-
         mNoTaskMainView.setText(model.getText());
         mNoTaskIcon.setImageResource(model.getIcon());
         mNoTaskAddView.setVisibility(model.isShowAdd() ? View.VISIBLE : View.GONE);

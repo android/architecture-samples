@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -57,9 +56,6 @@ public final class TasksViewModel {
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
-    @NonNull
-    private final PublishSubject<NoTasksModel> mNoTasks;
-
     public TasksViewModel(@NonNull TasksRepository tasksRepository,
                           @NonNull BaseNavigationProvider navigationProvider,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
@@ -71,20 +67,35 @@ public final class TasksViewModel {
         mFilter = BehaviorSubject.create(TasksFilterType.ALL_TASKS);
         mTriggerForceUpdate = BehaviorSubject.create(true);
         mSnackbarText = PublishSubject.create();
-        mNoTasks = PublishSubject.create();
     }
 
+
     /**
-     * @return the list of tasks.
+     * @return the model for the tasks list.
      */
     @NonNull
-    public Observable<List<TaskItem>> getTasks() {
+    public Observable<TasksModel> getTasksModel() {
         return getTaskItems()
                 .doOnSubscribe(() -> mProgressIndicatorSubject.onNext(true))
                 .doOnNext(__ -> mProgressIndicatorSubject.onNext(false))
                 .doOnError(__ -> mSnackbarText.onNext(R.string.loading_tasks_error))
-                .doOnNext(this::handleTasks)
-                .filter(tasks -> !tasks.isEmpty());
+                .switchMap(tasks -> mFilter.map(filterType -> Pair.create(tasks, filterType)))
+                .map(this::constructTasksModel);
+    }
+
+    @NonNull
+    private TasksModel constructTasksModel(Pair<List<TaskItem>, TasksFilterType> pair) {
+        List<TaskItem> tasks = pair.first;
+        TasksFilterType filterType = pair.second;
+
+        boolean isTasksListVisible = !tasks.isEmpty();
+        boolean isNoTasksViewVisible = !isTasksListVisible;
+        NoTasksModel noTasksModel = null;
+        if (tasks.isEmpty()) {
+            noTasksModel = getNoTasksModel(filterType);
+        }
+
+        return new TasksModel(isTasksListVisible, tasks, isNoTasksViewVisible, noTasksModel);
     }
 
     private Observable<List<TaskItem>> getTaskItems() {
@@ -95,17 +106,6 @@ public final class TasksViewModel {
                         .filter(task -> shouldFilterTask(task, pair.second))
                         .map(this::constructTaskItem)
                         .toList());
-    }
-
-    private void handleTasks(List<TaskItem> tasks) {
-        if (tasks.isEmpty()) {
-            mFilter.map(this::getNoTasksModel)
-                    .subscribe(
-                            //onNext
-                            mNoTasks::onNext,
-                            //onError
-                            error -> Log.e(TAG, "Error handling no tasks ", error));
-        }
     }
 
     private NoTasksModel getNoTasksModel(TasksFilterType mCurrentFiltering) {
@@ -120,14 +120,6 @@ public final class TasksViewModel {
                 return new NoTasksModel(R.string.no_tasks_all,
                         R.drawable.ic_assignment_turned_in_24dp, true);
         }
-    }
-
-    /**
-     * @return an Observable that emits when there are no tasks, with the reason why there are no tasks.
-     */
-    @NonNull
-    public Observable<NoTasksModel> getNoTasks() {
-        return mNoTasks.asObservable();
     }
 
     @NonNull
