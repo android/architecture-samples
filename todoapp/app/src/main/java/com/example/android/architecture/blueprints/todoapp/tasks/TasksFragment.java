@@ -85,7 +85,6 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("flo", "flo on activity result");
         mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
