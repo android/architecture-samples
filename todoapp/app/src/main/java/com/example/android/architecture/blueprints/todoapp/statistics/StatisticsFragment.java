@@ -57,15 +57,20 @@ public class StatisticsFragment extends Fragment {
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
 
         mViewModel = Injection.provideStatisticsViewModel(getContext());
-        bindViewModel();
 
         return root;
     }
 
     @Override
-    public void onDestroyView() {
+    public void onResume() {
+        bindViewModel();
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
         unbindViewModel();
-        super.onDestroyView();
+        super.onPause();
     }
 
     private void bindViewModel() {

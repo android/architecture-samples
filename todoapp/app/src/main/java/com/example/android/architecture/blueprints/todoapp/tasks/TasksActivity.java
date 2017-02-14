@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.IdlingResource;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -102,8 +103,18 @@ public class TasksActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // forward the result to the fragment
+        Fragment tasksFragment = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (tasksFragment != null) {
+            tasksFragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
     }
+
 }

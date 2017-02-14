@@ -76,17 +76,21 @@ public class AddEditTaskFragment extends Fragment {
 
         mViewModel = Injection.provideAddEditTaskViewModel(getTaskId(), getActivity());
         restoreData(savedInstanceState);
-        bindViewModel();
 
         return root;
     }
 
     @Override
-    public void onDestroyView() {
-        unbindViewModel();
-        super.onDestroyView();
+    public void onResume() {
+        bindViewModel();
+        super.onResume();
     }
 
+    @Override
+    public void onPause() {
+        unbindViewModel();
+        super.onPause();
+    }
 
     private void bindViewModel() {
         mSubscription = new CompositeSubscription();

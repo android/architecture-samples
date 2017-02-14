@@ -142,7 +142,7 @@ public final class TasksViewModel {
     }
 
     private void handleTaskTaped(Task task) {
-        mNavigationProvider.startActivityWithExtra(TaskDetailActivity.class,
+        mNavigationProvider.startActivityForResultWithExtra(TaskDetailActivity.class, -1,
                 TaskDetailActivity.EXTRA_TASK_ID, task.getId());
     }
 
@@ -205,6 +205,7 @@ public final class TasksViewModel {
         // If a task was successfully added, show snackbar
         if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
                 && Activity.RESULT_OK == resultCode) {
+            mTriggerForceUpdate.onNext(false);
             mSnackbarText.onNext(R.string.successfully_saved_task_message);
         }
     }

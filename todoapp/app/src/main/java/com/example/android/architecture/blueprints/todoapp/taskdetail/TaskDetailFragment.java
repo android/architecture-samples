@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,11 +36,8 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.google.common.base.Preconditions;
 
-import rx.SingleSubscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -55,9 +51,6 @@ public class TaskDetailFragment extends Fragment {
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
-
-    @NonNull
-    private static final int REQUEST_EDIT_TASK = 1;
 
     private TextView mLoadingProgress;
 
@@ -95,9 +88,20 @@ public class TaskDetailFragment extends Fragment {
         setupFab();
 
         mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getActivity());
-        bindViewModel();
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        bindViewModel();
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        unbindViewModel();
+        super.onPause();
     }
 
     private void setupFab() {
@@ -105,12 +109,6 @@ public class TaskDetailFragment extends Fragment {
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(__ -> editTask());
-    }
-
-    @Override
-    public void onDestroyView() {
-        unbindViewModel();
-        super.onDestroyView();
     }
 
     private void bindViewModel() {
@@ -216,23 +214,12 @@ public class TaskDetailFragment extends Fragment {
         getSubscription().add(getViewModel().editTask()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleSubscriber<String>() {
-                    @Override
-                    public void onSuccess(String taskId) {
-                        showEditTask(taskId);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        showMissingTask();
-                    }
-                }));
-    }
-
-    private void showEditTask(@Nullable String taskId) {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-        startActivityForResult(intent, REQUEST_EDIT_TASK);
+                .subscribe(  // onNext
+                        () -> {
+                            //nothing to do here
+                        },
+                        // onError
+                        __ -> showMissingTask()));
     }
 
     private void showSnackbar(@StringRes int text) {
@@ -242,13 +229,7 @@ public class TaskDetailFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_TASK) {
-            // If the task was edited successfully, go back to the list.
-            if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
-                return;
-            }
-        }
+        mViewModel.handleActivityResult(requestCode, resultCode);
         super.onActivityResult(requestCode, resultCode, data);
     }
 

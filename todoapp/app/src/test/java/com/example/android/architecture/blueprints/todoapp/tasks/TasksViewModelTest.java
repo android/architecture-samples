@@ -274,6 +274,20 @@ public class TasksViewModelTest {
     }
 
     @Test
+    public void getTaskModelEmits_whenTaskAdded_withResultOk() {
+        // Given that the task repository returns tasks
+        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        // Given that we are subscribed to the tasks model
+        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+
+        // When handling activity result for a task added successfully
+        mViewModel.handleActivityResult(AddEditTaskActivity.REQUEST_ADD_TASK, Activity.RESULT_OK);
+
+        // The mTasksSubscriber emits an initial value and then emits again
+        mTasksSubscriber.assertValueCount(2);
+    }
+
+    @Test
     public void snackbarEmits_whenTaskAdded_withResultCanceled() {
         //Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
@@ -333,8 +347,8 @@ public class TasksViewModelTest {
         taskItem.getOnClickAction().call();
 
         // The AddEditTaskActivity is opened with the correct request code
-        verify(mNavigationProvider).startActivityWithExtra(eq(TaskDetailActivity.class),
-                eq(TaskDetailActivity.EXTRA_TASK_ID), eq(ACTIVE_TASK.getId()));
+        verify(mNavigationProvider).startActivityForResultWithExtra(eq(TaskDetailActivity.class),
+                eq(-1), eq(TaskDetailActivity.EXTRA_TASK_ID), eq(ACTIVE_TASK.getId()));
     }
 
     @Test

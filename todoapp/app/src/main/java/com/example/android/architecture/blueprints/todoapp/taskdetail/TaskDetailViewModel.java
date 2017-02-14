@@ -16,10 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
@@ -27,7 +30,6 @@ import com.google.common.base.Strings;
 
 import rx.Completable;
 import rx.Observable;
-import rx.Single;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -108,15 +110,31 @@ public class TaskDetailViewModel {
     }
 
     /**
-     * @return a stream containing the current task id, or error if the task id is invalid.
+     * Handle the response received on onActivityResult.
+     *
+     * @param requestCode the request with which the Activity was opened.
+     * @param resultCode  the result of the Activity.
+     */
+    public void handleActivityResult(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (TaskDetailActivity.REQUEST_EDIT_TASK == requestCode
+                && Activity.RESULT_OK == resultCode) {
+            mNavigationProvider.finishActivity();
+        }
+    }
+
+    /**
+     * @return a stream that completes when the task was edited.
      */
     @NonNull
-    public Single<String> editTask() {
-        return Single.fromCallable(() -> {
+    public Completable editTask() {
+        return Completable.fromAction(() -> {
             if (Strings.isNullOrEmpty(mTaskId)) {
                 throw new RuntimeException("Task id null or empty");
             }
-            return mTaskId;
+            mNavigationProvider.startActivityForResultWithExtra(AddEditTaskActivity.class,
+                    TaskDetailActivity.REQUEST_EDIT_TASK, AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
+                    mTaskId);
         });
     }
 

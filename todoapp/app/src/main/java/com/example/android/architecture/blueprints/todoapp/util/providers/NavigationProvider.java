@@ -34,9 +34,10 @@ public final class NavigationProvider implements BaseNavigationProvider {
     }
 
     @Override
-    public void startActivityWithExtra(Class cls, String extraKey, String extraValue) {
+    public void startActivityForResultWithExtra(Class cls, int requestCode, String extraKey,
+                                                String extraValue) {
         Intent intent = new Intent(mActivity.get(), cls);
         intent.putExtra(extraKey, extraValue);
-        mActivity.get().startActivity(intent);
+        mActivity.get().startActivityForResult(intent, requestCode);
     }
 }

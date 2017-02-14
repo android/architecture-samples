@@ -1,6 +1,10 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.app.Activity;
+
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
@@ -17,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -149,11 +154,49 @@ public class TaskDetailViewModelTest {
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
 
         // When subscribing to the editing of the task
-        TestSubscriber<String> testSubscriber = new TestSubscriber<>();
-        mViewModel.editTask().subscribe(testSubscriber);
+        mViewModel.editTask().subscribe(mTestSubscriber);
 
-        // The correct task id is emitted
-        testSubscriber.assertValue(TASK_WITH_TITLE_DESCRIPTION.getId());
+        // The Completable completes
+        mTestSubscriber.assertCompleted();
+    }
+
+    @Test
+    public void editTask_startsActivity() {
+        // Get a reference to the class under test for a task id
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+
+        // When subscribing to the editing of the task
+        mViewModel.editTask().subscribe(mTestSubscriber);
+
+        // Starts activity
+        verify(mNavigationProvider).startActivityForResultWithExtra(eq(AddEditTaskActivity.class),
+                eq(TaskDetailActivity.REQUEST_EDIT_TASK),
+                eq(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID),
+                eq(TASK_WITH_TITLE_DESCRIPTION.getId()));
+    }
+
+    @Test
+    public void handleActivityResult_withResultOK_finishesActivity() {
+        // Get a reference to the class under test with an invalid task id
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+
+        //When handling activity result for edit task
+        mViewModel.handleActivityResult(TaskDetailActivity.REQUEST_EDIT_TASK, Activity.RESULT_OK);
+
+        // Finishes activity
+        verify(mNavigationProvider).finishActivity();
+    }
+
+    @Test
+    public void handleActivityResult_withCancel_doesntFinishActivity() {
+        // Get a reference to the class under test with an invalid task id
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+
+        //When handling activity result for edit task
+        mViewModel.handleActivityResult(TaskDetailActivity.REQUEST_EDIT_TASK, Activity.RESULT_CANCELED);
+
+        // Finishes activity
+        verify(mNavigationProvider, never()).finishActivity();
     }
 
     @Test

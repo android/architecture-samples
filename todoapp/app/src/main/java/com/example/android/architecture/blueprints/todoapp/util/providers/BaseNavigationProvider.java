@@ -29,8 +29,9 @@ public interface BaseNavigationProvider {
      * Start a new Activity for a result with an extra
      *
      * @param cls        the Activity class to be opened.
+     * @param requestCode the request code that will be passed to the opened Activity.
      * @param extraKey   the key for the extra that is passed in the Intent.
      * @param extraValue the value for the extra the is passed in the Intent.
      */
-    void startActivityWithExtra(Class cls, String extraKey, String extraValue);
+    void startActivityForResultWithExtra(Class cls, int requestCode, String extraKey, String extraValue);
 }

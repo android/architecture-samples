@@ -21,7 +21,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -30,6 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
  */
 public class TaskDetailActivity extends AppCompatActivity {
 
+    public static final int REQUEST_EDIT_TASK = 1;
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
     @Override
