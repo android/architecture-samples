@@ -87,7 +87,7 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = Injection.provideTaskDetailsViewModel(getTaskId(), getActivity());
+        mViewModel = Injection.createTaskDetailsViewModel(getTaskId(), getActivity());
 
         return root;
     }

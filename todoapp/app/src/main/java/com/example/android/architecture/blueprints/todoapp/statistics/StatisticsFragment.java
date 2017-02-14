@@ -56,7 +56,7 @@ public class StatisticsFragment extends Fragment {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
 
-        mViewModel = Injection.provideStatisticsViewModel(getContext());
+        mViewModel = Injection.createStatisticsViewModel(getContext());
 
         return root;
     }

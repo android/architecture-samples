@@ -58,42 +58,42 @@ public class Injection {
     }
 
     @NonNull
-    public static BaseResourceProvider provideResourceProvider(@NonNull Context context) {
+    public static BaseResourceProvider createResourceProvider(@NonNull Context context) {
         return new ResourceProvider(context);
     }
 
     @NonNull
-    public static StatisticsViewModel provideStatisticsViewModel(@NonNull Context context) {
+    public static StatisticsViewModel createStatisticsViewModel(@NonNull Context context) {
         return new StatisticsViewModel(provideTasksRepository(context),
-                provideResourceProvider(context));
+                createResourceProvider(context));
     }
 
     @NonNull
-    public static TaskDetailViewModel provideTaskDetailsViewModel(
+    public static TaskDetailViewModel createTaskDetailsViewModel(
             @Nullable String taskId,
             @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         return new TaskDetailViewModel(taskId, provideTasksRepository(appContext),
-                provideNavigationProvider(activity));
+                createNavigationProvider(activity));
     }
 
     @NonNull
-    public static BaseNavigationProvider provideNavigationProvider(@NonNull Activity activity) {
+    public static BaseNavigationProvider createNavigationProvider(@NonNull Activity activity) {
         return new NavigationProvider(activity);
     }
 
     @NonNull
-    public static AddEditTaskViewModel provideAddEditTaskViewModel(@Nullable String taskId,
-                                                                   @NonNull Activity activity) {
+    public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
+                                                                  @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
-                provideNavigationProvider(activity));
+                createNavigationProvider(activity));
     }
 
     @NonNull
-    public static TasksViewModel provideTasksViewModel(@NonNull Activity activity) {
+    public static TasksViewModel createTasksViewModel(@NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         return new TasksViewModel(provideTasksRepository(appContext),
-                provideNavigationProvider(activity), provideSchedulerProvider());
+                createNavigationProvider(activity), provideSchedulerProvider());
     }
 }

@@ -24,17 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
-import java.util.List;
-
 import rx.Observable;
-import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and exposes
- * updates for the progress of retrieveing the statistics, and the statistics.
+ * Retrieves the data and exposes updates for the progress of fetching the statistics.
  */
 public class StatisticsViewModel {
 
@@ -66,12 +62,8 @@ public class StatisticsViewModel {
 
         Observable<Task> tasks = mTasksRepository
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
-                    @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
-                    }
-                });
+                .flatMap(Observable::from);
+
         Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
         Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
 

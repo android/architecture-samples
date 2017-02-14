@@ -108,7 +108,7 @@ public class TasksFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        mViewModel = Injection.provideTasksViewModel(getActivity());
+        mViewModel = Injection.createTasksViewModel(getActivity());
         mViewModel.restoreState(savedInstanceState);
 
         return root;
