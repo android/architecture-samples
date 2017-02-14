@@ -7,8 +7,6 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
@@ -49,7 +47,7 @@ public class TasksViewModelTest {
     private TasksRepository mTasksRepository;
 
     @Mock
-    private BaseNavigationProvider mNavigationProvider;
+    private TasksNavigator mNavigatior;
 
     private TasksViewModel mViewModel;
 
@@ -70,7 +68,7 @@ public class TasksViewModelTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mViewModel = new TasksViewModel(mTasksRepository, mNavigationProvider,
+        mViewModel = new TasksViewModel(mTasksRepository, mNavigatior,
                 new ImmediateSchedulerProvider());
 
         // We subscribe the tasks to 3, with one active and two completed
@@ -336,7 +334,7 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void taskItem_tapAction_opensActivity() {
+    public void taskItem_tapAction_opensTaskDetails() {
         // Given a task
         withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         // And list of task items is emitted
@@ -346,9 +344,8 @@ public class TasksViewModelTest {
         // When triggering the click action
         taskItem.getOnClickAction().call();
 
-        // The AddEditTaskActivity is opened with the correct request code
-        verify(mNavigationProvider).startActivityForResultWithExtra(eq(TaskDetailActivity.class),
-                eq(-1), eq(TaskDetailActivity.EXTRA_TASK_ID), eq(ACTIVE_TASK.getId()));
+        // Opening of the task details is called with the correct task id
+        verify(mNavigatior).openTaskDetails(eq(ACTIVE_TASK.getId()));
     }
 
     @Test
@@ -416,13 +413,12 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void addTask_opensActivity() {
+    public void addTask_callsAddNewTask() {
         // When adding a new task
         mViewModel.addNewTask();
 
-        // The AddEditTaskActivity is opened with the correct request code
-        verify(mNavigationProvider).startActivityForResult(eq(AddEditTaskActivity.class),
-                eq(AddEditTaskActivity.REQUEST_ADD_TASK));
+        // The add new task method is called
+        verify(mNavigatior).addNewTask();
     }
 
     @Test

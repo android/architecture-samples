@@ -92,7 +92,14 @@ public class Injection {
     @NonNull
     public static TasksViewModel createTasksViewModel(@NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
+        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
         return new TasksViewModel(provideTasksRepository(appContext),
-                createNavigationProvider(activity), provideSchedulerProvider());
+                createTasksNavigator(navigationProvider), provideSchedulerProvider());
+    }
+
+    @NonNull
+    public static TasksNavigator createTasksNavigator(
+            @NonNull BaseNavigationProvider navigationProvider) {
+        return new TasksNavigator(navigationProvider);
     }
 }

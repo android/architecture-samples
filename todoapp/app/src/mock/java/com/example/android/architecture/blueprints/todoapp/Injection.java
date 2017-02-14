@@ -28,6 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksNavigator;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
@@ -93,7 +94,14 @@ public class Injection {
     @NonNull
     public static TasksViewModel createTasksViewModel(@NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
+        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
         return new TasksViewModel(provideTasksRepository(appContext),
-                createNavigationProvider(activity), provideSchedulerProvider());
+                createTasksNavigator(navigationProvider), provideSchedulerProvider());
+    }
+
+    @NonNull
+    public static TasksNavigator createTasksNavigator(
+            @NonNull BaseNavigationProvider navigationProvider) {
+        return new TasksNavigator(navigationProvider);
     }
 }

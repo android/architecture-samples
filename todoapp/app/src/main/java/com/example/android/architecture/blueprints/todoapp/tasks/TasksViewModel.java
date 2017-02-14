@@ -13,8 +13,6 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
@@ -39,7 +37,7 @@ public final class TasksViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private final BaseNavigationProvider mNavigationProvider;
+    private final TasksNavigator mNavigator;
 
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
@@ -57,10 +55,10 @@ public final class TasksViewModel {
     private final PublishSubject<Integer> mSnackbarText;
 
     public TasksViewModel(@NonNull TasksRepository tasksRepository,
-                          @NonNull BaseNavigationProvider navigationProvider,
+                          @NonNull TasksNavigator navigationProvider,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
-        mNavigationProvider = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
+        mNavigator = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
         mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
 
         mProgressIndicatorSubject = BehaviorSubject.create(false);
@@ -142,8 +140,7 @@ public final class TasksViewModel {
     }
 
     private void handleTaskTaped(Task task) {
-        mNavigationProvider.startActivityForResultWithExtra(TaskDetailActivity.class, -1,
-                TaskDetailActivity.EXTRA_TASK_ID, task.getId());
+        mNavigator.openTaskDetails(task.getId());
     }
 
     private void handleTaskChecked(Task task, boolean checked) {
@@ -191,8 +188,7 @@ public final class TasksViewModel {
      * Open the {@link AddEditTaskActivity}
      */
     public void addNewTask() {
-        mNavigationProvider.startActivityForResult(AddEditTaskActivity.class,
-                AddEditTaskActivity.REQUEST_ADD_TASK);
+        mNavigator.addNewTask();
     }
 
     /**
