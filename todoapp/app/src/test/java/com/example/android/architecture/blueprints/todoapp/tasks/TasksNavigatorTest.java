@@ -40,7 +40,6 @@ public class TasksNavigatorTest {
         // The AddEditTaskActivity is opened with the correct request code
         verify(mNavigationProvider).startActivityForResult(eq(AddEditTaskActivity.class),
                 eq(AddEditTaskActivity.REQUEST_ADD_TASK));
-
     }
 
     @Test
@@ -55,5 +54,4 @@ public class TasksNavigatorTest {
         verify(mNavigationProvider).startActivityForResultWithExtra(eq(TaskDetailActivity.class),
                 eq(-1), eq(TaskDetailActivity.EXTRA_TASK_ID), eq(taskId));
     }
-
 }
