@@ -3,11 +3,8 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.app.Activity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +34,7 @@ public class TaskDetailViewModelTest {
     private TasksRepository mTasksRepository;
 
     @Mock
-    private BaseNavigationProvider mNavigationProvider;
+    private TaskDetailNavigator mNavigator;
 
     private TestSubscriber<Void> mTestSubscriber;
 
@@ -61,7 +58,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void getLoadingIndicator_initiallyEmitsFalse() {
         // Get a reference to the class under test
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         //When subscribing to the loading indicator
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
@@ -74,7 +71,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void getTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
@@ -90,7 +87,7 @@ public class TaskDetailViewModelTest {
                 .thenReturn(Observable.just(TASK_WITH_TITLE_DESCRIPTION));
         // Get a reference to the class under test for the same task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository,
-                mNavigationProvider);
+                mNavigator);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
@@ -107,7 +104,7 @@ public class TaskDetailViewModelTest {
                 .thenReturn(Observable.just(TASK_WITH_TITLE_COMPLETED));
         // Get a reference to the class under test for the same task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository,
-                mNavigationProvider);
+                mNavigator);
 
         // When subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
@@ -122,7 +119,7 @@ public class TaskDetailViewModelTest {
         // Given a task in the repository
         when(mTasksRepository.getTask(TASK_WITH_TITLE_DESCRIPTION.getId())).thenReturn(Observable.just(TASK_WITH_TITLE_DESCRIPTION));
         // Get a reference to the class under test for the same task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         //When subscribing to the loading indicator updates
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
@@ -138,7 +135,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void editTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the editing of the task
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
@@ -151,7 +148,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void editTask_returnsCorrectData() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the editing of the task
         mViewModel.editTask().subscribe(mTestSubscriber);
@@ -161,48 +158,45 @@ public class TaskDetailViewModelTest {
     }
 
     @Test
-    public void editTask_startsActivity() {
+    public void editTask_navigates() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the editing of the task
         mViewModel.editTask().subscribe(mTestSubscriber);
 
-        // Starts activity
-        verify(mNavigationProvider).startActivityForResultWithExtra(eq(AddEditTaskActivity.class),
-                eq(TaskDetailActivity.REQUEST_EDIT_TASK),
-                eq(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID),
-                eq(TASK_WITH_TITLE_DESCRIPTION.getId()));
+        // Navigator handles starting to edit the task
+        verify(mNavigator).onStartEditTask(TASK_WITH_TITLE_DESCRIPTION.getId());
     }
 
     @Test
-    public void handleActivityResult_withResultOK_finishesActivity() {
+    public void handleActivityResult_withResultOK_navigates() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         //When handling activity result for edit task
         mViewModel.handleActivityResult(TaskDetailActivity.REQUEST_EDIT_TASK, Activity.RESULT_OK);
 
-        // Finishes activity
-        verify(mNavigationProvider).finishActivity();
+        // The navigator is called to handle the task edited
+        verify(mNavigator).onTaskEdited();
     }
 
     @Test
-    public void handleActivityResult_withCancel_doesntFinishActivity() {
+    public void handleActivityResult_withCancel_doesntNavigate() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         //When handling activity result for edit task
         mViewModel.handleActivityResult(TaskDetailActivity.REQUEST_EDIT_TASK, Activity.RESULT_CANCELED);
 
-        // Finishes activity
-        verify(mNavigationProvider, never()).finishActivity();
+        // The navigator is not called to handle the task edited
+        verify(mNavigator, never()).onTaskEdited();
     }
 
     @Test
     public void deleteTask_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the deletion of the task
         mViewModel.deleteTask().subscribe(mTestSubscriber);
@@ -214,7 +208,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void deleteTask_deletesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the deletion of the task
         mViewModel.deleteTask().subscribe(mTestSubscriber);
@@ -227,21 +221,21 @@ public class TaskDetailViewModelTest {
 
 
     @Test
-    public void deleteTask_finishesActivity() {
+    public void deleteTask_navigates() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the deletion of the task
         mViewModel.deleteTask().subscribe(mTestSubscriber);
 
-        // The activity finishes
-        mNavigationProvider.finishActivity();
+        // The navigator is called
+        verify(mNavigator).onTaskDeleted();
     }
 
     @Test
     public void taskCheckChanged_withInvalidTaskId() {
         // Get a reference to the class under test with an invalid task id
-        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the task changed observer
         mViewModel.taskCheckChanged(true).subscribe(mTestSubscriber);
@@ -253,7 +247,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void taskCheckChanged_true_completesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the task changed observer
         mViewModel.taskCheckChanged(true).subscribe(mTestSubscriber);
@@ -267,7 +261,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void taskCheckChanged_false_activatesTask() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the task changed observer
         mViewModel.taskCheckChanged(false).subscribe(mTestSubscriber);
@@ -281,7 +275,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void taskCheckChanged_true_completesTask_showsSnackbarText() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribed to the snackbar text emissions
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
@@ -295,7 +289,7 @@ public class TaskDetailViewModelTest {
     @Test
     public void taskCheckChanged_false_activatesTask_showsSnackbarText() {
         // Get a reference to the class under test for a task id
-        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigationProvider);
+        mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         // When subscribed to the snackbar text emissions
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);

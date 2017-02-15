@@ -33,7 +33,7 @@ public class TasksNavigatorTest {
     }
 
     @Test
-    public void addNewTask() {
+    public void addNewTask_startsActivity() {
         // When adding a new task
         mTasksNavigator.addNewTask();
 
@@ -43,7 +43,7 @@ public class TasksNavigatorTest {
     }
 
     @Test
-    public void openTaskDetails() {
+    public void openTaskDetails_startsActivity() {
         // Given a task id
         String taskId = "id";
 

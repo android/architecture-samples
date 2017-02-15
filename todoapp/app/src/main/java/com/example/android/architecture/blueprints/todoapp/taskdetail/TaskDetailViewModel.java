@@ -21,11 +21,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.base.Strings;
 
 import rx.Completable;
@@ -48,7 +45,7 @@ public class TaskDetailViewModel {
     private final String mTaskId;
 
     @NonNull
-    private final BaseNavigationProvider mNavigationProvider;
+    private final TaskDetailNavigator mNavigator;
 
     @NonNull
     private final BehaviorSubject<Boolean> mLoadingSubject;
@@ -58,10 +55,10 @@ public class TaskDetailViewModel {
 
     public TaskDetailViewModel(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
-                               @NonNull BaseNavigationProvider navigationProvider) {
+                               @NonNull TaskDetailNavigator navigator) {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
-        mNavigationProvider = checkNotNull(navigationProvider, "navigationProvider cannot be null");
+        mNavigator = checkNotNull(navigator, "navigator cannot be null");
         mLoadingSubject = BehaviorSubject.create(false);
         mSnackbarText = PublishSubject.create();
     }
@@ -116,10 +113,9 @@ public class TaskDetailViewModel {
      * @param resultCode  the result of the Activity.
      */
     public void handleActivityResult(int requestCode, int resultCode) {
-        // If a task was successfully added, show snackbar
         if (TaskDetailActivity.REQUEST_EDIT_TASK == requestCode
                 && Activity.RESULT_OK == resultCode) {
-            mNavigationProvider.finishActivity();
+            mNavigator.onTaskEdited();
         }
     }
 
@@ -132,9 +128,7 @@ public class TaskDetailViewModel {
             if (Strings.isNullOrEmpty(mTaskId)) {
                 throw new RuntimeException("Task id null or empty");
             }
-            mNavigationProvider.startActivityForResultWithExtra(AddEditTaskActivity.class,
-                    TaskDetailActivity.REQUEST_EDIT_TASK, AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
-                    mTaskId);
+            mNavigator.onStartEditTask(mTaskId);
         });
     }
 
@@ -151,7 +145,7 @@ public class TaskDetailViewModel {
                 throw new RuntimeException("Task id null or empty");
             }
             mTasksRepository.deleteTask(mTaskId);
-            mNavigationProvider.finishActivity();
+            mNavigator.onTaskDeleted();
         });
     }
 

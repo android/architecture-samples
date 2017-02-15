@@ -72,8 +72,15 @@ public class Injection {
             @Nullable String taskId,
             @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
+        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
         return new TaskDetailViewModel(taskId, provideTasksRepository(appContext),
-                createNavigationProvider(activity));
+                createTaskDetailNavigator(navigationProvider));
+    }
+
+    @NonNull
+    public static TaskDetailNavigator createTaskDetailNavigator(
+            @NonNull BaseNavigationProvider navigationProvider) {
+        return new TaskDetailNavigator(navigationProvider);
     }
 
     @NonNull
