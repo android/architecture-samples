@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
 import org.junit.After;
@@ -35,6 +34,10 @@ import java.util.NoSuchElementException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -78,7 +81,7 @@ public class TasksRepositoryTest {
 
         // Get a reference to the class under test
         mTasksRepository = TasksRepository.getInstance(
-                mTasksRemoteDataSource, mTasksLocalDataSource, new ImmediateSchedulerProvider());
+                mTasksRemoteDataSource, mTasksLocalDataSource);
 
         mTasksTestSubscriber = new TestSubscriber<>();
     }
