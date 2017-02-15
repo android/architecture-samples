@@ -22,7 +22,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import java.util.List;
 
-import rx.Completable;
 import rx.Observable;
 
 /**
@@ -36,8 +35,6 @@ public interface TasksDataSource {
     Observable<Task> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
-
-    Completable saveTasks(@NonNull List<Task> tasks);
 
     void completeTask(@NonNull Task task);
 

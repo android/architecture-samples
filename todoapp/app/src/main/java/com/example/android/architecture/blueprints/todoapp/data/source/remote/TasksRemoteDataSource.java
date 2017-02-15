@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import rx.Completable;
 import rx.Observable;
 
 /**
@@ -88,13 +87,6 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable saveTasks(@NonNull List<Task> tasks) {
-        return Observable.from(tasks)
-                .doOnNext(this::saveTask)
-                .toCompletable();
-    }
-
-    @Override
     public void completeTask(@NonNull Task task) {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
@@ -102,9 +94,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        Task task = TASKS_SERVICE_DATA.get(taskId);
-        task = new Task(task.getTitle(), task.getDescription(), taskId, true);
-        TASKS_SERVICE_DATA.put(task.getId(), task);
+        // Not required for the remote data source because the {@link TasksRepository} handles
+        // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
     @Override
@@ -115,9 +106,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        Task task = TASKS_SERVICE_DATA.get(taskId);
-        task = new Task(task.getTitle(), task.getDescription(), taskId, false);
-        TASKS_SERVICE_DATA.put(task.getId(), task);
+        // Not required for the remote data source because the {@link TasksRepository} handles
+        // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
     @Override

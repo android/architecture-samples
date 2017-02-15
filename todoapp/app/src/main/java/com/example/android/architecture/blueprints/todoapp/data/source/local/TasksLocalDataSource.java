@@ -33,7 +33,6 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.List;
 
-import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -65,6 +64,17 @@ public class TasksLocalDataSource implements TasksDataSource {
         mTaskMapperFunction = this::getTask;
     }
 
+    @NonNull
+    private Task getTask(@NonNull Cursor c) {
+        String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
+        String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
+        String description =
+                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
+        boolean completed =
+                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, itemId, completed);
+    }
+
     public static TasksLocalDataSource getInstance(
             @NonNull Context context,
             @NonNull BaseSchedulerProvider schedulerProvider) {
@@ -76,17 +86,6 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     public static void destroyInstance() {
         INSTANCE = null;
-    }
-
-    @NonNull
-    private Task getTask(@NonNull Cursor c) {
-        String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-        String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-        String description =
-                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed =
-                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(title, description, itemId, completed);
     }
 
     @Override
@@ -119,42 +118,12 @@ public class TasksLocalDataSource implements TasksDataSource {
     @Override
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
-        ContentValues values = toContentValues(task);
-        mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
-    }
-
-    @Override
-    public Completable saveTasks(@NonNull List<Task> tasks) {
-        checkNotNull(tasks);
-
-        return Observable.using(mDatabaseHelper::newTransaction,
-                transaction -> inTransactionInsert(tasks, transaction),
-                BriteDatabase.Transaction::end)
-                .toCompletable();
-    }
-
-    @NonNull
-    private Observable<List<Task>> inTransactionInsert(@NonNull List<Task> tasks,
-                                                       @NonNull BriteDatabase.Transaction transaction) {
-        checkNotNull(tasks);
-        checkNotNull(transaction);
-
-        return Observable.from(tasks)
-                .doOnNext(task -> {
-                    ContentValues values = toContentValues(task);
-                    mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
-                })
-                .doOnCompleted(transaction::markSuccessful)
-                .toList();
-    }
-
-    private ContentValues toContentValues(Task task) {
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
         values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
         values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-        return values;
+        mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     @Override

@@ -21,26 +21,22 @@ import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import rx.Completable;
 import rx.Observable;
-import rx.subjects.PublishSubject;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
  */
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
-    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
     private static FakeTasksRemoteDataSource INSTANCE;
-    private PublishSubject<Boolean> mRepeatWhen = PublishSubject.create();
+
+    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
 
     // Prevent direct instantiation.
     private FakeTasksRemoteDataSource() {
@@ -55,36 +51,25 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Observable<List<Task>> getTasks() {
-        List<Task> values = new ArrayList<>(TASKS_SERVICE_DATA.values());
-        return Observable.just(values)
-                .repeatWhen(observable -> mRepeatWhen);
+        Collection<Task> values = TASKS_SERVICE_DATA.values();
+        return Observable.from(values).toList();
     }
 
     @Override
     public Observable<Task> getTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        return Observable.just(task)
-                .repeatWhen(observable -> mRepeatWhen);
+        return Observable.just(task);
     }
 
     @Override
     public void saveTask(@NonNull Task task) {
         TASKS_SERVICE_DATA.put(task.getId(), task);
-        mRepeatWhen.onNext(true);
-    }
-
-    @Override
-    public Completable saveTasks(@NonNull List<Task> tasks) {
-        return Observable.from(tasks)
-                .doOnNext(this::saveTask)
-                .toCompletable();
     }
 
     @Override
     public void completeTask(@NonNull Task task) {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
-        mRepeatWhen.onNext(true);
     }
 
     @Override
@@ -92,14 +77,12 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         Task task = TASKS_SERVICE_DATA.get(taskId);
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
         TASKS_SERVICE_DATA.put(taskId, completedTask);
-        mRepeatWhen.onNext(true);
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
         Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
-        mRepeatWhen.onNext(true);
     }
 
     @Override
@@ -107,7 +90,6 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         Task task = TASKS_SERVICE_DATA.get(taskId);
         Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
         TASKS_SERVICE_DATA.put(taskId, activeTask);
-        mRepeatWhen.onNext(true);
     }
 
     @Override
@@ -119,23 +101,21 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
                 it.remove();
             }
         }
-        mRepeatWhen.onNext(true);
     }
 
     public void refreshTasks() {
-        mRepeatWhen.onNext(true);
+        // Not required because the {@link TasksRepository} handles the logic of refreshing the
+        // tasks from all the available data sources.
     }
 
     @Override
     public void deleteTask(@NonNull String taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
-        mRepeatWhen.onNext(true);
     }
 
     @Override
     public void deleteAllTasks() {
         TASKS_SERVICE_DATA.clear();
-        mRepeatWhen.onNext(true);
     }
 
     @VisibleForTesting
@@ -143,6 +123,5 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         for (Task task : tasks) {
             TASKS_SERVICE_DATA.put(task.getId(), task);
         }
-        mRepeatWhen.onNext(true);
     }
 }
