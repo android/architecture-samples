@@ -18,18 +18,14 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
-import java.util.Map;
 
 import rx.Completable;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -54,13 +50,14 @@ public class TasksRepository implements TasksDataSource {
 
     // Prevent direct instantiation.
     private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource) {
+                            @NonNull TasksDataSource tasksLocalDataSource,
+                            @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
+        mBaseSchedulerProvider = checkNotNull(schedulerProvider);
+
         // Load remote tasks and store in local repository
         refreshTasks();
-
-        mBaseSchedulerProvider = Injection.provideSchedulerProvider();
     }
 
     /**
@@ -71,16 +68,18 @@ public class TasksRepository implements TasksDataSource {
      * @return the {@link TasksRepository} instance
      */
     public static TasksRepository getInstance(@NonNull TasksDataSource tasksRemoteDataSource,
-                                              @NonNull TasksDataSource tasksLocalDataSource) {
+                                              @NonNull TasksDataSource tasksLocalDataSource,
+                                              @NonNull BaseSchedulerProvider schedulerProvider) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
+            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource,
+                    schedulerProvider);
         }
         return INSTANCE;
     }
 
     /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new instance
-     * next time it's called.
+     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource, BaseSchedulerProvider)}
+     * to create a new instance next time it's called.
      */
     public static void destroyInstance() {
         INSTANCE = null;

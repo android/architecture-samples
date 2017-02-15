@@ -50,8 +50,9 @@ public class Injection {
     @NonNull
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
         checkNotNull(context);
-        return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context, provideSchedulerProvider()));
+        return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
+                TasksLocalDataSource.getInstance(context, provideSchedulerProvider()),
+                provideSchedulerProvider());
     }
 
     @NonNull
