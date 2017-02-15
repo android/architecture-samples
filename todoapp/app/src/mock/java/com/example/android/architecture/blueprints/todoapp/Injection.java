@@ -21,6 +21,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskNavigator;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -95,8 +96,15 @@ public class Injection {
     public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
                                                                   @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
+        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
         return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
-                createNavigationProvider(activity));
+                createAddEditTaskNavigator(navigationProvider));
+    }
+
+    @NonNull
+    public static AddEditTaskNavigator createAddEditTaskNavigator(
+            @NonNull BaseNavigationProvider navigationProvider) {
+        return new AddEditTaskNavigator(navigationProvider);
     }
 
     @NonNull

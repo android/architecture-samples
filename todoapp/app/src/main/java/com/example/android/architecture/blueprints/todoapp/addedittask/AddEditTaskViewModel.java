@@ -1,6 +1,5 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -8,7 +7,6 @@ import android.support.annotation.StringRes;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.google.common.base.Strings;
 
 import rx.Completable;
@@ -26,7 +24,7 @@ public class AddEditTaskViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private final BaseNavigationProvider mNavigationProvider;
+    private final AddEditTaskNavigator mNavigator;
 
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
@@ -41,9 +39,9 @@ public class AddEditTaskViewModel {
     private String mRestoredDescription;
 
     public AddEditTaskViewModel(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
-                                @NonNull BaseNavigationProvider navigationProvider) {
+                                @NonNull AddEditTaskNavigator navigator) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
-        mNavigationProvider = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
+        mNavigator = checkNotNull(navigator, "navigator cannot be null");
         mTaskId = taskId;
         mSnackbarText = PublishSubject.create();
     }
@@ -119,13 +117,13 @@ public class AddEditTaskViewModel {
             showSnackbar(R.string.empty_task_message);
         } else {
             mTasksRepository.saveTask(newTask);
-            mNavigationProvider.finishActivityWithResult(Activity.RESULT_OK);
+            mNavigator.onTaskSaved();
         }
     }
 
     private void updateTask(String title, String description) {
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mNavigationProvider.finishActivityWithResult(Activity.RESULT_OK); // After an edit, go back to the list.
+        mNavigator.onTaskSaved();
     }
 
     private void showSnackbar(@StringRes int textId) {

@@ -92,8 +92,15 @@ public class Injection {
     public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
                                                                   @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
+        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
         return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
-                createNavigationProvider(activity));
+                createAddEditTaskNavigator(navigationProvider));
+    }
+
+    @NonNull
+    public static AddEditTaskNavigator createAddEditTaskNavigator(
+            @NonNull BaseNavigationProvider navigationProvider) {
+        return new AddEditTaskNavigator(navigationProvider);
     }
 
     @NonNull
