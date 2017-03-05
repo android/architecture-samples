@@ -50,6 +50,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setHomeActionContentDescription("Navigate up");
 
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);

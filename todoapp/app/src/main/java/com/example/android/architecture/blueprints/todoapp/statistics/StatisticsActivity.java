@@ -51,6 +51,7 @@ public class StatisticsActivity extends AppCompatActivity {
         ab.setTitle(R.string.statistics_title);
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeActionContentDescription("Navigate up");
 
         // Set up the navigation drawer.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

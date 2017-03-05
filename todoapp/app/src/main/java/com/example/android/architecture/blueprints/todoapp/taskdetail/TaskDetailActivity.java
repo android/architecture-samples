@@ -47,6 +47,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
+        ab.setHomeActionContentDescription("Navigate up");
 
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
