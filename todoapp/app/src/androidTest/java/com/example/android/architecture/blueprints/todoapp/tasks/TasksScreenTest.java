@@ -41,6 +41,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -438,7 +439,31 @@ public class TasksScreenTest {
     }
 
     @Test
-    public void orientationChange_DuringEdit() throws IllegalStateException {
+    @SdkSuppress(minSdkVersion = 21) // Blinking cursor after rotation breaks this in API 19
+    public void orientationChange_DuringEdit_ChangePersists() throws Throwable {
+        // Add a completed task
+        createTask(TITLE1, DESCRIPTION);
+
+        // Open the task in details view
+        onView(withText(TITLE1)).perform(click());
+
+        // Click on the edit task button
+        onView(withId(R.id.fab_edit_task)).perform(click());
+
+        // Change task title (but don't save)
+        onView(withId(R.id.add_task_title))
+                .perform(replaceText(TITLE2), closeSoftKeyboard()); // Type new task title
+
+        // Rotate the screen
+        TestUtils.rotateOrientation(getCurrentActivity());
+
+        // Verify task title is restored
+        onView(withId(R.id.add_task_title)).check(matches(withText(TITLE2)));
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 21) // Blinking cursor after rotation breaks this in API 19
+    public void orientationChange_DuringEdit_NoDuplicate() throws IllegalStateException {
         // Add a completed task
         createTask(TITLE1, DESCRIPTION);
 

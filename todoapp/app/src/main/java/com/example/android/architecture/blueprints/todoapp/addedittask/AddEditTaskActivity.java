@@ -25,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -36,6 +37,8 @@ import javax.inject.Inject;
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
+
+    public static final String SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY";
 
     @Inject AddEditTaskPresenter mAddEditTasksPresenter;
 
@@ -72,13 +75,33 @@ public class AddEditTaskActivity extends AppCompatActivity {
                     addEditTaskFragment, R.id.contentFrame);
         }
 
+        boolean shouldLoadDataFromRepo = true;
+
+        // Prevent the presenter from loading data from the repository if this is a config change.
+        if (savedInstanceState != null) {
+            // Data might not have loaded when the config change happen, so we saved the state.
+            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY);
+        }
+
         // Create the presenter
+        AddEditTaskPresenterModule addEditTaskPresenterModule = new AddEditTaskPresenterModule(
+                addEditTaskFragment, taskId, shouldLoadDataFromRepo);
+
+        TasksRepositoryComponent tasksRepositoryComponent =
+                ((ToDoApplication) getApplication()).getTasksRepositoryComponent();
+
         DaggerAddEditTaskComponent.builder()
-                .addEditTaskPresenterModule(
-                        new AddEditTaskPresenterModule(addEditTaskFragment, taskId))
-                .tasksRepositoryComponent(
-                        ((ToDoApplication) getApplication()).getTasksRepositoryComponent()).build()
+                .addEditTaskPresenterModule(addEditTaskPresenterModule)
+                .tasksRepositoryComponent(tasksRepositoryComponent)
+                .build()
                 .inject(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Save the state so that next time we know if we need to refresh data.
+        outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, mAddEditTasksPresenter.isDataMissing());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
