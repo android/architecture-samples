@@ -29,7 +29,8 @@ This project hosts each sample app in separate repository branches. For more inf
 | Sample | Description |
 | ------------- | ------------- |
 | [dev‑todo‑mvp‑tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Adds a master and detail view for tablets. |
-| [dev‑todo‑mvvm‑databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture.|
+| [dev‑todo‑mvvm‑databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
+| [dev‑todo‑mvvm‑rxjava](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-rxjava/) | Based on the todo-rxjava sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
 
 For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
 
