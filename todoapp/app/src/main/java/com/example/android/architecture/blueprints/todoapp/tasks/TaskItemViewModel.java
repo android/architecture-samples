@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Context;
 
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -27,8 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
  * Fragment's actions listener.
  */
-public class TaskItemViewModel extends TaskViewModel
-        implements SnackbarChangedCallback.SnackBarViewModel {
+public class TaskItemViewModel extends TaskViewModel {
 
     private final TaskItemNavigator mTaskItemNavigator;
 

@@ -16,9 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 
 
@@ -42,8 +43,6 @@ public class TaskDetailFragment extends Fragment {
     public static final int REQUEST_EDIT_TASK = 1;
 
     private TaskDetailViewModel mViewModel;
-
-    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -63,12 +62,25 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        setupSnackbar();
+        setupSnackBar();
     }
 
-    private void setupSnackbar() {
-        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    private void setupSnackBar() {
+        mViewModel.snackbarText.addOnPropertyChangedCallback(
+                new Observable.OnPropertyChangedCallback() {
+                    @Override
+                    public void onPropertyChanged(Observable observable, int i) {
+                        showSnackBar();
+                    }
+                });
+    }
+
+    private void showSnackBar() {
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+        Snackbar.make(v, mViewModel.getSnackbarText(), Snackbar.LENGTH_LONG).show();
     }
 
     private void setupFab() {
@@ -117,11 +129,5 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
     }
 }

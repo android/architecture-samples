@@ -27,7 +27,6 @@ import android.graphics.drawable.Drawable;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -47,7 +46,7 @@ import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFil
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends BaseObservable implements SnackbarChangedCallback.SnackBarViewModel {
+public class TasksViewModel extends BaseObservable {
 
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();

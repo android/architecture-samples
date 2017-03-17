@@ -16,10 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,8 +42,6 @@ public class AddEditTaskFragment extends Fragment {
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
     private AddEditTaskViewModel mViewModel;
-
-    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private AddtaskFragBinding mViewDataBinding;
 
@@ -97,8 +96,21 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupSnackBar() {
-        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mViewModel.snackbarText.addOnPropertyChangedCallback(
+                new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                showSnackBar();
+            }
+        });
+    }
+
+    private void showSnackBar() {
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+        Snackbar.make(v, mViewModel.getSnackbarText(), Snackbar.LENGTH_LONG).show();
     }
 
     private void setupFab() {
