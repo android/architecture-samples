@@ -36,11 +36,11 @@ import android.widget.ListView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
+import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +51,6 @@ import java.util.List;
 public class TasksFragment extends Fragment {
 
     private TasksViewModel mTasksViewModel;
-
-    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private TasksFragBinding mTasksFragBinding;
 
@@ -125,12 +123,6 @@ public class TasksFragment extends Fragment {
         setupRefreshLayout();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // If the ViewModel
-        mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackBarChangedCallback);
-    }
 
     private void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
@@ -158,8 +150,13 @@ public class TasksFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mTasksViewModel);
-        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(
+                new Observable.OnPropertyChangedCallback() {
+                    @Override
+                    public void onPropertyChanged(Observable observable, int i) {
+                        SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
+                    }
+                });
     }
 
     private void setupFab() {

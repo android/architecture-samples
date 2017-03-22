@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,8 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
+import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,8 +42,6 @@ public class AddEditTaskFragment extends Fragment {
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
     private AddEditTaskViewModel mViewModel;
-
-    private SnackbarChangedCallback mSnackBarChangedCallback;
 
     private AddtaskFragBinding mViewDataBinding;
 
@@ -74,7 +73,7 @@ public class AddEditTaskFragment extends Fragment {
 
         setupFab();
 
-        setupSnackBar();
+        setupSnackbar();
 
         setupActionBar();
     }
@@ -96,9 +95,14 @@ public class AddEditTaskFragment extends Fragment {
         return mViewDataBinding.getRoot();
     }
 
-    private void setupSnackBar() {
-        mSnackBarChangedCallback = new SnackbarChangedCallback(getView(), mViewModel);
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackBarChangedCallback);
+    private void setupSnackbar() {
+        mViewModel.snackbarText.addOnPropertyChangedCallback(
+                new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            }
+        });
     }
 
     private void setupFab() {

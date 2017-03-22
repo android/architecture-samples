@@ -38,6 +38,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -66,6 +67,7 @@ public class TasksViewModelTest {
 
     private TasksViewModel mTasksViewModel;
 
+    private static final String SNACKBAR_TEXT = "Snackbar text";
 
     @Before
     public void setupTasksViewModel() {
@@ -213,5 +215,26 @@ public class TasksViewModelTest {
 
         // Then the "Add task" action is visible
         assertThat(mTasksViewModel.getTasksAddViewVisible(), is(true));
+    }
+
+    @Test
+    public void updateSnackbar_nullValue() {
+        // Before setting the Snackbar text, get its current value
+        String snackbarText = mTasksViewModel.getSnackbarText();
+
+        // Check that the value is null
+        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
+    }
+
+    @Test
+    public void updateSnackbar_nonNullValue() {
+        // Set a new value for the Snackbar text via the public Observable
+        mTasksViewModel.snackbarText.set(SNACKBAR_TEXT);
+
+        // Get its current value with the Snackbar text getter
+        String snackbarText = mTasksViewModel.getSnackbarText();
+
+        // Check that the value matches the observable's.
+        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

@@ -35,6 +35,9 @@ import org.mockito.MockitoAnnotations;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -52,6 +55,8 @@ public class TaskDetailViewModelTest {
     private static final String NO_DATA_STRING = "NO_DATA_STRING";
 
     private static final String NO_DATA_DESC_STRING = "NO_DATA_DESC_STRING";
+
+    public static final String SNACKBAR_TEXT = "Snackbar text";
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -178,5 +183,26 @@ public class TaskDetailViewModelTest {
         verify(mTasksRepository).getTask(eq(mTask.getId()), mGetTaskCallbackCaptor.capture());
 
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(mTask); // Trigger callback
+    }
+
+    @Test
+    public void updateSnackbar_nullValue() {
+        // Before setting the Snackbar text, get its current value
+        String snackbarText = mTaskDetailViewModel.getSnackbarText();
+
+        // Check that the value is null
+        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
+    }
+
+    @Test
+    public void updateSnackbar_nonNullValue() {
+        // Set a new value for the Snackbar text via the public Observable
+        mTaskDetailViewModel.snackbarText.set(SNACKBAR_TEXT);
+
+        // Get its current value with the Snackbar text getter
+        String snackbarText = mTaskDetailViewModel.getSnackbarText();
+
+        // Check that the value matches the observable's.
+        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

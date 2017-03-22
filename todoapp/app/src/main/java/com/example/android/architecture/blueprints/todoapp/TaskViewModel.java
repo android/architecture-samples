@@ -21,8 +21,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.Observable;
 import android.databinding.ObservableField;
+import android.support.annotation.Nullable;
 
-import com.android.annotations.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -32,7 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * Abstract class for View Models that expose a single {@link Task}.
  */
 public abstract class TaskViewModel extends BaseObservable
-        implements TasksDataSource.GetTaskCallback, SnackbarChangedCallback.SnackBarViewModel {
+        implements TasksDataSource.GetTaskCallback {
 
     public final ObservableField<String> snackbarText = new ObservableField<>();
 

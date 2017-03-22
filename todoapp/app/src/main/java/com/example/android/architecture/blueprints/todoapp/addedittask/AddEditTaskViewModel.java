@@ -19,10 +19,9 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 import android.content.Context;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.support.annotation.Nullable;
 
-import com.android.annotations.Nullable;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarChangedCallback;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -35,8 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * {@link com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel} for
  * how to deal with more complex scenarios.
  */
-public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
-        SnackbarChangedCallback.SnackBarViewModel {
+public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -112,6 +110,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback,
         }
     }
 
+    @Nullable
     public String getSnackbarText() {
         return snackbarText.get();
     }
