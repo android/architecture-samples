@@ -57,7 +57,7 @@ Each sample includes a dedicated `README.md` file where you can find related met
 * The size of the app you are developing
 * The size and experience of your team
 * The amount of maintenance that you are expecting to have to do
-* Whether you need a tablet layout 
+* Whether you need a tablet layout
 * Whether you need to support multiple platforms
 * Your preference for the compactness of your codebase
 
@@ -78,7 +78,7 @@ git clone git@github.com:googlesamples/android-architecture.git
 ```
 
 Checkout the todo-mvp sample:
-  
+
 ```
 git checkout todo-mvp
 ```
@@ -113,6 +113,6 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
-[Sharif Salah] (https://github.com/sharifsalah) - Technical Writer
+[Sharif Salah](https://github.com/sharifsalah) - Technical Writer
 
 For more information on joining the project, see [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
