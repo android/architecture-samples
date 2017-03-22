@@ -110,6 +110,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
         }
     }
 
+    @Nullable
     public String getSnackbarText() {
         return snackbarText.get();
     }

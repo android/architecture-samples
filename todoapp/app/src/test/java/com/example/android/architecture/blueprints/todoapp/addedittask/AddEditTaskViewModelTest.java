@@ -30,7 +30,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verify;
  */
 public class AddEditTaskViewModelTest {
 
+    public static final String SNACKBAR_TEXT = "Snackbar text";
     @Mock
     private TasksRepository mTasksRepository;
 
@@ -95,5 +97,26 @@ public class AddEditTaskViewModelTest {
         // Verify the fields were updated
         assertThat(mAddEditTaskViewModel.title.get(), is(testTask.getTitle()));
         assertThat(mAddEditTaskViewModel.description.get(), is(testTask.getDescription()));
+    }
+
+    @Test
+    public void updateSnackbar_nullValue() {
+        // Get a reference to the class under test
+        mAddEditTaskViewModel = new AddEditTaskViewModel(
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
+
+        String snackbarText = mAddEditTaskViewModel.getSnackbarText();
+        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
+    }
+
+    @Test
+    public void updateSnackbar_nonNullValue() {
+        // Get a reference to the class under test
+        mAddEditTaskViewModel = new AddEditTaskViewModel(
+                mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
+
+        mAddEditTaskViewModel.snackbarText.set(SNACKBAR_TEXT);
+        String snackbarText = mAddEditTaskViewModel.getSnackbarText();
+        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

@@ -27,6 +27,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.google.common.collect.Lists;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,6 +40,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -50,6 +53,7 @@ import static org.mockito.Mockito.when;
  */
 public class TasksViewModelTest {
 
+    private static final String SNACKBAR_TEXT = "Snackbar text";
     private static List<Task> TASKS;
 
     @Mock
@@ -213,5 +217,22 @@ public class TasksViewModelTest {
 
         // Then the "Add task" action is visible
         assertThat(mTasksViewModel.getTasksAddViewVisible(), is(true));
+    }
+
+    @Test
+    public void updateSnackbar_nullValue() {
+        // Get a reference to the class under test
+
+        String snackbarText = mTasksViewModel.getSnackbarText();
+        Assert.assertThat("Snackbar text does not match", snackbarText, Matchers.is(nullValue()));
+    }
+
+    @Test
+    public void updateSnackbar_nonNullValue() {
+        // Get a reference to the class under test
+
+        mTasksViewModel.snackbarText.set(SNACKBAR_TEXT);
+        String snackbarText = mTasksViewModel.getSnackbarText();
+        Assert.assertThat("Snackbar text does not match", snackbarText, Matchers.is(SNACKBAR_TEXT));
     }
 }

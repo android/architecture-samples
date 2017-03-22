@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
+import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 
 /**
@@ -70,17 +71,9 @@ public class TaskDetailFragment extends Fragment {
                 new Observable.OnPropertyChangedCallback() {
                     @Override
                     public void onPropertyChanged(Observable observable, int i) {
-                        showSnackBar();
+                        SnackbarUtils.showSnackBar(getView(), mViewModel.getSnackbarText());
                     }
                 });
-    }
-
-    private void showSnackBar() {
-        View v = getView();
-        if (v == null) {
-            return;
-        }
-        Snackbar.make(v, mViewModel.getSnackbarText(), Snackbar.LENGTH_LONG).show();
     }
 
     private void setupFab() {

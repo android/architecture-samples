@@ -41,6 +41,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
+import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,17 +155,9 @@ public class TasksFragment extends Fragment {
                 new Observable.OnPropertyChangedCallback() {
                     @Override
                     public void onPropertyChanged(Observable observable, int i) {
-                        showSnackBar();
+                        SnackbarUtils.showSnackBar(getView(), mTasksViewModel.getSnackbarText());
                     }
                 });
-    }
-
-    private void showSnackBar() {
-        View v = getView();
-        if (v == null) {
-            return;
-        }
-        Snackbar.make(v, mTasksViewModel.getSnackbarText(), Snackbar.LENGTH_LONG).show();
     }
 
     private void setupFab() {
