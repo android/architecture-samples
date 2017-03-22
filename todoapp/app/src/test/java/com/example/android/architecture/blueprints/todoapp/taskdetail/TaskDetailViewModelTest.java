@@ -187,18 +187,22 @@ public class TaskDetailViewModelTest {
 
     @Test
     public void updateSnackbar_nullValue() {
-        // Get a reference to the class under test
-
+        // Before setting the Snackbar text, get its current value
         String snackbarText = mTaskDetailViewModel.getSnackbarText();
+
+        // Check that the value is null
         assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
     }
 
     @Test
     public void updateSnackbar_nonNullValue() {
-        // Get a reference to the class under test
-
+        // Set a new value for the Snackbar text via the public Observable
         mTaskDetailViewModel.snackbarText.set(SNACKBAR_TEXT);
+
+        // Get its current value with the Snackbar text getter
         String snackbarText = mTaskDetailViewModel.getSnackbarText();
+
+        // Check that the value matches the observable's.
         assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

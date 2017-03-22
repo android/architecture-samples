@@ -105,7 +105,10 @@ public class AddEditTaskViewModelTest {
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
 
+        // Before setting the Snackbar text, get its current value
         String snackbarText = mAddEditTaskViewModel.getSnackbarText();
+
+        // Check that the value is null
         assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
     }
 
@@ -115,8 +118,13 @@ public class AddEditTaskViewModelTest {
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository, mock(AddEditTaskNavigator.class));
 
+        // Set a new value for the Snackbar text via the public Observable
         mAddEditTaskViewModel.snackbarText.set(SNACKBAR_TEXT);
+
+        // Get its current value with the Snackbar text getter
         String snackbarText = mAddEditTaskViewModel.getSnackbarText();
+
+        // Check that the value matches the observable's.
         assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

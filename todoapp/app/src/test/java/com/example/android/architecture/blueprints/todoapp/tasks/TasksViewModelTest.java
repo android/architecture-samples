@@ -27,8 +27,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.google.common.collect.Lists;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -221,18 +219,22 @@ public class TasksViewModelTest {
 
     @Test
     public void updateSnackbar_nullValue() {
-        // Get a reference to the class under test
-
+        // Before setting the Snackbar text, get its current value
         String snackbarText = mTasksViewModel.getSnackbarText();
-        Assert.assertThat("Snackbar text does not match", snackbarText, Matchers.is(nullValue()));
+
+        // Check that the value is null
+        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
     }
 
     @Test
     public void updateSnackbar_nonNullValue() {
-        // Get a reference to the class under test
-
+        // Set a new value for the Snackbar text via the public Observable
         mTasksViewModel.snackbarText.set(SNACKBAR_TEXT);
+
+        // Get its current value with the Snackbar text getter
         String snackbarText = mTasksViewModel.getSnackbarText();
-        Assert.assertThat("Snackbar text does not match", snackbarText, Matchers.is(SNACKBAR_TEXT));
+
+        // Check that the value matches the observable's.
+        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }
