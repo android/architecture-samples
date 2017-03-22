@@ -6,7 +6,7 @@ This sample uses an MVVM (Model-View-ViewModel) architecture:
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvvm-databinding.png" alt="Diagram"/>
 
-<pre>"View" refers to the architectural concept, not to `android.view.View.`.</pre>
+<pre>"View" refers to the architectural concept, not to `android.view.View`.</pre>
 
 The ViewModel in MVVM is very similar to the Presenter in MVP. The main difference has to do with the communication between View and ViewModel/Presenter:
  - MVVM: when the ViewModel is modified, the View is updated by a library or framework. There's no way to update the View directly from the ViewModel, as it doesn't have this reference.
