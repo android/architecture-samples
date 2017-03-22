@@ -78,7 +78,6 @@ git clone git@github.com:googlesamples/android-architecture.git
 ```
 
 Checkout the todo-mvp sample:
-
 ```
 git checkout todo-mvp
 ```
