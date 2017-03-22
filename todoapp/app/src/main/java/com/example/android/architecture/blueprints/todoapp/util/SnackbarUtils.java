@@ -4,9 +4,8 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 
 /**
- * Created by jalc on 3/22/17.
+ * Provides a method to show a Snackbar.
  */
-
 public class SnackbarUtils {
 
     public static void showSnackBar(View v, String snackbarText) {

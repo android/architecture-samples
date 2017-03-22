@@ -53,7 +53,6 @@ import static org.mockito.Mockito.when;
  */
 public class TasksViewModelTest {
 
-    private static final String SNACKBAR_TEXT = "Snackbar text";
     private static List<Task> TASKS;
 
     @Mock
@@ -70,6 +69,7 @@ public class TasksViewModelTest {
 
     private TasksViewModel mTasksViewModel;
 
+    private static final String SNACKBAR_TEXT = "Snackbar text";
 
     @Before
     public void setupTasksViewModel() {
