@@ -20,7 +20,6 @@ import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,15 +62,15 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        setupSnackBar();
+        setupSnackbar();
     }
 
-    private void setupSnackBar() {
+    private void setupSnackbar() {
         mViewModel.snackbarText.addOnPropertyChangedCallback(
                 new Observable.OnPropertyChangedCallback() {
                     @Override
                     public void onPropertyChanged(Observable observable, int i) {
-                        SnackbarUtils.showSnackBar(getView(), mViewModel.getSnackbarText());
+                        SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
                     }
                 });
     }

@@ -61,7 +61,6 @@ public class TasksViewModel extends BaseObservable {
 
     public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
 
-    // This is a special Observable that will trigger a SnackBarChangedCallback when modified.
     final ObservableField<String> snackbarText = new ObservableField<>();
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;

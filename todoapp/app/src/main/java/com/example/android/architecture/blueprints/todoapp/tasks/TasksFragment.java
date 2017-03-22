@@ -21,7 +21,6 @@ import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
@@ -115,7 +114,7 @@ public class TasksFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setupSnackBar();
+        setupSnackbar();
 
         setupFab();
 
@@ -150,12 +149,12 @@ public class TasksFragment extends Fragment {
         popup.show();
     }
 
-    private void setupSnackBar() {
+    private void setupSnackbar() {
         mTasksViewModel.snackbarText.addOnPropertyChangedCallback(
                 new Observable.OnPropertyChangedCallback() {
                     @Override
                     public void onPropertyChanged(Observable observable, int i) {
-                        SnackbarUtils.showSnackBar(getView(), mTasksViewModel.getSnackbarText());
+                        SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
                     }
                 });
     }
