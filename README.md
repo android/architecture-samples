@@ -22,6 +22,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | [todo‑mvp‑dagger](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) | Uses [Dagger2](https://google.github.io/dagger/) to add support for [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection). |
 [todo‑mvp‑contentproviders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-contentproviders/) | Based on the todo-mvp-loaders sample, this version fetches data using the Loaders API, and also makes use of [content providers](https://developer.android.com/guide/topics/providers/content-providers.html). |
 | [todo‑mvp‑rxjava](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) | Uses [RxJava](https://github.com/ReactiveX/RxJava) to implement concurrency, and abstract the data layer. |
+| [todo‑mvvm‑databinding](https://github.com/googlesamples/android-architecture/tree/todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
 
 
 ### Samples in progress
@@ -29,7 +30,6 @@ This project hosts each sample app in separate repository branches. For more inf
 | Sample | Description |
 | ------------- | ------------- |
 | [dev‑todo‑mvp‑tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Adds a master and detail view for tablets. |
-| [dev‑todo‑mvvm‑databinding](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
 | [dev‑todo‑mvvm‑rxjava](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-rxjava/) | Based on the todo-rxjava sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
 
 For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
