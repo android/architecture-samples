@@ -56,7 +56,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
         
-        boolean hasExtra = getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+        boolean hasExtra = (taskId != null);
         
         if(hasExtra)
         {
