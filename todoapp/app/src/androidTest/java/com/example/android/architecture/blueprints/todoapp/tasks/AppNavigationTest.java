@@ -108,7 +108,7 @@ public class AppNavigationTest {
 
     @Test
     public void backFromTasksScreen_ExitsApp() {
-        // From the tasks screen, press back to go back to the tasks list
+        // From the tasks screen, press back should exit the app.
         assertPressingBackExitsApp();
     }
 
