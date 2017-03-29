@@ -199,7 +199,7 @@ public class TasksRepository implements TasksDataSource {
      * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
      * uses the network data source. This is done to simplify the sample.
      * <p>
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is fired if both data sources fail to
+     * Note: {@link GetTaskCallback#onDataNotAvailable()} is fired if both data sources fail to
      * get the data.
      */
     @Override
@@ -221,6 +221,11 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
+                // Do in memory cache update to keep the app UI up to date
+                if (mCachedTasks == null) {
+                    mCachedTasks = new LinkedHashMap<>();
+                }
+                mCachedTasks.put(task.getId(), task);
                 callback.onTaskLoaded(task);
             }
 
@@ -229,6 +234,11 @@ public class TasksRepository implements TasksDataSource {
                 mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
                     @Override
                     public void onTaskLoaded(Task task) {
+                        // Do in memory cache update to keep the app UI up to date
+                        if (mCachedTasks == null) {
+                            mCachedTasks = new LinkedHashMap<>();
+                        }
+                        mCachedTasks.put(task.getId(), task);
                         callback.onTaskLoaded(task);
                     }
 

@@ -16,9 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -28,7 +28,6 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 import javax.inject.Inject;
@@ -97,11 +96,7 @@ public class StatisticsActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                Intent intent =
-                                        new Intent(StatisticsActivity.this, TasksActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+                                NavUtils.navigateUpFromSameTask(StatisticsActivity.this);
                                 break;
                             case R.id.statistics_navigation_menu_item:
                                 // Do nothing, we're already on that screen

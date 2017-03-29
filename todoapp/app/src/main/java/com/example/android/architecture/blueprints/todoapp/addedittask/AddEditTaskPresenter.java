@@ -50,16 +50,19 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    private boolean mIsDataMissing;
+
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
      */
     @Inject
     AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository,
-            AddEditTaskContract.View addTaskView) {
+            AddEditTaskContract.View addTaskView, boolean shouldLoadDataFromRepo) {
         mTaskId = taskId;
         mTasksRepository = tasksRepository;
         mAddTaskView = addTaskView;
+        mIsDataMissing = shouldLoadDataFromRepo;
     }
 
     /**
@@ -73,7 +76,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void start() {
-        if (!isNewTask()) {
+        if (!isNewTask() && mIsDataMissing) {
             populateTask();
         }
     }
@@ -102,6 +105,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
         }
+        mIsDataMissing = false;
     }
 
     @Override
@@ -110,6 +114,11 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    @Override
+    public boolean isDataMissing() {
+        return mIsDataMissing;
     }
 
     private boolean isNewTask() {

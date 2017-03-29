@@ -16,9 +16,13 @@ public class AddEditTaskPresenterModule {
 
     private String mTaskId;
 
-    public AddEditTaskPresenterModule(AddEditTaskContract.View view, @Nullable String taskId) {
+    private boolean mShouldLoadDataFromRepo;
+
+    public AddEditTaskPresenterModule(AddEditTaskContract.View view, @Nullable String taskId,
+                                      boolean shouldLoadDataFromRepo) {
         mView = view;
         mTaskId = taskId;
+        mShouldLoadDataFromRepo = shouldLoadDataFromRepo;
     }
 
     @Provides
@@ -30,5 +34,10 @@ public class AddEditTaskPresenterModule {
     @Nullable
     String provideTaskId() {
         return mTaskId;
+    }
+
+    @Provides
+    boolean provideShouldLoadDataFromRepo() {
+        return mShouldLoadDataFromRepo;
     }
 }
