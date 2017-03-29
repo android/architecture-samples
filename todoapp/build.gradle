@@ -24,12 +24,12 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     minSdkVersion = 10
-    targetSdkVersion = 24
-    compileSdkVersion = 24
-    buildToolsVersion = '24.0.2'
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.0'
 
     // App dependencies
-    supportLibraryVersion = '24.2.0'
+    supportLibraryVersion = '25.3.1'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
