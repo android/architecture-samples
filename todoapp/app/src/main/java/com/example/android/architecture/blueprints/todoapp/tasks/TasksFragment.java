@@ -53,6 +53,7 @@ public class TasksFragment extends Fragment {
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
+    private TasksAdapter mListAdapter;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -123,6 +124,11 @@ public class TasksFragment extends Fragment {
         setupRefreshLayout();
     }
 
+    @Override
+    public void onDestroy() {
+        mListAdapter.onDestroy();
+        super.onDestroy();
+    }
 
     private void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
@@ -175,7 +181,7 @@ public class TasksFragment extends Fragment {
     private void setupListAdapter() {
         ListView listView =  mTasksFragBinding.tasksList;
 
-        TasksAdapter mListAdapter = new TasksAdapter(
+        mListAdapter = new TasksAdapter(
                 new ArrayList<Task>(0),
                 (TasksActivity) getActivity(),
                 Injection.provideTasksRepository(getContext().getApplicationContext()),
@@ -197,7 +203,7 @@ public class TasksFragment extends Fragment {
 
     public static class TasksAdapter extends BaseAdapter {
 
-        private final TasksActivity mTaskItemNavigator;
+        @Nullable private TaskItemNavigator mTaskItemNavigator;
 
         private final TasksViewModel mTasksViewModel;
 
@@ -213,6 +219,10 @@ public class TasksFragment extends Fragment {
             mTasksViewModel = tasksViewModel;
             setList(tasks);
 
+        }
+
+        public void onDestroy() {
+            mTaskItemNavigator = null;
         }
 
         public void replaceData(List<Task> tasks) {
@@ -253,6 +263,7 @@ public class TasksFragment extends Fragment {
                     viewGroup.getContext().getApplicationContext(),
                     mTasksRepository
             );
+
             viewmodel.setNavigator(mTaskItemNavigator);
 
             binding.setViewmodel(viewmodel);
@@ -269,6 +280,7 @@ public class TasksFragment extends Fragment {
 
             return binding.getRoot();
         }
+
 
         private void setList(List<Task> tasks) {
             mTasks = tasks;

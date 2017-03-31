@@ -27,7 +27,6 @@ import android.graphics.drawable.Drawable;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -68,12 +67,11 @@ public class TasksViewModel extends BaseObservable {
 
     private final TasksRepository mTasksRepository;
 
-    // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private WeakActivityReference<TasksActivity> mNavigator;
-
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
     private Context mContext; // To avoid leaks, this must be an Application Context.
+
+    private TasksNavigator mNavigator;
 
     public TasksViewModel(
             TasksRepository repository,
@@ -85,8 +83,13 @@ public class TasksViewModel extends BaseObservable {
         setFiltering(TasksFilterType.ALL_TASKS);
     }
 
-    void setNavigator(TasksActivity navigator) {
-        mNavigator = new WeakActivityReference<>(navigator);
+    void setNavigator(TasksNavigator navigator) {
+        mNavigator = navigator;
+    }
+
+    void onActivityDestroyed() {
+        // Clear references to avoid potential memory leaks.
+        mNavigator = null;
     }
 
     public void start() {
@@ -157,8 +160,8 @@ public class TasksViewModel extends BaseObservable {
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        if (mNavigator.get() != null) {
-            mNavigator.get().addNewTask();
+        if (mNavigator != null) {
+            mNavigator.addNewTask();
         }
     }
 

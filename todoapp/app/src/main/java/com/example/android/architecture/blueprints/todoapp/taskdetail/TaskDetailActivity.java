@@ -46,6 +46,8 @@ public class TaskDetailActivity extends BaseActivity implements TaskDetailNaviga
 
     public static final int EDIT_RESULT_OK = RESULT_FIRST_USER + 3;
 
+    private TaskDetailViewModel mTaskViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +58,17 @@ public class TaskDetailActivity extends BaseActivity implements TaskDetailNaviga
 
         TaskDetailFragment taskDetailFragment = findOrCreateViewFragment();
 
-        TaskDetailViewModel taskViewModel = findOrCreateViewModel();
-        taskViewModel.setNavigator(this);
+        mTaskViewModel = findOrCreateViewModel();
+        mTaskViewModel.setNavigator(this);
 
         // Link View and ViewModel
-        taskDetailFragment.setViewModel(taskViewModel);
+        taskDetailFragment.setViewModel(mTaskViewModel);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mTaskViewModel.onActivityDestroyed();
+        super.onDestroy();
     }
 
     @NonNull

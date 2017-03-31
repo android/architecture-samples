@@ -17,10 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
-import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import java.lang.ref.WeakReference;
 
 
 /**
@@ -29,15 +31,15 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  */
 public class TaskItemViewModel extends TaskViewModel {
 
-    // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private WeakActivityReference<TasksActivity> mTaskItemNavigator;
+    @Nullable
+    private WeakReference<TaskItemNavigator> mNavigator;
 
     public TaskItemViewModel(Context context, TasksRepository tasksRepository) {
         super(context, tasksRepository);
     }
 
-    void setNavigator(TasksActivity itemNavigator) {
-        mTaskItemNavigator = new WeakActivityReference<>(itemNavigator);
+    public void setNavigator(TaskItemNavigator navigator) {
+        mNavigator = new WeakReference<>(navigator);
     }
 
     /**
@@ -49,8 +51,8 @@ public class TaskItemViewModel extends TaskViewModel {
             // Click happened before task was loaded, no-op.
             return;
         }
-        if (mTaskItemNavigator.get() != null) {
-            mTaskItemNavigator.get().openTaskDetails(taskId);
+        if (mNavigator != null && mNavigator.get() != null) {
+            mNavigator.get().openTaskDetails(taskId);
         }
     }
 }

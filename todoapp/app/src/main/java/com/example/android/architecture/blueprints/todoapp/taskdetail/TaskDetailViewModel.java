@@ -17,9 +17,9 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
-import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
@@ -30,15 +30,20 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
  */
 public class TaskDetailViewModel extends TaskViewModel {
 
-    // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private WeakActivityReference<TaskDetailActivity> mTaskDetailNavigator;
+    @Nullable
+    private TaskDetailNavigator mTaskDetailNavigator;
 
     public TaskDetailViewModel(Context context, TasksRepository tasksRepository) {
         super(context, tasksRepository);
     }
 
-    public void setNavigator(TaskDetailActivity taskDetailNavigator) {
-        mTaskDetailNavigator = new WeakActivityReference<>(taskDetailNavigator);
+    public void setNavigator(TaskDetailNavigator taskDetailNavigator) {
+        mTaskDetailNavigator = taskDetailNavigator;
+    }
+
+    public void onActivityDestroyed() {
+        // Clear references to avoid potential memory leaks.
+        mTaskDetailNavigator = null;
     }
 
     /**
@@ -46,14 +51,14 @@ public class TaskDetailViewModel extends TaskViewModel {
      */
     public void deleteTask() {
         super.deleteTask();
-        if (mTaskDetailNavigator.get() != null) {
-            mTaskDetailNavigator.get().onTaskDeleted();
+        if (mTaskDetailNavigator != null) {
+            mTaskDetailNavigator.onTaskDeleted();
         }
     }
 
     public void startEditTask() {
-        if (mTaskDetailNavigator.get() != null) {
-            mTaskDetailNavigator.get().onStartEditTask();
+        if (mTaskDetailNavigator != null) {
+            mTaskDetailNavigator.onStartEditTask();
         }
     }
 }

@@ -22,7 +22,6 @@ import android.databinding.ObservableField;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -56,15 +55,20 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     private boolean mIsDataLoaded = false;
 
-    private WeakActivityReference<AddEditTaskActivity> mAddEditTaskNavigator;
+    private AddEditTaskNavigator mAddEditTaskNavigator;
 
     AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
     }
 
-    void setNavigator(AddEditTaskActivity navigator) {
-        mAddEditTaskNavigator = new WeakActivityReference<>(navigator);
+    void onActivityCreated(AddEditTaskNavigator navigator) {
+        mAddEditTaskNavigator = navigator;
+    }
+
+    void onActivityDestroyed() {
+        // Clear references to avoid potential memory leaks.
+        mAddEditTaskNavigator = null;
     }
 
     public void start(String taskId) {
@@ -140,8 +144,8 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     }
 
     private void navigateOnTaskSaved() {
-        if (mAddEditTaskNavigator.get() != null) {
-            mAddEditTaskNavigator.get().onTaskSaved();
+        if (mAddEditTaskNavigator!= null) {
+            mAddEditTaskNavigator.onTaskSaved();
         }
     }
 }

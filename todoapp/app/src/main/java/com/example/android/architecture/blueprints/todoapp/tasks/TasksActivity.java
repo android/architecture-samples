@@ -65,6 +65,12 @@ public class TasksActivity extends BaseActivity implements TaskItemNavigator, Ta
         tasksFragment.setViewModel(mViewModel);
     }
 
+    @Override
+    protected void onDestroy() {
+        mViewModel.onActivityDestroyed();
+        super.onDestroy();
+    }
+
     private TasksViewModel findOrCreateViewModel() {
         // In a configuration change we might have a ViewModel present. It's retained using the
         // Fragment Manager.

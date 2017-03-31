@@ -40,6 +40,7 @@ public class AddEditTaskActivity extends BaseActivity implements AddEditTaskNavi
     public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
     public static final String ADD_EDIT_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
+    private AddEditTaskViewModel mViewModel;
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -72,11 +73,18 @@ public class AddEditTaskActivity extends BaseActivity implements AddEditTaskNavi
 
         AddEditTaskFragment addEditTaskFragment = findOrCreateViewFragment();
 
-        AddEditTaskViewModel viewModel = findOrCreateViewModel();
-        viewModel.setNavigator(this);
+        mViewModel = findOrCreateViewModel();
 
         // Link View and ViewModel
-        addEditTaskFragment.setViewModel(viewModel);
+        addEditTaskFragment.setViewModel(mViewModel);
+
+        mViewModel.onActivityCreated(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mViewModel.onActivityDestroyed();
+        super.onDestroy();
     }
 
     @NonNull
