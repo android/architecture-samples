@@ -34,6 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +68,8 @@ public class TasksViewModel extends BaseObservable {
 
     private final TasksRepository mTasksRepository;
 
-    private final TasksNavigator mNavigator;
+    // Navigator has references to Activity so it must be wrapped to prevent leaks.
+    private final WeakReference<TasksNavigator> mNavigator;
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
@@ -79,7 +81,7 @@ public class TasksViewModel extends BaseObservable {
             TasksNavigator navigator) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
-        mNavigator = navigator;
+        mNavigator = new WeakReference<>(navigator);
 
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);
@@ -153,7 +155,9 @@ public class TasksViewModel extends BaseObservable {
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        mNavigator.addNewTask();
+        if (mNavigator.get() != null) {
+            mNavigator.get().addNewTask();
+        }
     }
 
     void handleActivityResult(int requestCode, int resultCode) {

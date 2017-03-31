@@ -21,6 +21,8 @@ import android.content.Context;
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
@@ -28,12 +30,13 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  */
 public class TaskItemViewModel extends TaskViewModel {
 
-    private final TaskItemNavigator mTaskItemNavigator;
+    // Navigator has references to Activity so it must be wrapped to prevent leaks.
+    private final WeakReference<TaskItemNavigator> mTaskItemNavigator;
 
     public TaskItemViewModel(Context context, TasksRepository tasksRepository,
                              TaskItemNavigator itemNavigator) {
         super(context, tasksRepository);
-        mTaskItemNavigator = itemNavigator;
+        mTaskItemNavigator = new WeakReference<>(itemNavigator);
     }
 
     /**
@@ -45,6 +48,8 @@ public class TaskItemViewModel extends TaskViewModel {
             // Click happened before task was loaded, no-op.
             return;
         }
-        mTaskItemNavigator.openTaskDetails(taskId);
+        if (mTaskItemNavigator.get() != null) {
+            mTaskItemNavigator.get().openTaskDetails(taskId);
+        }
     }
 }
