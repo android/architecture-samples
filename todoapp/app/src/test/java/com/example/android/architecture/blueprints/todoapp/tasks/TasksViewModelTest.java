@@ -80,6 +80,7 @@ public class TasksViewModelTest {
         // Get a reference to the class under test
         mTasksViewModel = new TasksViewModel(
                 mTasksRepository, mContext);
+        mTasksViewModel.setNavigator(mTasksNavigator);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),

@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -73,7 +72,7 @@ public class TaskDetailViewModelTest {
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
-    private TaskViewModel mTaskDetailViewModel;
+    private TaskDetailViewModel mTaskDetailViewModel;
 
     private Task mTask;
 
@@ -90,6 +89,7 @@ public class TaskDetailViewModelTest {
         // Get a reference to the class under test
         mTaskDetailViewModel = new TaskDetailViewModel(
                 mContext, mTasksRepository);
+        mTaskDetailViewModel.setNavigator(mock(TaskDetailActivity.class));
     }
 
     private void setupContext() {

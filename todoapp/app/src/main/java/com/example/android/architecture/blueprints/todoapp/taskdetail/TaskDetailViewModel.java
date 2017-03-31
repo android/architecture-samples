@@ -37,7 +37,7 @@ public class TaskDetailViewModel extends TaskViewModel {
         super(context, tasksRepository);
     }
 
-    void setNavigator(TaskDetailActivity taskDetailNavigator) {
+    public void setNavigator(TaskDetailActivity taskDetailNavigator) {
         mTaskDetailNavigator = new WeakActivityReference<>(taskDetailNavigator);
     }
 
