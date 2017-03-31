@@ -65,7 +65,7 @@ public class AddEditTaskViewModelTest {
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.setNavigator(mock(AddEditTaskActivity.class));
+        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class AddEditTaskViewModelTest {
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.setNavigator(mock(AddEditTaskActivity.class));
+        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
 
 
         // When the ViewModel is asked to populate an existing task
@@ -106,7 +106,7 @@ public class AddEditTaskViewModelTest {
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.setNavigator(mock(AddEditTaskActivity.class));
+        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
 
         // Before setting the Snackbar text, get its current value
         String snackbarText = mAddEditTaskViewModel.getSnackbarText();
@@ -120,7 +120,7 @@ public class AddEditTaskViewModelTest {
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
                 mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.setNavigator(mock(AddEditTaskActivity.class));
+        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
 
         // Set a new value for the Snackbar text via the public Observable
         mAddEditTaskViewModel.snackbarText.set(SNACKBAR_TEXT);

@@ -21,9 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.BaseActivity;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
@@ -33,7 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends BaseActivity implements AddEditTaskNavigator {
+public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
 
     public static final int REQUEST_CODE = 1;
 
