@@ -26,6 +26,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
+import java.lang.ref.WeakReference;
+
 /**
  * ViewModel for the Add/Edit screen.
  * <p>
@@ -53,7 +55,8 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     private boolean mIsNewTask;
 
-    private AddEditTaskNavigator mNavigator;
+    // Navigator has references to Activity so it must be wrapped to prevent leaks.
+    private WeakReference<AddEditTaskNavigator> mAddEditTaskNavigator;
 
     private boolean mIsDataLoaded = false;
 
@@ -62,7 +65,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
                                 AddEditTaskNavigator taskDetailNavigator) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
-        mNavigator = taskDetailNavigator;
+        mAddEditTaskNavigator = new WeakReference<>(taskDetailNavigator);
     }
 
     public void start(String taskId) {
@@ -125,7 +128,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
             snackbarText.set(mContext.getString(R.string.empty_task_message));
         } else {
             mTasksRepository.saveTask(newTask);
-            mNavigator.onTaskSaved();
+            navigateOnTaskSaved();
         }
     }
 
@@ -134,6 +137,12 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mNavigator.onTaskSaved(); // After an edit, go back to the list.
+        navigateOnTaskSaved(); // After an edit, go back to the list.
+    }
+
+    private void navigateOnTaskSaved() {
+        if (mAddEditTaskNavigator.get() != null) {
+            mAddEditTaskNavigator.get().onTaskSaved();
+        }
     }
 }

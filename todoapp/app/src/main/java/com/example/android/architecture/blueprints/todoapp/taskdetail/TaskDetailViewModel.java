@@ -22,6 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
@@ -29,12 +31,13 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
  */
 public class TaskDetailViewModel extends TaskViewModel {
 
-    private final TaskDetailNavigator mTaskDetailNavigator;
+    // Navigator has references to Activity so it must be wrapped to prevent leaks.
+    private final WeakReference<TaskDetailNavigator> mTaskDetailNavigator;
 
     public TaskDetailViewModel(Context context, TasksRepository tasksRepository,
                                TaskDetailNavigator taskDetailNavigator) {
         super(context, tasksRepository);
-        mTaskDetailNavigator = taskDetailNavigator;
+        mTaskDetailNavigator = new WeakReference<>(taskDetailNavigator);
     }
 
     /**
@@ -42,10 +45,14 @@ public class TaskDetailViewModel extends TaskViewModel {
      */
     public void deleteTask() {
         super.deleteTask();
-        mTaskDetailNavigator.onTaskDeleted();
+        if (mTaskDetailNavigator.get() != null) {
+            mTaskDetailNavigator.get().onTaskDeleted();
+        }
     }
 
     public void startEditTask() {
-        mTaskDetailNavigator.onStartEditTask();
+        if (mTaskDetailNavigator.get() != null) {
+            mTaskDetailNavigator.get().onStartEditTask();
+        }
     }
 }
