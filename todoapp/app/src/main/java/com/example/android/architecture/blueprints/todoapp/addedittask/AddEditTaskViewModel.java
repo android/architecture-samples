@@ -56,7 +56,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     private boolean mIsNewTask;
 
     // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private WeakReference<AddEditTaskNavigator> mNavigatorProvider;
+    private WeakReference<AddEditTaskNavigator> mAddEditTaskNavigator;
 
     private boolean mIsDataLoaded = false;
 
@@ -65,7 +65,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
                                 AddEditTaskNavigator taskDetailNavigator) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
-        mNavigatorProvider = new WeakReference<>(taskDetailNavigator);
+        mAddEditTaskNavigator = new WeakReference<>(taskDetailNavigator);
     }
 
     public void start(String taskId) {
@@ -141,8 +141,8 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     }
 
     private void navigateOnTaskSaved() {
-        if (mNavigatorProvider.get() != null) {
-            mNavigatorProvider.get().onTaskSaved();
+        if (mAddEditTaskNavigator.get() != null) {
+            mAddEditTaskNavigator.get().onTaskSaved();
         }
     }
 }
