@@ -89,7 +89,7 @@ public class TaskDetailViewModelTest {
 
         // Get a reference to the class under test
         mTaskDetailViewModel = new TaskDetailViewModel(
-                mContext, mTasksRepository, mock(TaskDetailNavigator.class));
+                mContext, mTasksRepository);
     }
 
     private void setupContext() {

@@ -60,7 +60,7 @@ public class TasksViewModelTest {
     private Context mContext;
 
     @Mock
-    private TasksNavigator mTasksNavigator;
+    private TasksActivity mTasksNavigator;
 
     @Captor
     private ArgumentCaptor<LoadTasksCallback> mLoadTasksCallbackCaptor;
@@ -79,7 +79,7 @@ public class TasksViewModelTest {
 
         // Get a reference to the class under test
         mTasksViewModel = new TasksViewModel(
-                mTasksRepository, mContext, mTasksNavigator);
+                mTasksRepository, mContext);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),

@@ -177,7 +177,7 @@ public class TasksFragment extends Fragment {
 
         TasksAdapter mListAdapter = new TasksAdapter(
                 new ArrayList<Task>(0),
-                (TaskItemNavigator) getActivity(),
+                (TasksActivity) getActivity(),
                 Injection.provideTasksRepository(getContext().getApplicationContext()),
                 mTasksViewModel);
         listView.setAdapter(mListAdapter);
@@ -197,7 +197,7 @@ public class TasksFragment extends Fragment {
 
     public static class TasksAdapter extends BaseAdapter {
 
-        private final TaskItemNavigator mTaskItemNavigator;
+        private final TasksActivity mTaskItemNavigator;
 
         private final TasksViewModel mTasksViewModel;
 
@@ -205,7 +205,7 @@ public class TasksFragment extends Fragment {
 
         private TasksRepository mTasksRepository;
 
-        public TasksAdapter(List<Task> tasks, TaskItemNavigator taskItemNavigator,
+        public TasksAdapter(List<Task> tasks, TasksActivity taskItemNavigator,
                             TasksRepository tasksRepository,
                             TasksViewModel tasksViewModel) {
             mTaskItemNavigator = taskItemNavigator;
@@ -251,8 +251,10 @@ public class TasksFragment extends Fragment {
 
             final TaskItemViewModel viewmodel = new TaskItemViewModel(
                     viewGroup.getContext().getApplicationContext(),
-                    mTasksRepository,
-                    mTaskItemNavigator);
+                    mTasksRepository
+            );
+            viewmodel.setNavigator(mTaskItemNavigator);
+
             binding.setViewmodel(viewmodel);
             // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the
             // fragment's.

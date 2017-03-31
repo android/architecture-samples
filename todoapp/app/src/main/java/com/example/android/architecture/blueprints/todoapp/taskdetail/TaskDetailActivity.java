@@ -20,9 +20,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.BaseActivity;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
@@ -36,7 +36,7 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
+public class TaskDetailActivity extends BaseActivity implements TaskDetailNavigator {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
@@ -57,6 +57,7 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         TaskDetailFragment taskDetailFragment = findOrCreateViewFragment();
 
         TaskDetailViewModel taskViewModel = findOrCreateViewModel();
+        taskViewModel.setNavigator(this);
 
         // Link View and ViewModel
         taskDetailFragment.setViewModel(taskViewModel);
@@ -78,8 +79,8 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
             // There is no ViewModel yet, create it.
             TaskDetailViewModel viewModel = new TaskDetailViewModel(
                     getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()),
-                    this);
+                    Injection.provideTasksRepository(getApplicationContext())
+            );
 
             // and bind it to this Activity's lifecycle using the Fragment Manager.
             ActivityUtils.addFragmentToActivity(

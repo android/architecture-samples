@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 
 import com.example.android.architecture.blueprints.todoapp.BR;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -34,7 +35,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +69,7 @@ public class TasksViewModel extends BaseObservable {
     private final TasksRepository mTasksRepository;
 
     // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private final WeakReference<TasksNavigator> mNavigator;
+    private WeakActivityReference<TasksActivity> mNavigator;
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
@@ -77,14 +77,16 @@ public class TasksViewModel extends BaseObservable {
 
     public TasksViewModel(
             TasksRepository repository,
-            Context context,
-            TasksNavigator navigator) {
+            Context context) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
-        mNavigator = new WeakReference<>(navigator);
 
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);
+    }
+
+    void setNavigator(TasksActivity navigator) {
+        mNavigator = new WeakActivityReference<>(navigator);
     }
 
     public void start() {

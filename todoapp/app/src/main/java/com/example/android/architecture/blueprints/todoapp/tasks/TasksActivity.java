@@ -25,10 +25,10 @@ import android.support.test.espresso.IdlingResource;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.BaseActivity;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
@@ -39,7 +39,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 
-public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
+public class TasksActivity extends BaseActivity implements TaskItemNavigator, TasksNavigator {
 
     private DrawerLayout mDrawerLayout;
 
@@ -59,6 +59,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         TasksFragment tasksFragment = findOrCreateViewFragment();
 
         mViewModel = findOrCreateViewModel();
+        mViewModel.setNavigator(this);
 
         // Link View and ViewModel
         tasksFragment.setViewModel(mViewModel);
@@ -79,8 +80,8 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
             // There is no ViewModel yet, create it.
             TasksViewModel viewModel = new TasksViewModel(
                     Injection.provideTasksRepository(getApplicationContext()),
-                    getApplicationContext(),
-                    this);
+                    getApplicationContext()
+            );
             // and bind it to this Activity's lifecycle using the Fragment Manager.
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(),

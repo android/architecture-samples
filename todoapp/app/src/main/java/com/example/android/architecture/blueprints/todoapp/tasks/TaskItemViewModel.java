@@ -19,9 +19,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
+import com.example.android.architecture.blueprints.todoapp.WeakActivityReference;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import java.lang.ref.WeakReference;
 
 
 /**
@@ -31,12 +30,14 @@ import java.lang.ref.WeakReference;
 public class TaskItemViewModel extends TaskViewModel {
 
     // Navigator has references to Activity so it must be wrapped to prevent leaks.
-    private final WeakReference<TaskItemNavigator> mTaskItemNavigator;
+    private WeakActivityReference<TasksActivity> mTaskItemNavigator;
 
-    public TaskItemViewModel(Context context, TasksRepository tasksRepository,
-                             TaskItemNavigator itemNavigator) {
+    public TaskItemViewModel(Context context, TasksRepository tasksRepository) {
         super(context, tasksRepository);
-        mTaskItemNavigator = new WeakReference<>(itemNavigator);
+    }
+
+    void setNavigator(TasksActivity itemNavigator) {
+        mTaskItemNavigator = new WeakActivityReference<>(itemNavigator);
     }
 
     /**
