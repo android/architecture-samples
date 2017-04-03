@@ -489,6 +489,33 @@ public class TasksScreenTest {
         onView(withItemText(TITLE1)).check(doesNotExist());
     }
 
+    @Test
+    public void noTasks_AllTasksFilter_AddTaskViewVisible() {
+        // Given an empty list of tasks, make sure "All tasks" filter is on
+        viewAllTasks();
+
+        // Add task View should be displayed
+        onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+        // Given an empty list of tasks, make sure "All tasks" filter is on
+        viewCompletedTasks();
+
+        // Add task View should be displayed
+        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+        // Given an empty list of tasks, make sure "All tasks" filter is on
+        viewActiveTasks();
+
+        // Add task View should be displayed
+        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())));
+    }
+
     private void viewAllTasks() {
         onView(withId(R.id.menu_filter)).perform(click());
         onView(withText(R.string.nav_all)).perform(click());
