@@ -39,7 +39,7 @@ public List<Task> loadInBackground() {
 }
 ```
 
-The UI thread recieves the results, and the [`TasksPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java) class handles them:
+The UI thread receives the results, and the [`TasksPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java) class handles them:
 
 ```java
 @Override
@@ -95,7 +95,7 @@ public void onTasksChanged() {
 
 ## Maintaining the app
 
-Adding or amending features to this version of the app requires a similar amount of effort to the todo-mvp sample. Before modifying the sample, you should be familiar with the [Loaders API](https://developer.android.com/guide/components/loaders.html), which is a relatively complex topic.
+Adding or amending features to this version of the app requires a similar amount of effort to the todo-mvp sample. Before modifying the sample, you should be familiar with the [Loaders API](https://developer.android.com/guide/components/loaders.html), which is not a trivial topic.
 
 This sample introduces two new classes, in addition to those found in todo-mvp: [`TaskLoader`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TaskLoader.java), and [`TasksLoader`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-loaders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksLoader.java). Some aspects of the code are simpler as loaders take care of asynchronous work. The table below summarizes the amount of code used to implement this version of the app. You can compare it with similar tables provided for each of the other samples in this project.
 
@@ -111,7 +111,7 @@ This sample introduces two new classes, in addition to those found in todo-mvp: 
 
 The following summary reviews how this solution compares to the todo-mvp base sample:
 
- * <b>Use of architectural frameworks, libraries, or tools: </b>None required.
+ * <b>Use of architectural frameworks, libraries, or tools: </b>Loaders API.
  * <b>UI testing: </b>Identical to todo-mvp.
  * <b>Ease of amending or adding a feature: </b>Similar effort to todo-mvp.
  * <b>Learning effort required: </b>Requires more background learning compared to todo-mvp.
