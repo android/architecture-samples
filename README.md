@@ -1,31 +1,45 @@
-# TODO-MVP-ContentProviders
+# todo-mvp-contentproviders
 
-It is based on the [TODO-MVP-Loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders) sample and uses a Content Provider to retrieve data into the repository.
+This version of the app is called todo-mvp-contentproviders. It is based on the [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders) sample, and adds a [content provider]((https://developer.android.com/guide/topics/providers/content-providers.html)) to manage access to the underlying SQLite database storage. Content providers provide a standard interface for allowing access to data in one process from code running in a different process. This sample demonstrates how to add a content provider to the [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders) sample. 
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Diagram"/>
+You could then use content providers to support additional features that are not covered by this sample, providing the following possible benefits:
 
-The advantages of Content Providers, from the [Content Provider documentation page](http://developer.android.com/guide/topics/providers/content-providers.html), are:
+ * Allow you to securely share data stored in your application with other applications.
+ * Add support for custom searches in your application.
+ * Develop widgets to access data in your application.
+ * Provide support for copying and pasting data between your application and other applications.
 
-  * Manage access to a structured set of data
-  * Content providers are the standard interface that connects data in one process with code running in another process
+Content providers can also be used to manage access to other types of storage including non-relational databases, or data stored on a file system. You can also use the [`FileProvider`](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) subclass of [`ContentProvider`](https://developer.android.com/reference/android/content/ContentProvider.html) to facilitate secure sharing of files associated with an app. A [`FileProvider`](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) can be used to create a `content://` URI for a file instead of a `file:///` URI. As with other versions of the [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp) app, this sample uses a SQLite database to provide data storage.
 
-The advantages of Loaders, from the [Loaders documentation page](http://developer.android.com/guide/components/loaders.html), are:
+## What you need
 
-  * They provide asynchronous loading of data, removing the need for callbacks in the repository.
-  * They monitor the source of their data and deliver new results when the content changes, in our case, the repository.
-  * They automatically reconnect to the last loader when being recreated after a configuration change.
+Before exploring this sample, make sure you familiarize yourself with the following topics:
 
-## Code
+ * The [project README](https://github.com/googlesamples/android-architecture/tree/master)
+ * The [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp) sample
+ * The [todo-mvp-loaders](https://github.com/googlesamples/android-architecture/tree/todo-mvp-loaders) sample
 
-### Asynchronous loading
+In addition to the dependencies used in the todo-mvp sample, this version of the app relies on the use of [content providers](https://developer.android.com/guide/topics/providers/content-providers.html).
 
-The data is fetched by [Cursor Loaders](http://developer.android.com/reference/android/support/v4/content/CursorLoader.html) and delivered to the Presenters.
-The Presenter does not need to know how the data is loaded, for that reason the LoaderProvider class is passed as a dependency of the Presenter and is in charge
-of dealing with the data loading.
+## Designing the app
 
+todo-mvp-contentproviders includes two new classes in addition to those used in the todo-mvp sample:
 
-In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/LoaderProvider.java):
+ * [`LoaderProvider`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/LoaderProvider.java) - Creates instances of [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html).
+ * [`TasksProvider`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java) - A subclass of [`ContentProvider`](https://developer.android.com/reference/android/content/ContentProvider.html).
+ 
+In addition a number of existing classes have been modified to support the use of a content provider. For example, each of the following presenter classes in this version of the application implements the [`LoaderManager.LoaderCallbacks`](https://developer.android.com/reference/android/app/LoaderManager.LoaderCallbacks.html) interface to add the methods required to interact with the manager:
 
+ * [`TasksPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
+ * [`TaskDetailPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/taskdetail/TaskDetailPresenter.java)
+ * [`StatisticsPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/statistics/StatisticsPresenter.java)
+ * [`AddEditTaskPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/addedittask/AddEditTaskPresenter.java)
+
+For more information on reviewing the changes to this version of the app, see [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples).
+
+## Implementing the app
+
+A [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html) is used to fetch and deliver data to a presenter. The [`LoaderProvider`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/LoaderProvider.java) class is responsible for creating the [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html):
 
 ```java
   return new CursorLoader(
@@ -34,10 +48,12 @@ In [src/data/source/LoaderProvider.java](https://github.com/googlesamples/androi
                  TasksPersistenceContract.TaskEntry.TASKS_COLUMNS, selection, selectionArgs, null
          );
 ```
-The results are received in the UI Thread, handled by the Presenter.
 
-In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
+The [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html) then loads data from storage using a [`ContentProvider`](https://developer.android.com/reference/android/content/ContentProvider.html) which is implemented in this application as the [`TasksProvider`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java) class. This interaction is illustrated in the following diagram:
 
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp-contentproviders.png" alt="Illustrates the introduction of a content provider in this version of the app."/>
+
+Any data that has been requested is returned to the UI thread and handled by the presenter. The following example illustrates how the [`TasksPresenter`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java) handles data returned by a [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html).
 
 ```java
     @Override
@@ -54,122 +70,28 @@ In [TasksPresenter.java](https://github.com/googlesamples/android-architecture/b
     }
 ```
 
-Since CursorLoaders have Observers listening to the underlying data changes in the ContentProvider, we don't need to tell them directly that new data is available.
-For that reason, the Presenter tells the Repository to go and grab the latest data.
+The [`TasksRepository`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java) class in this version of the application is designed to behave a little differently from the other samples in this project. The main difference is that the [`TasksRepository`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java) class does not return data to the presenter, but instead stores the tasks in the [`LocalDataSource`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java). A [`CursorLoader`](https://developer.android.com/reference/android/content/CursorLoader.html) automatically registers a [`ContentObserver`](https://developer.android.com/reference/android/database/ContentObserver.html) to reload data when changes are detected. A [`ContentProvider`](https://developer.android.com/reference/android/content/ContentProvider.html) can then notify observers of changes to the URI queried as illustrated in the following delete method from [`TasksProvider`](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java).
 
-```java
-   /**
-     * We will always have fresh data from remote, the Loaders handle the local data
-     */
-    public void loadTasks() {
-        mTasksView.setLoadingIndicator(true);
-        mTasksRepository.getTasks(this);
-    }
-```
+The use of the loaders and content providers introduces additional complexity in writing unit tests for the new functionality. This sample relies on the use of tests which need to be run on either a device or emulator.
 
-Upon start, once the data has been stored locally we simply ask the LoaderProvider to start the Loader
+## Maintaining the app
 
- ```java
-     @Override
-     public void onTasksLoaded() {
-         if (mLoaderManager.getLoader(TASKS_LOADER) == null) {
-             mLoaderManager.initLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
-         } else {
-             mLoaderManager.restartLoader(TASKS_LOADER, mCurrentFiltering.getFilterExtras(), this);
-         }
-     }
- ```
+To add or amend features to this version of the application, you should be familiar with the implementation details for loaders and content providers, both of which are in depth topics.
+
+Note that some aspects of the code in this version are simpler as loaders take care of asynchronous requests. The following table summarizes the amount of code required for this version of the application and provides a comparison to the todo-mvp base sample.
+
+| Language      | Number of files | Blank lines | Comment lines | Lines of code |
+| ------------- | --------------- | ----------- | ------------- | ------------- |
+| **Java**      |               48|         1100|           1460|           3535 (3450 in todo-mvP)|
+| **XML**       |               34|           97|            337|            601|
+| **Total**     |               82|         1197|           1797|           4136|
 
 
-### Content Provider and Tasks Repository
+## Comparing this sample
 
-The [TasksRepository](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksRepository.java#L81) behaves a bit differently compared to the other branches. The main difference is that it's not returning data to the `Presenter`, but only storing the tasks in the [LocalDataSource](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TasksLocalDataSource.java#L61). Once the `ContentProvider` inserts data, it will [notify](https://github.com/googlesamples/android-architecture/blob/todo-mvp-contentproviders/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/source/TasksProvider.java#L128) the change to the `Uri` and whoever is observing it will receive an update.
+The following summary reviews how this solution compares to the todo-mvp base sample:
 
-```java
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = mTasksDbHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        int rowsDeleted;
-
-        switch (match) {
-            case TASK:
-                rowsDeleted = db.delete(
-                        TasksPersistenceContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-        if (selection == null || rowsDeleted != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return rowsDeleted;
-    }
-```
-
-That's why there's no need to return the data to the `Presenter`, the `CursorLoader` will always have the data present in the `ContentProvider`
-
-
-## Additional considerations
-
-Content Providers are the perfect solution to share content with other applications. If your application doesn't need to share content then this is not
-the best approach for you.
-
-One can make the most out of them when using [Widgets](https://developer.android.com/design/patterns/widgets.html) or you'd like to share content the same
-way [Calendar](https://developer.android.com/guide/topics/providers/calendar-provider.html) or [Contacts](https://developer.android.com/guide/topics/providers/contacts-provider.html) do.
-
-Another benefit of Content Providers is that they don't need to use a SQLite database underneath, one could use other approach to give data to the application. For
- example, [FileProvider](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) is a great example of that. FileProvider is a special subclass of `ContentProvider` that facilitates secure sharing of files associated with an app by creating a content:// Uri for a file instead of a file:/// Uri.
-
-## Features
-
-### Complexity - understandability
-
-#### Use of architectural frameworks/libraries/tools:
-
-No external frameworks.
-
-#### Conceptual complexity
-
-Developers need to be familiar with the Loaders and Content Providers framework, which is not
-trivial. Following this approach is harder to decouple from dependencies of the Android Framework.
-
-### Testability
-
-#### Unit testing
-
-The use of the Loaders framework adds a big dependency with the Android
-framework so unit testing is harder. Same goes for the Content Provider, forcing us to use AndroidJUnit
-tests which run in a device / emulator and not in the developer's local JVM.
-
-#### UI testing
-
-No difference with MVP.
-
-### Code metrics
-
-Compared to MVP, the only new classes are LoaderProvider and TasksProvider. Parts of
-the code are simpler as Loaders take care of the asynchronous work.
-
-
-```
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-Java                            48           1100           1460           3535 (3450 in MVP)
-XML                             34             97            337            601
--------------------------------------------------------------------------------
-SUM:                            82           1197           1797           4136
--------------------------------------------------------------------------------
-
-```
-
-### Maintainability
-
-#### Ease of amending or adding a feature
-
-Similar to MVP Loaders
-
-#### Learning cost
-
-Medium as the Loaders and Content Providers framework are not trivial.
+ * <b>Use of architectural frameworks, libraries, or tools: </b>None required.
+ * <b>UI testing: </b>Identical to todo-mvp.
+ * <b>Ease of amending or adding a feature: </b>Similar effort to todo-mvp.
+ * <b>Learning effort required: </b>Requires more background learning compared to todo-mvp.
