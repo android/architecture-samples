@@ -31,6 +31,8 @@ import java.lang.ref.WeakReference;
  */
 public class TaskItemViewModel extends TaskViewModel {
 
+    // This navigator is s wrapped in a WeakReference to avoid leaks because it has references to an
+    // activity. There's no straightforward way to clear it for each item in a list adapter.
     @Nullable
     private WeakReference<TaskItemNavigator> mNavigator;
 
