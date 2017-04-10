@@ -86,8 +86,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
             // There is no ViewModel yet, create it.
             TasksViewModel viewModel = new TasksViewModel(
                     Injection.provideTasksRepository(getApplicationContext()),
-                    getApplicationContext()
-            );
+                    getApplicationContext());
             // and bind it to this Activity's lifecycle using the Fragment Manager.
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(),

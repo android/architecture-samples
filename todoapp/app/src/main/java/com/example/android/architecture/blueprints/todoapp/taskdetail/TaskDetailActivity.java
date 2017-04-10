@@ -87,8 +87,7 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
             // There is no ViewModel yet, create it.
             TaskDetailViewModel viewModel = new TaskDetailViewModel(
                     getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext())
-            );
+                    Injection.provideTasksRepository(getApplicationContext()));
 
             // and bind it to this Activity's lifecycle using the Fragment Manager.
             ActivityUtils.addFragmentToActivity(
