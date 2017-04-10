@@ -53,16 +53,22 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     private boolean mIsNewTask;
 
-    private AddEditTaskNavigator mNavigator;
-
     private boolean mIsDataLoaded = false;
 
-    public AddEditTaskViewModel(Context context,
-                                TasksRepository tasksRepository,
-                                AddEditTaskNavigator taskDetailNavigator) {
+    private AddEditTaskNavigator mAddEditTaskNavigator;
+
+    AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
-        mNavigator = taskDetailNavigator;
+    }
+
+    void onActivityCreated(AddEditTaskNavigator navigator) {
+        mAddEditTaskNavigator = navigator;
+    }
+
+    void onActivityDestroyed() {
+        // Clear references to avoid potential memory leaks.
+        mAddEditTaskNavigator = null;
     }
 
     public void start(String taskId) {
@@ -125,7 +131,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
             snackbarText.set(mContext.getString(R.string.empty_task_message));
         } else {
             mTasksRepository.saveTask(newTask);
-            mNavigator.onTaskSaved();
+            navigateOnTaskSaved();
         }
     }
 
@@ -134,6 +140,12 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mNavigator.onTaskSaved(); // After an edit, go back to the list.
+        navigateOnTaskSaved(); // After an edit, go back to the list.
+    }
+
+    private void navigateOnTaskSaved() {
+        if (mAddEditTaskNavigator!= null) {
+            mAddEditTaskNavigator.onTaskSaved();
+        }
     }
 }

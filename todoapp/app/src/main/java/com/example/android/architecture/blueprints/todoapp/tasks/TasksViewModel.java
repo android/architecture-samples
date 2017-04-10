@@ -67,22 +67,29 @@ public class TasksViewModel extends BaseObservable {
 
     private final TasksRepository mTasksRepository;
 
-    private final TasksNavigator mNavigator;
-
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
     private Context mContext; // To avoid leaks, this must be an Application Context.
 
+    private TasksNavigator mNavigator;
+
     public TasksViewModel(
             TasksRepository repository,
-            Context context,
-            TasksNavigator navigator) {
+            Context context) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
-        mNavigator = navigator;
 
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);
+    }
+
+    void setNavigator(TasksNavigator navigator) {
+        mNavigator = navigator;
+    }
+
+    void onActivityDestroyed() {
+        // Clear references to avoid potential memory leaks.
+        mNavigator = null;
     }
 
     public void start() {
@@ -153,7 +160,9 @@ public class TasksViewModel extends BaseObservable {
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        mNavigator.addNewTask();
+        if (mNavigator != null) {
+            mNavigator.addNewTask();
+        }
     }
 
     void handleActivityResult(int requestCode, int resultCode) {

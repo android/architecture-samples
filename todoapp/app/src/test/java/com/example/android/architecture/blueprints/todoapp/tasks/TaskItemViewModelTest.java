@@ -54,7 +54,7 @@ public class TaskItemViewModelTest {
     private Context mContext;
 
     @Mock
-    private TaskItemNavigator mTaskItemNavigator;
+    private TasksActivity mTaskItemNavigator;
 
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mLoadTasksCallbackCaptor;
@@ -72,7 +72,8 @@ public class TaskItemViewModelTest {
         setupContext();
 
         // Get a reference to the class under test
-        mTaskItemViewModel = new TaskItemViewModel(mContext, mTasksRepository, mTaskItemNavigator);
+        mTaskItemViewModel = new TaskItemViewModel(mContext, mTasksRepository);
+        mTaskItemViewModel.setNavigator(mTaskItemNavigator);
 
     }
 

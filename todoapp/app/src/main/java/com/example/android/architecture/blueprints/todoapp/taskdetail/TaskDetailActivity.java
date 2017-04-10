@@ -46,6 +46,8 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     public static final int EDIT_RESULT_OK = RESULT_FIRST_USER + 3;
 
+    private TaskDetailViewModel mTaskViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +58,17 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
         TaskDetailFragment taskDetailFragment = findOrCreateViewFragment();
 
-        TaskDetailViewModel taskViewModel = findOrCreateViewModel();
+        mTaskViewModel = findOrCreateViewModel();
+        mTaskViewModel.setNavigator(this);
 
         // Link View and ViewModel
-        taskDetailFragment.setViewModel(taskViewModel);
+        taskDetailFragment.setViewModel(mTaskViewModel);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mTaskViewModel.onActivityDestroyed();
+        super.onDestroy();
     }
 
     @NonNull
@@ -78,8 +87,7 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
             // There is no ViewModel yet, create it.
             TaskDetailViewModel viewModel = new TaskDetailViewModel(
                     getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()),
-                    this);
+                    Injection.provideTasksRepository(getApplicationContext()));
 
             // and bind it to this Activity's lifecycle using the Fragment Manager.
             ActivityUtils.addFragmentToActivity(
