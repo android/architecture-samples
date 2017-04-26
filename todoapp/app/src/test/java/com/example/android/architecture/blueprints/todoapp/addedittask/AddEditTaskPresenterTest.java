@@ -65,6 +65,16 @@ public class AddEditTaskPresenterTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView(){
+        // Get a reference to the class under test
+        mAddEditTaskPresenter = new AddEditTaskPresenter(
+                null, mTasksRepository, mAddEditTaskView, true);
+
+        // Then the presenter is set to the view
+        verify(mAddEditTaskView).setPresenter(mAddEditTaskPresenter);
+    }
+
+    @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(
