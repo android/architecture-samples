@@ -77,6 +77,15 @@ public class TasksPresenterTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView() {
+        // Get a reference to the class under test
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+
+        // Then the presenter is set to the view
+        verify(mTasksView).setPresenter(mTasksPresenter);
+    }
+
+    @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
         // When loading of Tasks is requested

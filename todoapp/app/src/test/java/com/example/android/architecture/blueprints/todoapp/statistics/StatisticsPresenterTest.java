@@ -21,14 +21,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.collect.Lists;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,6 +71,15 @@ public class StatisticsPresenterTest {
         // We start the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+    }
+
+    @Test
+    public void createPresenter_setsThePresenterToView() {
+        // Get a reference to the class under test
+        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+
+        // Then the presenter is set to the view
+        verify(mStatisticsView).setPresenter(mStatisticsPresenter);
     }
 
     @Test

@@ -88,8 +88,6 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 Injection.provideTasksRepository(getApplicationContext()),
                 addEditTaskFragment,
                 shouldLoadDataFromRepo);
-
-        addEditTaskFragment.setPresenter(mAddEditTaskPresenter);
     }
 
     private void setToolbarTitle(@Nullable String taskId) {
