@@ -73,6 +73,16 @@ public class StatisticsPresenterTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView() {
+        // Get a reference to the class under test
+        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView,
+                mSchedulerProvider);
+
+        // Then the presenter is set to the view
+        verify(mStatisticsView).setPresenter(mStatisticsPresenter);
+    }
+
+    @Test
     public void loadEmptyTasksFromRepository_CallViewToDisplay() {
         // Given an initialized StatisticsPresenter with no tasks
         TASKS.clear();

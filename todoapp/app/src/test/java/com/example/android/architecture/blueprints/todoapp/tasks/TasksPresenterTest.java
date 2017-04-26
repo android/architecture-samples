@@ -73,6 +73,15 @@ public class TasksPresenterTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView() {
+        // Get a reference to the class under test
+        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView, mSchedulerProvider);
+
+        // Then the presenter is set to the view
+        verify(mTasksView).setPresenter(mTasksPresenter);
+    }
+
+    @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));

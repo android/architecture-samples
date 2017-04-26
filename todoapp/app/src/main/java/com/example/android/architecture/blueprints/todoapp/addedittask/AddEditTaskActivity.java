@@ -84,8 +84,6 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 addEditTaskFragment,
                 shouldLoadDataFromRepo,
                 Injection.provideSchedulerProvider());
-
-        addEditTaskFragment.setPresenter(mAddEditTaskPresenter);
     }
 
     @Override
