@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import rx.Completable;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.when;
  */
 public class AddEditTaskViewModelTest {
 
+    private static final String NEW_TITLE = "new title";
+    private static final String NEW_DESCRIPTION = "new description";
     private static final Task TASK = new Task("TITLE", "DESCRIPTION");
 
     @Mock
@@ -99,26 +102,41 @@ public class AddEditTaskViewModelTest {
     }
 
     @Test
+    public void saveTask_emitsError_whenErrorSavingInRepository() {
+        // Get a reference to the class under test for a null task id
+        mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigator);
+        // Given that the repository returns an error when a task is saved
+        when(mTasksRepository.saveTask(any(Task.class)))
+                .thenReturn(Completable.error(new RuntimeException()));
+
+        // When saving a task
+        mViewModel.saveTask(NEW_TITLE, NEW_DESCRIPTION).subscribe(mCompletableTestSubscriber);
+
+        // An error is emitted
+        mCompletableTestSubscriber.assertError(RuntimeException.class);
+    }
+
+    @Test
     public void saveTask_whenNoTask_createsTask() {
         // Get a reference to the class under test for a null task id
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigator);
+        withTaskInRepositorySavedSuccessfully();
 
         // When saving a task
-        mViewModel.saveTask("title", "description").subscribe(mCompletableTestSubscriber);
+        mViewModel.saveTask(NEW_TITLE, NEW_DESCRIPTION).subscribe();
 
         // The task is saved in repository
         verify(mTasksRepository).saveTask(any(Task.class));
-        // The completable completes
-        mCompletableTestSubscriber.assertCompleted();
     }
 
     @Test
     public void saveTask_whenNoTask_navigates() {
         // Get a reference to the class under test for a null task id
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigator);
+        withTaskInRepositorySavedSuccessfully();
 
         // When saving a task
-        mViewModel.saveTask("title", "description").subscribe();
+        mViewModel.saveTask(NEW_TITLE, NEW_DESCRIPTION).subscribe();
 
         // Navigation is triggered
         verify(mNavigator).onTaskSaved();
@@ -154,14 +172,13 @@ public class AddEditTaskViewModelTest {
     public void saveTask_withExistingTaskId_savesTask() {
         // Get a reference to the class under test for a task id
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigator);
+        withTaskInRepositorySavedSuccessfully();
 
         // When saving the task with new title and new description
-        String newTitle = "new title";
-        String newDescription = "new description";
-        mViewModel.saveTask(newTitle, newDescription).subscribe();
+        mViewModel.saveTask(NEW_TITLE, NEW_DESCRIPTION).subscribe();
 
         // The updated task is saved in the repository
-        Task expected = new Task(newTitle, newDescription, TASK.getId());
+        Task expected = new Task(NEW_TITLE, NEW_DESCRIPTION, TASK.getId());
         verify(mTasksRepository).saveTask(expected);
     }
 
@@ -169,11 +186,10 @@ public class AddEditTaskViewModelTest {
     public void saveTask_withExistingTaskId_navigates() {
         // Get a reference to the class under test for a task id
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigator);
+        withTaskInRepositorySavedSuccessfully();
 
         // When saving the task with new title and new description
-        String newTitle = "new title";
-        String newDescription = "new description";
-        mViewModel.saveTask(newTitle, newDescription).subscribe(mCompletableTestSubscriber);
+        mViewModel.saveTask(NEW_TITLE, NEW_DESCRIPTION).subscribe(mCompletableTestSubscriber);
 
         // The navigation is triggered
         verify(mNavigator).onTaskSaved();
@@ -189,14 +205,13 @@ public class AddEditTaskViewModelTest {
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigator);
 
         // When setting a restore title
-        String restoredTitle = "new title";
-        mViewModel.setRestoredState(restoredTitle, null);
+        mViewModel.setRestoredState(NEW_TITLE, null);
         // When that we are subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
         // The emitted task has the restored title
         Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertEquals(task.getTitle(), restoredTitle);
+        assertEquals(task.getTitle(), NEW_TITLE);
         // And all the initial values of the task
         assertEquals(task.getId(), TASK.getId());
         assertEquals(task.getDescription(), TASK.getDescription());
@@ -210,16 +225,19 @@ public class AddEditTaskViewModelTest {
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigator);
 
         // When setting a restore description
-        String restoredDescription = "new description";
-        mViewModel.setRestoredState(null, restoredDescription);
+        mViewModel.setRestoredState(null, NEW_DESCRIPTION);
         // When that we are subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
         // The emitted task has the restored description
         Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertEquals(task.getDescription(), restoredDescription);
+        assertEquals(task.getDescription(), NEW_DESCRIPTION);
         // And all the initial values of the task
         assertEquals(task.getId(), TASK.getId());
         assertEquals(task.getTitle(), TASK.getTitle());
+    }
+
+    private void withTaskInRepositorySavedSuccessfully() {
+        when(mTasksRepository.saveTask(any(Task.class))).thenReturn(Completable.complete());
     }
 }

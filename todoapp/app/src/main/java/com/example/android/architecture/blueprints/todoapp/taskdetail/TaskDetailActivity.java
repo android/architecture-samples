@@ -16,7 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,6 +58,15 @@ public class TaskDetailActivity extends AppCompatActivity {
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     taskDetailFragment, R.id.contentFrame);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // forward the result to the fragment
+        Fragment tasksFragment = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (tasksFragment != null) {
+            tasksFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 

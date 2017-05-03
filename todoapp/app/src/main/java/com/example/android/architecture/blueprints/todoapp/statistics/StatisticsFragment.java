@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ import rx.subscriptions.CompositeSubscription;
  * Main UI for the statistics screen.
  */
 public class StatisticsFragment extends Fragment {
+
+    private static final String TAG = StatisticsFragment.class.getSimpleName();
 
     private TextView mStatisticsTV;
 
@@ -78,15 +81,6 @@ public class StatisticsFragment extends Fragment {
 
         mSubscription = new CompositeSubscription();
 
-        mSubscription.add(mViewModel.getProgressIndicator()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        // onNext
-                        this::setProgressIndicator,
-                        // onError
-                        __ -> showLoadingStatisticsError()));
-
         mSubscription.add(mViewModel.getStatistics()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -94,27 +88,15 @@ public class StatisticsFragment extends Fragment {
                         // onNext
                         this::showStatistics,
                         // onError
-                        throwable -> showLoadingStatisticsError()));
+                        throwable -> Log.e(TAG, "Error retrieving statistics text", throwable)));
     }
 
     private void unbindViewModel() {
         Preconditions.checkNotNull(mSubscription);
-
         mSubscription.unsubscribe();
     }
 
-    private void setProgressIndicator(boolean active) {
-        if (active) {
-            mStatisticsTV.setText(getString(R.string.loading));
-        }
+    private void showStatistics(@NonNull StatisticsUiModel statistics) {
+        mStatisticsTV.setText(statistics.getText());
     }
-
-    private void showStatistics(@NonNull String statistics) {
-        mStatisticsTV.setText(statistics);
-    }
-
-    private void showLoadingStatisticsError() {
-        mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
-    }
-
 }

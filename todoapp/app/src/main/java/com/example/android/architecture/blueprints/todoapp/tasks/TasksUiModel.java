@@ -1,13 +1,17 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import java.util.List;
 
 /**
  * Model for the list of tasks screen.
  */
-class TasksModel {
+class TasksUiModel {
+
+    @StringRes
+    private final int mFilterResId;
 
     private final boolean mIsTasksListVisible;
 
@@ -18,12 +22,18 @@ class TasksModel {
     @Nullable
     private final NoTasksModel mNoTasksModel;
 
-    public TasksModel(boolean isTasksListVisible, List<TaskItem> itemList,
-                      boolean isNoTasksViewVisible, NoTasksModel noTasksModel) {
+    public TasksUiModel(@StringRes int filterResId, boolean isTasksListVisible, List<TaskItem> itemList,
+                        boolean isNoTasksViewVisible, NoTasksModel noTasksModel) {
+        mFilterResId = filterResId;
         mIsTasksListVisible = isTasksListVisible;
         mItemList = itemList;
         mIsNoTasksViewVisible = isNoTasksViewVisible;
         mNoTasksModel = noTasksModel;
+    }
+
+    @StringRes
+    public int getFilterResId() {
+        return mFilterResId;
     }
 
     public boolean isTasksListVisible() {

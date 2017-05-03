@@ -77,7 +77,7 @@ public class TaskDetailViewModel {
      * task has been retrieved.
      */
     @NonNull
-    public Observable<TaskModel> getTask() {
+    public Observable<TaskUiModel> getTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             return Observable.error(new Exception("Task id null or empty"));
         }
@@ -85,15 +85,15 @@ public class TaskDetailViewModel {
         return mTasksRepository.getTask(mTaskId)
                 .map(this::createModel)
                 .doOnSubscribe(() -> mLoadingSubject.onNext(true))
-                .doOnTerminate(() -> mLoadingSubject.onNext(false));
+                .doOnNext(__ -> mLoadingSubject.onNext(false));
     }
 
     @NonNull
-    private TaskModel createModel(Task task) {
+    private TaskUiModel createModel(Task task) {
         boolean isTitleVisible = !Strings.isNullOrEmpty(task.getTitle());
         boolean isDescriptionVisible = !Strings.isNullOrEmpty(task.getDescription());
 
-        return new TaskModel(isTitleVisible, task.getTitle(), isDescriptionVisible,
+        return new TaskUiModel(isTitleVisible, task.getTitle(), isDescriptionVisible,
                 task.getDescription(), task.isCompleted());
     }
 
@@ -155,34 +155,32 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable taskCheckChanged(final boolean checked) {
-        return Completable.fromAction(() -> {
-            if (Strings.isNullOrEmpty(mTaskId)) {
-                throw new RuntimeException("Task id null or empty");
-            }
-            if (checked) {
-                completeTask();
-            } else {
-                activateTask();
-            }
-        });
+        if (Strings.isNullOrEmpty(mTaskId)) {
+            return Completable.error(new RuntimeException("Task id null or empty"));
+        }
+        if (checked) {
+            return completeTask();
+        } else {
+            return activateTask();
+        }
     }
 
     /**
      * Marks a task as completed in the repository.
      */
     @NonNull
-    private void completeTask() {
-        mTasksRepository.completeTask(mTaskId);
-        mSnackbarText.onNext(R.string.task_marked_complete);
+    private Completable completeTask() {
+        return mTasksRepository.completeTask(mTaskId)
+                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_complete));
     }
 
     /**
      * Marks a task as active in the repository.
      */
     @NonNull
-    private void activateTask() {
-        mTasksRepository.activateTask(mTaskId);
-        mSnackbarText.onNext(R.string.task_marked_active);
+    private Completable activateTask() {
+        return mTasksRepository.activateTask(mTaskId)
+                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_active));
     }
 
 }

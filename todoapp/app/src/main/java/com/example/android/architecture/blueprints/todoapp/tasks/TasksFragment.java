@@ -157,23 +157,13 @@ public class TasksFragment extends Fragment {
                         //onError
                         error -> Log.d(TAG, "Error showing progress indicator", error)
                 ));
-
-        mSubscription.add(mViewModel.getFilterText()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        //onNext
-                        this::setFilterLabel,
-                        //onError
-                        error -> Log.d(TAG, "Error setting filter label", error)
-                ));
     }
 
     private void unbindViewModel() {
         mSubscription.unsubscribe();
     }
 
-    private void setupView(TasksModel model) {
+    private void setupView(TasksUiModel model) {
         int tasksListVisiblity = model.isTasksListVisible() ? View.VISIBLE : View.GONE;
         int noTasksViewVisibility = model.isNoTasksViewVisible() ? View.VISIBLE : View.GONE;
         mTasksView.setVisibility(tasksListVisiblity);
@@ -185,6 +175,8 @@ public class TasksFragment extends Fragment {
         if (model.isNoTasksViewVisible() && model.getNoTasksModel() != null) {
             showNoTasks(model.getNoTasksModel());
         }
+
+        setFilterLabel(model.getFilterResId());
     }
 
     private void setupNoTasksView(View root) {
@@ -206,7 +198,7 @@ public class TasksFragment extends Fragment {
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
 
-        swipeRefreshLayout.setOnRefreshListener(() -> mViewModel.updateTasks());
+        swipeRefreshLayout.setOnRefreshListener(this::forceUpdate);
     }
 
     private void setupFabButton() {
@@ -234,7 +226,7 @@ public class TasksFragment extends Fragment {
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mViewModel.forceUpdateTasks();
+                forceUpdate();
                 break;
         }
         return true;
@@ -245,12 +237,26 @@ public class TasksFragment extends Fragment {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        //onNext
+                        //onCompleted
                         () -> {
                             // nothing to do here
                         },
                         //onError
                         error -> Log.d(TAG, "Error clearing completed tasks", error)
+                ));
+    }
+
+    private void forceUpdate() {
+        mSubscription.add(mViewModel.forceUpdateTasks()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        //onCompleted
+                        () -> {
+                            // nothing to do here
+                        },
+                        //onError
+                        error -> Log.d(TAG, "Error refreshing tasks", error)
                 ));
     }
 

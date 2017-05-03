@@ -16,15 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-
-import static org.hamcrest.core.IsNot.not;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
@@ -42,6 +33,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.core.IsNot.not;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -66,11 +65,9 @@ public class TaskDetailScreenTest {
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
-     *
      * <p>
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.
-     *
      * <p>
      * Sometimes an {@link Activity} requires a custom start {@link Intent} to receive data
      * from the source Activity. ActivityTestRule has a feature which let's you lazily start the
@@ -92,7 +89,6 @@ public class TaskDetailScreenTest {
     /**
      * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
      * a particular task id, which is then loaded from the service API.
-     *
      * <p>
      * Note that this test runs hermetically and is fully isolated using a fake implementation of
      * the service API. This is a great way to make your tests more reliable and faster at the same
@@ -102,7 +98,9 @@ public class TaskDetailScreenTest {
         // Add a task stub to the fake service api layer.
         TasksRepository.destroyInstance();
         TasksLocalDataSource.destroyInstance();
-        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext()).saveTask(task);
+        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
+                .saveTask(task)
+                .subscribe();
 
         // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         Intent startIntent = new Intent();

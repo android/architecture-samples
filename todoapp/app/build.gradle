@@ -65,6 +65,7 @@ android {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
     }
+    buildToolsVersion '25.0.2'
 }
 
 /*

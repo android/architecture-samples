@@ -25,7 +25,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,42 +39,39 @@ public class StatisticsViewModel {
     @NonNull
     private final BaseResourceProvider mResourceProvider;
 
-    @NonNull
-    private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
-
     public StatisticsViewModel(@NonNull TasksRepository tasksRepository,
                                @NonNull BaseResourceProvider resourceProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mResourceProvider = checkNotNull(resourceProvider, "resourceProvider cannot be null");
-
-        mProgressIndicatorSubject = BehaviorSubject.create(false);
     }
 
     /**
      * @return A stream of statistics to be displayed.
      */
     @NonNull
-    public Observable<String> getStatistics() {
+    public Observable<StatisticsUiModel> getStatistics() {
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
         Observable<Task> tasks = mTasksRepository
-                .getTasks()
+                .refreshTasks()
+                .andThen(mTasksRepository.getTasks()
+                        .first())
                 .flatMap(Observable::from);
 
         Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
         Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
 
-        return Observable
-                .zip(completedTasks,
+        return Observable.merge(
+                Observable.just(mResourceProvider.getString(R.string.loading)),
+                Observable.zip(completedTasks,
                         activeTasks,
                         (completed, active) -> getStatisticsString(active, completed))
-                .doOnSubscribe(() -> {
-                    // the progress indicator should be visible
-                    mProgressIndicatorSubject.onNext(true);
-                })
-                .doOnTerminate(() -> mProgressIndicatorSubject.onNext(false));
+                        .onErrorResumeNext(throwable -> {
+                            return Observable.just(mResourceProvider.getString(R.string.loading_tasks_error));
+                        }))
+                .map(StatisticsUiModel::new);
     }
 
     @NonNull
@@ -86,13 +82,5 @@ public class StatisticsViewModel {
             return mResourceProvider.getString(R.string.statistics_active_completed_tasks,
                     numberOfActiveTasks, numberOfCompletedTasks);
         }
-    }
-
-    /**
-     * @return a stream of data, indicating whether the retrieval of the statistics is in progress or not
-     */
-    @NonNull
-    public Observable<Boolean> getProgressIndicator() {
-        return mProgressIndicatorSubject.asObservable();
     }
 }

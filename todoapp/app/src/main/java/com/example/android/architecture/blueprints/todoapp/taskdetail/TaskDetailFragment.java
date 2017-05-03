@@ -162,7 +162,7 @@ public class TaskDetailFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void setupView(TaskModel model) {
+    private void setupView(TaskUiModel model) {
         int titleVisibility = model.isShowTitle() ? View.VISIBLE : View.GONE;
         int descriptionVisibility = model.isShowDescription() ? View.VISIBLE : View.GONE;
 

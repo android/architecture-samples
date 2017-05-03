@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -72,7 +73,7 @@ public final class TasksViewModel {
      * @return the model for the tasks list.
      */
     @NonNull
-    public Observable<TasksModel> getTasksModel() {
+    public Observable<TasksUiModel> getTasksModel() {
         return getTaskItems()
                 .doOnSubscribe(() -> mProgressIndicatorSubject.onNext(true))
                 .doOnNext(__ -> mProgressIndicatorSubject.onNext(false))
@@ -82,10 +83,11 @@ public final class TasksViewModel {
     }
 
     @NonNull
-    private TasksModel constructTasksModel(Pair<List<TaskItem>, TasksFilterType> pair) {
+    private TasksUiModel constructTasksModel(Pair<List<TaskItem>, TasksFilterType> pair) {
         List<TaskItem> tasks = pair.first;
         TasksFilterType filterType = pair.second;
 
+        int filterTextResId = getFilterText(filterType);
         boolean isTasksListVisible = !tasks.isEmpty();
         boolean isNoTasksViewVisible = !isTasksListVisible;
         NoTasksModel noTasksModel = null;
@@ -93,7 +95,8 @@ public final class TasksViewModel {
             noTasksModel = getNoTasksModel(filterType);
         }
 
-        return new TasksModel(isTasksListVisible, tasks, isNoTasksViewVisible, noTasksModel);
+        return new TasksUiModel(filterTextResId, isTasksListVisible, tasks, isNoTasksViewVisible,
+                noTasksModel);
     }
 
     private Observable<List<TaskItem>> getTaskItems() {
@@ -144,22 +147,26 @@ public final class TasksViewModel {
     }
 
     private void handleTaskChecked(Task task, boolean checked) {
-        if (checked) {
-            completeTask(task);
-        } else {
-            activateTask(task);
-        }
-        mTriggerForceUpdate.onNext(false);
+        Completable checkTask = checked ? completeTask(task) : activateTask(task);
+        checkTask.subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.computation())
+                .subscribe(
+                        //on Completed
+                        () -> {
+                        },
+                        // on error
+                        throwable -> Log.e(TAG, "Error completing or activating task")
+                );
     }
 
-    private void completeTask(Task completedTask) {
-        mTasksRepository.completeTask(completedTask);
-        mSnackbarText.onNext(R.string.task_marked_complete);
+    private Completable completeTask(Task completedTask) {
+        return mTasksRepository.completeTask(completedTask)
+                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_complete));
     }
 
-    private void activateTask(Task activeTask) {
-        mTasksRepository.activateTask(activeTask);
-        mSnackbarText.onNext(R.string.task_marked_active);
+    private Completable activateTask(Task activeTask) {
+        return mTasksRepository.activateTask(activeTask)
+                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_active));
     }
 
 
@@ -172,16 +179,10 @@ public final class TasksViewModel {
     /**
      * Trigger a force update of the tasks.
      */
-    public void forceUpdateTasks() {
+    public Completable forceUpdateTasks() {
         mProgressIndicatorSubject.onNext(true);
-        mTriggerForceUpdate.onNext(true);
-    }
-
-    /**
-     * Update the list of tasks.
-     */
-    public void updateTasks() {
-        mTriggerForceUpdate.onNext(false);
+        return mTasksRepository.refreshTasks()
+                .doOnTerminate(() -> mProgressIndicatorSubject.onNext(false));
     }
 
     /**
@@ -263,15 +264,6 @@ public final class TasksViewModel {
         Bundle bundle = new Bundle();
         bundle.putSerializable(FILTER_KEY, mFilter.getValue());
         return bundle;
-    }
-
-    /**
-     * @return the filter text.
-     */
-    @NonNull
-    public Observable<Integer> getFilterText() {
-        return mFilter.map(this::getFilterText)
-                .distinctUntilChanged();
     }
 
     /**

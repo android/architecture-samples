@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -29,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import rx.Completable;
 import rx.Observable;
 
 /**
@@ -56,7 +55,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description) {
         Task newTask = new Task(title, description);
@@ -74,7 +74,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public Observable<Task> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
-        if(task != null) {
+        if (task != null) {
             return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
             return Observable.empty();
@@ -82,32 +82,49 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void saveTask(@NonNull Task task) {
-        TASKS_SERVICE_DATA.put(task.getId(), task);
+    public Completable saveTask(@NonNull Task task) {
+        return Completable.fromAction(() -> TASKS_SERVICE_DATA.put(task.getId(), task));
     }
 
     @Override
-    public void completeTask(@NonNull Task task) {
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
-        TASKS_SERVICE_DATA.put(task.getId(), completedTask);
+    public Completable saveTasks(@NonNull List<Task> tasks) {
+        return Observable.from(tasks)
+                .doOnNext(this::saveTask)
+                .toCompletable();
     }
 
     @Override
-    public void completeTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+    public Completable completeTask(@NonNull Task task) {
+        return Completable.fromAction(() -> {
+            Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+            TASKS_SERVICE_DATA.put(task.getId(), completedTask);
+        });
     }
 
     @Override
-    public void activateTask(@NonNull Task task) {
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
-        TASKS_SERVICE_DATA.put(task.getId(), activeTask);
+    public Completable completeTask(@NonNull String taskId) {
+        return Completable.fromAction(() -> {
+            Task task = TASKS_SERVICE_DATA.get(taskId);
+            task = new Task(task.getTitle(), task.getDescription(), taskId, true);
+            TASKS_SERVICE_DATA.put(task.getId(), task);
+        });
     }
 
     @Override
-    public void activateTask(@NonNull String taskId) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+    public Completable activateTask(@NonNull Task task) {
+        return Completable.fromAction(() -> {
+            Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+            TASKS_SERVICE_DATA.put(task.getId(), activeTask);
+        });
+    }
+
+    @Override
+    public Completable activateTask(@NonNull String taskId) {
+        return Completable.fromAction(() -> {
+            Task task = TASKS_SERVICE_DATA.get(taskId);
+            task = new Task(task.getTitle(), task.getDescription(), taskId, false);
+            TASKS_SERVICE_DATA.put(task.getId(), task);
+        });
     }
 
     @Override
@@ -122,9 +139,10 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void refreshTasks() {
+    public Completable refreshTasks() {
         // Not required because the {@link TasksRepository} handles the logic of refreshing the
         // tasks from all the available data sources.
+        return Completable.complete();
     }
 
     @Override

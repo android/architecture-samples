@@ -95,35 +95,28 @@ public class AddEditTaskViewModel {
      * @param title       title of the task
      * @param description description of the task
      */
+    @NonNull
     public Completable saveTask(String title, String description) {
-        return Completable.fromAction(() -> createUpdateTask(title, description));
-    }
-
-    private void createUpdateTask(String title, String description) {
-        if (isNewTask()) {
-            createTask(title, description);
-        } else {
-            updateTask(title, description);
-        }
+        return createTask(title, description)
+                .doOnCompleted(mNavigator::onTaskSaved);
     }
 
     private boolean isNewTask() {
         return mTaskId == null;
     }
 
-    private void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            showSnackbar(R.string.empty_task_message);
+    private Completable createTask(String title, String description) {
+        Task newTask;
+        if (isNewTask()) {
+            newTask = new Task(title, description);
+            if (newTask.isEmpty()) {
+                showSnackbar(R.string.empty_task_message);
+                return Completable.complete();
+            }
         } else {
-            mTasksRepository.saveTask(newTask);
-            mNavigator.onTaskSaved();
+            newTask = new Task(title, description, mTaskId);
         }
-    }
-
-    private void updateTask(String title, String description) {
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mNavigator.onTaskSaved();
+        return mTasksRepository.saveTask(newTask);
     }
 
     private void showSnackbar(@StringRes int textId) {

@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import rx.Completable;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -38,7 +39,7 @@ public class TaskDetailViewModelTest {
 
     private TestSubscriber<Void> mTestSubscriber;
 
-    private TestSubscriber<TaskModel> mTaskTestSubscriber;
+    private TestSubscriber<TaskUiModel> mTaskTestSubscriber;
 
     private TestSubscriber<Integer> mSnackbarTestSubscriber;
 
@@ -93,8 +94,8 @@ public class TaskDetailViewModelTest {
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        TaskModel taskModel = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertTaskWithTitleAndDescription(taskModel);
+        TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertTaskWithTitleAndDescription(taskUiModel);
     }
 
     @Test
@@ -110,8 +111,8 @@ public class TaskDetailViewModelTest {
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        TaskModel taskModel = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertTaskWithTitleAndCompleted(taskModel);
+        TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertTaskWithTitleAndCompleted(taskUiModel);
     }
 
     @Test
@@ -248,6 +249,7 @@ public class TaskDetailViewModelTest {
     public void taskCheckChanged_true_completesTask() {
         // Get a reference to the class under test for a task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
+        withTaskCompleted(TASK_WITH_TITLE_DESCRIPTION.getId());
 
         // When subscribing to the task changed observer
         mViewModel.taskCheckChanged(true).subscribe(mTestSubscriber);
@@ -262,6 +264,7 @@ public class TaskDetailViewModelTest {
     public void taskCheckChanged_false_activatesTask() {
         // Get a reference to the class under test for a task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
+        withTaskActivated(TASK_WITH_TITLE_DESCRIPTION.getId());
 
         // When subscribing to the task changed observer
         mViewModel.taskCheckChanged(false).subscribe(mTestSubscriber);
@@ -276,6 +279,7 @@ public class TaskDetailViewModelTest {
     public void taskCheckChanged_true_completesTask_showsSnackbarText() {
         // Get a reference to the class under test for a task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
+        withTaskCompleted(TASK_WITH_TITLE_DESCRIPTION.getId());
 
         // When subscribed to the snackbar text emissions
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
@@ -290,6 +294,7 @@ public class TaskDetailViewModelTest {
     public void taskCheckChanged_false_activatesTask_showsSnackbarText() {
         // Get a reference to the class under test for a task id
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
+        withTaskActivated(TASK_WITH_TITLE_DESCRIPTION.getId());
 
         // When subscribed to the snackbar text emissions
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
@@ -300,7 +305,7 @@ public class TaskDetailViewModelTest {
         mSnackbarTestSubscriber.assertValue(R.string.task_marked_active);
     }
 
-    private void assertTaskWithTitleAndDescription(TaskModel model) {
+    private void assertTaskWithTitleAndDescription(TaskUiModel model) {
         assertEquals(model.getTitle(), TASK_WITH_TITLE_DESCRIPTION.getTitle());
         assertTrue(model.isShowTitle());
         assertEquals(model.getDescription(), TASK_WITH_TITLE_DESCRIPTION.getDescription());
@@ -308,11 +313,18 @@ public class TaskDetailViewModelTest {
         assertFalse(model.isChecked());
     }
 
-    private void assertTaskWithTitleAndCompleted(TaskModel model) {
+    private void assertTaskWithTitleAndCompleted(TaskUiModel model) {
         assertEquals(model.getTitle(), TASK_WITH_TITLE_COMPLETED.getTitle());
         assertTrue(model.isShowTitle());
         assertEquals(model.getDescription(), TASK_WITH_TITLE_COMPLETED.getDescription());
         assertFalse(model.isShowDescription());
         assertTrue(model.isChecked());
+    }
+
+    private void withTaskCompleted(String task) {
+        when(mTasksRepository.completeTask(task)).thenReturn(Completable.complete());
+    }
+    private void withTaskActivated(String task) {
+        when(mTasksRepository.activateTask(task)).thenReturn(Completable.complete());
     }
 }

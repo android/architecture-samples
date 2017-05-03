@@ -33,6 +33,7 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -59,20 +60,9 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
-        SqlBrite sqlBrite = SqlBrite.create();
+        SqlBrite sqlBrite = new SqlBrite.Builder().build();
         mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
         mTaskMapperFunction = this::getTask;
-    }
-
-    @NonNull
-    private Task getTask(@NonNull Cursor c) {
-        String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-        String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-        String description =
-                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed =
-                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(title, description, itemId, completed);
     }
 
     public static TasksLocalDataSource getInstance(
@@ -88,6 +78,21 @@ public class TasksLocalDataSource implements TasksDataSource {
         INSTANCE = null;
     }
 
+    @NonNull
+    private Task getTask(@NonNull Cursor c) {
+        String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
+        String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
+        String description =
+                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
+        boolean completed =
+                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, itemId, completed);
+    }
+
+    /**
+     * @return an Observable that emits the list of tasks in the database, every time the Tasks
+     * table is modified
+     */
     @Override
     public Observable<List<Task>> getTasks() {
         String[] projection = {
@@ -116,44 +121,81 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void saveTask(@NonNull Task task) {
+    public Completable saveTask(@NonNull Task task) {
         checkNotNull(task);
+        return Completable.fromAction(() -> {
+            ContentValues values = toContentValues(task);
+            mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
+        });
+    }
+
+    @Override
+    public Completable saveTasks(@NonNull List<Task> tasks) {
+        checkNotNull(tasks);
+
+        return Observable.using(mDatabaseHelper::newTransaction,
+                transaction -> inTransactionInsert(tasks, transaction),
+                BriteDatabase.Transaction::end)
+                .toCompletable();
+    }
+
+    @NonNull
+    private Observable<List<Task>> inTransactionInsert(@NonNull List<Task> tasks,
+                                                       @NonNull BriteDatabase.Transaction transaction) {
+        checkNotNull(tasks);
+        checkNotNull(transaction);
+
+        return Observable.from(tasks)
+                .doOnNext(task -> {
+                    ContentValues values = toContentValues(task);
+                    mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
+                })
+                .doOnCompleted(transaction::markSuccessful)
+                .toList();
+    }
+
+    private ContentValues toContentValues(Task task) {
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
         values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
         values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-        mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
+        return values;
     }
 
     @Override
-    public void completeTask(@NonNull Task task) {
-        completeTask(task.getId());
+    public Completable completeTask(@NonNull Task task) {
+        checkNotNull(task);
+        return completeTask(task.getId());
     }
 
     @Override
-    public void completeTask(@NonNull String taskId) {
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
+    public Completable completeTask(@NonNull String taskId) {
+        return Completable.fromAction(() -> {
+            ContentValues values = new ContentValues();
+            values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-        mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+            String[] selectionArgs = {taskId};
+            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+        });
     }
 
     @Override
-    public void activateTask(@NonNull Task task) {
-        activateTask(task.getId());
+    public Completable activateTask(@NonNull Task task) {
+        return activateTask(task.getId());
     }
 
     @Override
-    public void activateTask(@NonNull String taskId) {
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
+    public Completable activateTask(@NonNull String taskId) {
+        return Completable.fromAction(() -> {
+            ContentValues values = new ContentValues();
+            values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-        mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+            String[] selectionArgs = {taskId};
+            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+        });
     }
 
     @Override
@@ -164,9 +206,10 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void refreshTasks() {
+    public Completable refreshTasks() {
         // Not required because the {@link TasksRepository} handles the logic of refreshing the
         // tasks from all the available data sources.
+        return Completable.complete();
     }
 
     @Override

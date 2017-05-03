@@ -71,8 +71,9 @@ public class StatisticsScreenTest {
         // Given some tasks
         TasksRepository.destroyInstance();
         TasksRepository repository = Injection.provideTasksRepository(InstrumentationRegistry.getContext());
-        repository.saveTask(new Task("Title1", "", false));
-        repository.saveTask(new Task("Title2", "", true));
+        repository.saveTask(new Task("Title1", "", false))
+                .andThen(repository.saveTask(new Task("Title2", "", true)))
+                .subscribe();
 
         // Lazily start the Activity from the ActivityTestRule
         Intent startIntent = new Intent();
