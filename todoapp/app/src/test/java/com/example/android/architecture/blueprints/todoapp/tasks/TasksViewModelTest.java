@@ -215,7 +215,7 @@ public class TasksViewModelTest {
         mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
 
         // Then the "Add task" action is visible
-        assertThat(mTasksViewModel.getTasksAddViewVisible(), is(true));
+        assertThat(mTasksViewModel.tasksAddViewVisible.get(), is(true));
     }
 
     @Test

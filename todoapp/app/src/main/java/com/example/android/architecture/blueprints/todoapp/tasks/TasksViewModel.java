@@ -37,8 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
-
 /**
  * Exposes the data to be used in the task list screen.
  * <p>
@@ -94,11 +92,6 @@ public class TasksViewModel extends BaseObservable {
 
     public void start() {
         loadTasks(false);
-    }
-
-    @Bindable
-    public boolean getTasksAddViewVisible() {
-        return mCurrentFiltering == ALL_TASKS;
     }
 
     @Bindable
