@@ -53,7 +53,10 @@ public class TasksFragment extends Fragment {
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
+
     private TasksAdapter mListAdapter;
+
+    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -127,7 +130,20 @@ public class TasksFragment extends Fragment {
     @Override
     public void onDestroy() {
         mListAdapter.onDestroy();
+        if (mSnackbarCallback != null) {
+            mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
+        }
         super.onDestroy();
+    }
+
+    private void setupSnackbar() {
+        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
+            }
+        };
+        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
     }
 
     private void showFilteringPopUpMenu() {
@@ -153,16 +169,6 @@ public class TasksFragment extends Fragment {
         });
 
         popup.show();
-    }
-
-    private void setupSnackbar() {
-        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(
-                new Observable.OnPropertyChangedCallback() {
-                    @Override
-                    public void onPropertyChanged(Observable observable, int i) {
-                        SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
-                    }
-                });
     }
 
     private void setupFab() {

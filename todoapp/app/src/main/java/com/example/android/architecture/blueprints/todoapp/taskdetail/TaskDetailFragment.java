@@ -43,6 +43,7 @@ public class TaskDetailFragment extends Fragment {
     public static final int REQUEST_EDIT_TASK = 1;
 
     private TaskDetailViewModel mViewModel;
+    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -65,14 +66,22 @@ public class TaskDetailFragment extends Fragment {
         setupSnackbar();
     }
 
+    @Override
+    public void onDestroy() {
+        if (mSnackbarCallback != null) {
+            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
+        }
+        super.onDestroy();
+    }
+
     private void setupSnackbar() {
-        mViewModel.snackbarText.addOnPropertyChangedCallback(
-                new Observable.OnPropertyChangedCallback() {
-                    @Override
-                    public void onPropertyChanged(Observable observable, int i) {
-                        SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
-                    }
-                });
+        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            }
+        };
+        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
     }
 
     private void setupFab() {
