@@ -42,7 +42,6 @@ import rx.subscriptions.CompositeSubscription;
 public class AddEditTaskFragment extends Fragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
-
     private static final String TASK_TITLE_KEY = "title";
     private static final String TASK_DESCRIPTION_KEY = "description";
     private static final String TAG = AddEditTaskFragment.class.getSimpleName();

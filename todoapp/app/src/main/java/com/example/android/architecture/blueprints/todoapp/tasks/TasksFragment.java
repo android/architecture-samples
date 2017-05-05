@@ -305,7 +305,7 @@ public class TasksFragment extends Fragment {
     private void showNoTasks(NoTasksModel model) {
         mNoTaskMainView.setText(model.getText());
         mNoTaskIcon.setImageResource(model.getIcon());
-        mNoTaskAddView.setVisibility(model.isShowAdd() ? View.VISIBLE : View.GONE);
+        mNoTaskAddView.setVisibility(model.isAddNewTaskVisible() ? View.VISIBLE : View.GONE);
 
     }
 

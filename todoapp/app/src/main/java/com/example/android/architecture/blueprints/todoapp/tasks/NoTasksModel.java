@@ -14,12 +14,12 @@ final class NoTasksModel {
     @DrawableRes
     private int mIcon;
 
-    private boolean mShowAdd;
+    private boolean mIsAddNewTaskVisible;
 
-    public NoTasksModel(int text, int icon, boolean showAdd) {
+    public NoTasksModel(int text, int icon, boolean isAddNewTaskVisible) {
         mText = text;
         mIcon = icon;
-        mShowAdd = showAdd;
+        mIsAddNewTaskVisible = isAddNewTaskVisible;
     }
 
     @StringRes
@@ -32,7 +32,7 @@ final class NoTasksModel {
         return mIcon;
     }
 
-    public boolean isShowAdd() {
-        return mShowAdd;
+    public boolean isAddNewTaskVisible() {
+        return mIsAddNewTaskVisible;
     }
 }

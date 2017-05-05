@@ -446,7 +446,7 @@ public class TasksViewModelTest {
                                boolean expectedShowAdd) {
         assertEquals(model.getText(), expectedText);
         assertEquals(model.getIcon(), expectedIcon);
-        assertEquals(model.isShowAdd(), expectedShowAdd);
+        assertEquals(model.isAddNewTaskVisible(), expectedShowAdd);
     }
 
     private void assertTasksModelWithTasksVisible(TasksUiModel model) {
