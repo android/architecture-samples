@@ -18,26 +18,34 @@ public final class NavigationProvider implements BaseNavigationProvider {
 
     @Override
     public void finishActivity() {
-        mActivity.get().finish();
+        if (mActivity.get() != null) {
+            mActivity.get().finish();
+        }
     }
 
     @Override
     public void finishActivityWithResult(int resultCode) {
-        mActivity.get().setResult(resultCode);
-        mActivity.get().finish();
+        if (mActivity.get() != null) {
+            mActivity.get().setResult(resultCode);
+            mActivity.get().finish();
+        }
     }
 
     @Override
     public void startActivityForResult(Class cls, int requestCode) {
-        Intent intent = new Intent(mActivity.get(), cls);
-        mActivity.get().startActivityForResult(intent, requestCode);
+        if (mActivity.get() != null) {
+            Intent intent = new Intent(mActivity.get(), cls);
+            mActivity.get().startActivityForResult(intent, requestCode);
+        }
     }
 
     @Override
     public void startActivityForResultWithExtra(Class cls, int requestCode, String extraKey,
                                                 String extraValue) {
-        Intent intent = new Intent(mActivity.get(), cls);
-        intent.putExtra(extraKey, extraValue);
-        mActivity.get().startActivityForResult(intent, requestCode);
+        if (mActivity.get() != null) {
+            Intent intent = new Intent(mActivity.get(), cls);
+            intent.putExtra(extraKey, extraValue);
+            mActivity.get().startActivityForResult(intent, requestCode);
+        }
     }
 }
