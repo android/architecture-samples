@@ -19,11 +19,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/tasksContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/tasksLL"
@@ -48,38 +47,14 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/noTasks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="vertical">
+       <ViewStub
+           android:id="@+id/stub_notasks"
+           android:layout="@layout/task_notasks"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           />
 
-            <ImageView
-                android:id="@+id/noTasksIcon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_assignment_turned_in_24dp" />
-
-            <TextView
-                android:id="@+id/noTasksMain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/no_tasks_all"
-                android:layout_marginBottom="@dimen/list_item_padding" />
-
-            <TextView
-                android:id="@+id/noTasksAdd"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:background="@drawable/touch_feedback"
-                android:gravity="center"
-                android:text="@string/no_tasks_add" />
-
-        </LinearLayout>
-    </RelativeLayout>
+    </FrameLayout>
 </com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout>
 

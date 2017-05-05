@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,12 +27,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -59,6 +62,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     private TasksAdapter mListAdapter;
 
     private View mNoTasksView;
+
+    private ViewStub mNoTaskStub;
 
     private ImageView mNoTaskIcon;
 
@@ -112,17 +117,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
-        // Set up  no tasks view
-        mNoTasksView = root.findViewById(R.id.noTasks);
-        mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
-        mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
-        mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
-        mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddTask();
-            }
-        });
+        //Set up no task stub
+        mNoTaskStub = (ViewStub) root.findViewById(R.id.stub_notasks);
 
         // Set up floating action button
         FloatingActionButton fab =
@@ -248,7 +244,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mListAdapter.replaceData(tasks);
 
         mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+        if(mNoTasksView!=null){
+             mNoTasksView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -285,11 +283,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
         mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        //inflate and set data to no tasks layout
+        setupNoTaskView(mainText,iconRes,showAddView);
     }
 
     @Override
@@ -434,6 +430,21 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         void onCompleteTaskClick(Task completedTask);
 
         void onActivateTaskClick(Task activatedTask);
+    }
+
+    //inflates the no tasks stub and set up no tasks view
+    public void setupNoTaskView(String mainText, @DrawableRes int iconRes, boolean showAddView){
+        if(mNoTasksView==null){
+            mNoTasksView = mNoTaskStub.inflate();
+            mNoTaskIcon = (ImageView) mNoTasksView.findViewById(R.id.noTasksIcon);
+            mNoTaskMainView = (TextView) mNoTasksView.findViewById(R.id.noTasksMain);
+            mNoTaskAddView = (TextView) mNoTasksView.findViewById(R.id.noTasksAdd);
+            mNoTaskStub = null;
+        }
+        else{
+            mNoTasksView.setVisibility(View.VISIBLE);
+        }
+
     }
 
 }
