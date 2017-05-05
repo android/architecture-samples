@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -260,7 +258,9 @@ public class TasksRepository implements TasksDataSource {
                     mCachedTasks.put(task.getId(), task);
                 });
 
-        return Observable.concat(localTask, remoteTask).first()
+        return Observable.concat(localTask, remoteTask)
+                .filter(task -> task != null)
+                .first()
                 .map(task -> {
                     if (task == null) {
                         throw new NoSuchElementException("No task found with taskId " + taskId);
@@ -307,7 +307,10 @@ public class TasksRepository implements TasksDataSource {
     Observable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
         return mTasksLocalDataSource
                 .getTask(taskId)
-                .doOnNext(task -> mCachedTasks.put(taskId, task))
+                .doOnNext(task -> {
+                    if (task != null)
+                        mCachedTasks.put(taskId, task);
+                })
                 .first();
     }
 }

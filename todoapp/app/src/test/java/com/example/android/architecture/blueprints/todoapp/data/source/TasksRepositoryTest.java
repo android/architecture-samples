@@ -247,6 +247,23 @@ public class TasksRepositoryTest {
     }
 
     @Test
+    public void getTask_requestsSingleTaskFromRemoteDataSource() {
+        // Given a stub completed task with title and description in the local repository
+        Task task = new Task(TASK_TITLE, "Some Task Description", true);
+        setTaskAvailable(mTasksRemoteDataSource, task);
+        // And the task not available in the remote repository
+        setTaskNotAvailable(mTasksLocalDataSource, task.getId());
+
+        // When a task is requested from the tasks repository
+        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
+
+        // Then the task is loaded from the database
+        verify(mTasksRemoteDataSource).getTask(eq(task.getId()));
+        testSubscriber.assertValue(task);
+    }
+
+    @Test
     public void getTask_whenDataNotLocal_fails() {
         // Given a stub completed task with title and description in the remote repository
         Task task = new Task(TASK_TITLE, "Some Task Description", true);
