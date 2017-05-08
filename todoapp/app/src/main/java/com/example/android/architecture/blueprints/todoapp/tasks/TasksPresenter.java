@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TasksPresenter implements TasksContract.Presenter {
 
     @NonNull
-    private final TasksRepository mTasksRepository;
+    private final TasksDataSource mTasksRepository;
 
     @NonNull
     private final TasksContract.View mTasksView;
@@ -58,7 +58,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     @NonNull
     private CompositeSubscription mSubscriptions;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository,
+    public TasksPresenter(@NonNull TasksDataSource tasksRepository,
                           @NonNull TasksContract.View tasksView,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
