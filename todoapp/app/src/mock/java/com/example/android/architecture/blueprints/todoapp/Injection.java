@@ -67,58 +67,7 @@ public class Injection {
     }
 
     @NonNull
-    public static StatisticsViewModel createStatisticsViewModel(@NonNull Context context) {
-        return new StatisticsViewModel(provideTasksRepository(context),
-                createResourceProvider(context));
-    }
-
-    @NonNull
-    public static TaskDetailViewModel createTaskDetailsViewModel(
-            @Nullable String taskId,
-            @NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new TaskDetailViewModel(taskId, provideTasksRepository(appContext),
-                createTaskDetailNavigator(navigationProvider));
-    }
-
-    @NonNull
-    public static TaskDetailNavigator createTaskDetailNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new TaskDetailNavigator(navigationProvider);
-    }
-
-    @NonNull
     public static BaseNavigationProvider createNavigationProvider(@NonNull Activity activity) {
         return new NavigationProvider(activity);
-    }
-
-    @NonNull
-    public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
-                                                                  @NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
-                createAddEditTaskNavigator(navigationProvider));
-    }
-
-    @NonNull
-    public static AddEditTaskNavigator createAddEditTaskNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new AddEditTaskNavigator(navigationProvider);
-    }
-
-    @NonNull
-    public static TasksViewModel createTasksViewModel(@NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new TasksViewModel(provideTasksRepository(appContext),
-                createTasksNavigator(navigationProvider), provideSchedulerProvider());
-    }
-
-    @NonNull
-    public static TasksNavigator createTasksNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new TasksNavigator(navigationProvider);
     }
 }

@@ -19,19 +19,11 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskNavigator;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailNavigator;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksNavigator;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.providers.NavigationProvider;
@@ -66,58 +58,7 @@ public class Injection {
     }
 
     @NonNull
-    public static StatisticsViewModel createStatisticsViewModel(@NonNull Context context) {
-        return new StatisticsViewModel(provideTasksRepository(context),
-                createResourceProvider(context));
-    }
-
-    @NonNull
-    public static TaskDetailViewModel createTaskDetailsViewModel(
-            @Nullable String taskId,
-            @NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new TaskDetailViewModel(taskId, provideTasksRepository(appContext),
-                createTaskDetailNavigator(navigationProvider));
-    }
-
-    @NonNull
-    public static TaskDetailNavigator createTaskDetailNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new TaskDetailNavigator(navigationProvider);
-    }
-
-    @NonNull
     public static BaseNavigationProvider createNavigationProvider(@NonNull Activity activity) {
         return new NavigationProvider(activity);
-    }
-
-    @NonNull
-    public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
-                                                                  @NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new AddEditTaskViewModel(taskId, provideTasksRepository(appContext),
-                createAddEditTaskNavigator(navigationProvider));
-    }
-
-    @NonNull
-    public static AddEditTaskNavigator createAddEditTaskNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new AddEditTaskNavigator(navigationProvider);
-    }
-
-    @NonNull
-    public static TasksViewModel createTasksViewModel(@NonNull Activity activity) {
-        Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = createNavigationProvider(activity);
-        return new TasksViewModel(provideTasksRepository(appContext),
-                createTasksNavigator(navigationProvider), provideSchedulerProvider());
-    }
-
-    @NonNull
-    public static TasksNavigator createTasksNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
-        return new TasksNavigator(navigationProvider);
     }
 }

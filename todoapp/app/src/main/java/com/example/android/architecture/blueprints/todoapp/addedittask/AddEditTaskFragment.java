@@ -73,7 +73,7 @@ public class AddEditTaskFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = Injection.createAddEditTaskViewModel(getTaskId(), getActivity());
+        mViewModel = AddEditTaskModule.createAddEditTaskViewModel(getTaskId(), getActivity());
         restoreData(savedInstanceState);
 
         return root;

@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.google.common.base.Preconditions;
 
@@ -59,7 +58,7 @@ public class StatisticsFragment extends Fragment {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
 
-        mViewModel = Injection.createStatisticsViewModel(getContext());
+        mViewModel = StatisticsModule.createStatisticsViewModel(getContext());
 
         return root;
     }

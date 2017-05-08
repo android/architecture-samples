@@ -34,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.google.common.base.Preconditions;
 
@@ -87,7 +86,7 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = Injection.createTaskDetailsViewModel(getTaskId(), getActivity());
+        mViewModel = TaskDetailModule.createTaskDetailsViewModel(getTaskId(), getActivity());
 
         return root;
     }
