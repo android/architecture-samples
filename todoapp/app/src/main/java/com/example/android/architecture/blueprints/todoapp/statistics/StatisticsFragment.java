@@ -77,7 +77,8 @@ public class StatisticsFragment extends Fragment {
 
     private void bindViewModel() {
         Preconditions.checkNotNull(mViewModel);
-
+        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
+        // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
         mSubscription.add(mViewModel.getStatistics()
@@ -92,6 +93,7 @@ public class StatisticsFragment extends Fragment {
 
     private void unbindViewModel() {
         Preconditions.checkNotNull(mSubscription);
+        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
         mSubscription.unsubscribe();
     }
 

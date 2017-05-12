@@ -47,9 +47,13 @@ public class TaskDetailViewModel {
     @NonNull
     private final TaskDetailNavigator mNavigator;
 
+    // using a BehaviourSubject because we are interested in the last object that was emitted before
+    // subscribing. Like this we ensure that the progress indicator has the correct visibility.
     @NonNull
     private final BehaviorSubject<Boolean> mLoadingSubject;
 
+    // using a PublishSubject because we are not interested in the last object that was emitted
+    // before subscribing. Like this we avoid displaying the snackbar multiple times
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 

@@ -26,6 +26,8 @@ public class AddEditTaskViewModel {
     @NonNull
     private final AddEditTaskNavigator mNavigator;
 
+    // using a PublishSubject because we are not interested in the last object that was emitted
+    // before subscribing. Like this we avoid displaying the snackbar multiple times
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 

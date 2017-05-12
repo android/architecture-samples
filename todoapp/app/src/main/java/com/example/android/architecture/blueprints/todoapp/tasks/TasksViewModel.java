@@ -43,15 +43,17 @@ public final class TasksViewModel {
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
 
-    @NonNull
+    // using a BehaviourSubject because we are interested in the last object that was emitted before
+    // subscribing. Like this we ensure that the progress indicator has the correct visibility.
     private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
 
+    // using a BehaviourSubject because we are interested in the last object that was emitted before
+    // subscribing. Like this we ensure that the last selected filter or the default one is used.
     @NonNull
     private final BehaviorSubject<TasksFilterType> mFilter;
 
-    @NonNull
-    private final BehaviorSubject<Boolean> mTriggerForceUpdate;
-
+    // using a PublishSubject because we are not interested in the last object that was emitted
+    // before subscribing. Like this we avoid displaying the snackbar multiple times
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
@@ -64,7 +66,6 @@ public final class TasksViewModel {
 
         mProgressIndicatorSubject = BehaviorSubject.create(false);
         mFilter = BehaviorSubject.create(TasksFilterType.ALL_TASKS);
-        mTriggerForceUpdate = BehaviorSubject.create(true);
         mSnackbarText = PublishSubject.create();
     }
 
@@ -100,7 +101,7 @@ public final class TasksViewModel {
     }
 
     private Observable<List<TaskItem>> getTaskItems() {
-        return Observable.combineLatest(getTasksFromRepo(),
+        return Observable.combineLatest(mTasksRepository.getTasks(),
                 mFilter,
                 Pair::create)
                 .flatMap(pair -> Observable.from(pair.first)
@@ -121,14 +122,6 @@ public final class TasksViewModel {
                 return new NoTasksModel(R.string.no_tasks_all,
                         R.drawable.ic_assignment_turned_in_24dp, true);
         }
-    }
-
-    @NonNull
-    private Observable<List<Task>> getTasksFromRepo() {
-        return mTriggerForceUpdate
-                .observeOn(mSchedulerProvider.computation())
-                .doOnNext(this::forceRefreshTasks)
-                .flatMap(__ -> mTasksRepository.getTasks());
     }
 
     @NonNull
@@ -169,13 +162,6 @@ public final class TasksViewModel {
                 .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_active));
     }
 
-
-    private void forceRefreshTasks(boolean force) {
-        if (force) {
-            mTasksRepository.refreshTasks();
-        }
-    }
-
     /**
      * Trigger a force update of the tasks.
      */
@@ -202,7 +188,6 @@ public final class TasksViewModel {
         // If a task was successfully added, show snackbar
         if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
                 && Activity.RESULT_OK == resultCode) {
-            mTriggerForceUpdate.onNext(false);
             mSnackbarText.onNext(R.string.successfully_saved_task_message);
         }
     }
@@ -279,7 +264,6 @@ public final class TasksViewModel {
     private void clearCompletedTasksAndNotify() {
         mTasksRepository.clearCompletedTasks();
         mSnackbarText.onNext(R.string.completed_tasks_cleared);
-        mTriggerForceUpdate.onNext(false);
     }
 
     /**

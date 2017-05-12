@@ -1,6 +1,6 @@
 # TODO-MVVM-RXJAVA
 
-Project owner: [Florina Muntenescu (upday)](https://github.com/florina-muntenescu)
+Project owner: [Florina Muntenescu](https://github.com/florina-muntenescu)
 
 ### Summary
 
@@ -36,11 +36,11 @@ Very High. Given that the RxJava ``Observable``s are highly unit testable, unit 
 
 #### UI testing
 
-Similar with TODO-MVP
+Similar with TODO-MVP-RxJava
 
 ### Code metrics
 
-Compared to TODO-MVP, new classes were added for handing the ``Schedulers`` that provide the working threads.
+Compared to TODO-MVP-RxJava, 
 
 ```
 -------------------------------------------------------------------------------

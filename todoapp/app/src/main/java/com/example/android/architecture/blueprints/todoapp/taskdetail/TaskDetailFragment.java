@@ -111,6 +111,8 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void bindViewModel() {
+        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
+        // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
         mSubscription.add(getViewModel().getTask()
@@ -142,6 +144,7 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void unbindViewModel() {
+        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
         getSubscription().unsubscribe();
     }
 

@@ -81,13 +81,15 @@ public class TasksViewModelTest {
 
     @Test
     public void progressIndicator_emits_whenSubscribedToTasks() {
+        // Given that the task repository never emits
+        when(mTasksRepository.getTasks()).thenReturn(Observable.never());
         // Given that we are subscribed to the progress indicator
         mViewModel.getProgressIndicator().subscribe(mProgressIndicatorSubscriber);
 
         // When subscribed to the tasks model
         mViewModel.getTasksModel().subscribe();
 
-        // The progress indicator emits true after an initial value of false
+        // The progress indicator emits initially false and then true
         mProgressIndicatorSubscriber.assertValues(false, true);
     }
 
@@ -177,8 +179,6 @@ public class TasksViewModelTest {
 
     @Test
     public void geTasksModel_emits_whenNoTasks_withFilterAll() {
-        // Given that we are subscribed to the tasks model
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
         // Given that the task repository returns empty task list
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
 
@@ -195,12 +195,10 @@ public class TasksViewModelTest {
 
     @Test
     public void getTasksModel_emits_whenNoTasks_withFilterActive() {
-        // Given that we are subscribed to the tasks model
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
-        // Given that the filtering is active
-        mViewModel.filter(ACTIVE_TASKS);
         // Given that the task repository returns empty task list
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
+        // Given that the filtering is active
+        mViewModel.filter(ACTIVE_TASKS);
 
         // When subscribed to the tasks
         mViewModel.getTasksModel().subscribe(mTasksSubscriber);
@@ -215,8 +213,6 @@ public class TasksViewModelTest {
 
     @Test
     public void getTasksModel_emits_whenNoTasks_withFilterCompleted() {
-        // Given that we are subscribed to the tasks model
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
         // Given that the filtering is completed
         mViewModel.filter(COMPLETED_TASKS);
         // Given that the task repository returns empty task list
@@ -243,18 +239,6 @@ public class TasksViewModelTest {
 
         // The snackbar text emits correct value
         mSnackbarTextSubscriber.assertValue(R.string.successfully_saved_task_message);
-    }
-
-    @Test
-    public void getTaskModelEmits_whenTaskAdded_withResultOk() {
-        // Given that we are subscribed to the emissions of the UI model
-        withTasksInRepositoryAndSubscribed(TASKS);
-
-        // When handling activity result for a task added successfully
-        mViewModel.handleActivityResult(AddEditTaskActivity.REQUEST_ADD_TASK, Activity.RESULT_OK);
-
-        // The mTasksSubscriber emits an initial value and then emits again
-        mTasksSubscriber.assertValueCount(2);
     }
 
     @Test
@@ -422,18 +406,6 @@ public class TasksViewModelTest {
 
         // A snackbar text is emitted
         mSnackbarTextSubscriber.assertValue(R.string.completed_tasks_cleared);
-    }
-
-    @Test
-    public void clearCompletedTask_triggersGetTasksEmission() {
-        // Given that we are subscribed to the emissions of the UI model
-        withTasksInRepositoryAndSubscribed(TASKS);
-
-        // When clearing completed tasks
-        mViewModel.clearCompletedTasks().subscribe();
-
-        // The mTasksSubscriber emits an initial value and then emits again
-        mTasksSubscriber.assertValueCount(2);
     }
 
     private void assertTasksModelWithNoTasksVisible(TasksUiModel model) {

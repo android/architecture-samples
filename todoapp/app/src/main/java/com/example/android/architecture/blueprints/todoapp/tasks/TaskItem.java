@@ -40,10 +40,16 @@ final class TaskItem {
         return mBackground;
     }
 
+    /**
+     * @return the action to be triggered on click events
+     */
     public Action0 getOnClickAction() {
         return mOnClickAction;
     }
 
+    /**
+     * @return the action to be triggered when the task is checked (marked as done or active)
+     */
     public Action1<Boolean> getOnCheckAction() {
         return mOnCheckAction;
     }
