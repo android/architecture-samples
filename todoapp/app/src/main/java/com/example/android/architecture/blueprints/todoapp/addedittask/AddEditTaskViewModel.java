@@ -58,11 +58,10 @@ public class AddEditTaskViewModel {
     }
 
     /**
-     * @return a stream containing the task retrieved from the repository. An error will be emitted
-     * if the task id is invalid.
+     * @return a stream containing the model for the UI.
      */
     @NonNull
-    public Observable<Task> getTask() {
+    public Observable<AddEditTaskUiModel> getTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             // new task. nothing to do here.
             return Observable.empty();
@@ -70,7 +69,8 @@ public class AddEditTaskViewModel {
         return mTasksRepository
                 .getTask(mTaskId)
                 .map(this::restoreTask)
-                .doOnError(__ -> showSnackbar(R.string.empty_task_message));
+                .doOnError(__ -> showSnackbar(R.string.empty_task_message))
+                .map(task -> new AddEditTaskUiModel(task.getTitle(), task.getDescription()));
     }
 
     /**

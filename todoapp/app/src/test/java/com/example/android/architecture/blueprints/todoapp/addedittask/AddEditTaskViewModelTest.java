@@ -34,7 +34,7 @@ public class AddEditTaskViewModelTest {
     @Mock
     private AddEditTaskNavigator mNavigator;
 
-    private TestSubscriber<Task> mTaskTestSubscriber;
+    private TestSubscriber<AddEditTaskUiModel> mTaskTestSubscriber;
 
     private TestSubscriber<Integer> mSnackbarTestSubscriber;
 
@@ -82,7 +82,9 @@ public class AddEditTaskViewModelTest {
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        mTaskTestSubscriber.assertValue(TASK);
+        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getTitle(), TASK.getTitle());
+        assertEquals(model.getDescription(), TASK.getDescription());
     }
 
     @Test
@@ -209,12 +211,10 @@ public class AddEditTaskViewModelTest {
         // When that we are subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
-        // The emitted task has the restored title
-        Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertEquals(task.getTitle(), NEW_TITLE);
-        // And all the initial values of the task
-        assertEquals(task.getId(), TASK.getId());
-        assertEquals(task.getDescription(), TASK.getDescription());
+        // The emitted UI model has the restored title
+        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getTitle(), NEW_TITLE);
+        assertEquals(model.getDescription(), TASK.getDescription());
     }
 
     @Test
@@ -229,12 +229,10 @@ public class AddEditTaskViewModelTest {
         // When that we are subscribing to the task
         mViewModel.getTask().subscribe(mTaskTestSubscriber);
 
-        // The emitted task has the restored description
-        Task task = mTaskTestSubscriber.getOnNextEvents().get(0);
-        assertEquals(task.getDescription(), NEW_DESCRIPTION);
-        // And all the initial values of the task
-        assertEquals(task.getId(), TASK.getId());
-        assertEquals(task.getTitle(), TASK.getTitle());
+        // The emitted UI model has the restored description
+        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        assertEquals(model.getDescription(), NEW_DESCRIPTION);
+        assertEquals(model.getTitle(), TASK.getTitle());
     }
 
     private void withTaskInRepositorySavedSuccessfully() {

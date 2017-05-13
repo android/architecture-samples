@@ -161,9 +161,9 @@ public class AddEditTaskFragment extends Fragment {
         Snackbar.make(mTitle, textId, Snackbar.LENGTH_LONG).show();
     }
 
-    private void setTask(Task task) {
-        setTitle(task.getTitle());
-        setDescription(task.getDescription());
+    private void setTask(AddEditTaskUiModel model) {
+        setTitle(model.getTitle());
+        setDescription(model.getDescription());
     }
 
     private void setTitle(String title) {
