@@ -71,7 +71,7 @@ public class TaskDetailViewModel {
      * @return a stream notifying on whether the loading is in progress or not
      */
     @NonNull
-    public Observable<Boolean> getLoadingIndicator() {
+    public Observable<Boolean> getLoadingIndicatorVisibility() {
         return mLoadingSubject.asObservable();
     }
 
@@ -81,7 +81,7 @@ public class TaskDetailViewModel {
      * task has been retrieved.
      */
     @NonNull
-    public Observable<TaskUiModel> getTask() {
+    public Observable<TaskUiModel> getTaskUiModel() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             return Observable.error(new Exception("Task id null or empty"));
         }

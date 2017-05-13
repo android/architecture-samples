@@ -49,7 +49,7 @@ public class StatisticsViewModel {
      * @return A stream of statistics to be displayed.
      */
     @NonNull
-    public Observable<StatisticsUiModel> getStatistics() {
+    public Observable<StatisticsUiModel> getUiModel() {
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice

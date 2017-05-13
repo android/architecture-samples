@@ -72,7 +72,7 @@ public class StatisticsViewModelTest {
         withText(R.string.loading, LOADING);
 
         // When subscribing to the progress indicator
-        mViewModel.getStatistics().subscribe(mTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTestSubscriber);
 
         // One value, that contains the string loading, is emitted
         mTestSubscriber.assertValueCount(1);
@@ -86,7 +86,7 @@ public class StatisticsViewModelTest {
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
 
         //When subscribing to the statistics stream
-        mViewModel.getStatistics().subscribe();
+        mViewModel.getUiModel().subscribe();
 
         //The correct pair is returned
         verify(mResourceProvider).getString(R.string.statistics_active_completed_tasks, 1, 2);
@@ -101,7 +101,7 @@ public class StatisticsViewModelTest {
         withText(R.string.statistics_no_tasks, NO_TASKS);
 
         //When subscribing to the statistics stream
-        mViewModel.getStatistics().subscribe(mTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTestSubscriber);
 
         //The correct text is returned
         String result = mTestSubscriber.getOnNextEvents().get(1).getText();
@@ -117,7 +117,7 @@ public class StatisticsViewModelTest {
         withText(R.string.loading_tasks_error, LOADING_ERROR);
 
         //When subscribing to the statistics stream
-        mViewModel.getStatistics().subscribe(mTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTestSubscriber);
 
         // The initial value, false is emitted,
         // then values true and false were emitted

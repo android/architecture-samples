@@ -38,7 +38,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -131,15 +130,20 @@ public class TasksFragment extends Fragment {
         // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
-        mSubscription.add(mViewModel.getTasksModel()
+        // subscribe to the emissions of the Ui Model
+        // update the view at every emission fo the Ui Model
+        mSubscription.add(mViewModel.getUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         //onNext
-                        this::setupView,
+                        this::updateView,
                         //onError
                         error -> Log.e(TAG, "Error loading tasks", error)
                 ));
+
+        // subscribe to the emissions of the snackbar text
+        // every time the snackbar text emits, show the snackbar
         mSubscription.add(mViewModel.getSnackbarMessage()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -150,14 +154,16 @@ public class TasksFragment extends Fragment {
                         error -> Log.d(TAG, "Error showing snackbar", error)
                 ));
 
-        mSubscription.add(mViewModel.getProgressIndicator()
+        // subscribe to the emissions of the loading indicator visibility
+        // for every emission, update the visibility of the loading indicator
+        mSubscription.add(mViewModel.getLoadingIndicatorVisibility()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         //onNext
-                        this::setProgressIndicator,
+                        this::setLoadingIndicatorVisibility,
                         //onError
-                        error -> Log.d(TAG, "Error showing progress indicator", error)
+                        error -> Log.d(TAG, "Error showing loading indicator", error)
                 ));
     }
 
@@ -166,7 +172,7 @@ public class TasksFragment extends Fragment {
         mSubscription.unsubscribe();
     }
 
-    private void setupView(TasksUiModel model) {
+    private void updateView(TasksUiModel model) {
         int tasksListVisiblity = model.isTasksListVisible() ? View.VISIBLE : View.GONE;
         int noTasksViewVisibility = model.isNoTasksViewVisible() ? View.VISIBLE : View.GONE;
         mTasksView.setVisibility(tasksListVisiblity);
@@ -291,14 +297,14 @@ public class TasksFragment extends Fragment {
         popup.show();
     }
 
-    private void setProgressIndicator(final boolean active) {
+    private void setLoadingIndicatorVisibility(final boolean isVisible) {
         if (getView() == null) {
             return;
         }
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(() -> srl.setRefreshing(active));
+        srl.post(() -> srl.setRefreshing(isVisible));
     }
 
     private void showTasks(List<TaskItem> tasks) {

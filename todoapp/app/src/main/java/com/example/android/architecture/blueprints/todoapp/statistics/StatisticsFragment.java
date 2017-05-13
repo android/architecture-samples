@@ -81,12 +81,14 @@ public class StatisticsFragment extends Fragment {
         // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
-        mSubscription.add(mViewModel.getStatistics()
+        // subscribe to the emissions of the UiModel
+        // every time a new Ui Model is emitted, update the statistics
+        mSubscription.add(mViewModel.getUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::showStatistics,
+                        this::updateStatistics,
                         // onError
                         throwable -> Log.e(TAG, "Error retrieving statistics text", throwable)));
     }
@@ -97,7 +99,7 @@ public class StatisticsFragment extends Fragment {
         mSubscription.unsubscribe();
     }
 
-    private void showStatistics(@NonNull StatisticsUiModel statistics) {
+    private void updateStatistics(@NonNull StatisticsUiModel statistics) {
         mStatisticsTV.setText(statistics.getText());
     }
 }

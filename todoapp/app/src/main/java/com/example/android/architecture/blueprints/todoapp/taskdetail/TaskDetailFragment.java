@@ -115,24 +115,30 @@ public class TaskDetailFragment extends Fragment {
         // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
-        mSubscription.add(getViewModel().getTask()
+        // subscribe to the emissions of the Ui Model
+        // every time a new Ui Model, update the View
+        mSubscription.add(getViewModel().getTaskUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::setupView,
+                        this::updateView,
                         // onError
                         __ -> showMissingTask()));
 
-        mSubscription.add(getViewModel().getLoadingIndicator()
+        // subscribe to the emissions of the loading indicator visibility
+        // for every emission, update the visibility of the loading indicator
+        mSubscription.add(getViewModel().getLoadingIndicatorVisibility()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::setLoadingIndicator,
+                        this::setLoadingIndicatorVisibility,
                         // onError
                         __ -> showMissingTask()));
 
+        // subscribe to the emissions of the snackbar text
+        // every time the snackbar text emits, show the snackbar
         mSubscription.add(getViewModel().getSnackbarText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -164,7 +170,7 @@ public class TaskDetailFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void setupView(TaskUiModel model) {
+    private void updateView(TaskUiModel model) {
         int titleVisibility = model.isShowTitle() ? View.VISIBLE : View.GONE;
         int descriptionVisibility = model.isShowDescription() ? View.VISIBLE : View.GONE;
 
@@ -175,7 +181,7 @@ public class TaskDetailFragment extends Fragment {
         showCompletionStatus(model.isChecked());
     }
 
-    private void setLoadingIndicator(boolean isVisible) {
+    private void setLoadingIndicatorVisibility(boolean isVisible) {
         int visibility = isVisible ? View.VISIBLE : View.GONE;
         mLoadingProgress.setVisibility(visibility);
     }

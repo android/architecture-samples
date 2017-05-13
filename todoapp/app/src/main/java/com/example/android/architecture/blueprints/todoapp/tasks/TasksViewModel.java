@@ -44,8 +44,8 @@ public final class TasksViewModel {
     private final BaseSchedulerProvider mSchedulerProvider;
 
     // using a BehaviourSubject because we are interested in the last object that was emitted before
-    // subscribing. Like this we ensure that the progress indicator has the correct visibility.
-    private final BehaviorSubject<Boolean> mProgressIndicatorSubject;
+    // subscribing. Like this we ensure that the loading indicator has the correct visibility.
+    private final BehaviorSubject<Boolean> mLoadingIndicatorSubject;
 
     // using a BehaviourSubject because we are interested in the last object that was emitted before
     // subscribing. Like this we ensure that the last selected filter or the default one is used.
@@ -64,7 +64,7 @@ public final class TasksViewModel {
         mNavigator = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
         mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
 
-        mProgressIndicatorSubject = BehaviorSubject.create(false);
+        mLoadingIndicatorSubject = BehaviorSubject.create(false);
         mFilter = BehaviorSubject.create(TasksFilterType.ALL_TASKS);
         mSnackbarText = PublishSubject.create();
     }
@@ -74,10 +74,10 @@ public final class TasksViewModel {
      * @return the model for the tasks list.
      */
     @NonNull
-    public Observable<TasksUiModel> getTasksModel() {
+    public Observable<TasksUiModel> getUiModel() {
         return getTaskItems()
-                .doOnSubscribe(() -> mProgressIndicatorSubject.onNext(true))
-                .doOnNext(__ -> mProgressIndicatorSubject.onNext(false))
+                .doOnSubscribe(() -> mLoadingIndicatorSubject.onNext(true))
+                .doOnNext(__ -> mLoadingIndicatorSubject.onNext(false))
                 .doOnError(__ -> mSnackbarText.onNext(R.string.loading_tasks_error))
                 .switchMap(tasks -> mFilter.map(filterType -> Pair.create(tasks, filterType)))
                 .map(this::constructTasksModel);
@@ -166,9 +166,9 @@ public final class TasksViewModel {
      * Trigger a force update of the tasks.
      */
     public Completable forceUpdateTasks() {
-        mProgressIndicatorSubject.onNext(true);
+        mLoadingIndicatorSubject.onNext(true);
         return mTasksRepository.refreshTasks()
-                .doOnTerminate(() -> mProgressIndicatorSubject.onNext(false));
+                .doOnTerminate(() -> mLoadingIndicatorSubject.onNext(false));
     }
 
     /**
@@ -278,7 +278,7 @@ public final class TasksViewModel {
      * @return a stream that emits true if the progress indicator should be displayed, false otherwise.
      */
     @NonNull
-    public Observable<Boolean> getProgressIndicator() {
-        return mProgressIndicatorSubject.asObservable();
+    public Observable<Boolean> getLoadingIndicatorVisibility() {
+        return mLoadingIndicatorSubject.asObservable();
     }
 }

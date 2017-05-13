@@ -84,10 +84,10 @@ public class TasksViewModelTest {
         // Given that the task repository never emits
         when(mTasksRepository.getTasks()).thenReturn(Observable.never());
         // Given that we are subscribed to the progress indicator
-        mViewModel.getProgressIndicator().subscribe(mProgressIndicatorSubscriber);
+        mViewModel.getLoadingIndicatorVisibility().subscribe(mProgressIndicatorSubscriber);
 
         // When subscribed to the tasks model
-        mViewModel.getTasksModel().subscribe();
+        mViewModel.getUiModel().subscribe();
 
         // The progress indicator emits initially false and then true
         mProgressIndicatorSubscriber.assertValues(false, true);
@@ -101,7 +101,7 @@ public class TasksViewModelTest {
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
 
         // When subscribed to the tasks model
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        mViewModel.getUiModel().subscribe(mTasksSubscriber);
 
         // The snackbar emits an error message
         mSnackbarTextSubscriber.assertValue(R.string.loading_tasks_error);
@@ -153,7 +153,7 @@ public class TasksViewModelTest {
         // Given that the task repository refresh completes
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
         // Given that we are subscribed to the progress indicator
-        mViewModel.getProgressIndicator().subscribe(mProgressIndicatorSubscriber);
+        mViewModel.getLoadingIndicatorVisibility().subscribe(mProgressIndicatorSubscriber);
 
         // When calling force update
         mViewModel.forceUpdateTasks().subscribe(mCompletableSubscriber);
@@ -183,7 +183,7 @@ public class TasksViewModelTest {
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
 
         // When subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        mViewModel.getUiModel().subscribe(mTasksSubscriber);
 
         // NoTasks emits
         mTasksSubscriber.assertValueCount(1);
@@ -201,7 +201,7 @@ public class TasksViewModelTest {
         mViewModel.filter(ACTIVE_TASKS);
 
         // When subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        mViewModel.getUiModel().subscribe(mTasksSubscriber);
 
         // TasksUiModel emits with no tasks
         mTasksSubscriber.assertValueCount(1);
@@ -219,7 +219,7 @@ public class TasksViewModelTest {
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
 
         // When subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        mViewModel.getUiModel().subscribe(mTasksSubscriber);
 
         // TasksUiModel emits with no tasks
         mTasksSubscriber.assertValueCount(1);
@@ -455,7 +455,7 @@ public class TasksViewModelTest {
         // Given that the task repository returns tasks
         when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
         // Given that we are subscribed to the tasks
-        mViewModel.getTasksModel().subscribe(mTasksSubscriber);
+        mViewModel.getUiModel().subscribe(mTasksSubscriber);
     }
 
     private void withTaskCompleted(Task task) {

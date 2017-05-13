@@ -28,9 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -96,6 +94,8 @@ public class AddEditTaskFragment extends Fragment {
         // later unsubscribed together
         mSubscription = new CompositeSubscription();
 
+        // subscribe to the emissions of the snackbar text.
+        // whenever a new snackbar text is emitted, show the snackbar
         mSubscription.add(mViewModel.getSnackbarText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -105,12 +105,14 @@ public class AddEditTaskFragment extends Fragment {
                         // onError
                         throwable -> Log.e(TAG, "Error retrieving snackbar text", throwable)));
 
-        mSubscription.add(mViewModel.getTask()
+        // subscribe to the emissions of the UiModel
+        // every time a new UiModel is emitted update the Ui
+        mSubscription.add(mViewModel.getUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         // onNext
-                        this::setTask,
+                        this::updateUi,
                         // onError
                         throwable -> Log.e(TAG, "Error retrieving the task", throwable)));
 
@@ -144,8 +146,9 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void saveTask() {
-        mSubscription.add(mViewModel.saveTask(mTitle.getText().toString(),
-                mDescription.getText().toString())
+        String title = mTitle.getText().toString();
+        String description = mDescription.getText().toString();
+        mSubscription.add(mViewModel.saveTask(title, description)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -161,17 +164,9 @@ public class AddEditTaskFragment extends Fragment {
         Snackbar.make(mTitle, textId, Snackbar.LENGTH_LONG).show();
     }
 
-    private void setTask(AddEditTaskUiModel model) {
-        setTitle(model.getTitle());
-        setDescription(model.getDescription());
-    }
-
-    private void setTitle(String title) {
-        mTitle.setText(title);
-    }
-
-    private void setDescription(String description) {
-        mDescription.setText(description);
+    private void updateUi(AddEditTaskUiModel model) {
+        mTitle.setText(model.getTitle());
+        mDescription.setText(model.getDescription());
     }
 
     private String getTaskId() {

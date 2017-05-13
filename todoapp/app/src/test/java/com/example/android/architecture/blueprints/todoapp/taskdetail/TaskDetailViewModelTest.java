@@ -63,7 +63,7 @@ public class TaskDetailViewModelTest {
 
         //When subscribing to the loading indicator
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
-        mViewModel.getLoadingIndicator().subscribe(testSubscriber);
+        mViewModel.getLoadingIndicatorVisibility().subscribe(testSubscriber);
 
         // Emits false, since the loading is not in progress
         testSubscriber.assertValue(false);
@@ -75,7 +75,7 @@ public class TaskDetailViewModelTest {
         mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getTaskUiModel().subscribe(mTaskTestSubscriber);
 
         // An error is emitted
         mTaskTestSubscriber.assertError(Exception.class);
@@ -91,7 +91,7 @@ public class TaskDetailViewModelTest {
                 mNavigator);
 
         // When subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getTaskUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
         TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
@@ -108,7 +108,7 @@ public class TaskDetailViewModelTest {
                 mNavigator);
 
         // When subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getTaskUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
         TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
@@ -124,9 +124,9 @@ public class TaskDetailViewModelTest {
 
         //When subscribing to the loading indicator updates
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
-        mViewModel.getLoadingIndicator().subscribe(testSubscriber);
+        mViewModel.getLoadingIndicatorVisibility().subscribe(testSubscriber);
         // When subscribing to the task
-        mViewModel.getTask().subscribe();
+        mViewModel.getTaskUiModel().subscribe();
 
         // The loading indicator emits initial values, then when the loading is in progress and when
         // loading is done

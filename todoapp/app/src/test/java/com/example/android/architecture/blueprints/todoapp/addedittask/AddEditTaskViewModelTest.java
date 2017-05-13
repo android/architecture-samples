@@ -57,7 +57,7 @@ public class AddEditTaskViewModelTest {
     public void getTask_withNullTaskId_doesNotEmit() {
         mViewModel = new AddEditTaskViewModel(null, mTasksRepository, mNavigator);
 
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         mTaskTestSubscriber.assertNoValues();
     }
@@ -66,7 +66,7 @@ public class AddEditTaskViewModelTest {
     public void getTask_withEmptyTaskId_doesNotEmit() {
         mViewModel = new AddEditTaskViewModel("", mTasksRepository, mNavigator);
 
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         mTaskTestSubscriber.assertNoValues();
     }
@@ -79,7 +79,7 @@ public class AddEditTaskViewModelTest {
         mViewModel = new AddEditTaskViewModel(TASK.getId(), mTasksRepository, mNavigator);
 
         // When subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
         AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
@@ -97,7 +97,7 @@ public class AddEditTaskViewModelTest {
         mViewModel.getSnackbarText().subscribe(mSnackbarTestSubscriber);
 
         // When subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct resource id is emitted
         mSnackbarTestSubscriber.assertValue(R.string.empty_task_message);
@@ -209,7 +209,7 @@ public class AddEditTaskViewModelTest {
         // When setting a restore title
         mViewModel.setRestoredState(NEW_TITLE, null);
         // When that we are subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The emitted UI model has the restored title
         AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
@@ -227,7 +227,7 @@ public class AddEditTaskViewModelTest {
         // When setting a restore description
         mViewModel.setRestoredState(null, NEW_DESCRIPTION);
         // When that we are subscribing to the task
-        mViewModel.getTask().subscribe(mTaskTestSubscriber);
+        mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The emitted UI model has the restored description
         AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);

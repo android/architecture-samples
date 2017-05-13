@@ -61,7 +61,7 @@ public class AddEditTaskViewModel {
      * @return a stream containing the model for the UI.
      */
     @NonNull
-    public Observable<AddEditTaskUiModel> getTask() {
+    public Observable<AddEditTaskUiModel> getUiModel() {
         if (Strings.isNullOrEmpty(mTaskId)) {
             // new task. nothing to do here.
             return Observable.empty();
