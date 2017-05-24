@@ -109,11 +109,11 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
 
+[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
+
 [Stephan Linzner](http://github.com/slinzner) - Core developer
 
 [Florina Muntenescu](https://github.com/florina-muntenescu) - Core developer
-
-[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
 
 [Sharif Salah](https://github.com/sharifsalah) - Technical Writer
 
