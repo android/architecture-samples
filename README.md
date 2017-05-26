@@ -105,15 +105,15 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
-[Florina Muntenescu](https://github.com/florina-muntenescu) - Developer (MVP RxJava sample)
-
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
 
+[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
+
 [Stephan Linzner](http://github.com/slinzner) - Core developer
 
-[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
+[Florina Muntenescu](https://github.com/florina-muntenescu) - Core developer
 
 [Sharif Salah](https://github.com/sharifsalah) - Technical Writer
 
