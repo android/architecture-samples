@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 public interface BaseView<T> {
-
+    //规定 View 必须要实现的 setPresenter 方法,则 View 中保持对 Presenter 的引用
     void setPresenter(T presenter);
 
 }
