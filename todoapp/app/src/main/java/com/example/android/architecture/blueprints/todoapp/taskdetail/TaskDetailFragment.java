@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.arch.lifecycle.LifecycleFragment;
+import android.arch.lifecycle.Observer;
 import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -36,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment {
+public class TaskDetailFragment extends LifecycleFragment {
 
     public static final String ARGUMENT_TASK_ID = "TASK_ID";
 
@@ -68,20 +70,16 @@ public class TaskDetailFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (mSnackbarCallback != null) {
-            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
         super.onDestroy();
     }
 
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mViewModel.snackbarText.observe(this, new Observer<String>() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            public void onChanged(@Nullable String s) {
+                SnackbarUtils.showSnackbar(getView(), s);
             }
-        };
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void setupFab() {

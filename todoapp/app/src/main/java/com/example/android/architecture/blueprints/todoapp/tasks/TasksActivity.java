@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.TaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
@@ -74,26 +76,12 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
     private TasksViewModel findOrCreateViewModel() {
         // In a configuration change we might have a ViewModel present. It's retained using the
         // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<TasksViewModel> retainedViewModel =
-                (ViewModelHolder<TasksViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(TASKS_VIEWMODEL_TAG);
-
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            TasksViewModel viewModel = new TasksViewModel(
-                    Injection.provideTasksRepository(getApplicationContext()),
-                    getApplicationContext());
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    TASKS_VIEWMODEL_TAG);
-            return viewModel;
-        }
+        TasksViewModel model = ViewModelProviders.of(this).get(TasksViewModel.class);
+        model.init(
+                Injection.provideTasksRepository(getApplicationContext()),
+                getApplication()
+        );
+        return model;
     }
 
     @NonNull

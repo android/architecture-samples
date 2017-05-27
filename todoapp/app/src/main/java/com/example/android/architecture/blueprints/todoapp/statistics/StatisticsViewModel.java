@@ -94,7 +94,6 @@ public class StatisticsViewModel extends BaseObservable {
     /**
      * Returns a String showing the number of active tasks.
      */
-    @Bindable
     public String getNumberOfActiveTasks() {
         return mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks);
     }
@@ -102,7 +101,6 @@ public class StatisticsViewModel extends BaseObservable {
     /**
      * Returns a String showing the number of completed tasks.
      */
-    @Bindable
     public String getNumberOfCompletedTasks() {
         return mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks);
     }
@@ -110,7 +108,6 @@ public class StatisticsViewModel extends BaseObservable {
     /**
      * Controls whether the stats are shown or a "No data" message.
      */
-    @Bindable
     public boolean isEmpty() {
         return mNumberOfActiveTasks + mNumberOfCompletedTasks == 0;
     }

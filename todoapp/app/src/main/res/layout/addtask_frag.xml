@@ -30,8 +30,8 @@
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:enabled="@{viewmodel.dataLoading}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        app:enabled="@{viewmodel.dataLoading.value}"
+        app:refreshing="@{viewmodel.dataLoading.value}">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
+                android:visibility="@{viewmodel.dataLoading.value ? View.GONE : View.VISIBLE}">
 
                 <EditText
                     android:id="@+id/add_task_title"
@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/title_hint"
                     android:singleLine="true"
-                    android:text="@={viewmodel.title}"
+                    android:text="@={viewmodel.title.value}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
                 <EditText
@@ -62,7 +62,7 @@
                     android:layout_height="350dp"
                     android:gravity="top"
                     android:hint="@string/description_hint"
-                    android:text="@={viewmodel.description}"/>
+                    android:text="@={viewmodel.description.value}"/>
 
             </LinearLayout>
         </ScrollView>

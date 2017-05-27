@@ -16,6 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.arch.lifecycle.LifecycleFragment;
+import android.arch.lifecycle.Observer;
+import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,20 +35,19 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
+import static android.databinding.DataBindingUtil.inflate;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment {
+public class AddEditTaskFragment extends LifecycleFragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
     private AddEditTaskViewModel mViewModel;
 
     private AddtaskFragBinding mViewDataBinding;
-
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -84,35 +86,25 @@ public class AddEditTaskFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        if (mViewDataBinding == null) {
-            mViewDataBinding = AddtaskFragBinding.bind(root);
-        }
-
+        mViewDataBinding = DataBindingUtil.inflate(inflater, R.layout.addtask_frag, container, false);
         mViewDataBinding.setViewmodel(mViewModel);
-
         setHasOptionsMenu(true);
         setRetainInstance(false);
-
         return mViewDataBinding.getRoot();
     }
 
     @Override
     public void onDestroy() {
-        if (mSnackbarCallback != null) {
-            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
         super.onDestroy();
     }
 
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mViewModel.snackbarText.observe(this, new Observer<String>() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            public void onChanged(@Nullable String s) {
+                SnackbarUtils.showSnackbar(getView(), s);
             }
-        };
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void setupFab() {
@@ -122,7 +114,7 @@ public class AddEditTaskFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
+                mViewModel.saveTask(mViewModel.title.getValue(), mViewModel.description.getValue());
             }
         });
     }
