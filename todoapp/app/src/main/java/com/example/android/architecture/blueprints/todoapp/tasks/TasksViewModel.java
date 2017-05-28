@@ -103,10 +103,6 @@ public class TasksViewModel extends ViewModel {
         loadTasks(false);
     }
 
-    public boolean isEmpty() {
-        return items.isEmpty();
-    }
-
     public void loadTasks(boolean forceUpdate) {
         loadTasks(forceUpdate, true);
     }
@@ -238,7 +234,6 @@ public class TasksViewModel extends ViewModel {
 
                 items.clear();
                 items.addAll(tasksToShow);
-                //notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
             }
 
             @Override
