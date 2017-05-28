@@ -40,9 +40,9 @@ public abstract class TaskViewModel extends ViewModel
 
     public final MutableLiveData<String> snackbarText = new MutableLiveData<>();
 
-    public final MutableLiveData<String> title = new MutableLiveData<>();
+    public final ObservableField<String> title = new ObservableField<>();
 
-    public final MutableLiveData<String> description = new MutableLiveData<>();
+    public final ObservableField<String> description = new ObservableField<>();
 
     private final ObservableField<Task> mTaskObservable = new ObservableField<>();
 
@@ -62,11 +62,11 @@ public abstract class TaskViewModel extends ViewModel
             public void onPropertyChanged(Observable observable, int i) {
                 Task task = mTaskObservable.get();
                 if (task != null) {
-                    title.setValue(task.getTitle());
-                    description.setValue(task.getDescription());
+                    title.set(task.getTitle());
+                    description.set(task.getDescription());
                 } else {
-                    title.setValue(mContext.getString(R.string.no_data));
-                    description.setValue(mContext.getString(R.string.no_data_description));
+                    title.set(mContext.getString(R.string.no_data));
+                    description.set(mContext.getString(R.string.no_data_description));
                 }
             }
         });

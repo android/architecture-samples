@@ -114,7 +114,7 @@ public class AddEditTaskFragment extends LifecycleFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.saveTask(mViewModel.title.getValue(), mViewModel.description.getValue());
+                mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
             }
         });
     }

@@ -28,6 +28,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * ViewModel for the Add/Edit screen.
  * <p>
@@ -38,14 +40,11 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  */
 public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.GetTaskCallback {
 
-    public MutableLiveData<String> title = new MutableLiveData<>();
+    public ObservableField<String> title = new ObservableField<>();
 
-    public MutableLiveData<String> description = new MutableLiveData<>();
+    public ObservableField<String> description = new ObservableField<>();
 
-    public MutableLiveData<Boolean> dataLoading = new MutableLiveData<Boolean>();
-    {
-        dataLoading.setValue(false);
-    }
+    public ObservableBoolean dataLoading = new ObservableBoolean(false);
 
     public final MutableLiveData<String> snackbarText = new MutableLiveData<>();
 
@@ -84,7 +83,7 @@ public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.G
     }
 
     public void start(String taskId) {
-        if (dataLoading.getValue()) {
+        if (dataLoading.get()) {
             // Already loading, ignore.
             return;
         }
@@ -99,15 +98,15 @@ public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.G
             return;
         }
         mIsNewTask = false;
-        dataLoading.setValue(true);
+        dataLoading.set(true);
         mTasksRepository.getTask(taskId, this);
     }
 
     @Override
     public void onTaskLoaded(Task task) {
-        title.setValue(task.getTitle());
-        description.setValue(task.getDescription());
-        dataLoading.setValue(false);
+        title.set(task.getTitle());
+        description.set(task.getDescription());
+        dataLoading.set(false);
         mIsDataLoaded = true;
 
         // Note that there's no need to notify that the values changed because we're using
@@ -116,7 +115,7 @@ public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.G
 
     @Override
     public void onDataNotAvailable() {
-        dataLoading.setValue(false);
+        dataLoading.set(false);
     }
 
     // Called when clicking on fab.
