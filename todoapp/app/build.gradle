@@ -52,7 +52,7 @@ android {
     // Always show the result of every unit test, even if it passes.
     testOptions.unitTests.all {
         testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            events 'PASSED', 'SKIPPED', 'FAILED', 'STANDARD_OUT', 'STANDARD_ERROR'
         }
     }
 }
