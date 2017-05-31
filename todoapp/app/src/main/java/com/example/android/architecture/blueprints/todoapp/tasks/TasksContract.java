@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * This specifies the contract between the view and the presenter.
+ * 契约接口类,用于同一管理 View 与 Presenter 的所有接口
  */
 public interface TasksContract {
 

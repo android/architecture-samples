@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 public interface BasePresenter {
-
+    // 在 Presenter 中必须实现的方法
     void start();
 
 }
