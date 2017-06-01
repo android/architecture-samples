@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * Fetches the list of tasks.
  */
-public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseValue> {
+public class GetTasks implements UseCase<GetTasks.RequestValues, GetTasks.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -45,28 +46,27 @@ public class GetTasks extends UseCase<GetTasks.RequestValues, GetTasks.ResponseV
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        if (values.isForceUpdate()) {
+    public void executeUseCase(@NonNull final RequestValues requestValues, @NonNull final Callback<ResponseValue> callback, @NonNull Subscription subscription) {
+        if (requestValues.isForceUpdate()) {
             mTasksRepository.refreshTasks();
         }
 
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                TasksFilterType currentFiltering = values.getCurrentFiltering();
+                TasksFilterType currentFiltering = requestValues.getCurrentFiltering();
                 TaskFilter taskFilter = mFilterFactory.create(currentFiltering);
 
                 List<Task> tasksFiltered = taskFilter.filter(tasks);
                 ResponseValue responseValue = new ResponseValue(tasksFiltered);
-                getUseCaseCallback().onSuccess(responseValue);
+                callback.onNext(responseValue);
             }
 
             @Override
             public void onDataNotAvailable() {
-                getUseCaseCallback().onError();
+                callback.onError(new Exception("Tasks data not available"));
             }
         });
-
     }
 
     public static final class RequestValues implements UseCase.RequestValues {

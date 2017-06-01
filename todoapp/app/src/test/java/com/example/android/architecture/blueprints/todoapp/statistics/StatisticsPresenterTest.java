@@ -129,7 +129,7 @@ public class StatisticsPresenterTest {
     }
 
     private StatisticsPresenter givenStatisticsPresenter() {
-        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler());
+        UseCaseHandler useCaseHandler = new UseCaseHandler(new TestUseCaseScheduler(), new TestUseCaseScheduler());
         GetStatistics getStatistics = new GetStatistics(mTasksRepository);
 
         return new StatisticsPresenter(useCaseHandler, mStatisticsView, getStatistics);

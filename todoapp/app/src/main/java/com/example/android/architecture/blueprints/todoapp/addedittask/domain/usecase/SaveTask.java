@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -27,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Updates or creates a new {@link Task} in the {@link TasksRepository}.
  */
-public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseValue> {
+public class SaveTask implements UseCase<SaveTask.RequestValues, SaveTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -36,11 +37,19 @@ public class SaveTask extends UseCase<SaveTask.RequestValues, SaveTask.ResponseV
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        Task task = values.getTask();
+    public void executeUseCase(@NonNull RequestValues requestValues, @NonNull Callback<ResponseValue> callback, @NonNull Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+
+        Task task = requestValues.getTask();
         mTasksRepository.saveTask(task);
 
-        getUseCaseCallback().onSuccess(new ResponseValue(task));
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+        callback.onNext(new ResponseValue(task));
+        callback.onCompleted();
     }
 
     public static final class RequestValues implements UseCase.RequestValues {

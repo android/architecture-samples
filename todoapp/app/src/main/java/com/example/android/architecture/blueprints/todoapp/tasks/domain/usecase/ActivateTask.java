@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
@@ -26,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Marks a task as active (not completed yet).
  */
-public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
+public class ActivateTask implements UseCase<ActivateTask.RequestValues, ActivateTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -35,10 +36,20 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        String activeTask = values.getActivateTask();
+    public void executeUseCase(@NonNull RequestValues requestValues, @NonNull Callback<ResponseValue> callback, @NonNull Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+
+        callback.onStart();
+        String activeTask = requestValues.getActivateTask();
         mTasksRepository.activateTask(activeTask);
-        getUseCaseCallback().onSuccess(new ResponseValue());
+
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+        callback.onNext(new ResponseValue());
+        callback.onCompleted();
     }
 
     public static final class RequestValues implements UseCase.RequestValues {

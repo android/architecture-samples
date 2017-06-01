@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -45,6 +46,10 @@ public class TasksPresenter implements TasksContract.Presenter {
     private final CompleteTask mCompleteTask;
     private final ActivateTask mActivateTask;
     private final ClearCompleteTasks mClearCompleteTasks;
+    private Subscription mGetTaskSubscription;
+    private Subscription mCompleteSubscription;
+    private Subscription mActivateTaskSubscription;
+    private Subscription mClearCompleteTasksSubscription;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
@@ -71,6 +76,24 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void start() {
         loadTasks(false);
+    }
+
+
+
+    @Override
+    public void stop() {
+        if (mGetTaskSubscription != null) {
+            mGetTaskSubscription.unsubscribe();
+        }
+        if (mCompleteSubscription != null) {
+            mCompleteSubscription.unsubscribe();
+        }
+        if (mActivateTaskSubscription != null) {
+            mActivateTaskSubscription.unsubscribe();
+        }
+        if (mClearCompleteTasksSubscription != null) {
+            mClearCompleteTasksSubscription.unsubscribe();
+        }
     }
 
     @Override
@@ -101,11 +124,16 @@ public class TasksPresenter implements TasksContract.Presenter {
         GetTasks.RequestValues requestValue = new GetTasks.RequestValues(forceUpdate,
                 mCurrentFiltering);
 
-        mUseCaseHandler.execute(mGetTasks, requestValue,
-                new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
+        mGetTaskSubscription = mUseCaseHandler.execute(mGetTasks, requestValue,
+                new UseCase.Callback<GetTasks.ResponseValue>() {
                     @Override
-                    public void onSuccess(GetTasks.ResponseValue response) {
-                        List<Task> tasks = response.getTasks();
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(GetTasks.ResponseValue responseValues) {
+                        List<Task> tasks = responseValues.getTasks();
                         // The view may not be able to handle UI updates anymore
                         if (!mTasksView.isActive()) {
                             return;
@@ -118,7 +146,12 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
 
                     @Override
-                    public void onError() {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable exception) {
                         // The view may not be able to handle UI updates anymore
                         if (!mTasksView.isActive()) {
                             return;
@@ -182,17 +215,27 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
+        mCompleteSubscription = mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
                         completedTask.getId()),
-                new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
+                new UseCase.Callback<CompleteTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(CompleteTask.ResponseValue response) {
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(CompleteTask.ResponseValue responseValues) {
                         mTasksView.showTaskMarkedComplete();
                         loadTasks(false, false);
                     }
 
                     @Override
-                    public void onError() {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable exception) {
                         mTasksView.showLoadingTasksError();
                     }
                 });
@@ -201,16 +244,26 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
-        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
-                new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
+        mActivateTaskSubscription = mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
+                new UseCase.Callback<ActivateTask.ResponseValue>() {
                     @Override
-                    public void onSuccess(ActivateTask.ResponseValue response) {
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(ActivateTask.ResponseValue responseValues) {
                         mTasksView.showTaskMarkedActive();
                         loadTasks(false, false);
                     }
 
                     @Override
-                    public void onError() {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable exception) {
                         mTasksView.showLoadingTasksError();
                     }
                 });
@@ -218,16 +271,26 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void clearCompletedTasks() {
-        mUseCaseHandler.execute(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
-                new UseCase.UseCaseCallback<ClearCompleteTasks.ResponseValue>() {
+        mClearCompleteTasksSubscription = mUseCaseHandler.execute(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
+                new UseCase.Callback<ClearCompleteTasks.ResponseValue>() {
                     @Override
-                    public void onSuccess(ClearCompleteTasks.ResponseValue response) {
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(ClearCompleteTasks.ResponseValue responseValues) {
                         mTasksView.showCompletedTasksCleared();
                         loadTasks(false, false);
                     }
 
                     @Override
-                    public void onError() {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable exception) {
                         mTasksView.showLoadingTasksError();
                     }
                 });

@@ -74,6 +74,12 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mPresenter.start();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.stop();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

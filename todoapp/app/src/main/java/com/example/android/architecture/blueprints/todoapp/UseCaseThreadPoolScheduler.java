@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import android.os.Handler;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,8 +28,6 @@ import java.util.concurrent.TimeUnit;
  * {@link java.util.concurrent.ExecutorService}s for different scenarios.
  */
 public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
-
-    private final Handler mHandler = new Handler();
 
     public static final int POOL_SIZE = 2;
 
@@ -50,27 +46,4 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
     public void execute(Runnable runnable) {
         mThreadPoolExecutor.execute(runnable);
     }
-
-    @Override
-    public <V extends UseCase.ResponseValue> void notifyResponse(final V response,
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                useCaseCallback.onSuccess(response);
-            }
-        });
-    }
-
-    @Override
-    public <V extends UseCase.ResponseValue> void onError(
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                useCaseCallback.onError();
-            }
-        });
-    }
-
 }

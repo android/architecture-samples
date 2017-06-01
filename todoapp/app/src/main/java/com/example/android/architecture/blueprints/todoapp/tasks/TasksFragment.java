@@ -91,6 +91,12 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.stop();
+    }
+
+    @Override
     public void setPresenter(@NonNull TasksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }

@@ -17,36 +17,51 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Runs {@link UseCase}s using a {@link UseCaseScheduler}.
  */
 public class UseCaseHandler {
 
-    private static UseCaseHandler INSTANCE;
+    private static final UseCaseHandler INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler(), new UseCaseUiScheduler());
+    private UseCaseScheduler executeScheduler;
+    private UseCaseScheduler callbackScheduler;
 
-    private final UseCaseScheduler mUseCaseScheduler;
-
-    public UseCaseHandler(UseCaseScheduler useCaseScheduler) {
-        mUseCaseScheduler = useCaseScheduler;
+    public static UseCaseHandler getInstance() {
+        return INSTANCE;
     }
 
-    public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> void execute(
-            final UseCase<T, R> useCase, T values, UseCase.UseCaseCallback<R> callback) {
-        useCase.setRequestValues(values);
-        useCase.setUseCaseCallback(new UiCallbackWrapper(callback, this));
+    public UseCaseHandler(UseCaseScheduler executeScheduler, UseCaseScheduler callbackScheduler) {
+        this.executeScheduler = executeScheduler;
+        this.callbackScheduler = callbackScheduler;
+    }
+
+    public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> Subscription execute(
+            @NonNull final UseCase<T, R> useCase, @NonNull final T request, @Nullable UseCase.Callback<R> callback) {
+        if (callback == null) {
+            callback = new VoidCallback();
+        } else {
+            callback = new CallbackSchedulerWrapper(callback, callbackScheduler);
+        }
+
+        final CallbackSubscriptionWrapper<R> callbackWrapper = new CallbackSubscriptionWrapper<>(callback);
 
         // The network request might be handled in a different thread so make sure
         // Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mUseCaseScheduler.execute(new Runnable() {
+        executeScheduler.execute(new Runnable() {
             @Override
             public void run() {
+                useCase.executeUseCase(request, callbackWrapper, callbackWrapper);
 
-                useCase.run();
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
                 // it throws "Counter has been corrupted!" exception.
@@ -55,44 +70,169 @@ public class UseCaseHandler {
                 }
             }
         });
+
+        return callbackWrapper;
     }
 
-    public <V extends UseCase.ResponseValue> void notifyResponse(final V response,
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
-        mUseCaseScheduler.notifyResponse(response, useCaseCallback);
-    }
+    /**
+     * Redirects/Executes callback events on given {@code UseCaseScheduler}
+     *
+     * @param <V> the callback response type
+     */
+    private static final class CallbackSchedulerWrapper<V extends UseCase.ResponseValue> implements
+            UseCase.Callback<V> {
+        private final UseCase.Callback<V> callback;
+        private final UseCaseScheduler scheduler;
 
-    private <V extends UseCase.ResponseValue> void notifyError(
-            final UseCase.UseCaseCallback<V> useCaseCallback) {
-        mUseCaseScheduler.onError(useCaseCallback);
-    }
-
-    private static final class UiCallbackWrapper<V extends UseCase.ResponseValue> implements
-            UseCase.UseCaseCallback<V> {
-        private final UseCase.UseCaseCallback<V> mCallback;
-        private final UseCaseHandler mUseCaseHandler;
-
-        public UiCallbackWrapper(UseCase.UseCaseCallback<V> callback,
-                UseCaseHandler useCaseHandler) {
-            mCallback = callback;
-            mUseCaseHandler = useCaseHandler;
+        public CallbackSchedulerWrapper(UseCase.Callback<V> callback, UseCaseScheduler scheduler) {
+            this.callback = callback;
+            this.scheduler = scheduler;
         }
 
         @Override
-        public void onSuccess(V response) {
-            mUseCaseHandler.notifyResponse(response, mCallback);
+        public void onStart() {
+            scheduler.execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onStart();
+                }
+            });
         }
 
         @Override
-        public void onError() {
-            mUseCaseHandler.notifyError(mCallback);
+        public void onNext(final V response) {
+            scheduler.execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onNext(response);
+                }
+            });
+        }
+
+        @Override
+        public void onCompleted() {
+            scheduler.execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onCompleted();
+                }
+            });
+        }
+
+        @Override
+        public void onError(final Throwable exception) {
+            scheduler.execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onError(exception);
+                }
+            });
         }
     }
 
-    public static UseCaseHandler getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler());
+    /**
+     * Stops the receipt of notifications on the wrapped {@link UseCase.Callback}
+     *
+     * @param <V> the callback response type
+     */
+    private static final class CallbackSubscriptionWrapper<V extends UseCase.ResponseValue> implements UseCase.Callback<V>, Subscription {
+        private UseCase.Callback<V> callback;
+        private AtomicBoolean unsubscribed = new AtomicBoolean(false);
+
+        public CallbackSubscriptionWrapper(UseCase.Callback<V> callback) {
+            this.callback = callback;
         }
-        return INSTANCE;
+
+        @Override
+        public void onStart() {
+            if (isUnsubscribed()) {
+                return;
+            }
+
+            UseCase.Callback<V> callback = this.callback;
+
+            if (callback != null) {
+                callback.onStart();
+            }
+        }
+
+        @Override
+        public void onNext(V response) {
+            if (isUnsubscribed()) {
+                return;
+            }
+
+            UseCase.Callback<V> callback = this.callback;
+
+            if (callback != null) {
+                callback.onNext(response);
+            }
+        }
+
+        @Override
+        public void onCompleted() {
+            if (isUnsubscribed()) {
+                return;
+            }
+
+            UseCase.Callback<V> callback = this.callback;
+
+            if (callback != null) {
+                callback.onCompleted();
+            }
+
+            unsubscribe();
+        }
+
+        @Override
+        public void onError(Throwable exception) {
+            if (isUnsubscribed()) {
+                return;
+            }
+
+            UseCase.Callback<V> callback = this.callback;
+
+            if (callback != null) {
+                callback.onError(exception);
+            }
+
+            unsubscribe();
+        }
+
+        @Override
+        public void unsubscribe() {
+            unsubscribed.set(true);
+            callback = null;
+        }
+
+        @Override
+        public boolean isUnsubscribed() {
+            return unsubscribed.get();
+        }
+    }
+
+    /**
+     * Consumes callback events without taking any action
+     */
+    private static class VoidCallback implements UseCase.Callback {
+        @Override
+        public void onStart() {
+            // Take no-action
+        }
+
+        @Override
+        public void onNext(Object responseValues) {
+            // Take no-action
+        }
+
+        @Override
+        public void onCompleted() {
+            // Take no-action
+        }
+
+        @Override
+        public void onError(Throwable exception) {
+            // Take no-action
+        }
     }
 }

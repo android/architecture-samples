@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask.domain.u
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.Subscription;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -27,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Deletes a {@link Task} from the {@link TasksRepository}.
  */
-public class DeleteTask extends UseCase<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
+public class DeleteTask implements UseCase<DeleteTask.RequestValues, DeleteTask.ResponseValue> {
 
     private final TasksRepository mTasksRepository;
 
@@ -36,9 +37,18 @@ public class DeleteTask extends UseCase<DeleteTask.RequestValues, DeleteTask.Res
     }
 
     @Override
-    protected void executeUseCase(final RequestValues values) {
-        mTasksRepository.deleteTask(values.getTaskId());
-        getUseCaseCallback().onSuccess(new ResponseValue());
+    public void executeUseCase(@NonNull RequestValues requestValues, @NonNull Callback<ResponseValue> callback, @NonNull Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+
+        mTasksRepository.deleteTask(requestValues.getTaskId());
+
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+        callback.onNext(new ResponseValue());
+        callback.onCompleted();
     }
 
     public static final class RequestValues implements UseCase.RequestValues {
