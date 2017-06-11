@@ -22,6 +22,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.annotation.Nullable;
 
@@ -50,7 +51,7 @@ public abstract class TaskViewModel extends ViewModel
 
     private final Context mContext;
 
-    private boolean mIsDataLoading;
+    public final ObservableBoolean dataLoading = new ObservableBoolean();
 
     public TaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
@@ -74,7 +75,7 @@ public abstract class TaskViewModel extends ViewModel
 
     public void start(String taskId) {
         if (taskId != null) {
-            mIsDataLoading = true;
+            dataLoading.set(true);
             mTasksRepository.getTask(taskId, this);
         }
     }
@@ -90,7 +91,7 @@ public abstract class TaskViewModel extends ViewModel
     }
 
     public void setCompleted(boolean completed) {
-        if (mIsDataLoading) {
+        if (dataLoading.get()) {
             return;
         }
         Task task = mTaskObservable.get();
@@ -111,10 +112,6 @@ public abstract class TaskViewModel extends ViewModel
         return mTaskObservable.get() != null;
     }
 
-    public boolean isDataLoading() {
-        return mIsDataLoading;
-    }
-
     // This could be an observable, but we save a call to Task.getTitleForList() if not needed.
     public String getTitleForList() {
         if (mTaskObservable.get() == null) {
@@ -126,14 +123,14 @@ public abstract class TaskViewModel extends ViewModel
     @Override
     public void onTaskLoaded(Task task) {
         mTaskObservable.set(task);
-        mIsDataLoading = false;
+        dataLoading.set(false);
         //notifyChange(); // For the @Bindable properties
     }
 
     @Override
     public void onDataNotAvailable() {
         mTaskObservable.set(null);
-        mIsDataLoading = false;
+        dataLoading.set(false);
     }
 
     public void deleteTask() {
