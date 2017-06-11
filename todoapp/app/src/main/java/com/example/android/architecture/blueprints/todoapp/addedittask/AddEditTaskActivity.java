@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -27,6 +28,7 @@ import android.support.v7.widget.Toolbar;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
@@ -106,31 +108,15 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
                     addEditTaskFragment, R.id.contentFrame);
         }
         return addEditTaskFragment;
+
     }
 
     private AddEditTaskViewModel findOrCreateViewModel() {
-        // In a configuration change we might have a ViewModel present. It's retained using the
-        // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<AddEditTaskViewModel> retainedViewModel =
-                (ViewModelHolder<AddEditTaskViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(ADD_EDIT_VIEWMODEL_TAG);
-
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            AddEditTaskViewModel viewModel = new AddEditTaskViewModel(
-                    getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()));
-
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    ADD_EDIT_VIEWMODEL_TAG);
-            return viewModel;
-        }
+        AddEditTaskViewModel model = ViewModelProviders.of(this).get(AddEditTaskViewModel.class);
+        model.init(
+                getApplicationContext(),
+                Injection.provideTasksRepository(getApplicationContext())
+        );
+        return model;
     }
 }

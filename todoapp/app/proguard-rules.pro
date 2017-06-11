@@ -26,3 +26,6 @@
 -dontwarn com.squareup.javawriter.JavaWriter
 # Uncomment this if you use Mockito
 -dontwarn org.mockito.**
+
+# Arch components
+-keep class android.arch.** { *; }

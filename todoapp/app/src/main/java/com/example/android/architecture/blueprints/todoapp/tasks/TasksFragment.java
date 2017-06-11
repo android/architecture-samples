@@ -16,6 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.arch.lifecycle.LifecycleFragment;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.Observer;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.Bundle;
@@ -24,6 +28,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,18 +50,18 @@ import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment {
+public class TasksFragment extends LifecycleFragment {
 
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
 
     private TasksAdapter mListAdapter;
-
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -130,20 +135,23 @@ public class TasksFragment extends Fragment {
     @Override
     public void onDestroy() {
         mListAdapter.onDestroy();
+        /*
+        No need to remove the callback, as lifeCycle will handle it implicitly
         if (mSnackbarCallback != null) {
             mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
         }
+        */
         super.onDestroy();
     }
 
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mTasksViewModel.snackbarText.observe(this, new Observer<String>() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
+            public void onChanged(@Nullable String s) {
+                Log.d(TAG, "Snack bar value changed " + s);
+                SnackbarUtils.showSnackbar(getView(), s);
             }
-        };
-        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void showFilteringPopUpMenu() {
@@ -191,6 +199,7 @@ public class TasksFragment extends Fragment {
                 new ArrayList<Task>(0),
                 (TasksActivity) getActivity(),
                 Injection.provideTasksRepository(getContext().getApplicationContext()),
+                this,
                 mTasksViewModel);
         listView.setAdapter(mListAdapter);
     }
@@ -213,16 +222,20 @@ public class TasksFragment extends Fragment {
 
         private final TasksViewModel mTasksViewModel;
 
+        private LifecycleRegistryOwner mLifecycleRegistryOwner;
+
         private List<Task> mTasks;
 
         private TasksRepository mTasksRepository;
 
         public TasksAdapter(List<Task> tasks, TasksActivity taskItemNavigator,
                             TasksRepository tasksRepository,
+                            LifecycleRegistryOwner lifecycleRegistryOwner,
                             TasksViewModel tasksViewModel) {
             mTaskItemNavigator = taskItemNavigator;
             mTasksRepository = tasksRepository;
             mTasksViewModel = tasksViewModel;
+            mLifecycleRegistryOwner = lifecycleRegistryOwner;
             setList(tasks);
 
         }
@@ -275,11 +288,11 @@ public class TasksFragment extends Fragment {
             binding.setViewmodel(viewmodel);
             // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the
             // fragment's.
-            viewmodel.snackbarText.addOnPropertyChangedCallback(
-                    new Observable.OnPropertyChangedCallback() {
+
+            viewmodel.snackbarText.observe(mLifecycleRegistryOwner, new Observer<String>() {
                 @Override
-                public void onPropertyChanged(Observable observable, int i) {
-                    mTasksViewModel.snackbarText.set(viewmodel.getSnackbarText());
+                public void onChanged(@Nullable String s) {
+                    mTasksViewModel.snackbarText.setValue(s);
                 }
             });
             viewmodel.setTask(task);

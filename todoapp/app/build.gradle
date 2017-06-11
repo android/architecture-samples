@@ -57,6 +57,7 @@ android {
     dataBinding {
         enabled = true
     }
+    buildToolsVersion '25.0.0'
 }
 
 /*
@@ -72,6 +73,14 @@ dependencies {
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
+
+
+    compile "com.google.guava:guava:$rootProject.guavaVersion"
+
+    compile "android.arch.lifecycle:runtime:$rootProject.archLifecycleVersion"
+    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
+    compile "android.arch.persistence.room:runtime:$rootProject.archLifecycleVersion"
 
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"

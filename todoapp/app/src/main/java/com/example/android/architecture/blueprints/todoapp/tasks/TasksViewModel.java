@@ -16,6 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -44,7 +47,7 @@ import java.util.List;
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends BaseObservable {
+public class TasksViewModel extends ViewModel {
 
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
@@ -59,11 +62,11 @@ public class TasksViewModel extends BaseObservable {
 
     public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
 
-    final ObservableField<String> snackbarText = new ObservableField<>();
+    final MutableLiveData<String> snackbarText = new MutableLiveData<>();
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
-    private final TasksRepository mTasksRepository;
+    private TasksRepository mTasksRepository;
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
@@ -71,14 +74,20 @@ public class TasksViewModel extends BaseObservable {
 
     private TasksNavigator mNavigator;
 
+    public TasksViewModel() {
+    }
+
+    public void init(TasksRepository repository, Context context) {
+        mContext = context.getApplicationContext(); // Force use of Application Context.
+        mTasksRepository = repository;
+        // Set initial state
+        setFiltering(TasksFilterType.ALL_TASKS);
+    }
+
     public TasksViewModel(
             TasksRepository repository,
             Context context) {
-        mContext = context.getApplicationContext(); // Force use of Application Context.
-        mTasksRepository = repository;
-
-        // Set initial state
-        setFiltering(TasksFilterType.ALL_TASKS);
+        this.init(repository, context);
     }
 
     void setNavigator(TasksNavigator navigator) {
@@ -92,11 +101,6 @@ public class TasksViewModel extends BaseObservable {
 
     public void start() {
         loadTasks(false);
-    }
-
-    @Bindable
-    public boolean isEmpty() {
-        return items.isEmpty();
     }
 
     public void loadTasks(boolean forceUpdate) {
@@ -141,12 +145,8 @@ public class TasksViewModel extends BaseObservable {
 
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        snackbarText.set(mContext.getString(R.string.completed_tasks_cleared));
+        snackbarText.setValue(mContext.getString(R.string.completed_tasks_cleared));
         loadTasks(false, false);
-    }
-
-    public String getSnackbarText() {
-        return snackbarText.get();
     }
 
     /**
@@ -162,15 +162,15 @@ public class TasksViewModel extends BaseObservable {
         if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
             switch (resultCode) {
                 case TaskDetailActivity.EDIT_RESULT_OK:
-                    snackbarText.set(
+                    snackbarText.setValue(
                             mContext.getString(R.string.successfully_saved_task_message));
                     break;
                 case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    snackbarText.set(
+                    snackbarText.setValue(
                             mContext.getString(R.string.successfully_added_task_message));
                     break;
                 case TaskDetailActivity.DELETE_RESULT_OK:
-                    snackbarText.set(
+                    snackbarText.setValue(
                             mContext.getString(R.string.successfully_deleted_task_message));
                     break;
             }
@@ -234,7 +234,6 @@ public class TasksViewModel extends BaseObservable {
 
                 items.clear();
                 items.addAll(tasksToShow);
-                notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
             }
 
             @Override

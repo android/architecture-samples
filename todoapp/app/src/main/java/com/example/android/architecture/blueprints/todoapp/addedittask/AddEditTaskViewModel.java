@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
@@ -26,6 +28,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * ViewModel for the Add/Edit screen.
  * <p>
@@ -34,19 +38,19 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * {@link com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel} for
  * how to deal with more complex scenarios.
  */
-public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
+public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.GetTaskCallback {
 
-    public final ObservableField<String> title = new ObservableField<>();
+    public ObservableField<String> title = new ObservableField<>();
 
-    public final ObservableField<String> description = new ObservableField<>();
+    public ObservableField<String> description = new ObservableField<>();
 
-    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+    public ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    public final ObservableField<String> snackbarText = new ObservableField<>();
+    public final MutableLiveData<String> snackbarText = new MutableLiveData<>();
 
-    private final TasksRepository mTasksRepository;
+    TasksRepository mTasksRepository;
 
-    private final Context mContext;  // To avoid leaks, this must be an Application Context.
+    Context mContext;  // To avoid leaks, this must be an Application Context.
 
     @Nullable
     private String mTaskId;
@@ -57,9 +61,16 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     private AddEditTaskNavigator mAddEditTaskNavigator;
 
+    public AddEditTaskViewModel() {
+    }
+
+    public void init(Context context, TasksRepository tasksRepository) {
+        this.mContext = context.getApplicationContext(); // Force use of Application Context.
+        this.mTasksRepository = tasksRepository;
+    }
+
     AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
-        mContext = context.getApplicationContext(); // Force use of Application Context.
-        mTasksRepository = tasksRepository;
+        this.init(context, tasksRepository);
     }
 
     void onActivityCreated(AddEditTaskNavigator navigator) {
@@ -118,7 +129,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     @Nullable
     public String getSnackbarText() {
-        return snackbarText.get();
+        return snackbarText.getValue();
     }
 
     private boolean isNewTask() {
@@ -128,7 +139,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            snackbarText.set(mContext.getString(R.string.empty_task_message));
+            snackbarText.setValue(mContext.getString(R.string.empty_task_message));
         } else {
             mTasksRepository.saveTask(newTask);
             navigateOnTaskSaved();
