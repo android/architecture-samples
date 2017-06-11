@@ -38,10 +38,11 @@ import static android.R.attr.description;
  */
 public abstract class TaskViewModel extends ViewModel
         implements TasksDataSource.GetTaskCallback {
-
     public final MutableLiveData<String> snackbarText = new MutableLiveData<>();
 
     public final ObservableField<String> title = new ObservableField<>();
+
+    public final ObservableField<String> titleForList = new ObservableField<>();
 
     public final ObservableField<String> description = new ObservableField<>();
 
@@ -53,6 +54,10 @@ public abstract class TaskViewModel extends ViewModel
 
     public final ObservableBoolean dataLoading = new ObservableBoolean();
 
+    public final ObservableBoolean completed = new ObservableBoolean();
+
+    public final ObservableBoolean dataAvailable = new ObservableBoolean();
+
     public TaskViewModel(Context context, TasksRepository tasksRepository) {
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = tasksRepository;
@@ -62,6 +67,7 @@ public abstract class TaskViewModel extends ViewModel
             @Override
             public void onPropertyChanged(Observable observable, int i) {
                 Task task = mTaskObservable.get();
+                notifyChange(); // earlier for the @Bindable properties. Was being used in onTaskLoaded. Now it has a custom implementation
                 if (task != null) {
                     title.set(task.getTitle());
                     description.set(task.getDescription());
@@ -69,6 +75,28 @@ public abstract class TaskViewModel extends ViewModel
                     title.set(mContext.getString(R.string.no_data));
                     description.set(mContext.getString(R.string.no_data_description));
                 }
+            }
+        });
+
+        completed.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (dataLoading.get()) {
+                    return;
+                }
+                Task task = mTaskObservable.get();
+                // Update the entity
+                task.setCompleted(completed.get());
+
+                // Notify repository and user
+                if (completed.get()) {
+                    mTasksRepository.completeTask(task);
+                    snackbarText.setValue(mContext.getResources().getString(R.string.task_marked_complete));
+                } else {
+                    mTasksRepository.activateTask(task);
+                    snackbarText.setValue(mContext.getResources().getString(R.string.task_marked_active));
+                }
+
             }
         });
     }
@@ -84,47 +112,21 @@ public abstract class TaskViewModel extends ViewModel
         mTaskObservable.set(task);
     }
 
-    // "completed" is two-way bound, so in order to intercept the new value, use a @Bindable
-    // annotation and process it in the setter.
-    public boolean getCompleted() {
-        return mTaskObservable.get().isCompleted();
-    }
-
-    public void setCompleted(boolean completed) {
-        if (dataLoading.get()) {
-            return;
-        }
-        Task task = mTaskObservable.get();
-        // Update the entity
-        task.setCompleted(completed);
-
-        // Notify repository and user
-        if (completed) {
-            mTasksRepository.completeTask(task);
-            snackbarText.setValue(mContext.getResources().getString(R.string.task_marked_complete));
-        } else {
-            mTasksRepository.activateTask(task);
-            snackbarText.setValue(mContext.getResources().getString(R.string.task_marked_active));
-        }
-    }
-
-    public boolean isDataAvailable() {
-        return mTaskObservable.get() != null;
-    }
-
-    // This could be an observable, but we save a call to Task.getTitleForList() if not needed.
-    public String getTitleForList() {
-        if (mTaskObservable.get() == null) {
-            return "No data";
-        }
-        return mTaskObservable.get().getTitleForList();
-    }
-
     @Override
     public void onTaskLoaded(Task task) {
         mTaskObservable.set(task);
         dataLoading.set(false);
-        //notifyChange(); // For the @Bindable properties
+    }
+
+    public void notifyChange() {
+        titleForList.set(mTaskObservable.get() == null ?
+                "No Data" :
+                mTaskObservable.get().getTitleForList()
+        );
+        if (mTaskObservable.get() != null) {
+            completed.set(mTaskObservable.get().isCompleted());
+        }
+        dataAvailable.set(mTaskObservable.get() != null);
     }
 
     @Override
