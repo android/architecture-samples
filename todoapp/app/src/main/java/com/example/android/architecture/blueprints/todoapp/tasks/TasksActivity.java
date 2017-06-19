@@ -30,6 +30,7 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.faq.view.FAQFragment;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -41,6 +42,8 @@ public class TasksActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
 
     private TasksPresenter mTasksPresenter;
+    private TasksFragment tasksFragment;
+    private FAQFragment faqFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +65,7 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        TasksFragment tasksFragment =
+        tasksFragment =
                 (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {
             // Create the fragment
@@ -79,7 +82,7 @@ public class TasksActivity extends AppCompatActivity {
                 Injection.provideCompleteTasks(getApplicationContext()),
                 Injection.provideActivateTask(getApplicationContext()),
                 Injection.provideClearCompleteTasks(getApplicationContext())
-                );
+        );
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
@@ -114,7 +117,8 @@ public class TasksActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                // Do nothing, we're already on that screen
+                                ActivityUtils.addFragmentToActivity(
+                                        getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
                                 break;
                             case R.id.statistics_navigation_menu_item:
                                 Intent intent =
@@ -123,6 +127,13 @@ public class TasksActivity extends AppCompatActivity {
                                         | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
+                            case R.id.faq_navigation_menu_item: {
+                                if (faqFragment == null)
+                                    faqFragment = FAQFragment.newInstance();
+                                ActivityUtils.addFragmentToActivity(
+                                        getSupportFragmentManager(), faqFragment, R.id.contentFrame);
+                            }
+                            break;
                             default:
                                 break;
                         }

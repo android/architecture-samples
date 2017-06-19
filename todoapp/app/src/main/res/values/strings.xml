@@ -55,5 +55,10 @@
     <string name="no_tasks_completed">You have no completed TO-DOs!</string>
     <string name="no_tasks_add">Add a TO-DO item +</string>
     <string name="refresh">Refresh</string>
+    <string name="faq_title">FAQ</string>
+    <string name="faq_title_label">Frequantly Asked Questions</string>
+    <string name="no_faq_all">You have no FAQs!</string>
+    <string name="faq_item_clicked">FAQ item clicked</string>
+    <string name="error_loading_faq" >Error loading FAQ.</string>
 
 </resources>

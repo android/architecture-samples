@@ -25,9 +25,13 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.domain.us
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
+import com.example.android.architecture.blueprints.todoapp.faq.datasourse.FAQRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.faq.datasourse.fake.FAQFakeRepository;
+import com.example.android.architecture.blueprints.todoapp.faq.datasourse.remote.FAQRemoteRepository;
+import com.example.android.architecture.blueprints.todoapp.faq.domain.usecase.GetFaqUseCase;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ActivateTask;
@@ -82,5 +86,13 @@ public class Injection {
 
     public static GetStatistics provideGetStatistics(@NonNull Context context) {
         return new GetStatistics(Injection.provideTasksRepository(context));
+    }
+    public static GetFaqUseCase provideGetFAQ(@NonNull Context context) {
+        return new GetFaqUseCase(Injection.provideFAQRepository(context));
+    }
+
+    private static FAQRepository provideFAQRepository(Context context) {
+        checkNotNull(context);
+        return FAQRepository.getInstance(new FAQRemoteRepository(),new FAQFakeRepository());
     }
 }
