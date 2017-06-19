@@ -24,4 +24,8 @@
         android:id="@+id/statistics_navigation_menu_item"
         android:icon="@drawable/ic_statistics"
         android:title="@string/statistics_title" />
+    <item
+        android:id="@+id/faq_navigation_menu_item"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="@string/faq_title" />
 </menu>

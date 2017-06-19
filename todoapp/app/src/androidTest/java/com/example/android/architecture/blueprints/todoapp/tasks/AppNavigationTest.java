@@ -113,4 +113,18 @@ public class AppNavigationTest {
         onView(withId(R.id.drawer_layout))
                 .check(matches(isOpen(Gravity.LEFT))); // Left drawer is open open.
     }
+    @Test
+    public void clickOnFAQNavigationItem_ShowsSFAQScreen() {
+        // Open Drawer to click on navigation.
+        onView(withId(R.id.drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
+                .perform(open()); // Open Drawer
+
+        // Start faq screen.
+        onView(withId(R.id.nav_view))
+                .perform(navigateTo(R.id.faq_navigation_menu_item));
+
+        // Check that faq was opened.
+        onView(withId(R.id.faq_list)).check(matches(isDisplayed()));
+    }
 }
