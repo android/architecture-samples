@@ -1,4 +1,5 @@
 # todo-mvp-room
+
 # Summary
 This sample is based on the TODO-MVP project and uses [Room](https://developer.android.com/topic/libraries/architecture/room.html), the data persistence library part of the [Architecture Components](https://developer.android.com/topic/libraries/architecture/index.html).
 
@@ -13,7 +14,7 @@ This sample is not final, as the Architecture Components are in alpha stage at t
 
 ### Complexity - understandability
 
-Developers need to be familiar with Room.
+Low, since developers only need to be familiar with Room.
 
 ### Testability
 
@@ -23,7 +24,7 @@ Similar to TODO-MVP.
 
 #### Integration testing
 
-High, since all database related classes can be tested. 
+High, since all database related classes can be tested.
 
 ### Code metrics
 
@@ -47,4 +48,4 @@ High.
 
 #### Learning cost
 
-Low, as working with Room does not involve a high learning curve
+Low, as it’s easy to work with Room.
