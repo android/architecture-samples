@@ -67,6 +67,8 @@ public class TasksLocalDataSourceTest {
                 .build();
         TasksDao tasksDao = mDatabase.taskDao();
 
+        // Make sure that we're not keeping a reference to the wrong instance.
+        TasksLocalDataSource.clearInstance();
         mLocalDataSource = TasksLocalDataSource.getInstance(new SingleExecutors(), tasksDao);
     }
 
