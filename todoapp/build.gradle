@@ -13,6 +13,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
@@ -23,10 +26,11 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 10
+    // Support library and architecture components support minSdk 14 and above.
+    minSdkVersion = 14
     targetSdkVersion = 25
     compileSdkVersion = 25
-    buildToolsVersion = '25.0.0'
+    buildToolsVersion = '25.0.2'
 
     // App dependencies
     supportLibraryVersion = '25.3.1'
@@ -38,4 +42,5 @@ ext {
     runnerVersion = '0.5'
     rulesVersion = '0.5'
     espressoVersion = '2.2.2'
+    roomVersion = "1.0.0-alpha3"
 }

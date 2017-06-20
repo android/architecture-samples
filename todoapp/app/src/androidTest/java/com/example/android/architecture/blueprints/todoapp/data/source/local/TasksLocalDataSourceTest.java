@@ -16,20 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
-
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.List;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -40,8 +26,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import android.arch.persistence.room.Room;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
+import android.support.test.runner.AndroidJUnit4;
+
+import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.util.SingleExecutors;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.List;
+
 /**
- * Integration test for the {@link TasksDataSource}, which uses the {@link TasksDbHelper}.
+ * Integration test for the {@link TasksDataSource}.
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -55,15 +57,23 @@ public class TasksLocalDataSourceTest {
 
     private TasksLocalDataSource mLocalDataSource;
 
+    private ToDoDatabase mDatabase;
+
     @Before
     public void setup() {
-        mLocalDataSource = TasksLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext());
+        // using an in-memory database for testing, since it doesn't survive killing the process
+        mDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
+                ToDoDatabase.class)
+                .build();
+        TasksDao tasksDao = mDatabase.taskDao();
+
+        mLocalDataSource = TasksLocalDataSource.getInstance(new SingleExecutors(), tasksDao);
     }
 
     @After
     public void cleanUp() {
-        mLocalDataSource.deleteAllTasks();
+        mDatabase.close();
+        TasksLocalDataSource.clearInstance();
     }
 
     @Test
