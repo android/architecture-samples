@@ -16,34 +16,31 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.test.espresso.IdlingResource;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 
-public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
+public class TasksActivity extends LifecycleAppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
     private DrawerLayout mDrawerLayout;
-
-    public static final String TASKS_VIEWMODEL_TAG = "TASKS_VIEWMODEL_TAG";
 
     private TasksViewModel mViewModel;
 
@@ -56,57 +53,48 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
         setupNavigationDrawer();
 
-        TasksFragment tasksFragment = findOrCreateViewFragment();
+        setupViewFragment();
 
-        mViewModel = findOrCreateViewModel();
-        mViewModel.setNavigator(this);
+        mViewModel = obtainViewModel(this);
 
-        // Link View and ViewModel
-        tasksFragment.setViewModel(mViewModel);
+        // Subscribe to "open task" event
+        mViewModel.getOpenTaskEvent().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String taskId) {
+                if (taskId != null) {
+                    openTaskDetails(taskId);
+                }
+            }
+        });
+
+        // Subscribe to "new task" event
+        mViewModel.getNewTaskEvent().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void _) {
+                addNewTask();
+            }
+        });
     }
 
-    @Override
-    protected void onDestroy() {
-        mViewModel.onActivityDestroyed();
-        super.onDestroy();
+    public static TasksViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+
+        TasksViewModel viewModel =
+                ViewModelProviders.of(activity, factory).get(TasksViewModel.class);
+
+        return viewModel;
     }
 
-    private TasksViewModel findOrCreateViewModel() {
-        // In a configuration change we might have a ViewModel present. It's retained using the
-        // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<TasksViewModel> retainedViewModel =
-                (ViewModelHolder<TasksViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(TASKS_VIEWMODEL_TAG);
-
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            TasksViewModel viewModel = new TasksViewModel(
-                    Injection.provideTasksRepository(getApplicationContext()),
-                    getApplicationContext());
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    TASKS_VIEWMODEL_TAG);
-            return viewModel;
-        }
-    }
-
-    @NonNull
-    private TasksFragment findOrCreateViewFragment() {
+    private void setupViewFragment() {
         TasksFragment tasksFragment =
                 (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {
             // Create the fragment
             tasksFragment = TasksFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
+            ActivityUtils.replaceFragmentInActivity(
                     getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
-        return tasksFragment;
     }
 
     private void setupToolbar() {
@@ -162,11 +150,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
                         return true;
                     }
                 });
-    }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
     }
 
     @Override

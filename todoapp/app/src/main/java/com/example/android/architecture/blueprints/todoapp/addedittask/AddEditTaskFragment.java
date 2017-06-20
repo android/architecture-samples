@@ -16,12 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.databinding.Observable;
+import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -29,15 +28,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment {
+public class AddEditTaskFragment extends LifecycleFragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
@@ -45,28 +43,12 @@ public class AddEditTaskFragment extends Fragment {
 
     private AddtaskFragBinding mViewDataBinding;
 
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
-
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
     }
 
     public AddEditTaskFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getArguments() != null) {
-            mViewModel.start(getArguments().getString(ARGUMENT_EDIT_TASK_ID));
-        } else {
-            mViewModel.start(null);
-        }
-    }
-
-    public void setViewModel(@NonNull AddEditTaskViewModel viewModel) {
-        mViewModel = checkNotNull(viewModel);
     }
 
     @Override
@@ -78,6 +60,17 @@ public class AddEditTaskFragment extends Fragment {
         setupSnackbar();
 
         setupActionBar();
+
+        loadData();
+    }
+
+    private void loadData() {
+        // Add or edit an existing task?
+        if (getArguments() != null) {
+            mViewModel.start(getArguments().getString(ARGUMENT_EDIT_TASK_ID));
+        } else {
+            mViewModel.start(null);
+        }
     }
 
     @Nullable
@@ -89,6 +82,8 @@ public class AddEditTaskFragment extends Fragment {
             mViewDataBinding = AddtaskFragBinding.bind(root);
         }
 
+        mViewModel = AddEditTaskActivity.obtainViewModel(getActivity());
+
         mViewDataBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
@@ -97,22 +92,13 @@ public class AddEditTaskFragment extends Fragment {
         return mViewDataBinding.getRoot();
     }
 
-    @Override
-    public void onDestroy() {
-        if (mSnackbarCallback != null) {
-            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
-        super.onDestroy();
-    }
-
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
+                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
             }
-        };
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void setupFab() {
@@ -129,6 +115,9 @@ public class AddEditTaskFragment extends Fragment {
 
     private void setupActionBar() {
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
         if (getArguments() != null) {
             actionBar.setTitle(R.string.edit_task);
         } else {

@@ -18,16 +18,19 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,13 +72,26 @@ public class StatisticsScreenTest {
     @Before
     public void intentWithStubbedTaskId() {
         // Given some tasks
-        TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
+        TasksRepository tasksRepository = Injection.provideTasksRepository(
+                InstrumentationRegistry.getTargetContext());
+        tasksRepository.deleteAllTasks();
+        tasksRepository.saveTask(new Task("Title1", "", false));
+        tasksRepository.saveTask(new Task("Title2", "", true));
 
         // Lazily start the Activity from the ActivityTestRule
         Intent startIntent = new Intent();
         mStatisticsActivityTestRule.launchActivity(startIntent);
+    }
+
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
+     */
+    @Before
+    public void registerIdlingResource() {
+        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -87,5 +103,13 @@ public class StatisticsScreenTest {
         String expectedCompletedTaskText = InstrumentationRegistry.getTargetContext()
                 .getString(R.string.statistics_completed_tasks, 1);
         onView(withText(containsString(expectedCompletedTaskText))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
     }
 }

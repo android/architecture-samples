@@ -17,28 +17,35 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View.OnClickListener" />
+
         <variable
-            name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TaskItemViewModel" />
+            name="task"
+            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
+
+        <variable
+            name="listener"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TaskItemUserActionsListener" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:background="@{viewmodel.completed ? @drawable/list_completed_touch_feedback : @drawable/touch_feedback}"
+        android:background="@{task.completed ? @drawable/list_completed_touch_feedback : @drawable/touch_feedback}"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/list_item_padding"
         android:paddingTop="@dimen/list_item_padding"
-        android:onClick="@{() -> viewmodel.taskClicked()}">
+        android:onClick="@{() -> listener.onTaskClicked(task)}">
 
         <CheckBox
             android:id="@+id/complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:checked="@={viewmodel.completed}"/>
+            android:onClick="@{(view) -> listener.onCompleteChanged(task, view)}"
+            android:checked="@{task.completed}"/>
 
         <TextView
             android:id="@+id/title"
@@ -47,6 +54,6 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:text="@{viewmodel.titleForList}" />
+            android:text="@{task.titleForList}" />
     </LinearLayout>
 </layout>

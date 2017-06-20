@@ -16,10 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -27,9 +29,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -37,8 +38,6 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
  * Show statistics for tasks.
  */
 public class StatisticsActivity extends AppCompatActivity {
-
-    public static final String STATS_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
 
     private DrawerLayout mDrawerLayout;
 
@@ -63,38 +62,14 @@ public class StatisticsActivity extends AppCompatActivity {
 
         setupNavigationDrawer();
 
-        StatisticsFragment statisticsFragment = findOrCreateViewFragment();
-
-        StatisticsViewModel statisticsViewModel = findOrCreateViewModel();
-
-        // Link View and ViewModel
-        statisticsFragment.setViewModel(statisticsViewModel);
+        findOrCreateViewFragment();
     }
 
-    @NonNull
-    private StatisticsViewModel findOrCreateViewModel() {
-        // In a configuration change we might have a ViewModel present. It's retained using the
-        // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<StatisticsViewModel> retainedViewModel =
-                (ViewModelHolder<StatisticsViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(STATS_VIEWMODEL_TAG);
+    public static StatisticsViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
 
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            StatisticsViewModel viewModel = new StatisticsViewModel(getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()));
-
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    STATS_VIEWMODEL_TAG);
-            return viewModel;
-        }
+        return ViewModelProviders.of(activity, factory).get(StatisticsViewModel.class);
     }
 
     @NonNull
@@ -103,7 +78,7 @@ public class StatisticsActivity extends AppCompatActivity {
                 .findFragmentById(R.id.contentFrame);
         if (statisticsFragment == null) {
             statisticsFragment = StatisticsFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+            ActivityUtils.replaceFragmentInActivity(getSupportFragmentManager(),
                     statisticsFragment, R.id.contentFrame);
         }
         return statisticsFragment;

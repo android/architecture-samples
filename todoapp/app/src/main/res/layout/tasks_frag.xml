@@ -21,10 +21,6 @@
         <import type="android.view.View" />
 
         <variable
-            name="view"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment" />
-
-        <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
 

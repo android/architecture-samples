@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -25,17 +27,18 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 
-import com.example.android.architecture.blueprints.todoapp.BR;
+import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Exposes the data to be used in the task list screen.
@@ -44,7 +47,7 @@ import java.util.List;
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends BaseObservable {
+public class TasksViewModel extends AndroidViewModel {
 
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
@@ -57,9 +60,11 @@ public class TasksViewModel extends BaseObservable {
 
     public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
 
+    public final ObservableBoolean empty = new ObservableBoolean(false);
+
     public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
 
-    final ObservableField<String> snackbarText = new ObservableField<>();
+    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
@@ -67,13 +72,16 @@ public class TasksViewModel extends BaseObservable {
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
+    private SingleLiveEvent<String> mOpenTaskEvent = new SingleLiveEvent<>();
+
     private Context mContext; // To avoid leaks, this must be an Application Context.
 
-    private TasksNavigator mNavigator;
+    private SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
 
     public TasksViewModel(
-            TasksRepository repository,
-            Context context) {
+            Application context,
+            TasksRepository repository) {
+        super(context);
         mContext = context.getApplicationContext(); // Force use of Application Context.
         mTasksRepository = repository;
 
@@ -81,22 +89,8 @@ public class TasksViewModel extends BaseObservable {
         setFiltering(TasksFilterType.ALL_TASKS);
     }
 
-    void setNavigator(TasksNavigator navigator) {
-        mNavigator = navigator;
-    }
-
-    void onActivityDestroyed() {
-        // Clear references to avoid potential memory leaks.
-        mNavigator = null;
-    }
-
     public void start() {
         loadTasks(false);
-    }
-
-    @Bindable
-    public boolean isEmpty() {
-        return items.isEmpty();
     }
 
     public void loadTasks(boolean forceUpdate) {
@@ -141,37 +135,58 @@ public class TasksViewModel extends BaseObservable {
 
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        snackbarText.set(mContext.getString(R.string.completed_tasks_cleared));
+        mSnackbarText.setValue(R.string.completed_tasks_cleared);
         loadTasks(false, false);
     }
 
-    public String getSnackbarText() {
-        return snackbarText.get();
+    public void completeTask(Task task, boolean completed) {
+        // Update the entity
+        task.setCompleted(completed);
+
+        // Notify repository
+        if (completed) {
+            mTasksRepository.completeTask(task);
+            showSnackbarMessage(R.string.task_marked_complete);
+        } else {
+            mTasksRepository.activateTask(task);
+            showSnackbarMessage(R.string.task_marked_active);
+        }
+    }
+
+    SnackbarMessage getSnackbarMessage() {
+        return mSnackbarText;
+    }
+
+    SingleLiveEvent<String> getOpenTaskEvent() {
+        return mOpenTaskEvent;
+    }
+
+    SingleLiveEvent<Void> getNewTaskEvent() {
+        return mNewTaskEvent;
+    }
+
+    private void showSnackbarMessage(Integer message) {
+        mSnackbarText.setValue(message);
     }
 
     /**
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        if (mNavigator != null) {
-            mNavigator.addNewTask();
-        }
+        mNewTaskEvent.call();
     }
 
     void handleActivityResult(int requestCode, int resultCode) {
         if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
             switch (resultCode) {
                 case TaskDetailActivity.EDIT_RESULT_OK:
-                    snackbarText.set(
-                            mContext.getString(R.string.successfully_saved_task_message));
+                    mSnackbarText.setValue(R.string.successfully_saved_task_message);
                     break;
                 case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    snackbarText.set(
-                            mContext.getString(R.string.successfully_added_task_message));
+                    mSnackbarText.setValue(R.string.successfully_added_task_message);
                     break;
                 case TaskDetailActivity.DELETE_RESULT_OK:
-                    snackbarText.set(
-                            mContext.getString(R.string.successfully_deleted_task_message));
+                    mSnackbarText.setValue(R.string.successfully_deleted_task_message);
                     break;
             }
         }
@@ -190,21 +205,10 @@ public class TasksViewModel extends BaseObservable {
             mTasksRepository.refreshTasks();
         }
 
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
-
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
                 List<Task> tasksToShow = new ArrayList<Task>();
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
 
                 // We filter the tasks based on the requestType
                 for (Task task : tasks) {
@@ -234,7 +238,7 @@ public class TasksViewModel extends BaseObservable {
 
                 items.clear();
                 items.addAll(tasksToShow);
-                notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
+                empty.set(items.isEmpty());
             }
 
             @Override
@@ -243,5 +247,4 @@ public class TasksViewModel extends BaseObservable {
             }
         });
     }
-
 }

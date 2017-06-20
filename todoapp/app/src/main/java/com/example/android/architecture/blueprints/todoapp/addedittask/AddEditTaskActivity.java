@@ -16,41 +16,33 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
+public class AddEditTaskActivity extends LifecycleAppCompatActivity implements AddEditTaskNavigator {
 
     public static final int REQUEST_CODE = 1;
 
     public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
-    public static final String ADD_EDIT_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
-    private AddEditTaskViewModel mViewModel;
-
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
     }
 
     @Override
@@ -71,24 +63,35 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment = findOrCreateViewFragment();
+        AddEditTaskFragment addEditTaskFragment = obtainViewFragment();
 
-        mViewModel = findOrCreateViewModel();
+        ActivityUtils.replaceFragmentInActivity(getSupportFragmentManager(),
+                addEditTaskFragment, R.id.contentFrame);
 
-        // Link View and ViewModel
-        addEditTaskFragment.setViewModel(mViewModel);
-
-        mViewModel.onActivityCreated(this);
+        subscribeToNavigationChanges();
     }
 
-    @Override
-    protected void onDestroy() {
-        mViewModel.onActivityDestroyed();
-        super.onDestroy();
+    private void subscribeToNavigationChanges() {
+        AddEditTaskViewModel viewModel = obtainViewModel(this);
+
+        // The activity observes the navigation events in the ViewModel
+        viewModel.getTaskUpdatedEvent().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void _) {
+                AddEditTaskActivity.this.onTaskSaved();
+            }
+        });
+    }
+
+    public static AddEditTaskViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+
+        return ViewModelProviders.of(activity, factory).get(AddEditTaskViewModel.class);
     }
 
     @NonNull
-    private AddEditTaskFragment findOrCreateViewFragment() {
+    private AddEditTaskFragment obtainViewFragment() {
         // View Fragment
         AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.contentFrame);
@@ -101,36 +104,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
             bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
                     getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID));
             addEditTaskFragment.setArguments(bundle);
-
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    addEditTaskFragment, R.id.contentFrame);
         }
         return addEditTaskFragment;
-    }
-
-    private AddEditTaskViewModel findOrCreateViewModel() {
-        // In a configuration change we might have a ViewModel present. It's retained using the
-        // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<AddEditTaskViewModel> retainedViewModel =
-                (ViewModelHolder<AddEditTaskViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(ADD_EDIT_VIEWMODEL_TAG);
-
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            AddEditTaskViewModel viewModel = new AddEditTaskViewModel(
-                    getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()));
-
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    ADD_EDIT_VIEWMODEL_TAG);
-            return viewModel;
-        }
     }
 }

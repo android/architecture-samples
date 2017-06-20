@@ -17,7 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 
-import android.content.Context;
+import android.app.Application;
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -25,6 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -33,6 +35,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -41,6 +45,10 @@ import static org.mockito.Mockito.verify;
  * Unit tests for the implementation of {@link StatisticsViewModel}
  */
 public class StatisticsViewModelTest {
+
+    // Executes each task synchronously using Architecture Components.
+    @Rule
+    public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
 
     private static List<Task> TASKS;
 
@@ -59,7 +67,7 @@ public class StatisticsViewModelTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsViewModel = new StatisticsViewModel(mock(Context.class), mTasksRepository);
+        mStatisticsViewModel = new StatisticsViewModel(mock(Application.class), mTasksRepository);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
@@ -67,7 +75,7 @@ public class StatisticsViewModelTest {
     }
 
     @Test
-    public void loadEmptyTasksFromRepository_CallViewToDisplay() {
+    public void loadEmptyTasksFromRepository_EmptyResults() {
         // Given an initialized StatisticsViewModel with no tasks
         TASKS.clear();
 
@@ -78,14 +86,12 @@ public class StatisticsViewModelTest {
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
-        // Then progress indicator is hidden and correct data is passed on to the view
-        assertEquals(mStatisticsViewModel.isEmpty(), true);
-        assertEquals(mStatisticsViewModel.mNumberOfActiveTasks, 0);
-        assertEquals(mStatisticsViewModel.mNumberOfCompletedTasks, 0);
+        // Then the results are empty
+        assertThat(mStatisticsViewModel.empty.get(), is(true));
     }
 
     @Test
-    public void loadNonEmptyTasksFromRepository_CallViewToDisplay() {
+    public void loadNonEmptyTasksFromRepository_NonEmptyResults() {
         // When loading of Tasks is requested
         mStatisticsViewModel.loadStatistics();
 
@@ -93,9 +99,8 @@ public class StatisticsViewModelTest {
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
-        // Then progress indicator is hidden and correct data is passed on to the view
-        assertEquals(mStatisticsViewModel.mNumberOfActiveTasks, 1);
-        assertEquals(mStatisticsViewModel.mNumberOfCompletedTasks, 2);
+        // Then the results are empty
+        assertThat(mStatisticsViewModel.empty.get(), is(false));
     }
 
 
@@ -109,7 +114,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
-        assertEquals(mStatisticsViewModel.isEmpty(), true);
+        assertEquals(mStatisticsViewModel.empty.get(), true);
         assertEquals(mStatisticsViewModel.error.get(), true);
     }
 }

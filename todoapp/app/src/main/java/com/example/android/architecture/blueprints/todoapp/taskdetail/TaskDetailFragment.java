@@ -16,19 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.databinding.Observable;
+import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
@@ -36,14 +38,13 @@ import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment {
+public class TaskDetailFragment extends LifecycleFragment {
 
     public static final String ARGUMENT_TASK_ID = "TASK_ID";
 
     public static final int REQUEST_EDIT_TASK = 1;
 
     private TaskDetailViewModel mViewModel;
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -51,10 +52,6 @@ public class TaskDetailFragment extends Fragment {
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    public void setViewModel(TaskDetailViewModel taskViewModel) {
-        mViewModel = taskViewModel;
     }
 
     @Override
@@ -66,22 +63,14 @@ public class TaskDetailFragment extends Fragment {
         setupSnackbar();
     }
 
-    @Override
-    public void onDestroy() {
-        if (mSnackbarCallback != null) {
-            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
-        super.onDestroy();
-    }
-
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
+                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
+
             }
-        };
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void setupFab() {
@@ -91,7 +80,7 @@ public class TaskDetailFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.startEditTask();
+                mViewModel.editTask();
             }
         });
     }
@@ -110,11 +99,27 @@ public class TaskDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
 
         TaskdetailFragBinding viewDataBinding = TaskdetailFragBinding.bind(view);
+
+        mViewModel = TaskDetailActivity.obtainViewModel(getActivity());
+
         viewDataBinding.setViewmodel(mViewModel);
+
+        TaskDetailUserActionsListener actionsListener = getTaskDetailUserActionsListener();
+
+        viewDataBinding.setListener(actionsListener);
 
         setHasOptionsMenu(true);
 
         return view;
+    }
+
+    private TaskDetailUserActionsListener getTaskDetailUserActionsListener() {
+        return new TaskDetailUserActionsListener() {
+            @Override
+            public void onCompleteChanged(View v) {
+                mViewModel.setCompleted(((CheckBox) v).isChecked());
+            }
+        };
     }
 
     @Override

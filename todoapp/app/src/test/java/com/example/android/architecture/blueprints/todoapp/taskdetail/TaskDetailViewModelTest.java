@@ -17,15 +17,18 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 
-import android.content.Context;
+import android.app.Application;
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.content.res.Resources;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -34,9 +37,9 @@ import org.mockito.MockitoAnnotations;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,6 +50,10 @@ import static org.mockito.Mockito.when;
  */
 public class TaskDetailViewModelTest {
 
+    // Executes each task synchronously using Architecture Components.
+    @Rule
+    public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
+
     private static final String TITLE_TEST = "title";
 
     private static final String DESCRIPTION_TEST = "description";
@@ -55,13 +62,11 @@ public class TaskDetailViewModelTest {
 
     private static final String NO_DATA_DESC_STRING = "NO_DATA_DESC_STRING";
 
-    public static final String SNACKBAR_TEXT = "Snackbar text";
-
     @Mock
     private TasksRepository mTasksRepository;
 
     @Mock
-    private Context mContext;
+    private Application mContext;
 
     @Mock
     private TasksDataSource.GetTaskCallback mRepositoryCallback;
@@ -87,9 +92,7 @@ public class TaskDetailViewModelTest {
         mTask = new Task(TITLE_TEST, DESCRIPTION_TEST);
 
         // Get a reference to the class under test
-        mTaskDetailViewModel = new TaskDetailViewModel(
-                mContext, mTasksRepository);
-        mTaskDetailViewModel.setNavigator(mock(TaskDetailActivity.class));
+        mTaskDetailViewModel = new TaskDetailViewModel(mContext, mTasksRepository);
     }
 
     private void setupContext() {
@@ -104,8 +107,8 @@ public class TaskDetailViewModelTest {
         setupViewModelRepositoryCallback();
 
         // Then verify that the view was notified
-        assertEquals(mTaskDetailViewModel.title.get(), mTask.getTitle());
-        assertEquals(mTaskDetailViewModel.description.get(), mTask.getDescription());
+        assertEquals(mTaskDetailViewModel.task.get().getTitle(), mTask.getTitle());
+        assertEquals(mTaskDetailViewModel.task.get().getDescription(), mTask.getDescription());
     }
 
     @Test
@@ -128,6 +131,8 @@ public class TaskDetailViewModelTest {
 
         // Then a request is sent to the task repository and the UI is updated
         verify(mTasksRepository).completeTask(mTask);
+        assertThat(mTaskDetailViewModel.getSnackbarMessage().getValue(),
+                is(R.string.task_marked_complete));
     }
 
     @Test
@@ -139,6 +144,8 @@ public class TaskDetailViewModelTest {
 
         // Then a request is sent to the task repository and the UI is updated
         verify(mTasksRepository).activateTask(mTask);
+        assertThat(mTaskDetailViewModel.getSnackbarMessage().getValue(),
+                is(R.string.task_marked_active));
     }
 
     @Test
@@ -169,8 +176,7 @@ public class TaskDetailViewModelTest {
         assertFalse(mTaskDetailViewModel.isDataAvailable());
 
         // Then task detail UI is shown
-        assertEquals(mTaskDetailViewModel.title.get(), NO_DATA_STRING);
-        assertEquals(mTaskDetailViewModel.description.get(), NO_DATA_DESC_STRING);
+        assertThat(mTaskDetailViewModel.task.get(), is(nullValue()));
     }
 
     private void setupViewModelRepositoryCallback() {
@@ -188,21 +194,9 @@ public class TaskDetailViewModelTest {
     @Test
     public void updateSnackbar_nullValue() {
         // Before setting the Snackbar text, get its current value
-        String snackbarText = mTaskDetailViewModel.getSnackbarText();
+        SnackbarMessage snackbarText = mTaskDetailViewModel.getSnackbarMessage();
 
         // Check that the value is null
-        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
-    }
-
-    @Test
-    public void updateSnackbar_nonNullValue() {
-        // Set a new value for the Snackbar text via the public Observable
-        mTaskDetailViewModel.snackbarText.set(SNACKBAR_TEXT);
-
-        // Get its current value with the Snackbar text getter
-        String snackbarText = mTaskDetailViewModel.getSnackbarText();
-
-        // Check that the value matches the observable's.
-        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
+        assertThat("Snackbar text does not match", snackbarText.getValue(), is(nullValue()));
     }
 }

@@ -52,6 +52,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mStatisticsViewModel = StatisticsActivity.obtainViewModel(getActivity());
         mViewDataBinding.setStats(mStatisticsViewModel);
     }
 
@@ -59,10 +60,6 @@ public class StatisticsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mStatisticsViewModel.start();
-    }
-
-    public void setViewModel(StatisticsViewModel statisticsViewModel) {
-        mStatisticsViewModel = statisticsViewModel;
     }
 
     public boolean isActive() {

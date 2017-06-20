@@ -14,20 +14,18 @@
  *  limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.util;
+package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.support.design.widget.Snackbar;
+
 import android.view.View;
 
-/**
- * Provides a method to show a Snackbar.
- */
-public class SnackbarUtils {
+import com.example.android.architecture.blueprints.todoapp.data.Task;
 
-    public static void showSnackbar(View v, String snackbarText) {
-        if (v == null || snackbarText == null) {
-            return;
-        }
-        Snackbar.make(v, snackbarText, Snackbar.LENGTH_LONG).show();
-    }
+/**
+ * Listener used with data binding to process user actions.
+ */
+public interface TaskItemUserActionsListener {
+    void onCompleteChanged(Task task, View v);
+
+    void onTaskClicked(Task task);
 }

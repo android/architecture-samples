@@ -16,12 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.content.Context;
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -34,7 +37,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * {@link com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel} for
  * how to deal with more complex scenarios.
  */
-public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
+public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -42,11 +45,11 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
-    public final ObservableField<String> snackbarText = new ObservableField<>();
+    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
+
+    private final SingleLiveEvent<Void> mTaskUpdated = new SingleLiveEvent<>();
 
     private final TasksRepository mTasksRepository;
-
-    private final Context mContext;  // To avoid leaks, this must be an Application Context.
 
     @Nullable
     private String mTaskId;
@@ -55,20 +58,12 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
 
     private boolean mIsDataLoaded = false;
 
-    private AddEditTaskNavigator mAddEditTaskNavigator;
+    private boolean mTaskCompleted = false;
 
-    AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
-        mContext = context.getApplicationContext(); // Force use of Application Context.
+    public AddEditTaskViewModel(Application context,
+                                TasksRepository tasksRepository) {
+        super(context);
         mTasksRepository = tasksRepository;
-    }
-
-    void onActivityCreated(AddEditTaskNavigator navigator) {
-        mAddEditTaskNavigator = navigator;
-    }
-
-    void onActivityDestroyed() {
-        // Clear references to avoid potential memory leaks.
-        mAddEditTaskNavigator = null;
     }
 
     public void start(String taskId) {
@@ -88,6 +83,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
         }
         mIsNewTask = false;
         dataLoading.set(true);
+
         mTasksRepository.getTask(taskId, this);
     }
 
@@ -95,6 +91,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     public void onTaskLoaded(Task task) {
         title.set(task.getTitle());
         description.set(task.getDescription());
+        mTaskCompleted = task.isCompleted();
         dataLoading.set(false);
         mIsDataLoaded = true;
 
@@ -108,44 +105,42 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     }
 
     // Called when clicking on fab.
-    public void saveTask(String title, String description) {
-        if (isNewTask()) {
-            createTask(title, description);
+    void saveTask(String title, String description) {
+        Task task = new Task(title, description);
+        if (task.isEmpty()) {
+            mSnackbarText.setValue(R.string.empty_task_message);
+            return;
+        }
+        if (isNewTask() || mTaskId == null) {
+            createTask(task);
         } else {
-            updateTask(title, description);
+            task = new Task(title, description, mTaskId, mTaskCompleted);
+            updateTask(task);
         }
     }
 
-    @Nullable
-    public String getSnackbarText() {
-        return snackbarText.get();
+    SnackbarMessage getSnackbarMessage() {
+        return mSnackbarText;
+    }
+
+    SingleLiveEvent<Void> getTaskUpdatedEvent() {
+        return mTaskUpdated;
     }
 
     private boolean isNewTask() {
         return mIsNewTask;
     }
 
-    private void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        if (newTask.isEmpty()) {
-            snackbarText.set(mContext.getString(R.string.empty_task_message));
-        } else {
-            mTasksRepository.saveTask(newTask);
-            navigateOnTaskSaved();
-        }
+    private void createTask(Task newTask) {
+        mTasksRepository.saveTask(newTask);
+        mTaskUpdated.call();
     }
 
-    private void updateTask(String title, String description) {
+    private void updateTask(Task task) {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        navigateOnTaskSaved(); // After an edit, go back to the list.
-    }
-
-    private void navigateOnTaskSaved() {
-        if (mAddEditTaskNavigator!= null) {
-            mAddEditTaskNavigator.onTaskSaved();
-        }
+        mTasksRepository.saveTask(task);
+        mTaskUpdated.call();
     }
 }

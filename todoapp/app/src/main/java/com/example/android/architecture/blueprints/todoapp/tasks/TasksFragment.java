@@ -16,12 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
+import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
@@ -30,33 +29,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
+import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment {
+public class TasksFragment extends LifecycleFragment {
 
     private TasksViewModel mTasksViewModel;
 
     private TasksFragBinding mTasksFragBinding;
 
     private TasksAdapter mListAdapter;
-
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -78,15 +71,13 @@ public class TasksFragment extends Fragment {
                              Bundle savedInstanceState) {
         mTasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
 
-        mTasksFragBinding.setView(this);
+        mTasksViewModel = TasksActivity.obtainViewModel(getActivity());
 
         mTasksFragBinding.setViewmodel(mTasksViewModel);
 
         setHasOptionsMenu(true);
 
-        View root = mTasksFragBinding.getRoot();
-
-        return root;
+        return mTasksFragBinding.getRoot();
     }
 
     @Override
@@ -110,10 +101,6 @@ public class TasksFragment extends Fragment {
         inflater.inflate(R.menu.tasks_fragment_menu, menu);
     }
 
-    public void setViewModel(TasksViewModel viewModel) {
-        mTasksViewModel = viewModel;
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -127,23 +114,13 @@ public class TasksFragment extends Fragment {
         setupRefreshLayout();
     }
 
-    @Override
-    public void onDestroy() {
-        mListAdapter.onDestroy();
-        if (mSnackbarCallback != null) {
-            mTasksViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
-        super.onDestroy();
-    }
-
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        mTasksViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
             @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mTasksViewModel.getSnackbarText());
+            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
+                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
             }
-        };
-        mTasksViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
+        });
     }
 
     private void showFilteringPopUpMenu() {
@@ -189,9 +166,8 @@ public class TasksFragment extends Fragment {
 
         mListAdapter = new TasksAdapter(
                 new ArrayList<Task>(0),
-                (TasksActivity) getActivity(),
-                Injection.provideTasksRepository(getContext().getApplicationContext()),
-                mTasksViewModel);
+                mTasksViewModel
+        );
         listView.setAdapter(mListAdapter);
     }
 
@@ -207,90 +183,4 @@ public class TasksFragment extends Fragment {
         swipeRefreshLayout.setScrollUpChild(listView);
     }
 
-    public static class TasksAdapter extends BaseAdapter {
-
-        @Nullable private TaskItemNavigator mTaskItemNavigator;
-
-        private final TasksViewModel mTasksViewModel;
-
-        private List<Task> mTasks;
-
-        private TasksRepository mTasksRepository;
-
-        public TasksAdapter(List<Task> tasks, TasksActivity taskItemNavigator,
-                            TasksRepository tasksRepository,
-                            TasksViewModel tasksViewModel) {
-            mTaskItemNavigator = taskItemNavigator;
-            mTasksRepository = tasksRepository;
-            mTasksViewModel = tasksViewModel;
-            setList(tasks);
-
-        }
-
-        public void onDestroy() {
-            mTaskItemNavigator = null;
-        }
-
-        public void replaceData(List<Task> tasks) {
-            setList(tasks);
-        }
-
-        @Override
-        public int getCount() {
-            return mTasks != null ? mTasks.size() : 0;
-        }
-
-        @Override
-        public Task getItem(int i) {
-            return mTasks.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            Task task = getItem(i);
-            TaskItemBinding binding;
-            if (view == null) {
-                // Inflate
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-
-                // Create the binding
-                binding = TaskItemBinding.inflate(inflater, viewGroup, false);
-            } else {
-                // Recycling view
-                binding = DataBindingUtil.getBinding(view);
-            }
-
-            final TaskItemViewModel viewmodel = new TaskItemViewModel(
-                    viewGroup.getContext().getApplicationContext(),
-                    mTasksRepository
-            );
-
-            viewmodel.setNavigator(mTaskItemNavigator);
-
-            binding.setViewmodel(viewmodel);
-            // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the
-            // fragment's.
-            viewmodel.snackbarText.addOnPropertyChangedCallback(
-                    new Observable.OnPropertyChangedCallback() {
-                @Override
-                public void onPropertyChanged(Observable observable, int i) {
-                    mTasksViewModel.snackbarText.set(viewmodel.getSnackbarText());
-                }
-            });
-            viewmodel.setTask(task);
-
-            return binding.getRoot();
-        }
-
-
-        private void setList(List<Task> tasks) {
-            mTasks = tasks;
-            notifyDataSetChanged();
-        }
-    }
 }

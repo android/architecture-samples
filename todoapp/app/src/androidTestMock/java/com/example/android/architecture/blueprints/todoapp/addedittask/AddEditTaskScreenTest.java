@@ -23,6 +23,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -59,13 +60,12 @@ public class AddEditTaskScreenTest {
     /**
      * Prepare your test fixture for this test. In this case we register an IdlingResources with
      * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
-     * idle state. This helps Espresso to synchronize your test actions, which makes tests significantly
-     * more reliable.
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(
-                mAddTaskIntentsTestRule.getActivity().getCountingIdlingResource());
+        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -85,7 +85,6 @@ public class AddEditTaskScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(
-                mAddTaskIntentsTestRule.getActivity().getCountingIdlingResource());
+        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
     }
 }

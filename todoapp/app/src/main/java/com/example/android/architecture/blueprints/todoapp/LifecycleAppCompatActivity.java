@@ -14,20 +14,23 @@
  *  limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.util;
+package com.example.android.architecture.blueprints.todoapp;
 
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.support.v7.app.AppCompatActivity;
 
 /**
- * Provides a method to show a Snackbar.
+ * Temporary class until Architecture Components is final. Makes {@link AppCompatActivity} a
+ * {@link LifecycleRegistryOwner}.
  */
-public class SnackbarUtils {
+public class LifecycleAppCompatActivity extends AppCompatActivity
+        implements LifecycleRegistryOwner {
 
-    public static void showSnackbar(View v, String snackbarText) {
-        if (v == null || snackbarText == null) {
-            return;
-        }
-        Snackbar.make(v, snackbarText, Snackbar.LENGTH_LONG).show();
+    private final LifecycleRegistry mRegistry = new LifecycleRegistry(this);
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return mRegistry;
     }
 }

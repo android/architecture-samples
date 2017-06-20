@@ -16,16 +16,19 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelHolder;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
@@ -36,11 +39,9 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
+public class TaskDetailActivity extends LifecycleAppCompatActivity implements TaskDetailNavigator {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
-
-    public static final String TASKDETAIL_VIEWMODEL_TAG = "TASKDETAIL_VIEWMODEL_TAG";
 
     public static final int DELETE_RESULT_OK = RESULT_FIRST_USER + 2;
 
@@ -58,44 +59,12 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
         TaskDetailFragment taskDetailFragment = findOrCreateViewFragment();
 
-        mTaskViewModel = findOrCreateViewModel();
-        mTaskViewModel.setNavigator(this);
+        ActivityUtils.replaceFragmentInActivity(getSupportFragmentManager(),
+                taskDetailFragment, R.id.contentFrame);
 
-        // Link View and ViewModel
-        taskDetailFragment.setViewModel(mTaskViewModel);
-    }
+        mTaskViewModel = obtainViewModel(this);
 
-    @Override
-    protected void onDestroy() {
-        mTaskViewModel.onActivityDestroyed();
-        super.onDestroy();
-    }
-
-    @NonNull
-    private TaskDetailViewModel findOrCreateViewModel() {
-        // In a configuration change we might have a ViewModel present. It's retained using the
-        // Fragment Manager.
-        @SuppressWarnings("unchecked")
-        ViewModelHolder<TaskDetailViewModel> retainedViewModel =
-                (ViewModelHolder<TaskDetailViewModel>) getSupportFragmentManager()
-                        .findFragmentByTag(TASKDETAIL_VIEWMODEL_TAG);
-
-        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
-            // If the model was retained, return it.
-            return retainedViewModel.getViewmodel();
-        } else {
-            // There is no ViewModel yet, create it.
-            TaskDetailViewModel viewModel = new TaskDetailViewModel(
-                    getApplicationContext(),
-                    Injection.provideTasksRepository(getApplicationContext()));
-
-            // and bind it to this Activity's lifecycle using the Fragment Manager.
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(),
-                    ViewModelHolder.createContainer(viewModel),
-                    TASKDETAIL_VIEWMODEL_TAG);
-            return viewModel;
-        }
+        subscribeToNavigationChanges(mTaskViewModel);
     }
 
     @NonNull
@@ -108,11 +77,16 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
         if (taskDetailFragment == null) {
             taskDetailFragment = TaskDetailFragment.newInstance(taskId);
-
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    taskDetailFragment, R.id.contentFrame);
         }
         return taskDetailFragment;
+    }
+
+    @NonNull
+    public static TaskDetailViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+
+        return ViewModelProviders.of(activity, factory).get(TaskDetailViewModel.class);
     }
 
     private void setupToolbar() {
@@ -121,6 +95,22 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
+    }
+
+    private void subscribeToNavigationChanges(TaskDetailViewModel viewModel) {
+        // The activity observes the navigation commands in the ViewModel
+        viewModel.getEditTaskCommand().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void _) {
+                TaskDetailActivity.this.onStartEditTask();
+            }
+        });
+        viewModel.getDeleteTaskCommand().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void _) {
+                TaskDetailActivity.this.onTaskDeleted();
+            }
+        });
     }
 
     @Override
@@ -155,4 +145,5 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
         startActivityForResult(intent, REQUEST_EDIT_TASK);
     }
+
 }

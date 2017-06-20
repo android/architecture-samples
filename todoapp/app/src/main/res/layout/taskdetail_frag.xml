@@ -23,6 +23,10 @@
         <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel" />
+
+        <variable
+            name="listener"
+            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailUserActionsListener" />
     </data>
 
     <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
@@ -74,14 +78,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:checked="@={viewmodel.completed}" />
+                android:onClick="@{(view) -> listener.onCompleteChanged(view)}"
+                android:checked="@{viewmodel.completed}" />
 
             <TextView
                 android:id="@+id/task_detail_title"
                 android:layout_toRightOf="@id/task_detail_complete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{viewmodel.title}"
+                android:text="@{viewmodel.task.title}"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
@@ -90,7 +95,7 @@
                 android:layout_below="@id/task_detail_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{viewmodel.description}"
+                android:text="@{viewmodel.task.description}"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>

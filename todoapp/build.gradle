@@ -4,7 +4,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,6 +15,9 @@ allprojects {
     repositories {
         jcenter()
         mavenLocal()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
@@ -25,14 +28,14 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 10
-    targetSdkVersion = 24
-    compileSdkVersion = 24
-    buildToolsVersion = '24.0.2'
+    minSdkVersion = 14
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.2'
 
     // App dependencies
-    supportLibraryVersion = '24.2.0'
-    guavaVersion = '18.0'
+    supportLibraryVersion = '25.3.1'
+    guavaVersion = '22.0-android'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
@@ -40,26 +43,7 @@ ext {
     runnerVersion = '0.5'
     rulesVersion = '0.5'
     espressoVersion = '2.2.2'
-}
 
-/*
- * Workaround for https://code.google.com/p/android/issues/detail?id=182715
- *
- * The Android Gradle plugin is creating DataBindingExportBuildInfoTasks for the instrumentation
- * APK that generates from the app APKs layouts. This creates duplicate classes in the app and
- * instrumentation APK which leads to
- *      java.lang.IllegalAccessError: Class ref in pre-verified class resolved to unexpected implementation
- * on older devices.
- *
- * The workaround is to get the DataBindingExportBuildInfoTasks tasks for the instrumentation APK
- * and delete the files right after it creates them.
- */
-subprojects {
-    tasks.withType(com.android.build.gradle.internal.tasks.databinding.DataBindingExportBuildInfoTask) { task ->
-        if (task.name.endsWith("AndroidTest")) {
-            task.finalizedBy(tasks.create("${task.name}Workaround") << {
-                task.output.deleteDir()
-            })
-        }
-    }
+    // Architecture Components dependencies
+    archLifecycleVersion = "1.0.0-alpha3"
 }

@@ -17,13 +17,15 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 
-import android.content.Context;
+import android.app.Application;
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -31,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -43,7 +44,10 @@ import static org.mockito.Mockito.verify;
  */
 public class AddEditTaskViewModelTest {
 
-    public static final String SNACKBAR_TEXT = "Snackbar text";
+    // Executes each task synchronously using Architecture Components.
+    @Rule
+    public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
+
     @Mock
     private TasksRepository mTasksRepository;
 
@@ -64,8 +68,7 @@ public class AddEditTaskViewModelTest {
 
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
+                mock(Application.class), mTasksRepository);
     }
 
     @Test
@@ -83,8 +86,7 @@ public class AddEditTaskViewModelTest {
 
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
+                mock(Application.class), mTasksRepository);
 
 
         // When the ViewModel is asked to populate an existing task
@@ -99,36 +101,5 @@ public class AddEditTaskViewModelTest {
         // Verify the fields were updated
         assertThat(mAddEditTaskViewModel.title.get(), is(testTask.getTitle()));
         assertThat(mAddEditTaskViewModel.description.get(), is(testTask.getDescription()));
-    }
-
-    @Test
-    public void updateSnackbar_nullValue() {
-        // Get a reference to the class under test
-        mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
-
-        // Before setting the Snackbar text, get its current value
-        String snackbarText = mAddEditTaskViewModel.getSnackbarText();
-
-        // Check that the value is null
-        assertThat("Snackbar text does not match", snackbarText, is(nullValue()));
-    }
-
-    @Test
-    public void updateSnackbar_nonNullValue() {
-        // Get a reference to the class under test
-        mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Context.class), mTasksRepository);
-        mAddEditTaskViewModel.onActivityCreated(mock(AddEditTaskActivity.class));
-
-        // Set a new value for the Snackbar text via the public Observable
-        mAddEditTaskViewModel.snackbarText.set(SNACKBAR_TEXT);
-
-        // Get its current value with the Snackbar text getter
-        String snackbarText = mAddEditTaskViewModel.getSnackbarText();
-
-        // Check that the value matches the observable's.
-        assertThat("Snackbar text does not match", snackbarText, is(SNACKBAR_TEXT));
     }
 }

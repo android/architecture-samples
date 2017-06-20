@@ -16,12 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,12 +28,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
  * <p>
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
+ *
+ * //TODO: Implement this class using LiveData.
  */
 public class TasksRepository implements TasksDataSource {
 
@@ -53,7 +56,7 @@ public class TasksRepository implements TasksDataSource {
      * Marks the cache as invalid, to force an update the next time data is requested. This variable
      * has package local visibility so it can be accessed from tests.
      */
-    boolean mCacheIsDirty = false;
+    private boolean mCacheIsDirty = false;
 
     // Prevent direct instantiation.
     private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
@@ -102,6 +105,8 @@ public class TasksRepository implements TasksDataSource {
             return;
         }
 
+        EspressoIdlingResource.increment(); // App is busy until further notice
+
         if (mCacheIsDirty) {
             // If the cache is dirty we need to fetch new data from the network.
             getTasksFromRemoteDataSource(callback);
@@ -111,6 +116,8 @@ public class TasksRepository implements TasksDataSource {
                 @Override
                 public void onTasksLoaded(List<Task> tasks) {
                     refreshCache(tasks);
+
+                    EspressoIdlingResource.decrement(); // Set app as idle.
                     callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
                 }
 
@@ -215,6 +222,8 @@ public class TasksRepository implements TasksDataSource {
             return;
         }
 
+        EspressoIdlingResource.increment(); // App is busy until further notice
+
         // Load from server/persisted if needed.
 
         // Is the task in the local data source? If not, query the network.
@@ -226,6 +235,9 @@ public class TasksRepository implements TasksDataSource {
                     mCachedTasks = new LinkedHashMap<>();
                 }
                 mCachedTasks.put(task.getId(), task);
+
+                EspressoIdlingResource.decrement(); // Set app as idle.
+
                 callback.onTaskLoaded(task);
             }
 
@@ -234,16 +246,24 @@ public class TasksRepository implements TasksDataSource {
                 mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
                     @Override
                     public void onTaskLoaded(Task task) {
+                        if (task == null) {
+                            onDataNotAvailable();
+                            return;
+                        }
                         // Do in memory cache update to keep the app UI up to date
                         if (mCachedTasks == null) {
                             mCachedTasks = new LinkedHashMap<>();
                         }
                         mCachedTasks.put(task.getId(), task);
+                        EspressoIdlingResource.decrement(); // Set app as idle.
+
                         callback.onTaskLoaded(task);
                     }
 
                     @Override
                     public void onDataNotAvailable() {
+                        EspressoIdlingResource.decrement(); // Set app as idle.
+
                         callback.onDataNotAvailable();
                     }
                 });
@@ -281,11 +301,15 @@ public class TasksRepository implements TasksDataSource {
             public void onTasksLoaded(List<Task> tasks) {
                 refreshCache(tasks);
                 refreshLocalDataSource(tasks);
+
+                EspressoIdlingResource.decrement(); // Set app as idle.
                 callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
             }
 
             @Override
             public void onDataNotAvailable() {
+
+                EspressoIdlingResource.decrement(); // Set app as idle.
                 callback.onDataNotAvailable();
             }
         });
