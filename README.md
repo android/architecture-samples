@@ -44,6 +44,7 @@ For information about planned samples, see ["New sample" issues](https://github.
 | [todo‑mvp‑fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | Uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
 | [todo‑mvp‑conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | Uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
 | [todo‑mvp‑kotlin](https://github.com/SerjSmor/android-architecture) | A translation of todo-mvp to [Kotlin](https://kotlinlang.org/) |
+| [todo‑mvp‑rxjava-kotlin](https://github.com/goodev/android-architecture) | A translation of todo-mvp-rxjava to [Kotlin](https://kotlinlang.org/) |
 
 
 
