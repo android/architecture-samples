@@ -122,7 +122,7 @@ public class AddEditTaskFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.saveTask(mViewModel.title.get(), mViewModel.description.get());
+                mViewModel.saveTask();
             }
         });
     }
