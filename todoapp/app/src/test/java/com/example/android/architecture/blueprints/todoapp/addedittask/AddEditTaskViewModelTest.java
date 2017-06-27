@@ -74,7 +74,9 @@ public class AddEditTaskViewModelTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the ViewModel is asked to save a task
-        mAddEditTaskViewModel.saveTask("New Task Title", "Some Task Description");
+        mAddEditTaskViewModel.description.set("Some Task Description");
+        mAddEditTaskViewModel.title.set("New Task Title");
+        mAddEditTaskViewModel.saveTask();
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model

@@ -105,8 +105,8 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
     }
 
     // Called when clicking on fab.
-    void saveTask(String title, String description) {
-        Task task = new Task(title, description);
+    void saveTask() {
+        Task task = new Task(title.get(), description.get());
         if (task.isEmpty()) {
             mSnackbarText.setValue(R.string.empty_task_message);
             return;
@@ -114,7 +114,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
         if (isNewTask() || mTaskId == null) {
             createTask(task);
         } else {
-            task = new Task(title, description, mTaskId, mTaskCompleted);
+            task = new Task(title.get(), description.get(), mTaskId, mTaskCompleted);
             updateTask(task);
         }
     }
