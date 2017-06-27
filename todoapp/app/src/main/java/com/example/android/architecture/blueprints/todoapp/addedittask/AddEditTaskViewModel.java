@@ -108,11 +108,11 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     }
 
     // Called when clicking on fab.
-    public void saveTask(String title, String description) {
+    public void saveTask() {
         if (isNewTask()) {
-            createTask(title, description);
+            createTask(title.get(), description.get());
         } else {
-            updateTask(title, description);
+            updateTask(title.get(), description.get());
         }
     }
 
