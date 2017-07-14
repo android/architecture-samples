@@ -35,6 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -192,7 +193,7 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.getTasks(callback);
 
         verify(callback).onDataNotAvailable();
-        verify(callback, never()).onTasksLoaded(anyList());
+        verify(callback, never()).onTasksLoaded(anyListOf(Task.class));
     }
 
     @Test

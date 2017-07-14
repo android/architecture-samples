@@ -72,8 +72,12 @@ public class TasksPresenterTest {
         when(mTasksView.isActive()).thenReturn(true);
 
         // We start the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+        Task task1 = new Task("Title1", "Description1");
+        Task task2 = new Task("Title2", "Description2");
+        task2.setCompleted(true);
+        Task task3 = new Task("Title3", "Description3");
+        task3.setCompleted(true);
+        TASKS = Lists.newArrayList(task1, task2, task3);
     }
 
     @Test
@@ -89,7 +93,7 @@ public class TasksPresenterTest {
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
         // When loading of Tasks is requested
-        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+        mTasksPresenter.setCurrentFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
@@ -110,7 +114,7 @@ public class TasksPresenterTest {
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
         // When loading of Tasks is requested
-        mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+        mTasksPresenter.setCurrentFiltering(TasksFilterType.ACTIVE_TASKS);
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
@@ -128,7 +132,7 @@ public class TasksPresenterTest {
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
         // When loading of Tasks is requested
-        mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+        mTasksPresenter.setCurrentFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
@@ -179,7 +183,8 @@ public class TasksPresenterTest {
     @Test
     public void activateTask_ShowsTaskMarkedActive() {
         // Given a stubbed completed task
-        Task task = new Task("Details Requested", "For this task", true);
+        Task task = new Task("Details Requested", "For this task");
+        task.setCompleted(true);
         mTasksPresenter.loadTasks(true);
 
         // When task is marked as activated
@@ -193,7 +198,7 @@ public class TasksPresenterTest {
     @Test
     public void unavailableTasks_ShowsError() {
         // When tasks are loaded
-        mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+        mTasksPresenter.setCurrentFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
 
         // And the tasks aren't available in the repository

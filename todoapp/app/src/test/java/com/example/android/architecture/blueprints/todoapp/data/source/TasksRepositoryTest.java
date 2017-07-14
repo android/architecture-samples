@@ -131,7 +131,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).saveTask(newTask);
         verify(mTasksLocalDataSource).saveTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
     }
 
     @Test
@@ -146,8 +146,8 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
+        assertThat(mTasksRepository.getCachedTasks().get(newTask.getId()).isActive(), is(false));
     }
 
     @Test
@@ -162,14 +162,15 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
+        assertThat(mTasksRepository.getCachedTasks().get(newTask.getId()).isActive(), is(false));
     }
 
     @Test
     public void activateTask_activatesTaskToServiceAPIUpdatesCache() {
         // Given a stub completed task with title and description in the repository
-        Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+        Task newTask = new Task(TASK_TITLE, "Some Task Description");
+        newTask.setCompleted(true);
         mTasksRepository.saveTask(newTask);
 
         // When a completed task is activated to the tasks repository
@@ -178,14 +179,15 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
+        assertThat(mTasksRepository.getCachedTasks().get(newTask.getId()).isActive(), is(true));
     }
 
     @Test
     public void activateTaskId_activatesTaskToServiceAPIUpdatesCache() {
         // Given a stub completed task with title and description in the repository
-        Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+        Task newTask = new Task(TASK_TITLE, "Some Task Description");
+        newTask.setCompleted(true);
         mTasksRepository.saveTask(newTask);
 
         // When a completed task is activated with its id to the tasks repository
@@ -194,8 +196,8 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
+        assertThat(mTasksRepository.getCachedTasks().get(newTask.getId()).isActive(), is(true));
     }
 
     @Test
@@ -211,11 +213,13 @@ public class TasksRepositoryTest {
     @Test
     public void deleteCompletedTasks_deleteCompletedTasksToServiceAPIUpdatesCache() {
         // Given 2 stub completed tasks and 1 stub active tasks in the repository
-        Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+        Task newTask = new Task(TASK_TITLE, "Some Task Description");
+        newTask.setCompleted(true);
         mTasksRepository.saveTask(newTask);
         Task newTask2 = new Task(TASK_TITLE2, "Some Task Description");
         mTasksRepository.saveTask(newTask2);
-        Task newTask3 = new Task(TASK_TITLE3, "Some Task Description", true);
+        Task newTask3 = new Task(TASK_TITLE3, "Some Task Description");
+        newTask3.setCompleted(true);
         mTasksRepository.saveTask(newTask3);
 
         // When a completed tasks are cleared to the tasks repository
@@ -226,19 +230,21 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).clearCompletedTasks();
         verify(mTasksLocalDataSource).clearCompletedTasks();
 
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertTrue(mTasksRepository.mCachedTasks.get(newTask2.getId()).isActive());
-        assertThat(mTasksRepository.mCachedTasks.get(newTask2.getId()).getTitle(), is(TASK_TITLE2));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(1));
+        assertTrue(mTasksRepository.getCachedTasks().get(newTask2.getId()).isActive());
+        assertThat(mTasksRepository.getCachedTasks().get(newTask2.getId()).getTitle(), is(TASK_TITLE2));
     }
 
     @Test
     public void deleteAllTasks_deleteTasksToServiceAPIUpdatesCache() {
         // Given 2 stub completed tasks and 1 stub active tasks in the repository
-        Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+        Task newTask = new Task(TASK_TITLE, "Some Task Description");
+        newTask.setCompleted(true);
         mTasksRepository.saveTask(newTask);
         Task newTask2 = new Task(TASK_TITLE2, "Some Task Description");
         mTasksRepository.saveTask(newTask2);
-        Task newTask3 = new Task(TASK_TITLE3, "Some Task Description", true);
+        Task newTask3 = new Task(TASK_TITLE3, "Some Task Description");
+        newTask3.setCompleted(true);
         mTasksRepository.saveTask(newTask3);
 
         // When all tasks are deleted to the tasks repository
@@ -248,15 +254,16 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).deleteAllTasks();
         verify(mTasksLocalDataSource).deleteAllTasks();
 
-        assertThat(mTasksRepository.mCachedTasks.size(), is(0));
+        assertThat(mTasksRepository.getCachedTasks().size(), is(0));
     }
 
     @Test
     public void deleteTask_deleteTaskToServiceAPIRemovedFromCache() {
         // Given a task in the repository
-        Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+        Task newTask = new Task(TASK_TITLE, "Some Task Description");
+        newTask.setCompleted(true);
         mTasksRepository.saveTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.containsKey(newTask.getId()), is(true));
+        assertThat(mTasksRepository.getCachedTasks().containsKey(newTask.getId()), is(true));
 
         // When deleted
         mTasksRepository.deleteTask(newTask.getId());
@@ -266,7 +273,7 @@ public class TasksRepositoryTest {
         verify(mTasksLocalDataSource).deleteTask(newTask.getId());
 
         // Verify it's removed from repository
-        assertThat(mTasksRepository.mCachedTasks.containsKey(newTask.getId()), is(false));
+        assertThat(mTasksRepository.getCachedTasks().containsKey(newTask.getId()), is(false));
     }
 
     @Test

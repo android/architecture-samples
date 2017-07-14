@@ -70,8 +70,12 @@ public class StatisticsScreenTest {
     public void intentWithStubbedTaskId() {
         // Given some tasks
         TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
+        Task newTask1 = new Task("Title1", "");
+        newTask1.setCompleted(false);
+        FakeTasksRemoteDataSource.getInstance().addTasks(newTask1);
+        Task newTask2 = new Task("Title1", "");
+        newTask2.setCompleted(true);
+        FakeTasksRemoteDataSource.getInstance().addTasks(newTask2);
 
         // Lazily start the Activity from the ActivityTestRule
         Intent startIntent = new Intent();

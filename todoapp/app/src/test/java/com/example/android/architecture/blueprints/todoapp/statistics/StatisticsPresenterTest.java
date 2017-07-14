@@ -69,8 +69,12 @@ public class StatisticsPresenterTest {
         when(mStatisticsView.isActive()).thenReturn(true);
 
         // We start the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+        Task task1 = new Task("Title1", "Description1");
+        Task task2 = new Task("Title2", "Description2");
+        task2.setCompleted(true);
+        Task task3 = new Task("Title3", "Description3");
+        task3.setCompleted(true);
+        TASKS = Lists.newArrayList(task1, task2, task3);
     }
 
     @Test

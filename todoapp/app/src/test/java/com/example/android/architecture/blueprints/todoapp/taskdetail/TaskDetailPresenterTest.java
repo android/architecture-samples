@@ -47,7 +47,12 @@ public class TaskDetailPresenterTest {
 
     public static final Task ACTIVE_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST);
 
-    public static final Task COMPLETED_TASK = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
+    public static final Task COMPLETED_TASK;
+
+    static {
+        COMPLETED_TASK  = new Task(TITLE_TEST, DESCRIPTION_TEST);
+        COMPLETED_TASK.setCompleted(true);
+    }
 
     @Mock
     private TasksRepository mTasksRepository;
@@ -173,7 +178,8 @@ public class TaskDetailPresenterTest {
     @Test
     public void activateTask() {
         // Given an initialized presenter with a completed task
-        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST, true);
+        Task task = new Task(TITLE_TEST, DESCRIPTION_TEST);
+        task.setCompleted(true);
         mTaskDetailPresenter = new TaskDetailPresenter(
                 task.getId(), mTasksRepository, mTaskDetailView);
         mTaskDetailPresenter.start();
