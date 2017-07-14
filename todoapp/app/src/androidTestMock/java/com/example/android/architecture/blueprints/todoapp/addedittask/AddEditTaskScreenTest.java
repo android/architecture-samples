@@ -103,7 +103,9 @@ public class AddEditTaskScreenTest {
     public void toolbarTitle_editTask_persistsRotation() {
         // Put a task in the repository and start the activity to edit it
         TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", TASK_ID, false));
+        Task newTask = new Task("Title1", "", TASK_ID);
+        newTask.setCompleted(false);
+        FakeTasksRemoteDataSource.getInstance().addTasks(newTask);
         launchNewTaskActivity(TASK_ID);
 
         // Check that the toolbar shows the correct title

@@ -36,11 +36,11 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.DrawerActions.open;
 import static android.support.test.espresso.contrib.DrawerMatchers.isClosed;
 import static android.support.test.espresso.contrib.DrawerMatchers.isOpen;
+import static android.support.test.espresso.contrib.NavigationViewActions.navigateTo;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getToolbarNavigationContentDescription;
-import static com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo;
 import static junit.framework.Assert.fail;
 
 /**
