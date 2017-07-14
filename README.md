@@ -119,4 +119,8 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [Sharif Salah](https://github.com/sharifsalah) - Technical Writer
 
+[Doug Sigelbaum](https://github.com/DougSig) - Kotlin conversion
+
+[Ben Weiss](https://github.com/keyboardsurfer) - Kotlin conversion
+
 For more information on joining the project, see [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
