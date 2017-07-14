@@ -1,4 +1,4 @@
-# todo-mvp
+# todo-mvp-kotlin
 
 This version of the app is called todo-mvp-kotlin, and provides a foundation for other kotlin samples in this project. The sample aims to:
 
