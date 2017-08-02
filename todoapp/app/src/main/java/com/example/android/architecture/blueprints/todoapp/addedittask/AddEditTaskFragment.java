@@ -29,26 +29,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.di.Injectable;
+import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+@PerActivity
+public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View, Injectable {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.Presenter mPresenter;
+    @Inject AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
     private TextView mDescription;
 
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
-    }
-
+    @Inject
     public AddEditTaskFragment() {
         // Required empty public constructor
     }
@@ -56,12 +58,13 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.takeView(this);
     }
 
     @Override
-    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void onPause() {
+        super.onPause();
+        mPresenter.dropView();
     }
 
     @Override
@@ -116,5 +119,10 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public void setPresenter(AddEditTaskContract.Presenter presenter) {
+
     }
 }

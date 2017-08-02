@@ -1,26 +1,20 @@
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.app.Application;
 import android.content.Context;
 
+import com.example.android.architecture.blueprints.todoapp.di.AppComponent;
+
+import dagger.Binds;
 import dagger.Module;
-import dagger.Provides;
 
 /**
- * This is a Dagger module. We use this to pass in the Context dependency to the
+ * This is a Dagger module. We use this to bind our Application class as a Context in the TaskRepositoryComponent
  * {@link
- * com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent}.
+ * AppComponent}.
  */
 @Module
-public final class ApplicationModule {
-
-    private final Context mContext;
-
-    ApplicationModule(Context context) {
-        mContext = context;
-    }
-
-    @Provides
-    Context provideContext() {
-        return mContext;
-    }
+public abstract class ApplicationModule {
+    @Binds
+    abstract Context bindContext(Application application);
 }

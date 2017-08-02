@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,14 +31,21 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends AppCompatActivity {
+public class AddEditTaskActivity extends AppCompatActivity implements HasSupportFragmentInjector {
 
     public static final int REQUEST_ADD_TASK = 1;
 
-    @Inject AddEditTaskPresenter mAddEditTasksPresenter;
+    @Inject AddEditTaskContract.Presenter mAddEditTasksPresenter;
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentInjector;
+    @Inject AddEditTaskFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +65,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
 
         if (addEditTaskFragment == null) {
-            addEditTaskFragment = AddEditTaskFragment.newInstance();
+            addEditTaskFragment = fragment;
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
                 actionBar.setTitle(R.string.edit_task);
@@ -71,15 +79,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
-
-        // Create the presenter
-        DaggerAddEditTaskComponent.builder()
-                .addEditTaskPresenterModule(
-                        new AddEditTaskPresenterModule(addEditTaskFragment, taskId))
-                .tasksRepositoryComponent(
-                        ((ToDoApplication) getApplication()).getTasksRepositoryComponent()).build()
-                .inject(this);
     }
+
+
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -90,5 +92,15 @@ public class AddEditTaskActivity extends AppCompatActivity {
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentInjector;
     }
 }

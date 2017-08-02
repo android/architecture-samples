@@ -29,10 +29,10 @@ import javax.inject.Inject;
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
  * updates
  * the UI as required.
- * <p />
+ * <p/>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the AddEditTaskPresenter (if it fails, it emits a compiler error). It uses
- * {@link AddEditTaskPresenterModule} to do so.
+ * {@link } to do so.
  * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually bypassing Dagger,
@@ -44,8 +44,8 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final TasksDataSource mTasksRepository;
 
-    @NonNull
-    private final AddEditTaskContract.View mAddTaskView;
+    @Nullable
+    private AddEditTaskContract.View mAddTaskView;
 
     @Nullable
     private String mTaskId;
@@ -55,27 +55,9 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * with {@code @Nullable} values.
      */
     @Inject
-    AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository,
-            AddEditTaskContract.View addTaskView) {
+    AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository) {
         mTaskId = taskId;
         mTasksRepository = tasksRepository;
-        mAddTaskView = addTaskView;
-    }
-
-    /**
-     * Method injection is used here to safely reference {@code this} after the object is created.
-     * For more information, see Java Concurrency in Practice.
-     */
-    @Inject
-    void setupListeners() {
-        mAddTaskView.setPresenter(this);
-    }
-
-    @Override
-    public void start() {
-        if (!isNewTask()) {
-            populateTask();
-        }
     }
 
     @Override
@@ -93,6 +75,19 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             throw new RuntimeException("populateTask() was called but task is new.");
         }
         mTasksRepository.getTask(mTaskId, this);
+    }
+
+    @Override
+    public void takeView(AddEditTaskContract.View view) {
+        this.mAddTaskView = view;
+        if (!isNewTask()) {
+            populateTask();
+        }
+    }
+
+    @Override
+    public void dropView() {
+        this.mAddTaskView=null;
     }
 
     @Override

@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,23 +26,27 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.di.Injectable;
+import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
+
+import javax.inject.Inject;
 
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment implements StatisticsContract.View {
+@PerActivity
+public class StatisticsFragment extends Fragment implements StatisticsContract.View, Injectable {
 
+    @Inject
+    StatisticsContract.Presenter mPresenter;
     private TextView mStatisticsTV;
 
-    private StatisticsContract.Presenter mPresenter;
-
-    public static StatisticsFragment newInstance() {
-        return new StatisticsFragment();
+    @Inject
+    public StatisticsFragment() {
     }
 
     @Override
     public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -52,14 +54,20 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
-        mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
+        mStatisticsTV = root.findViewById(R.id.statistics);
         return root;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.takeView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dropView();
     }
 
     @Override

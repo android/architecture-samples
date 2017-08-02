@@ -31,7 +31,7 @@ import javax.inject.Inject;
  * <p />
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the StatisticsPresenter (if it fails, it emits a compiler error). It uses
- * {@link StatisticsPresenterModule} to do so.
+ * {@link StatisticsModule} to do so.
  * <p />
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
@@ -41,32 +41,19 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
-    private final StatisticsContract.View mStatisticsView;
+    private  StatisticsContract.View mStatisticsView;
 
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
      */
     @Inject
-    StatisticsPresenter(TasksRepository tasksRepository,
-                               StatisticsContract.View statisticsView) {
+    StatisticsPresenter(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
-        mStatisticsView = statisticsView;
     }
 
-    /**
-     * Method injection is used here to safely reference {@code this} after the object is created.
-     * For more information, see Java Concurrency in Practice.
-     */
-    @Inject
-    void setupListeners() {
-        mStatisticsView.setPresenter(this);
-    }
 
-    @Override
-    public void start() {
-        loadStatistics();
-    }
+
 
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
@@ -114,5 +101,16 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
                 mStatisticsView.showLoadingStatisticsError();
             }
         });
+    }
+
+    @Override
+    public void takeView(StatisticsContract.View view) {
+        mStatisticsView=view;
+        loadStatistics();
+    }
+
+    @Override
+    public void dropView() {
+        mStatisticsView=null;
     }
 }

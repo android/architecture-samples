@@ -48,33 +48,20 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
      */
-    @Nullable String mTaskId;
+    @Nullable
+    private String mTaskId;
+
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
      */
     @Inject
     TaskDetailPresenter(@Nullable String taskId,
-            TasksRepository tasksRepository,
-            TaskDetailContract.View taskDetailView) {
+                        TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
-        mTaskDetailView = taskDetailView;
         mTaskId = taskId;
     }
 
-    /**
-     * Method injection is used here to safely reference {@code this} after the object is created.
-     * For more information, see Java Concurrency in Practice.
-     */
-    @Inject
-    void setupListeners() {
-        mTaskDetailView.setPresenter(this);
-    }
-
-    @Override
-    public void start() {
-        openTask();
-    }
 
     private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
@@ -146,6 +133,17 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
         mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
+    }
+
+    @Override
+    public void takeView(TaskDetailContract.View taskDetailView) {
+        mTaskDetailView = taskDetailView;
+        openTask();
+    }
+
+    @Override
+    public void dropView() {
+        mTaskDetailView = null;
     }
 
     private void showTask(@NonNull Task task) {

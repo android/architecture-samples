@@ -60,5 +60,8 @@ public interface TaskDetailContract {
         void completeTask();
 
         void activateTask();
+
+        void takeView(TaskDetailContract.View taskDetailFragment);
+        void dropView();
     }
 }

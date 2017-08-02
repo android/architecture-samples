@@ -1,45 +1,43 @@
 package com.example.android.architecture.blueprints.todoapp;
 
+import android.app.Activity;
 import android.app.Application;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskComponent;
-import com.example.android.architecture.blueprints.todoapp.data.source.DaggerTasksRepositoryComponent;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryComponent;
-import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsComponent;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailComponent;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksComponent;
+import com.example.android.architecture.blueprints.todoapp.di.AppComponent;
+import com.example.android.architecture.blueprints.todoapp.di.AppInjector;
+import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
+
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
 
 /**
  * Even though Dagger2 allows annotating a {@link dagger.Component} as a singleton, the code itself
  * must ensure only one instance of the class is created. Therefore, we create a custom
  * {@link Application} class to store a singleton reference to the {@link
- * TasksRepositoryComponent}.
- * <P>
+ * AppComponent}.
+ * <p>
  * The application is made of 5 Dagger components, as follows:<BR />
- * {@link TasksRepositoryComponent}: the data (it encapsulates a db and server data)<BR />
- * {@link TasksComponent}: showing the list of to do items, including marking them as
+ * {@link AppComponent}: the data (it encapsulates a db and server data)<BR />
  * completed<BR />
- * {@link AddEditTaskComponent}: adding or editing a to do item<BR />
- * {@link TaskDetailComponent}: viewing details about a to do item, inlcuding marking it as
- * completed and deleting it<BR />
- * {@link StatisticsComponent}: viewing statistics about your to do items<BR />
  */
-public class ToDoApplication extends Application {
+public class ToDoApplication extends Application implements HasActivityInjector {
 
-    private TasksRepositoryComponent mRepositoryComponent;
+    @Inject AppInjector appInjector;
+    @Inject DispatchingAndroidInjector<Activity> activityInjector;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        mRepositoryComponent = DaggerTasksRepositoryComponent.builder()
-                .applicationModule(new ApplicationModule((getApplicationContext())))
-                .build();
+        DaggerAppComponent.builder().application(this).build().inject(this);
+        appInjector.inject(this);
 
     }
 
-    public TasksRepositoryComponent getTasksRepositoryComponent() {
-        return mRepositoryComponent;
+    @Override
+    public AndroidInjector<Activity> activityInjector() {
+        return activityInjector;
     }
-
 }

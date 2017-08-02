@@ -42,5 +42,8 @@ public interface AddEditTaskContract {
         void saveTask(String title, String description);
 
         void populateTask();
+
+        void takeView(AddEditTaskContract.View view);
+        void dropView();
     }
 }

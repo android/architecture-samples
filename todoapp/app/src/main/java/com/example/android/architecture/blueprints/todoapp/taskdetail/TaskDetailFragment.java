@@ -37,41 +37,47 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.example.android.architecture.blueprints.todoapp.di.Injectable;
+import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
 import com.google.common.base.Preconditions;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
+@PerActivity
+public class TaskDetailFragment extends Fragment implements TaskDetailContract.View, Injectable {
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
 
     @NonNull
     private static final int REQUEST_EDIT_TASK = 1;
-
-    private TaskDetailContract.Presenter mPresenter;
-
+    @Inject
+    String taskId;
+    @Inject TaskDetailContract.Presenter mPresenter;
     private TextView mDetailTitle;
-
     private TextView mDetailDescription;
-
     private CheckBox mDetailCompleteStatus;
 
-    public static TaskDetailFragment newInstance(@Nullable String taskId) {
-        Bundle arguments = new Bundle();
-        arguments.putString(ARGUMENT_TASK_ID, taskId);
-        TaskDetailFragment fragment = new TaskDetailFragment();
-        fragment.setArguments(arguments);
-        return fragment;
+    @Inject
+    public TaskDetailFragment() {
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.takeView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dropView();
     }
 
     @Nullable
@@ -80,9 +86,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
-        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
-        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+        mDetailTitle = root.findViewById(R.id.task_detail_title);
+        mDetailDescription = root.findViewById(R.id.task_detail_description);
+        mDetailCompleteStatus = root.findViewById(R.id.task_detail_complete);
 
         // Set up floating action button
         FloatingActionButton fab =

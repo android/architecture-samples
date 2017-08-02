@@ -12,7 +12,7 @@ import dagger.Module;
  * This is used by Dagger to inject the required arguments into the {@link TasksRepository}.
  */
 @Module
-abstract class TasksRepositoryModule {
+abstract public class TasksRepositoryModule {
 
     @Singleton
     @Binds
