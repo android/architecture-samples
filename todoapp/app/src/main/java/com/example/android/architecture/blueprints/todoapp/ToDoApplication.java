@@ -2,6 +2,7 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.app.Activity;
 import android.app.Application;
+import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.di.AppComponent;
 import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
@@ -29,13 +30,15 @@ public class ToDoApplication extends Application implements HasActivityInjector 
     UIInjector UIInjector;
     @Inject
     DispatchingAndroidInjector<Activity> activityInjector;
+    private AppComponent appcomponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
         //we never have to retain an instance of the App Scoped component,
         //Dagger Android will keep it for us.
-        DaggerAppComponent.builder().application(this).build().inject(this);
+        appcomponent = DaggerAppComponent.builder().application(this).build();
+        appcomponent.inject(this);
         UIInjector.inject(this);
 
     }
@@ -43,5 +46,12 @@ public class ToDoApplication extends Application implements HasActivityInjector 
     @Override
     public AndroidInjector<Activity> activityInjector() {
         return activityInjector;
+    }
+
+    //Our Espresso tests need to be able to get an instance of the {@link TaskRespository}
+    //so that we can delete all tasks before running each test
+    @VisibleForTesting
+    public AppComponent getTasksRepositoryComponent() {
+        return appcomponent;
     }
 }

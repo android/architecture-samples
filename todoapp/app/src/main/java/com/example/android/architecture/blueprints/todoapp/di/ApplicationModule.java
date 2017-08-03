@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp;
+package com.example.android.architecture.blueprints.todoapp.di;
 
 import android.app.Application;
 import android.content.Context;

@@ -2,8 +2,8 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
-import com.example.android.architecture.blueprints.todoapp.util.PerFragment;
+import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.di.PerFragment;
 
 import dagger.Binds;
 import dagger.Module;

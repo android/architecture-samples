@@ -8,7 +8,6 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenterModule;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksModule;
-import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

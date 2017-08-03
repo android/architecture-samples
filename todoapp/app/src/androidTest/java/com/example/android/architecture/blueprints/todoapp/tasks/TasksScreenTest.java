@@ -91,9 +91,9 @@ public class TasksScreenTest {
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
-//                    ((ToDoApplication) InstrumentationRegistry.getTargetContext()
-//                            .getApplicationContext()).getTasksRepositoryComponent()
-//                            .getTasksRepository().deleteAllTasks();
+                    ((ToDoApplication) InstrumentationRegistry.getTargetContext()
+                            .getApplicationContext()).getTasksRepositoryComponent()
+                            .getTasksRepository().deleteAllTasks();
                 }
             };
 
@@ -193,6 +193,7 @@ public class TasksScreenTest {
 
     @Test
     public void markTaskAsActive() {
+
         viewAllTasks();
 
         // Add completed task

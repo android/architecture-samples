@@ -2,7 +2,6 @@ package com.example.android.architecture.blueprints.todoapp.di;
 
 import android.app.Application;
 
-import com.example.android.architecture.blueprints.todoapp.ApplicationModule;
 import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepositoryModule;

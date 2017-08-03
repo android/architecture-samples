@@ -38,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.di.Injectable;
-import com.example.android.architecture.blueprints.todoapp.util.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
 import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
