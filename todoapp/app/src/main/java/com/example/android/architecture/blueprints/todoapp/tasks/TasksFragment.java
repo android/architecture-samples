@@ -113,11 +113,6 @@ public class TasksFragment extends Fragment implements TasksContract.View, Injec
     }
 
     @Override
-    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mPresenter.result(requestCode, resultCode);
     }

@@ -49,6 +49,10 @@ ext {
     daggerVersion = '2.11'
     dexmakerVersion = '1.2'
 }
+
+//When there is an error in code generation you will may see
+//lots of errors due too missing generated code in your logs, we increase
+//how many errors are shown here so that the real error is visible when it is near the end
 allprojects {
     afterEvaluate {
         tasks.withType(JavaCompile.class) {

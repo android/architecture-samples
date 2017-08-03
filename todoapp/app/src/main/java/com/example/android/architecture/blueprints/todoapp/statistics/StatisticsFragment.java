@@ -45,10 +45,6 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public StatisticsFragment() {
     }
 
-    @Override
-    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

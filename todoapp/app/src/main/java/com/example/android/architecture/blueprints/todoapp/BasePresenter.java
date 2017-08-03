@@ -16,8 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-public interface BasePresenter {
+public interface BasePresenter<T> {
+    void takeView(T view);  //when A view is resumed it will bind to the presenter
 
-
+    //the Presenter will preform initilization here
+    void dropView();        //When a view is destroyed we will drop the reference from our Presenter
 
 }

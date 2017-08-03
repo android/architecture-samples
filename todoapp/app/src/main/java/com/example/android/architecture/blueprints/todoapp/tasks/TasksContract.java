@@ -18,9 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public interface TasksContract {
         void showFilteringPopUpMenu();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
 
         void result(int requestCode, int resultCode);
 
@@ -82,11 +82,12 @@ public interface TasksContract {
 
         void clearCompletedTasks();
 
-        void setFiltering(TasksFilterType requestType);
-
         TasksFilterType getFiltering();
 
+        void setFiltering(TasksFilterType requestType);
+
         void takeView(TasksContract.View view);
+
         void dropView();
     }
 }

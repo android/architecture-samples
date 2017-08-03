@@ -14,11 +14,12 @@ import javax.inject.Singleton;
 import dagger.android.AndroidInjection;
 import dagger.android.support.AndroidSupportInjection;
 import dagger.android.support.HasSupportFragmentInjector;
+//UIInjector will automatically register our activities and fragments with Dagger
 @Singleton
-public class AppInjector {
+public class UIInjector {
 
     @Inject
-    public AppInjector() {
+    public UIInjector() {
     }
 
     public void inject(Application application) {

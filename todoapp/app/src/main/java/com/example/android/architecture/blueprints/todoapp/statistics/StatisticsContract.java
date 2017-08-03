@@ -35,9 +35,5 @@ public interface StatisticsContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
-        void takeView(StatisticsContract.View view);
-        void dropView();
-
-    }
+    interface Presenter extends BasePresenter<View> {}
 }

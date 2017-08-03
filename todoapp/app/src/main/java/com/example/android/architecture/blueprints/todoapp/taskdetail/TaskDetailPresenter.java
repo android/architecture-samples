@@ -41,7 +41,7 @@ import javax.inject.Inject;
 final class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private TasksRepository mTasksRepository;
-
+    @Nullable
     private TaskDetailContract.View mTaskDetailView;
 
     /**
@@ -65,11 +65,15 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showMissingTask();
+            }
             return;
         }
 
-        mTaskDetailView.setLoadingIndicator(true);
+        if (mTaskDetailView != null) {
+            mTaskDetailView.setLoadingIndicator(true);
+        }
         mTasksRepository.getTask(mTaskId, new TasksDataSource.GetTaskCallback() {
             @Override
             public void onTaskLoaded(Task task) {
@@ -99,40 +103,56 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void editTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showMissingTask();
+            }
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        if (mTaskDetailView != null) {
+            mTaskDetailView.showEditTask(mTaskId);
+        }
     }
 
     @Override
     public void deleteTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showMissingTask();
+            }
             return;
         }
         mTasksRepository.deleteTask(mTaskId);
-        mTaskDetailView.showTaskDeleted();
+        if (mTaskDetailView != null) {
+            mTaskDetailView.showTaskDeleted();
+        }
     }
 
     @Override
     public void completeTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showMissingTask();
+            }
             return;
         }
         mTasksRepository.completeTask(mTaskId);
-        mTaskDetailView.showTaskMarkedComplete();
+        if (mTaskDetailView != null) {
+            mTaskDetailView.showTaskMarkedComplete();
+        }
     }
 
     @Override
     public void activateTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showMissingTask();
+            }
             return;
         }
         mTasksRepository.activateTask(mTaskId);
-        mTaskDetailView.showTaskMarkedActive();
+        if (mTaskDetailView != null) {
+            mTaskDetailView.showTaskMarkedActive();
+        }
     }
 
     @Override
@@ -151,16 +171,26 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
         String description = task.getDescription();
 
         if (Strings.isNullOrEmpty(title)) {
-            mTaskDetailView.hideTitle();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.hideTitle();
+            }
         } else {
-            mTaskDetailView.showTitle(title);
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showTitle(title);
+            }
         }
 
         if (Strings.isNullOrEmpty(description)) {
-            mTaskDetailView.hideDescription();
+            if (mTaskDetailView != null) {
+                mTaskDetailView.hideDescription();
+            }
         } else {
-            mTaskDetailView.showDescription(description);
+            if (mTaskDetailView != null) {
+                mTaskDetailView.showDescription(description);
+            }
         }
-        mTaskDetailView.showCompletionStatus(task.isCompleted());
+        if (mTaskDetailView != null) {
+            mTaskDetailView.showCompletionStatus(task.isCompleted());
+        }
     }
 }

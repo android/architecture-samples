@@ -32,7 +32,7 @@ import javax.inject.Inject;
  * <p/>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the AddEditTaskPresenter (if it fails, it emits a compiler error). It uses
- * {@link } to do so.
+ * {@link AddEditTaskModule} to do so.
  * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually bypassing Dagger,
@@ -55,7 +55,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * with {@code @Nullable} values.
      */
     @Inject
-    AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository) {
+    AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository) {
         mTaskId = taskId;
         mTasksRepository = tasksRepository;
     }
@@ -87,13 +87,13 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void dropView() {
-        this.mAddTaskView=null;
+        this.mAddTaskView = null;
     }
 
     @Override
     public void onTaskLoaded(Task task) {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
+        if (mAddTaskView != null && mAddTaskView.isActive()) {
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
         }
@@ -102,7 +102,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void onDataNotAvailable() {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
+        if (mAddTaskView != null && mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
     }
@@ -114,10 +114,14 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+            if (mAddTaskView != null) {
+                mAddTaskView.showEmptyTaskError();
+            }
         } else {
             mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            if (mAddTaskView != null) {
+                mAddTaskView.showTasksList();
+            }
         }
     }
 
@@ -126,6 +130,8 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        if (mAddTaskView != null) {
+            mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        }
     }
 }

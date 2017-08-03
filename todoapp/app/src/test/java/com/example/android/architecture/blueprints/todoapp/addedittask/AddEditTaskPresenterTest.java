@@ -65,10 +65,11 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
-
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository);
+        mAddEditTaskPresenter.takeView(mAddEditTaskView);
         // When the presenter is asked to save a task
-        mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
+        mAddEditTaskPresenter.saveTask("New Task Title",
+                "Some Task Description");
 
         // Then a task is saved in the repository and the view updated
         verify(mTasksRepository).saveTask(any(Task.class)); // saved to the model
@@ -78,7 +79,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository);
+        mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
         // When the presenter is asked to save an empty task
         mAddEditTaskPresenter.saveTask("", "");
@@ -90,7 +92,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mAddEditTaskView);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository);
+        mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
         // When the presenter is asked to save an existing task
         mAddEditTaskPresenter.saveTask("New Task Title", "Some Task Description");
@@ -105,10 +108,10 @@ public class AddEditTaskPresenterTest {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository, mAddEditTaskView);
+                mTasksRepository);
+        //When we bind the view we will also populate the task
+        mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
-        // When the presenter is asked to populate an existing task
-        mAddEditTaskPresenter.populateTask();
 
         // Then the task repository is queried and the view updated
         verify(mTasksRepository).getTask(eq(testTask.getId()), mGetTaskCallbackCaptor.capture());

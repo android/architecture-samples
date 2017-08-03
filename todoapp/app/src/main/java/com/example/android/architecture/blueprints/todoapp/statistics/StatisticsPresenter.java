@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import android.support.annotation.Nullable;
+
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -28,11 +30,11 @@ import javax.inject.Inject;
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
- * <p />
+ * <p/>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the StatisticsPresenter (if it fails, it emits a compiler error). It uses
  * {@link StatisticsModule} to do so.
- * <p />
+ * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
  * it's good practice minimise the visibility of the class/constructor as much as possible.
@@ -41,7 +43,8 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
-    private  StatisticsContract.View mStatisticsView;
+    @Nullable
+    private StatisticsContract.View mStatisticsView;
 
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
@@ -53,10 +56,10 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
 
-
-
     private void loadStatistics() {
-        mStatisticsView.setProgressIndicator(true);
+        if (mStatisticsView != null) {
+            mStatisticsView.setProgressIndicator(true);
+        }
 
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
@@ -105,12 +108,12 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
 
     @Override
     public void takeView(StatisticsContract.View view) {
-        mStatisticsView=view;
+        mStatisticsView = view;
         loadStatistics();
     }
 
     @Override
     public void dropView() {
-        mStatisticsView=null;
+        mStatisticsView = null;
     }
 }

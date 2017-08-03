@@ -34,6 +34,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +67,8 @@ public class TasksPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksPresenter = new TasksPresenter(mTasksRepository, mTasksView);
+        mTasksPresenter = new TasksPresenter(mTasksRepository);
+        mTasksPresenter.takeView(mTasksView);
 
         // The presenter won't update the view unless it's active.
         when(mTasksView.isActive()).thenReturn(true);
@@ -83,15 +85,15 @@ public class TasksPresenterTest {
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
 
-        // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
+        // Callback is captured and invoked with stubbed tasks twice
+        //First time is when the fragment is bound to the view and a second time when we force another load
+        verify(mTasksRepository,times(2)).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is shown
-        InOrder inOrder = inOrder(mTasksView);
-        inOrder.verify(mTasksView).setLoadingIndicator(true);
+        verify(mTasksView,times(2)).setLoadingIndicator(true);
         // Then progress indicator is hidden and all tasks are shown in UI
-        inOrder.verify(mTasksView).setLoadingIndicator(false);
+        verify(mTasksView,times(1)).setLoadingIndicator(false);
         ArgumentCaptor<List> showTasksArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(mTasksView).showTasks(showTasksArgumentCaptor.capture());
         assertTrue(showTasksArgumentCaptor.getValue().size() == 3);
@@ -105,7 +107,7 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
+        verify(mTasksRepository,times(2)).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and active tasks are shown in UI
@@ -123,7 +125,7 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
+        verify(mTasksRepository,times(2)).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden and completed tasks are shown in UI
@@ -188,7 +190,7 @@ public class TasksPresenterTest {
         mTasksPresenter.loadTasks(true);
 
         // And the tasks aren't available in the repository
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
+        verify(mTasksRepository,times(2)).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown

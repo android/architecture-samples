@@ -58,6 +58,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
+        //Bind view to the presenter which will signal for the presenter to load the task.
         mPresenter.takeView(this);
     }
 
@@ -121,8 +122,4 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         return isAdded();
     }
 
-    @Override
-    public void setPresenter(AddEditTaskContract.Presenter presenter) {
-
-    }
 }
