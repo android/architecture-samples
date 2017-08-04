@@ -17,9 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -27,17 +25,16 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.support.DaggerAppCompatActivity;
 
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class TaskDetailActivity extends DaggerAppCompatActivity {
     public static final String EXTRA_TASK_ID = "TASK_ID";
-    @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
-    @Inject TaskDetailFragment injectedFragment;
+    @Inject
+    TaskDetailFragment injectedFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +62,5 @@ public class TaskDetailActivity extends AppCompatActivity implements HasSupportF
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentInjector;
     }
 }

@@ -21,11 +21,9 @@ import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.IdlingResource;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -37,15 +35,11 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import javax.inject.Inject;
 
 import dagger.Lazy;
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.support.DaggerAppCompatActivity;
 
-public class TasksActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class TasksActivity extends DaggerAppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-    @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
     @Inject
     TasksPresenter mTasksPresenter;
     @Inject
@@ -56,7 +50,6 @@ public class TasksActivity extends AppCompatActivity implements HasSupportFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tasks_act);
-
 
         // Set up the toolbar.
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -138,10 +131,5 @@ public class TasksActivity extends AppCompatActivity implements HasSupportFragme
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
-    }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentInjector;
     }
 }

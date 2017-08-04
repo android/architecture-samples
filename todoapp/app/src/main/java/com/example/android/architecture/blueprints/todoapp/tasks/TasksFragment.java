@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
@@ -41,14 +40,15 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.di.Injectable;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import dagger.android.support.DaggerFragment;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
 @PerActivity
-public class TasksFragment extends Fragment implements TasksContract.View, Injectable {
+public class TasksFragment extends DaggerFragment implements TasksContract.View {
 
     @Inject
     TasksContract.Presenter mPresenter;
@@ -86,6 +86,7 @@ public class TasksFragment extends Fragment implements TasksContract.View, Injec
     private TextView mNoTaskAddView;
     private LinearLayout mTasksView;
     private TextView mFilteringLabelView;
+
     @Inject
     public TasksFragment() {
         // Requires empty public constructor

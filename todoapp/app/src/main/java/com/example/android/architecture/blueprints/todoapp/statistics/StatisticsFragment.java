@@ -18,23 +18,23 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.di.Injectable;
 import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
 
 import javax.inject.Inject;
+
+import dagger.android.support.DaggerFragment;
 
 /**
  * Main UI for the statistics screen.
  */
 @PerActivity
-public class StatisticsFragment extends Fragment implements StatisticsContract.View, Injectable {
+public class StatisticsFragment extends DaggerFragment implements StatisticsContract.View {
 
     @Inject
     StatisticsContract.Presenter mPresenter;

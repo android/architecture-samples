@@ -21,29 +21,28 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.di.Injectable;
 import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
 
 import javax.inject.Inject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import dagger.android.support.DaggerFragment;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
 @PerActivity
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View, Injectable {
+public class AddEditTaskFragment extends DaggerFragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    @Inject AddEditTaskContract.Presenter mPresenter;
+    @Inject
+    AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
@@ -71,8 +70,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,8 +85,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_task_title);
-        mDescription = (TextView) root.findViewById(R.id.add_task_description);
+        mTitle = root.findViewById(R.id.add_task_title);
+        mDescription = root.findViewById(R.id.add_task_description);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);

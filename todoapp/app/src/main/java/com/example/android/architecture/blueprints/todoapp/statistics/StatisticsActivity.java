@@ -19,11 +19,9 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -33,21 +31,19 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.support.DaggerAppCompatActivity;
 
 /**
  * Show statistics for tasks.
  */
-public class StatisticsActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class StatisticsActivity extends DaggerAppCompatActivity {
 
     @Inject
     StatisticsPresenter mStatiticsPresenter;
     @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
+    StatisticsFragment fragment;
     private DrawerLayout mDrawerLayout;
-    @Inject StatisticsFragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +69,7 @@ public class StatisticsActivity extends AppCompatActivity implements HasSupportF
         StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.contentFrame);
         if (statisticsFragment == null) {
-            statisticsFragment =fragment;
+            statisticsFragment = fragment;
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     statisticsFragment, R.id.contentFrame);
         }
@@ -116,10 +112,4 @@ public class StatisticsActivity extends AppCompatActivity implements HasSupportF
                     }
                 });
     }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentInjector;
-    }
-
 }

@@ -35,4 +35,8 @@ public abstract class AddEditTaskModule {
     @PerActivity
     @Binds
     abstract AddEditTaskContract.Presenter taskPresenter(AddEditTaskPresenter presenter);
+
+    //NOTE:  IF you want to have something be only in the Fragment scope but not activity mark a
+    //@provides or @Binds method as @PerFragment.  Use case is when there are multiple fragments
+    //in an activity but you do not want them to share all the same objects.
 }

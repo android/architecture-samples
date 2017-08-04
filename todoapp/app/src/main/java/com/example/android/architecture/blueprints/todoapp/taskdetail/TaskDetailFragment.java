@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,19 +36,18 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-import com.example.android.architecture.blueprints.todoapp.di.Injectable;
 import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
 import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import dagger.android.support.DaggerFragment;
 
 /**
  * Main UI for the task detail screen.
  */
 @PerActivity
-public class TaskDetailFragment extends Fragment implements TaskDetailContract.View, Injectable {
+public class TaskDetailFragment extends DaggerFragment implements TaskDetailContract.View {
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
@@ -58,7 +56,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     private static final int REQUEST_EDIT_TASK = 1;
     @Inject
     String taskId;
-    @Inject TaskDetailContract.Presenter mPresenter;
+    @Inject
+    TaskDetailContract.Presenter mPresenter;
     private TextView mDetailTitle;
     private TextView mDetailDescription;
     private CheckBox mDetailCompleteStatus;
