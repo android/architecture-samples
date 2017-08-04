@@ -313,8 +313,8 @@ public class TasksFragment extends DaggerFragment implements TasksContract.View 
 
     @Override
     public void showTaskDetailsUi(String taskId) {
-//         in it's own Activity, since it makes more sense that way and it gives us the flexibility
-//         to show some Intent stubbing.
+        //Shown in it's own Activity, since it makes more sense that way
+        // and it gives us the flexibility to show some Intent stubbing.
         Intent intent = new Intent(getContext(), TaskDetailActivity.class);
         intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
         startActivity(intent);
