@@ -75,8 +75,8 @@ public class TaskDetailFragment extends DaggerFragment implements TaskDetailCont
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mPresenter.dropView();
+        super.onDestroy();
     }
 
     @Nullable

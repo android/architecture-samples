@@ -61,8 +61,8 @@ public class StatisticsFragment extends DaggerFragment implements StatisticsCont
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mPresenter.dropView();
+        super.onDestroy();
     }
 
     @Override

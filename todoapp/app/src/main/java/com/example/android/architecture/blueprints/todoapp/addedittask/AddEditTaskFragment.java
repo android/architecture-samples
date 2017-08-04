@@ -62,8 +62,8 @@ public class AddEditTaskFragment extends DaggerFragment implements AddEditTaskCo
 
     @Override
     public void onPause() {
-        super.onPause();
         mPresenter.dropView();
+        super.onPause();
     }
 
     @Override
