@@ -42,10 +42,10 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
     @Inject
     AddEditTaskContract.Presenter mAddEditTasksPresenter;
     @Inject
-    AddEditTaskFragment fragment;
+    AddEditTaskFragment mFragment;
     @Inject
     @Nullable
-    String taskID;
+    String mTaskId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +58,8 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (addEditTaskFragment == null) {
-            addEditTaskFragment = fragment;
-            if (taskID != null) {
+            addEditTaskFragment = mFragment;
+            if (mTaskId != null) {
                 actionBar.setTitle(R.string.edit_task);
             } else {
                 actionBar.setTitle(R.string.add_task);
@@ -89,10 +89,5 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 }
