@@ -29,13 +29,15 @@ public class ToDoApplication extends DaggerApplication {
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-       return DaggerAppComponent.builder().application(this).build();
+        AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
+        appComponent.inject(this);
+        return appComponent;
     }
 
 
     /**
-     * Our Espresso tests need to be able to get an instance of the {@link TasksDataSource}
-     *so that we can delete all tasks before running each test
+     * Our Espresso tests need to be able to get an instance of the {@link TasksRepository}
+     * so that we can delete all tasks before running each test
      */
 
     @VisibleForTesting
