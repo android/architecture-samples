@@ -78,7 +78,7 @@ final class TaskDetailPresenter implements TaskDetailContract.Presenter {
             @Override
             public void onTaskLoaded(Task task) {
                 // The view may not be able to handle UI updates anymore
-                if (!mTaskDetailView.isActive()) {
+                if (mTaskDetailView==null||!mTaskDetailView.isActive()) {
                     return;
                 }
                 mTaskDetailView.setLoadingIndicator(false);
