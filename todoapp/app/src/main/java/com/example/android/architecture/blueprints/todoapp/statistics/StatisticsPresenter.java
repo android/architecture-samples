@@ -87,7 +87,7 @@ final class StatisticsPresenter implements StatisticsContract.Presenter {
                     }
                 }
                 // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
+                if (mStatisticsView == null || !mStatisticsView.isActive()) {
                     return;
                 }
                 mStatisticsView.setProgressIndicator(false);

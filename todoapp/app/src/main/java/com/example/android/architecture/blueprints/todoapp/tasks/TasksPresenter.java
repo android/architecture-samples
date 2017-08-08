@@ -138,7 +138,7 @@ final class TasksPresenter implements TasksContract.Presenter {
                     }
                 }
                 // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
+                if (mTasksView==null||!mTasksView.isActive()) {
                     return;
                 }
                 if (showLoadingUI) {
