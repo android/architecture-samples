@@ -1,10 +1,11 @@
 buildscript {
     repositories {
-        maven { url 'https://maven.google.com' }
+        // As of Gradle plugin 3.0 you can use the `google()` shortcut instead of `maven { url 'https://maven.google.com' }`
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -13,7 +14,7 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url 'https://maven.google.com' }
+        google()
         jcenter()
     }
 }
@@ -25,7 +26,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    // TODO check if we need 10
+    // TODO upgrade minSdk to 14 as support library 26 does the same. Check if it's okay.
     minSdkVersion = 14
     targetSdkVersion = 26
     compileSdkVersion = 26
