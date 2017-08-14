@@ -23,8 +23,8 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +138,7 @@ final class TasksPresenter implements TasksContract.Presenter {
                     }
                 }
                 // The view may not be able to handle UI updates anymore
-                if (mTasksView==null||!mTasksView.isActive()) {
+                if (mTasksView == null || !mTasksView.isActive()) {
                     return;
                 }
                 if (showLoadingUI) {
@@ -279,5 +279,4 @@ final class TasksPresenter implements TasksContract.Presenter {
     public void dropView() {
         mTasksView = null;
     }
-
 }

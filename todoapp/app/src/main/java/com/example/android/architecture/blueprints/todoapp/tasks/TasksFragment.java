@@ -286,6 +286,7 @@ public class TasksFragment extends DaggerFragment implements TasksContract.View 
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
+        //noinspection deprecation
         mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
@@ -410,9 +411,11 @@ public class TasksFragment extends DaggerFragment implements TasksContract.View 
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
             if (task.isCompleted()) {
+                //noinspection deprecation (api <16)
                 rowView.setBackgroundDrawable(viewGroup.getContext()
                         .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
             } else {
+                //noinspection deprecation (api <16)
                 rowView.setBackgroundDrawable(viewGroup.getContext()
                         .getResources().getDrawable(R.drawable.touch_feedback));
             }

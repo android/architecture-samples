@@ -44,8 +44,8 @@ android {
 
     // Remove mockRelease as it's not needed.
     android.variantFilter { variant ->
-        if (variant.buildType.name.equals('release')
-                && variant.getFlavors().get(0).name.equals('mock')) {
+        if (variant.buildType.name == 'release'
+                && variant.getFlavors().get(0).name == 'mock') {
             variant.setIgnore(true);
         }
     }
@@ -69,7 +69,6 @@ dependencies {
     compile "com.android.support:design:$rootProject.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
 
     // Dagger dependencies
@@ -96,16 +95,11 @@ dependencies {
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:$rootProject.ext.dexmakerVersion"
 
     // Espresso UI Testing
-    androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion") {
-        exclude group: 'com.google.code.findbugs'
-    }
-    androidTestCompile("com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion") {
-        exclude group: 'com.google.code.findbugs'
-    }
-    androidTestCompile("com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion") {
-        exclude group: 'com.google.code.findbugs'
-        //version of findbugs brought in by Dagger.Android differs
-    }
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
+    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
+    androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
+    androidTestCompile "com.android.support.test.espresso.idling:idling-concurrent:3.0.0"
+    compile "com.android.support.test.espresso:espresso-idling-resource:3.0.0"
 
     // Resolve conflicts between main and test APK:
     androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
@@ -113,4 +107,6 @@ dependencies {
     androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.google.code.findbugs:jsr305:3.0.1"
+
 }

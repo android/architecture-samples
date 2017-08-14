@@ -3,7 +3,6 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.app.Application;
 import android.support.annotation.VisibleForTesting;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.di.AppComponent;
 import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
@@ -23,17 +22,11 @@ public class ToDoApplication extends DaggerApplication {
     TasksRepository tasksRepository;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
         AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
         appComponent.inject(this);
         return appComponent;
     }
-
 
     /**
      * Our Espresso tests need to be able to get an instance of the {@link TasksRepository}
@@ -44,5 +37,4 @@ public class ToDoApplication extends DaggerApplication {
     public TasksRepository getTasksRepository() {
         return tasksRepository;
     }
-
 }
