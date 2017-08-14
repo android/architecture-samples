@@ -38,8 +38,10 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
 
     @Inject
     AddEditTaskContract.Presenter mAddEditTasksPresenter;
+    
     @Inject
     AddEditTaskFragment mFragment;
+    
     @Inject
     @Nullable
     String mTaskId;
