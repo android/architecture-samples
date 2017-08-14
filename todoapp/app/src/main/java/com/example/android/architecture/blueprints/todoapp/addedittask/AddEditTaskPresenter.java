@@ -79,7 +79,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void takeView(AddEditTaskContract.View view) {
-        this.mAddTaskView = view;
+        mAddTaskView = view;
         if (!isNewTask()) {
             populateTask();
         }
@@ -87,7 +87,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
 
     @Override
     public void dropView() {
-        this.mAddTaskView = null;
+        mAddTaskView = null;
     }
 
     @Override

@@ -2,8 +2,8 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.support.annotation.Nullable;
 
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
-import com.example.android.architecture.blueprints.todoapp.di.PerFragment;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
+import com.example.android.architecture.blueprints.todoapp.di.FragmentScoped;
 
 import dagger.Binds;
 import dagger.Module;
@@ -22,21 +22,21 @@ public abstract class AddEditTaskModule {
     // We can then inject our TaskId into our Presenter without having pass through dependency from the Activity.
     // Each UI object gets the dependency it needs and nothing else.
     @Provides
-    @PerActivity
+    @ActivityScoped
     @Nullable
     static String provideTaskId(AddEditTaskActivity activity) {
         return activity.getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
     }
 
-    @PerFragment
+    @FragmentScoped
     @ContributesAndroidInjector
     abstract AddEditTaskFragment addEditTaskFragment();
 
-    @PerActivity
+    @ActivityScoped
     @Binds
     abstract AddEditTaskContract.Presenter taskPresenter(AddEditTaskPresenter presenter);
 
     //NOTE:  IF you want to have something be only in the Fragment scope but not activity mark a
-    //@provides or @Binds method as @PerFragment.  Use case is when there are multiple fragments
+    //@provides or @Binds method as @FragmentScoped.  Use case is when there are multiple fragments
     //in an activity but you do not want them to share all the same objects.
 }

@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ import dagger.android.support.DaggerFragment;
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-@PerActivity
+@ActivityScoped
 public class AddEditTaskFragment extends DaggerFragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";

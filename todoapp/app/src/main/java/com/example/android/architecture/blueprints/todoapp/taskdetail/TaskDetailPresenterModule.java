@@ -1,7 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
-import com.example.android.architecture.blueprints.todoapp.di.PerFragment;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
+import com.example.android.architecture.blueprints.todoapp.di.FragmentScoped;
 
 import dagger.Binds;
 import dagger.Module;
@@ -18,16 +18,16 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
 public abstract class TaskDetailPresenterModule {
 
 
-    @PerFragment
+    @FragmentScoped
     @ContributesAndroidInjector
     abstract TaskDetailFragment taskDetailFragment();
 
-    @PerActivity
+    @ActivityScoped
     @Binds
     abstract TaskDetailContract.Presenter statitsticsPresenter(TaskDetailPresenter presenter);
 
     @Provides
-    @PerActivity
+    @ActivityScoped
     static String provideTaskId(TaskDetailActivity activity) {
         return activity.getIntent().getStringExtra(EXTRA_TASK_ID);
     }

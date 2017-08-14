@@ -1,7 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
-import com.example.android.architecture.blueprints.todoapp.di.PerFragment;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
+import com.example.android.architecture.blueprints.todoapp.di.FragmentScoped;
 
 import dagger.Binds;
 import dagger.Module;
@@ -14,11 +14,11 @@ import dagger.android.ContributesAndroidInjector;
 @Module
 public abstract class StatisticsModule {
 
-    @PerFragment
+    @FragmentScoped
     @ContributesAndroidInjector
     abstract StatisticsFragment statisticsFragment();
 
-    @PerActivity
+    @ActivityScoped
     @Binds
     abstract StatisticsContract.Presenter statitsticsPresenter(StatisticsPresenter presenter);
 }

@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
 
 import javax.inject.Inject;
 
@@ -33,7 +33,7 @@ import dagger.android.support.DaggerFragment;
 /**
  * Main UI for the statistics screen.
  */
-@PerActivity
+@ActivityScoped
 public class StatisticsFragment extends DaggerFragment implements StatisticsContract.View {
 
     @Inject

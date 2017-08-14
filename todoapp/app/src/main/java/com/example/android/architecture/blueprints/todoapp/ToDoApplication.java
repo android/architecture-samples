@@ -4,7 +4,6 @@ import android.app.Application;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.di.AppComponent;
 import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
 
 import javax.inject.Inject;
@@ -23,9 +22,7 @@ public class ToDoApplication extends DaggerApplication {
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-        AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
-        appComponent.inject(this);
-        return appComponent;
+        return DaggerAppComponent.builder().application(this).build();
     }
 
     /**

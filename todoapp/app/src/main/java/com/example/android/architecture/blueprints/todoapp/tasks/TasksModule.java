@@ -1,7 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
-import com.example.android.architecture.blueprints.todoapp.di.PerFragment;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
+import com.example.android.architecture.blueprints.todoapp.di.FragmentScoped;
 
 import dagger.Binds;
 import dagger.Module;
@@ -13,10 +13,10 @@ import dagger.android.ContributesAndroidInjector;
  */
 @Module
 public abstract class TasksModule {
-    @PerFragment
+    @FragmentScoped
     @ContributesAndroidInjector
     abstract TasksFragment tasksFragment();
 
-    @PerActivity
+    @ActivityScoped
     @Binds abstract TasksContract.Presenter taskPresenter(TasksPresenter presenter);
 }

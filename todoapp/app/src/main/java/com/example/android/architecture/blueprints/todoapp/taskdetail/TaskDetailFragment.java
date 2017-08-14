@@ -36,7 +36,7 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-import com.example.android.architecture.blueprints.todoapp.di.PerActivity;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
 import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
@@ -46,7 +46,7 @@ import dagger.android.support.DaggerFragment;
 /**
  * Main UI for the task detail screen.
  */
-@PerActivity
+@ActivityScoped
 public class TaskDetailFragment extends DaggerFragment implements TaskDetailContract.View {
 
     @NonNull
