@@ -18,9 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 
 import java.util.List;
 

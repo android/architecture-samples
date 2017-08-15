@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.custom.action;
 
-import org.hamcrest.Matcher;
-
 import android.content.res.Resources.NotFoundException;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.PerformException;
@@ -29,6 +27,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import org.hamcrest.Matcher;
 
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
@@ -47,7 +47,7 @@ public final class NavigationViewActions {
     /**
      * Returns a {@link ViewAction} that navigates to a menu item in {@link NavigationView} using a
      * menu item resource id.
-     *
+     * <p>
      * <p>
      * View constraints:
      * <ul>

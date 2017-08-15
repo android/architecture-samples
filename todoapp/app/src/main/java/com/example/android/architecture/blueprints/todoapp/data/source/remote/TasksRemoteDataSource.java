@@ -16,12 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -74,7 +72,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public Observable<Task> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
-        if(task != null) {
+        if (task != null) {
             return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
             return Observable.empty();
