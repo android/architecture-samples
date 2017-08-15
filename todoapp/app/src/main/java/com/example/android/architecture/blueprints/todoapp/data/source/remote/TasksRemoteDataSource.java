@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 /**
  * Implementation of the data source that adds a latency simulating network.
@@ -54,7 +54,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description) {
         Task newTask = new Task(title, description);
@@ -62,20 +63,20 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
-        return Observable
-                .from(TASKS_SERVICE_DATA.values())
+    public Flowable<List<Task>> getTasks() {
+        return Flowable
+                .fromIterable(TASKS_SERVICE_DATA.values())
                 .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
-                .toList();
+                .toList().toFlowable();
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Task> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
         if (task != null) {
-            return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+            return Flowable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
-            return Observable.empty();
+            return Flowable.empty();
         }
     }
 

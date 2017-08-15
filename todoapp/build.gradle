@@ -41,7 +41,7 @@ ext {
     runnerVersion = '1.0.0'
     rulesVersion = '1.0.0'
     espressoVersion = '3.0.0'
-    rxjavaVersion = '1.1.8'
-    rxandroidVersion = '1.2.1'
-    sqlbriteVersion = '1.1.1'
+    rxjavaVersion = '2.1.3'
+    rxandroidVersion = '2.0.1'
+    sqlbriteVersion = '2.0.0'
 }

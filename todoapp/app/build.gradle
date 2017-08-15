@@ -79,9 +79,9 @@ dependencies {
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     implementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
     implementation "com.google.guava:guava:$rootProject.guavaVersion"
-    implementation "io.reactivex:rxjava:$rootProject.rxjavaVersion"
-    implementation "io.reactivex:rxandroid:$rootProject.rxandroidVersion"
-    implementation "com.squareup.sqlbrite:sqlbrite:$rootProject.sqlbriteVersion"
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+    implementation "com.squareup.sqlbrite2:sqlbrite:$rootProject.sqlbriteVersion"
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$rootProject.ext.junitVersion"

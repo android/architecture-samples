@@ -58,7 +58,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+        mPresenter.unSubscribe();
     }
 
     @Override

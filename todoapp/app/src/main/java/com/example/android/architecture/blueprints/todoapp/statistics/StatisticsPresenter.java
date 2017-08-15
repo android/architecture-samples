@@ -24,9 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,7 +46,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private final BaseSchedulerProvider mSchedulerProvider;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable mCompositeDisposable;
 
     public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
                                @NonNull StatisticsContract.View statisticsView,
@@ -55,7 +55,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mStatisticsView = checkNotNull(statisticsView, "statisticsView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
 
-        mSubscriptions = new CompositeSubscription();
+        mCompositeDisposable = new CompositeDisposable();
         mStatisticsView.setPresenter(this);
     }
 
@@ -65,8 +65,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     @Override
-    public void unsubscribe() {
-        mSubscriptions.clear();
+    public void unSubscribe() {
+        mCompositeDisposable.clear();
     }
 
     private void loadStatistics() {
@@ -76,12 +76,12 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        Observable<Task> tasks = mTasksRepository
+        Flowable<Task> tasks = mTasksRepository
                 .getTasks()
-                .flatMap(Observable::from);
-        Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
-        Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
-        Subscription subscription = Observable
+                .flatMap(Flowable::fromIterable);
+        Flowable<Long> completedTasks = tasks.filter(Task::isCompleted).count().toFlowable();
+        Flowable<Long> activeTasks = tasks.filter(Task::isActive).count().toFlowable();
+        Disposable disposable = Flowable
                 .zip(completedTasks, activeTasks, (completed, active) -> Pair.create(active, completed))
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
@@ -97,6 +97,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                         throwable -> mStatisticsView.showLoadingStatisticsError(),
                         // onCompleted
                         () -> mStatisticsView.setProgressIndicator(false));
-        mSubscriptions.add(subscription);
+        mCompositeDisposable.add(disposable);
     }
 }

@@ -65,7 +65,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+        mPresenter.unSubscribe();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
+    public void showStatistics(long numberOfIncompleteTasks, long numberOfCompletedTasks) {
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {

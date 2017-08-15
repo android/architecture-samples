@@ -28,7 +28,7 @@ public interface StatisticsContract {
 
         void setProgressIndicator(boolean active);
 
-        void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks);
+        void showStatistics(long numberOfIncompleteTasks, long numberOfCompletedTasks);
 
         void showLoadingStatisticsError();
 

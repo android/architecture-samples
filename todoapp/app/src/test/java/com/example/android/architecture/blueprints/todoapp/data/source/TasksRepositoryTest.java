@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Flowable;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
@@ -404,19 +404,19 @@ public class TasksRepositoryTest {
     }
 
     private void setTasksNotAvailable(TasksDataSource dataSource) {
-        when(dataSource.getTasks()).thenReturn(Observable.just(Collections.<Task>emptyList()));
+        when(dataSource.getTasks()).thenReturn(Flowable.just(Collections.emptyList()));
     }
 
     private void setTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
         // don't allow the data sources to complete.
-        when(dataSource.getTasks()).thenReturn(Observable.just(tasks).concatWith(Observable.<List<Task>>never()));
+        when(dataSource.getTasks()).thenReturn(Flowable.just(tasks).concatWith(Flowable.never()));
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-        when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.<Task>never()));
+        when(dataSource.getTask(eq(taskId))).thenReturn(Flowable.<Task>just(null).concatWith(Flowable.never()));
     }
 
     private void setTaskAvailable(TasksDataSource dataSource, Task task) {
-        when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task).concatWith(Observable.<Task>never()));
+        when(dataSource.getTask(eq(task.getId()))).thenReturn(Flowable.just(task).concatWith(Flowable.never()));
     }
 }

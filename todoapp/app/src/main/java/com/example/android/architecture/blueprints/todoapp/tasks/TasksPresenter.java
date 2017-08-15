@@ -28,10 +28,10 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,7 +56,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     private boolean mFirstLoad = true;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable mCompositeDisposable;
 
     public TasksPresenter(@NonNull TasksRepository tasksRepository,
                           @NonNull TasksContract.View tasksView,
@@ -65,7 +65,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
 
-        mSubscriptions = new CompositeSubscription();
+        mCompositeDisposable = new CompositeDisposable();
         mTasksView.setPresenter(this);
     }
 
@@ -75,8 +75,8 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void unsubscribe() {
-        mSubscriptions.clear();
+    public void unSubscribe() {
+        mCompositeDisposable.clear();
     }
 
     @Override
@@ -110,13 +110,13 @@ public class TasksPresenter implements TasksContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mSubscriptions.clear();
-        Subscription subscription = mTasksRepository
+        mCompositeDisposable.clear();
+        Disposable disposable = mTasksRepository
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                .flatMap(new Function<List<Task>, Flowable<Task>>() {
                     @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
+                    public Flowable<Task> apply(List<Task> tasks) {
+                        return Flowable.fromIterable(tasks);
                     }
                 })
                 .filter(task -> {
@@ -133,11 +133,12 @@ public class TasksPresenter implements TasksContract.Presenter {
                 .toList()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(() -> {
+                .doAfterTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
+                .toFlowable()
                 .subscribe(
                         // onNext
                         this::processTasks,
@@ -145,7 +146,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                         throwable -> mTasksView.showLoadingTasksError(),
                         // onCompleted
                         () -> mTasksView.setLoadingIndicator(false));
-        mSubscriptions.add(subscription);
+        mCompositeDisposable.add(disposable);
     }
 
     private void processTasks(@NonNull List<Task> tasks) {

@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -131,10 +131,10 @@ public class StatisticsPresenterTest {
     }
 
     private void setTasksAvailable(List<Task> tasks) {
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(tasks));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.just(tasks));
     }
 
     private void setTasksNotAvailable() {
-        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>error(new Exception()));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.error(new Exception()));
     }
 }

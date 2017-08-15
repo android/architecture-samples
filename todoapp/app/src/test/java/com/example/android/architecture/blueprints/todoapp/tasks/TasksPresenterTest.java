@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -84,7 +84,7 @@ public class TasksPresenterTest {
     @Test
     public void loadAllTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
         mTasksPresenter.loadTasks(true);
@@ -98,7 +98,7 @@ public class TasksPresenterTest {
     @Test
     public void loadActiveTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
         mTasksPresenter.loadTasks(true);
@@ -110,7 +110,7 @@ public class TasksPresenterTest {
     @Test
     public void loadCompletedTasksFromRepositoryAndLoadIntoView() {
         // Given an initialized TasksPresenter with initialized tasks
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(TASKS));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.just(TASKS));
         // When loading of Tasks is requested
         mTasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
         mTasksPresenter.loadTasks(true);
@@ -145,7 +145,7 @@ public class TasksPresenterTest {
         // Given a stubbed task
         Task task = new Task("Details Requested", "For this task");
         // And no tasks available in the repository
-        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.empty());
 
         // When task is marked as complete
         mTasksPresenter.completeTask(task);
@@ -160,7 +160,7 @@ public class TasksPresenterTest {
         // Given a stubbed completed task
         Task task = new Task("Details Requested", "For this task", true);
         // And no tasks available in the repository
-        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>empty());
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.empty());
         mTasksPresenter.loadTasks(true);
 
         // When task is marked as activated
@@ -174,7 +174,7 @@ public class TasksPresenterTest {
     @Test
     public void errorLoadingTasks_ShowsError() {
         // Given that no tasks are available in the repository
-        when(mTasksRepository.getTasks()).thenReturn(Observable.<List<Task>>error(new Exception()));
+        when(mTasksRepository.getTasks()).thenReturn(Flowable.error(new Exception()));
 
         // When tasks are loaded
         mTasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
