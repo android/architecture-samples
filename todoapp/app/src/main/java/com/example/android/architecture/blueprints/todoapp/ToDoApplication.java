@@ -19,7 +19,7 @@ import dagger.android.DaggerApplication;
  */
 public class ToDoApplication extends DaggerApplication {
     @Inject
-    volatile TasksRepository tasksRepository;
+    TasksRepository tasksRepository;
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {

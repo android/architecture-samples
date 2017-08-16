@@ -17,11 +17,11 @@ import dagger.android.ContributesAndroidInjector;
 @Module
 public abstract class AddEditTaskModule {
 
-    //Rather than having the activity deal with getting the intent extra and passing it to the presenter
-    //we will provide the taskId directly into the AddEditTaskActivitySubcomponent
+    // Rather than having the activity deal with getting the intent extra and passing it to the presenter
+    // we will provide the taskId directly into the AddEditTaskActivitySubcomponent
     // which is what gets generated for us by Dagger.Android.
-    // We can then inject our TaskId into our Presenter without having pass through dependency from the Activity.
-    // Each UI object gets the dependency it needs and nothing else.
+    // We can then inject our TaskId and state into our Presenter without having pass through dependency from 
+    // the Activity. Each UI object gets the dependency it needs and nothing else.
     @Provides
     @ActivityScoped
     @Nullable
