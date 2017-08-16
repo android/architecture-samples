@@ -50,7 +50,7 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
 
     // In a rotation it's important to know if we want to let the framework restore view state or
     // need to load data from the repository. This is saved into the state bundle.
-    boolean mIsDataMissing = true;
+    private boolean mIsDataMissing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,10 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
+        restoreState(savedInstanceState);
+    }
 
+    private void restoreState(Bundle savedInstanceState) {
         // Prevent the presenter from loading data from the repository if this is a config change.
         if (savedInstanceState != null) {
             // Data might not have loaded when the config change happen, so we saved the state.
@@ -103,7 +106,7 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
         return true;
     }
 
-    public boolean isDataMissing() {
+    boolean isDataMissing() {
         return mIsDataMissing;
     }
 }
