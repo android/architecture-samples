@@ -51,7 +51,7 @@ For this to work we added new classes to the feature, mostly within the`example/
      @FragmentScoped
     @ContributesAndroidInjector
     abstract TasksFragment tasksFragment();
-    ```
+ ```
 
 * Lastly we have our activities extend `DaggerActivity` and our application extend `DaggerApplication` which will inject (provide) our dependencies when we need them
 
