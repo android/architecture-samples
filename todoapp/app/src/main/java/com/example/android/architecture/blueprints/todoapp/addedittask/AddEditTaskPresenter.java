@@ -25,6 +25,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
+
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
  * updates
@@ -50,14 +52,29 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Nullable
     private String mTaskId;
 
+    // This is provided lazily because its value is determined in the Activity's onCreate. By
+    // calling it in takeView(), the value is guaranteed to be set.
+    private Lazy<Boolean> mIsDataMissingLazy;
+
+    // Whether the data has been loaded with this presenter (or comes from a system restore)
+    private boolean mIsDataMissing;
+
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
      * with {@code @Nullable} values.
+     *
+     * @param taskId the task ID or null if it's a new task
+     * @param tasksRepository the data source
+     * @param shouldLoadDataFromRepo a flag that controls whether we should load data from the
+     *                               repository or not. It's lazy because it's determined in the
+     *                               Activity's onCreate.
      */
     @Inject
-    AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository) {
+    AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
+                         Lazy<Boolean> shouldLoadDataFromRepo) {
         mTaskId = taskId;
         mTasksRepository = tasksRepository;
+        mIsDataMissingLazy = shouldLoadDataFromRepo;
     }
 
     @Override
@@ -80,7 +97,8 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void takeView(AddEditTaskContract.View view) {
         mAddTaskView = view;
-        if (!isNewTask()) {
+        mIsDataMissing = mIsDataMissingLazy.get();
+        if (!isNewTask() && mIsDataMissing) {
             populateTask();
         }
     }
@@ -97,6 +115,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
         }
+        mIsDataMissing = false;
     }
 
     @Override
@@ -105,6 +124,11 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         if (mAddTaskView != null && mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    @Override
+    public boolean isDataMissing() {
+        return mIsDataMissing;
     }
 
     private boolean isNewTask() {

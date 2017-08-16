@@ -1,7 +1,5 @@
-# Android Architecture Blueprints [beta] - MVP + Dagger2
+# Android Architecture Blueprints - MVP + Dagger2
 ### Summary
-
-Project contributors: [Saúl Molinero](https://github.com/saulmm)
 
 ### Key concepts
 

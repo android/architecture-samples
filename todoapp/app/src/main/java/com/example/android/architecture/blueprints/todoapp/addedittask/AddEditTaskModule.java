@@ -16,6 +16,7 @@ import dagger.android.ContributesAndroidInjector;
  */
 @Module
 public abstract class AddEditTaskModule {
+
     //Rather than having the activity deal with getting the intent extra and passing it to the presenter
     //we will provide the taskId directly into the AddEditTaskActivitySubcomponent
     // which is what gets generated for us by Dagger.Android.
@@ -26,6 +27,12 @@ public abstract class AddEditTaskModule {
     @Nullable
     static String provideTaskId(AddEditTaskActivity activity) {
         return activity.getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+    }
+
+    @Provides
+    @ActivityScoped
+    static boolean provideStatusDataMissing(AddEditTaskActivity activity) {
+        return activity.isDataMissing();
     }
 
     @FragmentScoped
