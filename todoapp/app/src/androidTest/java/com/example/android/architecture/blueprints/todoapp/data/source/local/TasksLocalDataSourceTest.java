@@ -170,7 +170,7 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.getTask(newTask2.getId(), callback2);
 
         verify(callback2).onDataNotAvailable();
-        verify(callback2, never()).onTaskLoaded(newTask1);
+        verify(callback2, never()).onTaskLoaded(newTask2);
 
         mLocalDataSource.getTask(newTask3.getId(), callback3);
 
