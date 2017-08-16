@@ -27,9 +27,11 @@ public class TasksActivity extends AppCompatActivity {
 For this to work we added new classes to the feature, mostly within the`example/android/architecture/blueprints/todoapp/di` package, check out:
  * [AppComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/AppComponent.java) - Here is where we register `modules` which bring in individual `providers` to our app. Notice we also bring in an auto generated `AndroidSupportInjectionModule` which comes from our `Dagger-Android` dependency.
   * [ActivityBindingModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/ActivityBindingModule.java) - This module  has a `@ContributesInjector` for each `Activity` in our app.  Dagger Android will generate a subcomponent for each one of these abstract methods:
-  ```   @ActivityScoped
+  ```   
+  @ActivityScoped
     @ContributesAndroidInjector(modules = TasksModule.class)
-    abstract TasksActivity tasksActivity();```
+    abstract TasksActivity tasksActivity();
+    ```
  generates a subcomponent that looks like 
  ```
  @Subcomponent(modules = TasksModule.class)
