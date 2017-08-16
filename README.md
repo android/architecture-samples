@@ -1,7 +1,5 @@
-# Android Architecture Blueprints [beta] - MVP + Dagger2
+# Android Architecture Blueprints - MVP + Dagger2
 ### Summary
-
-Project contributors: [Saúl Molinero](https://github.com/saulmm)
 
 ### Key concepts
 
@@ -55,11 +53,12 @@ Very high. Use of Dagger2 improves flexibility in local integration tests and UI
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Java                            60           1175           1610           3699 (3451 in MVP)
-XML                             34             97            337            602
+Java                            58           1193           1658           3901 (3451 in MVP)
+XML                             34             97            338            610
 -------------------------------------------------------------------------------
-SUM:                            94           1272           1947           4301
+SUM:                            92           1290           1996           4511
 -------------------------------------------------------------------------------
+
 ```
 ### Maintainability
 

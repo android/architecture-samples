@@ -27,6 +27,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import dagger.Lazy;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -51,6 +53,12 @@ public class AddEditTaskPresenterTest {
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
     private AddEditTaskPresenter mAddEditTaskPresenter;
+    private Lazy<Boolean> mBooleanLazy = new Lazy<Boolean>() {
+        @Override
+        public Boolean get() {
+            return true;
+        }
+    };
 
     @Before
     public void setupMocksAndView() {
@@ -65,7 +73,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mBooleanLazy);
         mAddEditTaskPresenter.takeView(mAddEditTaskView);
         // When the presenter is asked to save a task
         mAddEditTaskPresenter.saveTask("New Task Title",
@@ -79,7 +87,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveTask_emptyTaskShowsErrorUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(null, mTasksRepository, mBooleanLazy);
         mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
         // When the presenter is asked to save an empty task
@@ -92,7 +100,7 @@ public class AddEditTaskPresenterTest {
     @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
-        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository);
+        mAddEditTaskPresenter = new AddEditTaskPresenter("1", mTasksRepository, mBooleanLazy);
         mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
         // When the presenter is asked to save an existing task
@@ -108,7 +116,7 @@ public class AddEditTaskPresenterTest {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
-                mTasksRepository);
+                mTasksRepository, mBooleanLazy);
         //When we bind the view we will also populate the task
         mAddEditTaskPresenter.takeView(mAddEditTaskView);
 
