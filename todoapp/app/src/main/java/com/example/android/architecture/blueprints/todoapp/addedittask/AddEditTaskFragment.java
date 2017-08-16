@@ -18,37 +18,37 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerFragment;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+@ActivityScoped
+public class AddEditTaskFragment extends DaggerFragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskContract.Presenter mPresenter;
+    @Inject
+    AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
     private TextView mDescription;
 
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
-    }
-
+    @Inject
     public AddEditTaskFragment() {
         // Required empty public constructor
     }
@@ -56,20 +56,21 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        //Bind view to the presenter which will signal for the presenter to load the task.
+        mPresenter.takeView(this);
     }
 
     @Override
-    public void setPresenter(@NonNull AddEditTaskContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void onPause() {
+        mPresenter.dropView();
+        super.onPause();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,8 +85,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_task_title);
-        mDescription = (TextView) root.findViewById(R.id.add_task_description);
+        mTitle = root.findViewById(R.id.add_task_title);
+        mDescription = root.findViewById(R.id.add_task_description);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -117,4 +118,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     public boolean isActive() {
         return isAdded();
     }
+
 }

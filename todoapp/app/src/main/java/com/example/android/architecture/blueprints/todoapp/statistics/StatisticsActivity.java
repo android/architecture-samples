@@ -22,25 +22,27 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 import javax.inject.Inject;
 
+import dagger.android.support.DaggerAppCompatActivity;
+
 /**
  * Show statistics for tasks.
  */
-public class StatisticsActivity extends AppCompatActivity {
+public class StatisticsActivity extends DaggerAppCompatActivity {
 
+    @Inject
+    StatisticsPresenter mStatiticsPresenter;
+    @Inject
+    StatisticsFragment fragment;
     private DrawerLayout mDrawerLayout;
-
-    @Inject StatisticsPresenter mStatiticsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +59,9 @@ public class StatisticsActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         // Set up the navigation drawer.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
@@ -67,16 +69,10 @@ public class StatisticsActivity extends AppCompatActivity {
         StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.contentFrame);
         if (statisticsFragment == null) {
-            statisticsFragment = StatisticsFragment.newInstance();
+            statisticsFragment = fragment;
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     statisticsFragment, R.id.contentFrame);
         }
-
-        DaggerStatisticsComponent.builder()
-            .statisticsPresenterModule(new StatisticsPresenterModule(statisticsFragment))
-            .tasksRepositoryComponent(((ToDoApplication) getApplication())
-            .getTasksRepositoryComponent())
-            .build().inject(this);
     }
 
     @Override

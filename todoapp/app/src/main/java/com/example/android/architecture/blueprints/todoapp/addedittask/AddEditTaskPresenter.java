@@ -29,10 +29,10 @@ import javax.inject.Inject;
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
  * updates
  * the UI as required.
- * <p />
+ * <p/>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the AddEditTaskPresenter (if it fails, it emits a compiler error). It uses
- * {@link AddEditTaskPresenterModule} to do so.
+ * {@link AddEditTaskModule} to do so.
  * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually bypassing Dagger,
@@ -44,8 +44,8 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @NonNull
     private final TasksDataSource mTasksRepository;
 
-    @NonNull
-    private final AddEditTaskContract.View mAddTaskView;
+    @Nullable
+    private AddEditTaskContract.View mAddTaskView;
 
     @Nullable
     private String mTaskId;
@@ -55,27 +55,9 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
      * with {@code @Nullable} values.
      */
     @Inject
-    AddEditTaskPresenter(@Nullable String taskId, TasksRepository tasksRepository,
-            AddEditTaskContract.View addTaskView) {
+    AddEditTaskPresenter(@Nullable String taskId, @NonNull TasksRepository tasksRepository) {
         mTaskId = taskId;
         mTasksRepository = tasksRepository;
-        mAddTaskView = addTaskView;
-    }
-
-    /**
-     * Method injection is used here to safely reference {@code this} after the object is created.
-     * For more information, see Java Concurrency in Practice.
-     */
-    @Inject
-    void setupListeners() {
-        mAddTaskView.setPresenter(this);
-    }
-
-    @Override
-    public void start() {
-        if (!isNewTask()) {
-            populateTask();
-        }
     }
 
     @Override
@@ -96,9 +78,22 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     }
 
     @Override
+    public void takeView(AddEditTaskContract.View view) {
+        mAddTaskView = view;
+        if (!isNewTask()) {
+            populateTask();
+        }
+    }
+
+    @Override
+    public void dropView() {
+        mAddTaskView = null;
+    }
+
+    @Override
     public void onTaskLoaded(Task task) {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
+        if (mAddTaskView != null && mAddTaskView.isActive()) {
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
         }
@@ -107,7 +102,7 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     @Override
     public void onDataNotAvailable() {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
+        if (mAddTaskView != null && mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
     }
@@ -119,10 +114,14 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+            if (mAddTaskView != null) {
+                mAddTaskView.showEmptyTaskError();
+            }
         } else {
             mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            if (mAddTaskView != null) {
+                mAddTaskView.showTasksList();
+            }
         }
     }
 
@@ -131,6 +130,8 @@ final class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, mTaskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        if (mAddTaskView != null) {
+            mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        }
     }
 }

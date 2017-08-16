@@ -1,9 +1,12 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
 
         // Better IDE support for annotations (so Android Studio interacts better with Dagger)
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
@@ -15,6 +18,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
@@ -25,21 +31,32 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 10
-    targetSdkVersion = 24
-    compileSdkVersion = 24
-    buildToolsVersion = '24.0.2'
+    minSdkVersion = 14
+    targetSdkVersion = 25
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.1'
 
     // App dependencies
-    supportLibraryVersion = '24.2.0'
+    supportLibraryVersion = '26.0.0'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
     hamcrestVersion = '1.3'
-    runnerVersion = '0.5'
-    rulesVersion = '0.5'
-    espressoVersion = '2.2.2'
-    daggerVersion = '2.7'
+    runnerVersion = '1.0.0'
+    rulesVersion = '1.0.0'
+    espressoVersion = '3.0.0'
+    daggerVersion = '2.11'
     dexmakerVersion = '1.2'
+}
+
+//When there is an error in code generation you will may see
+//lots of errors due too missing generated code in your logs, we increase
+//how many errors are shown here so that the real error is visible when it is near the end
+allprojects {
+    afterEvaluate {
+        tasks.withType(JavaCompile.class) {
+            options.compilerArgs << "-Xmaxerrs" << "500"
+        }
+    }
 }

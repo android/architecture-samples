@@ -18,40 +18,38 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
-import android.support.test.espresso.IdlingResource;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import javax.inject.Inject;
 
-public class TasksActivity extends AppCompatActivity {
+import dagger.Lazy;
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class TasksActivity extends DaggerAppCompatActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
+    @Inject
+    TasksPresenter mTasksPresenter;
+    @Inject
+    Lazy<TasksFragment> taskFragmentProvider;
     private DrawerLayout mDrawerLayout;
-
-    @Inject TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tasks_act);
 
-
         // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
@@ -60,24 +58,19 @@ public class TasksActivity extends AppCompatActivity {
         // Set up the navigation drawer.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
         TasksFragment tasksFragment =
                 (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {
-            // Create the fragment
-            tasksFragment = TasksFragment.newInstance();
+            // Get the fragment from dagger
+            tasksFragment = taskFragmentProvider.get();
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
 
-        // Create the presenter
-        DaggerTasksComponent.builder()
-                .tasksRepositoryComponent(((ToDoApplication) getApplication()).getTasksRepositoryComponent())
-                .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build()
-                .inject(this);
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
@@ -130,10 +123,5 @@ public class TasksActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-    }
-
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
     }
 }

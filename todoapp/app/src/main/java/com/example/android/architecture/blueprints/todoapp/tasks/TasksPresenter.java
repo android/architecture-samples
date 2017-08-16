@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
@@ -25,31 +23,36 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.di.ActivityScoped;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
- * <p />
+ * <p/>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the TasksPresenter (if it fails, it emits a compiler error).  It uses
- * {@link TasksPresenterModule} to do so.
+ * {@link TasksModule} to do so.
  * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  **/
+@ActivityScoped
 final class TasksPresenter implements TasksContract.Presenter {
 
     private final TasksRepository mTasksRepository;
-
-    private final TasksContract.View mTasksView;
+    @Nullable
+    private TasksContract.View mTasksView;
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
@@ -60,31 +63,19 @@ final class TasksPresenter implements TasksContract.Presenter {
      * with {@code @Nullable} values.
      */
     @Inject
-    TasksPresenter(TasksRepository tasksRepository, TasksContract.View tasksView) {
+    TasksPresenter(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
-        mTasksView = tasksView;
     }
 
-    /**
-     * Method injection is used here to safely reference {@code this} after the object is created.
-     * For more information, see Java Concurrency in Practice.
-     */
-    @Inject
-    void setupListeners() {
-        mTasksView.setPresenter(this);
-    }
-
-    @Override
-    public void start() {
-        loadTasks(false);
-    }
 
     @Override
     public void result(int requestCode, int resultCode) {
-        // If a task was successfully added, show snackbar
+//         If a task was successfully added, show snackbar
         if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
                 && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
+            if (mTasksView != null) {
+                mTasksView.showSuccessfullySavedMessage();
+            }
         }
     }
 
@@ -101,7 +92,9 @@ final class TasksPresenter implements TasksContract.Presenter {
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setLoadingIndicator(true);
+            if (mTasksView != null) {
+                mTasksView.setLoadingIndicator(true);
+            }
         }
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
@@ -114,7 +107,7 @@ final class TasksPresenter implements TasksContract.Presenter {
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<Task>();
+                List<Task> tasksToShow = new ArrayList<>();
 
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
@@ -145,7 +138,7 @@ final class TasksPresenter implements TasksContract.Presenter {
                     }
                 }
                 // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
+                if (mTasksView == null || !mTasksView.isActive()) {
                     return;
                 }
                 if (showLoadingUI) {
@@ -172,7 +165,9 @@ final class TasksPresenter implements TasksContract.Presenter {
             processEmptyTasks();
         } else {
             // Show the list of tasks
-            mTasksView.showTasks(tasks);
+            if (mTasksView != null) {
+                mTasksView.showTasks(tasks);
+            }
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -181,18 +176,25 @@ final class TasksPresenter implements TasksContract.Presenter {
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                mTasksView.showActiveFilterLabel();
+                if (mTasksView != null) {
+                    mTasksView.showActiveFilterLabel();
+                }
                 break;
             case COMPLETED_TASKS:
-                mTasksView.showCompletedFilterLabel();
+                if (mTasksView != null) {
+                    mTasksView.showCompletedFilterLabel();
+                }
                 break;
             default:
-                mTasksView.showAllFilterLabel();
+                if (mTasksView != null) {
+                    mTasksView.showAllFilterLabel();
+                }
                 break;
         }
     }
 
     private void processEmptyTasks() {
+        if (mTasksView == null) return;
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
                 mTasksView.showNoActiveTasks();
@@ -208,20 +210,26 @@ final class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void addNewTask() {
-        mTasksView.showAddTask();
+        if (mTasksView != null) {
+            mTasksView.showAddTask();
+        }
     }
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+        if (mTasksView != null) {
+            mTasksView.showTaskDetailsUi(requestedTask.getId());
+        }
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
-        mTasksView.showTaskMarkedComplete();
+        if (mTasksView != null) {
+            mTasksView.showTaskMarkedComplete();
+        }
         loadTasks(false, false);
     }
 
@@ -229,15 +237,24 @@ final class TasksPresenter implements TasksContract.Presenter {
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
-        mTasksView.showTaskMarkedActive();
+        if (mTasksView != null) {
+            mTasksView.showTaskMarkedActive();
+        }
         loadTasks(false, false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        mTasksView.showCompletedTasksCleared();
+        if (mTasksView != null) {
+            mTasksView.showCompletedTasksCleared();
+        }
         loadTasks(false, false);
+    }
+
+    @Override
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
     }
 
     /**
@@ -253,8 +270,13 @@ final class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
+    public void takeView(TasksContract.View view) {
+        this.mTasksView = view;
+        loadTasks(false);
     }
 
+    @Override
+    public void dropView() {
+        mTasksView = null;
+    }
 }

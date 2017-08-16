@@ -37,7 +37,7 @@ public interface AddEditTaskContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
 
         void saveTask(String title, String description);
 

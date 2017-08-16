@@ -16,6 +16,22 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
+
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -25,21 +41,8 @@ import static android.support.test.espresso.contrib.DrawerMatchers.isOpen;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getToolbarNavigationContentDescription;
 import static com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo;
-
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.widget.DrawerLayout;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.view.Gravity;
-
-import com.example.android.architecture.blueprints.todoapp.R;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Tests for the {@link DrawerLayout} layout component in {@link TasksActivity} which manages
@@ -59,6 +62,24 @@ public class AppNavigationTest {
     @Rule
     public ActivityTestRule<TasksActivity> mActivityTestRule =
             new ActivityTestRule<>(TasksActivity.class);
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
+     */
+    @Before
+    public void registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
+    }
 
     @Test
     public void clickOnStatisticsNavigationItem_ShowsStatisticsScreen() {

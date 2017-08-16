@@ -21,14 +21,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.collect.Lists;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,7 +63,8 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository);
+        mStatisticsPresenter.takeView(mStatisticsView);
 
         // The presenter won't update the view unless it's active.
         when(mStatisticsView.isActive()).thenReturn(true);
@@ -77,9 +78,6 @@ public class StatisticsPresenterTest {
     public void loadEmptyTasksFromRepository_CallViewToDisplay() {
         // Given an initialized StatisticsPresenter with no tasks
         TASKS.clear();
-
-        // When loading of Tasks is requested
-        mStatisticsPresenter.start();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
@@ -97,9 +95,6 @@ public class StatisticsPresenterTest {
     public void loadNonEmptyTasksFromRepository_CallViewToDisplay() {
         // Given an initialized StatisticsPresenter with 1 active and 2 completed tasks
 
-        // When loading of Tasks is requested
-        mStatisticsPresenter.start();
-
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
 
@@ -114,9 +109,6 @@ public class StatisticsPresenterTest {
 
     @Test
     public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
-        // When statistics are loaded
-        mStatisticsPresenter.start();
-
         // And tasks data isn't available
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
         mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();

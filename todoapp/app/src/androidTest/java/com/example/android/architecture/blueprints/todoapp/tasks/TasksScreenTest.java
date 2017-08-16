@@ -16,6 +16,30 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ListView;
+
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.TestUtils;
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
@@ -33,32 +57,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
 import static com.google.common.base.Preconditions.checkArgument;
-
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
-
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.ListView;
-
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.TestUtils;
-import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -92,12 +94,30 @@ public class TasksScreenTest {
                     super.beforeActivityLaunched();
                     // Doing this in @Before generates a race condition.
                     ((ToDoApplication) InstrumentationRegistry.getTargetContext()
-                            .getApplicationContext()).getTasksRepositoryComponent()
-                            .getTasksRepository().deleteAllTasks();
+                            .getApplicationContext()).getTasksRepository().deleteAllTasks();
                 }
             };
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
+     */
+    @Before
+    public void registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+    }
 
     /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
+    }
+
+    /**
+     * `
      * A custom {@link Matcher} which matches an item in a {@link ListView} by its text.
      * <p>
      * View constraints:
@@ -193,6 +213,7 @@ public class TasksScreenTest {
 
     @Test
     public void markTaskAsActive() {
+
         viewAllTasks();
 
         // Add completed task
@@ -439,6 +460,8 @@ public class TasksScreenTest {
 
     @Test
     public void orientationChange_DuringEdit() throws IllegalStateException {
+        viewAllTasks();
+
         // Add a completed task
         createTask(TITLE1, DESCRIPTION);
 
