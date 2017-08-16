@@ -31,8 +31,10 @@ For this to work we added new classes to the feature, mostly within the`example/
   @ActivityScoped
     @ContributesAndroidInjector(modules = TasksModule.class)
     abstract TasksActivity tasksActivity();
-    ```
+ ```
+ 
  generates a subcomponent that looks like 
+ 
  ```
  @Subcomponent(modules = TasksModule.class)
   @ActivityScoped
