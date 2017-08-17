@@ -118,5 +118,4 @@ public class AddEditTaskFragment extends DaggerFragment implements AddEditTaskCo
     public boolean isActive() {
         return isAdded();
     }
-
 }

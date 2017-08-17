@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 
-<manifest
-    package="com.example.android.architecture.blueprints.todoapp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.android.architecture.blueprints.todoapp">
 
     <application
         android:allowBackup="false"
@@ -27,16 +27,24 @@
         android:theme="@style/AppTheme"
         android:name="com.example.android.architecture.blueprints.todoapp.ToDoApplication">
         <activity
-                android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
-                android:theme="@style/AppTheme.OverlapSystemBar">
+            android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
+            android:theme="@style/AppTheme.OverlapSystemBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
-        <activity android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity" />
         <activity android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity" />
+        <activity android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity" />
+        <activity
+            android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity"
+            android:parentActivityName=".tasks.TasksActivity"
+            tools:ignore="UnusedAttribute">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".tasks.TasksActivity" />
+        </activity>
     </application>
 
 </manifest>

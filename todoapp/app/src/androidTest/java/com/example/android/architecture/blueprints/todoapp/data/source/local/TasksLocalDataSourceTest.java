@@ -212,7 +212,7 @@ public class TasksLocalDataSourceTest {
 
                 boolean newTask1IdFound = false;
                 boolean newTask2IdFound = false;
-                for (Task task: tasks) {
+                for (Task task : tasks) {
                     if (task.getId().equals(newTask1.getId())) {
                         newTask1IdFound = true;
                     }
