@@ -27,7 +27,7 @@ public class TasksActivity extends AppCompatActivity {
 For this to work we added new classes to the feature, mostly within the`example/android/architecture/blueprints/todoapp/di` package, check out:
  * [AppComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/AppComponent.java) - Here is where we register `modules` which bring in individual `providers` to our app. Notice we also bring in an auto generated `AndroidSupportInjectionModule` which comes from our `Dagger-Android` dependency.
   * [ActivityBindingModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/ActivityBindingModule.java) - This module  has a `@ContributesInjector` for each `Activity` in our app.  Dagger Android will generate a subcomponent for each one of these abstract methods:
-  ```   
+  ```java
   @ActivityScoped
     @ContributesAndroidInjector(modules = TasksModule.class)
     abstract TasksActivity tasksActivity();
@@ -35,7 +35,7 @@ For this to work we added new classes to the feature, mostly within the`example/
  
  generates a subcomponent that looks like 
  
- ```
+ ```java
  @Subcomponent(modules = TasksModule.class)
   @ActivityScoped
   public interface TasksActivitySubcomponent extends AndroidInjector<TasksActivity> {
@@ -45,9 +45,9 @@ For this to work we added new classes to the feature, mostly within the`example/
 }
 ```
 
-
  * [TasksModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksModule.java) - provides a `Fragment` and `Presenter` for our `TaskActivity` to use.  Additionally we create a fragment subcomponent here
- ```
+
+ ```java
      @FragmentScoped
     @ContributesAndroidInjector
     abstract TasksFragment tasksFragment();
@@ -80,7 +80,7 @@ Very high. Use of Dagger2 improves flexibility in local integration tests and UI
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Java                            58           1193           1658           3901 (3451 in MVP)
+Java                            58           1193           1658           3904 (3451 in MVP)
 XML                             34             97            338            610
 -------------------------------------------------------------------------------
 SUM:                            92           1290           1996           4511
