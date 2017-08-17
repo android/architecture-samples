@@ -28,15 +28,15 @@ For this to work we added new classes to the feature, mostly within the`example/
  * [AppComponent](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/AppComponent.java) - Here is where we register `modules` which bring in individual `providers` to our app. Notice we also bring in an auto generated `AndroidSupportInjectionModule` which comes from our `Dagger-Android` dependency.
   * [ActivityBindingModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/di/ActivityBindingModule.java) - This module  has a `@ContributesInjector` for each `Activity` in our app.  Dagger Android will generate a subcomponent for each one of these abstract methods:
   ```java
-  @ActivityScoped
+    @ActivityScoped
     @ContributesAndroidInjector(modules = TasksModule.class)
     abstract TasksActivity tasksActivity();
  ```
  
- generates a subcomponent that looks like 
+The generated subcomponent looks like:
  
  ```java
- @Subcomponent(modules = TasksModule.class)
+  @Subcomponent(modules = TasksModule.class)
   @ActivityScoped
   public interface TasksActivitySubcomponent extends AndroidInjector<TasksActivity> {
     @Subcomponent.Builder
@@ -45,15 +45,16 @@ For this to work we added new classes to the feature, mostly within the`example/
 }
 ```
 
- * [TasksModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksModule.java) - provides a `Fragment` and `Presenter` for our `TaskActivity` to use.  Additionally we create a fragment subcomponent here
+ * [TasksModule](https://github.com/googlesamples/android-architecture/blob/todo-mvp-dagger/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksModule.java) - provides a `Fragment` 
+and `Presenter` for our `TaskActivity` to use. Additionally we create a fragment subcomponent here:
 
  ```java
-     @FragmentScoped
+    @FragmentScoped
     @ContributesAndroidInjector
     abstract TasksFragment tasksFragment();
  ```
 
-* Lastly we have our activities extend `DaggerActivity` and our application extend `DaggerApplication` which will inject (provide) our dependencies when we need them
+* Lastly we have our activities extend `DaggerActivity` and our application extend `DaggerApplication` which will inject (provide) our dependencies when we need them.
 
  The main advantage of doing this is that we can swap different implementations of dependencies for testing. By externalizing all instance creation from the objects that use them it becomes trivial to pass in fake or mock dependencies during testing.  This can be done at compile time, using flavors, or at runtime, using some kind of debug panel for manual testing. Dependencies can also be configured from automated tests, to test different scenarios.  With Dependency Injection you will have a place for creating your objects rather than having to instantiate objects within your activties or application class.  
 
@@ -92,3 +93,9 @@ SUM:                            92           1290           1996           4511
 #### Ease of amending or adding a feature + Learning cost
 
 Medium. Developers need to be aware of how Dagger2 works, although the setup of new features should look very similar to existing ones.  Once Dagger is setup within an app it is no more difficult to add a new feature than without it.
+
+## External contributors
+
+[Mike Nakhimovich](https://github.com/digitalbuddha)
+
+[Saúl Molinero](https://github.com/saulmm)
