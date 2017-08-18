@@ -33,8 +33,6 @@ import dagger.android.support.AndroidSupportInjectionModule;
 
 public interface AppComponent extends AndroidInjector<DaggerApplication> {
 
-    void inject(ToDoApplication application);
-
     TasksRepository getTasksRepository();
 
     @Override
