@@ -50,7 +50,7 @@ public class StatisticsActivity extends DaggerAppCompatActivity {
         setContentView(R.layout.statistics_act);
 
         // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setTitle(R.string.statistics_title);

@@ -56,7 +56,7 @@ public class TasksActivity extends DaggerAppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         // Set up the navigation drawer.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
