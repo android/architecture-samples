@@ -90,8 +90,7 @@ public class TaskDetailFragment extends DaggerFragment implements TaskDetailCont
         mDetailCompleteStatus = root.findViewById(R.id.task_detail_complete);
 
         // Set up floating action button
-        FloatingActionButton fab =
-                getActivity().findViewById(R.id.fab_edit_task);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -142,8 +142,7 @@ public class TasksFragment extends DaggerFragment implements TasksContract.View 
         });
 
         // Set up floating action button
-        FloatingActionButton fab =
-                getActivity().findViewById(R.id.fab_add_task);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_add_task);
 
         fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -229,8 +228,7 @@ public class TasksFragment extends DaggerFragment implements TasksContract.View 
         if (getView() == null) {
             return;
         }
-        final SwipeRefreshLayout srl =
-                getView().findViewById(R.id.refresh_layout);
+        final SwipeRefreshLayout srl = getView().findViewById(R.id.refresh_layout);
 
         // Make sure setRefreshing() is called after the layout is done with everything else.
         srl.post(new Runnable() {
