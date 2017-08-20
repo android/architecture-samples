@@ -85,7 +85,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                 .zip(completedTasks, activeTasks, (completed, active) -> Pair.create(active, completed))
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(() -> {
+                .doFinally(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }

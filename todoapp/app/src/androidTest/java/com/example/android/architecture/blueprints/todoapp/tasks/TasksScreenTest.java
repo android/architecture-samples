@@ -98,15 +98,24 @@ public class TasksScreenTest {
                 }
             };
 
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests significantly
+     * more reliable.
+     */
     @Before
     public void setUp() throws Exception {
         IdlingRegistry.getInstance().register(
                 mTasksActivityTestRule.getActivity().getCountingIdlingResource());
     }
 
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
     @After
     public void tearDown() throws Exception {
-        IdlingRegistry.getInstance().register(
+        IdlingRegistry.getInstance().unregister(
                 mTasksActivityTestRule.getActivity().getCountingIdlingResource());
     }
 

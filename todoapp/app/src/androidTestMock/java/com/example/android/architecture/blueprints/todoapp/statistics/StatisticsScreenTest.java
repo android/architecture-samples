@@ -80,7 +80,7 @@ public class StatisticsScreenTest {
     }
 
     @Test
-    public void Tasks_ShowsNonEmptyMessage() throws Exception {
+    public void tasks_ShowsNonEmptyMessage() throws Exception {
         // Check that the active and completed tasks text is displayed
         String expectedActiveTaskText = InstrumentationRegistry.getTargetContext()
                 .getString(R.string.statistics_active_tasks);

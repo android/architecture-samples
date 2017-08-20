@@ -85,7 +85,7 @@ public class AddEditTaskScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        IdlingRegistry.getInstance().register(
+        IdlingRegistry.getInstance().unregister(
                 mAddTaskIntentsTestRule.getActivity().getCountingIdlingResource());
     }
 }

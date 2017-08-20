@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.util;
 
 import android.support.test.espresso.IdlingResource;
+import android.support.test.espresso.idling.CountingIdlingResource;
 
 /**
  * Contains a static reference to {@link IdlingResource}, only available in the 'mock' build type.
@@ -25,8 +26,8 @@ public class EspressoIdlingResource {
 
     private static final String RESOURCE = "GLOBAL";
 
-    private static SimpleCountingIdlingResource mCountingIdlingResource =
-            new SimpleCountingIdlingResource(RESOURCE);
+    private static CountingIdlingResource mCountingIdlingResource =
+            new CountingIdlingResource(RESOURCE);
 
     public static void increment() {
         mCountingIdlingResource.increment();
