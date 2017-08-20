@@ -20,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.google.common.base.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -204,7 +205,7 @@ public class TaskDetailPresenterTest {
     }
 
     private void setTaskAvailable(Task task) {
-        when(mTasksRepository.getTask(eq(task.getId()))).thenReturn(Flowable.just(task));
+        when(mTasksRepository.getTask(eq(task.getId()))).thenReturn(Flowable.just(Optional.of(task)));
     }
 
 }

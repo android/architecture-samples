@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 import org.junit.After;
@@ -233,35 +234,35 @@ public class TasksRepositoryTest {
     public void getTask_requestsSingleTaskFromLocalDataSource() {
         // Given a stub completed task with title and description in the local repository
         Task task = new Task(TASK_TITLE, "Some Task Description", true);
-        setTaskAvailable(mTasksLocalDataSource, task);
+        Optional<Task> taskOptional = Optional.of(task);
+        setTaskAvailable(mTasksLocalDataSource, taskOptional);
         // And the task not available in the remote repository
-        setTaskNotAvailable(mTasksRemoteDataSource, task.getId());
+        setTaskNotAvailable(mTasksRemoteDataSource, taskOptional.get().getId());
 
         // When a task is requested from the tasks repository
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
 
         // Then the task is loaded from the database
         verify(mTasksLocalDataSource).getTask(eq(task.getId()));
-        testSubscriber.assertValue(task);
+        testSubscriber.assertValue(taskOptional);
     }
 
     @Test
     public void getTask_whenDataNotLocal_fails() {
         // Given a stub completed task with title and description in the remote repository
         Task task = new Task(TASK_TITLE, "Some Task Description", true);
-        setTaskAvailable(mTasksRemoteDataSource, task);
+        Optional<Task> taskOptional = Optional.of(task);
+        setTaskAvailable(mTasksRemoteDataSource, taskOptional);
         // And the task not available in the local repository
         setTaskNotAvailable(mTasksLocalDataSource, task.getId());
 
         // When a task is requested from the tasks repository
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mTasksRepository.getTask(task.getId()).subscribe(testSubscriber);
 
-        // Verify no data is returned
-        testSubscriber.assertNoValues();
-        // Verify that error is returned
-        testSubscriber.assertError(NoSuchElementException.class);
+        // then empty Optional is returned
+        testSubscriber.assertValue(Optional.absent());
     }
 
     @Test
@@ -380,11 +381,11 @@ public class TasksRepositoryTest {
         setTaskNotAvailable(mTasksRemoteDataSource, taskId);
 
         // When calling getTask in the repository
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mTasksRepository.getTask(taskId).subscribe(testSubscriber);
 
         // Verify that error is returned
-        testSubscriber.assertError(NoSuchElementException.class);
+        testSubscriber.assertValue(Optional.absent());
     }
 
     @Test
@@ -413,10 +414,10 @@ public class TasksRepositoryTest {
     }
 
     private void setTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-        when(dataSource.getTask(eq(taskId))).thenReturn(Flowable.<Task>just(null).concatWith(Flowable.never()));
+        when(dataSource.getTask(eq(taskId))).thenReturn(Flowable.just(Optional.absent()));
     }
 
-    private void setTaskAvailable(TasksDataSource dataSource, Task task) {
-        when(dataSource.getTask(eq(task.getId()))).thenReturn(Flowable.just(task).concatWith(Flowable.never()));
+    private void setTaskAvailable(TasksDataSource dataSource, Optional<Task> taskOptional) {
+        when(dataSource.getTask(eq(taskOptional.get().getId()))).thenReturn(Flowable.just(taskOptional).concatWith(Flowable.never()));
     }
 }

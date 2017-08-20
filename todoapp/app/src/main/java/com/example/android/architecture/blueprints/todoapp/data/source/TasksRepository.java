@@ -21,15 +21,14 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.common.base.Optional;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import io.reactivex.Flowable;
-import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -117,34 +116,24 @@ public class TasksRepository implements TasksDataSource {
             Flowable<List<Task>> localTasks = getAndCacheLocalTasks();
             return Flowable.concat(localTasks, remoteTasks)
                     .filter(tasks -> !tasks.isEmpty())
-                    .firstElement().toFlowable();
+                    .firstOrError().toFlowable();
         }
     }
 
     private Flowable<List<Task>> getAndCacheLocalTasks() {
         return mTasksLocalDataSource.getTasks()
-                .flatMap(new Function<List<Task>, Flowable<List<Task>>>() {
-                    @Override
-                    public Flowable<List<Task>> apply(List<Task> tasks) {
-                        return Flowable.fromIterable(tasks)
-                                .doOnNext(task -> mCachedTasks.put(task.getId(), task))
-                                .toList().toFlowable();
-                    }
-                });
+                .flatMap(tasks -> Flowable.fromIterable(tasks)
+                        .doOnNext(task -> mCachedTasks.put(task.getId(), task))
+                        .toList().toFlowable());
     }
 
     private Flowable<List<Task>> getAndSaveRemoteTasks() {
         return mTasksRemoteDataSource
                 .getTasks()
-                .flatMap(new Function<List<Task>, Flowable<List<Task>>>() {
-                    @Override
-                    public Flowable<List<Task>> apply(List<Task> tasks) {
-                        return Flowable.fromIterable(tasks).doOnNext(task -> {
-                            mTasksLocalDataSource.saveTask(task);
-                            mCachedTasks.put(task.getId(), task);
-                        }).toList().toFlowable();
-                    }
-                })
+                .flatMap(tasks -> Flowable.fromIterable(tasks).doOnNext(task -> {
+                    mTasksLocalDataSource.saveTask(task);
+                    mCachedTasks.put(task.getId(), task);
+                }).toList().toFlowable())
                 .doOnComplete(() -> mCacheIsDirty = false);
     }
 
@@ -232,14 +221,14 @@ public class TasksRepository implements TasksDataSource {
      * uses the network data source. This is done to simplify the sample.
      */
     @Override
-    public Flowable<Task> getTask(@NonNull final String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull final String taskId) {
         checkNotNull(taskId);
 
         final Task cachedTask = getTaskWithId(taskId);
 
         // Respond immediately with cache if available
         if (cachedTask != null) {
-            return Flowable.just(cachedTask);
+            return Flowable.just(Optional.of(cachedTask));
         }
 
         // Load from server/persisted if needed.
@@ -250,21 +239,20 @@ public class TasksRepository implements TasksDataSource {
         }
 
         // Is the task in the local data source? If not, query the network.
-        Flowable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
-        Flowable<Task> remoteTask = mTasksRemoteDataSource
+        Flowable<Optional<Task>> localTask = getTaskWithIdFromLocalRepository(taskId);
+        Flowable<Optional<Task>> remoteTask = mTasksRemoteDataSource
                 .getTask(taskId)
-                .doOnNext(task -> {
-                    mTasksLocalDataSource.saveTask(task);
-                    mCachedTasks.put(task.getId(), task);
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        Task task = taskOptional.get();
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
+                    }
                 });
 
-        return Flowable.concat(localTask, remoteTask).firstElement().toFlowable()
-                .map(task -> {
-                    if (task == null) {
-                        throw new NoSuchElementException("No task found with taskId " + taskId);
-                    }
-                    return task;
-                });
+        return Flowable.concat(localTask, remoteTask)
+                .firstElement()
+                .toFlowable();
     }
 
     @Override
@@ -302,10 +290,14 @@ public class TasksRepository implements TasksDataSource {
     }
 
     @NonNull
-    Flowable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
+    Flowable<Optional<Task>> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
         return mTasksLocalDataSource
                 .getTask(taskId)
-                .doOnNext(task -> mCachedTasks.put(taskId, task))
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        mCachedTasks.put(taskId, taskOptional.get());
+                    }
+                })
                 .firstElement().toFlowable();
     }
 }

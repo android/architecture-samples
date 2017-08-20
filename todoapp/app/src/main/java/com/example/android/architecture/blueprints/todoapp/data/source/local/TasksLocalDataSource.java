@@ -28,6 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -103,7 +104,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public Flowable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
@@ -113,7 +114,8 @@ public class TasksLocalDataSource implements TasksDataSource {
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
                 TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
-                .mapToOneOrDefault(mTaskMapperFunction, null).toFlowable(BackpressureStrategy.BUFFER);
+                .mapToOneOrDefault(cursor -> Optional.of(mTaskMapperFunction.apply(cursor)), Optional.<Task>absent())
+                .toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @Override

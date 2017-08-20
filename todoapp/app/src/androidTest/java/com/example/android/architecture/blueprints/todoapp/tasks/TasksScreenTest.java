@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingRegistry;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -33,6 +34,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,6 +97,18 @@ public class TasksScreenTest {
                             .deleteAllTasks();
                 }
             };
+
+    @Before
+    public void setUp() throws Exception {
+        IdlingRegistry.getInstance().register(
+                mTasksActivityTestRule.getActivity().getCountingIdlingResource());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        IdlingRegistry.getInstance().register(
+                mTasksActivityTestRule.getActivity().getCountingIdlingResource());
+    }
 
     /**
      * A custom {@link Matcher} which matches an item in a {@link ListView} by its text.

@@ -20,13 +20,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.google.common.base.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.NoSuchElementException;
 
 import io.reactivex.Flowable;
 
@@ -119,7 +118,8 @@ public class AddEditTaskPresenterTest {
     @Test
     public void populateTask_callsRepoAndUpdatesViewOnSuccess() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
-        when(mTasksRepository.getTask(testTask.getId())).thenReturn(Flowable.just(testTask));
+        Optional<Task> taskOptional = Optional.of(testTask);
+        when(mTasksRepository.getTask(testTask.getId())).thenReturn(Flowable.just(taskOptional));
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
@@ -140,7 +140,7 @@ public class AddEditTaskPresenterTest {
     public void populateTask_callsRepoAndUpdatesViewOnError() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
         when(mTasksRepository.getTask(testTask.getId())).thenReturn(
-                Flowable.error(new NoSuchElementException()));
+                Flowable.just(Optional.absent()));
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),

@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.google.common.base.Optional;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -71,10 +72,10 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Flowable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
         if (task != null) {
-            return Flowable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+            return Flowable.just(Optional.of(task)).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
             return Flowable.empty();
         }

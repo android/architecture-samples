@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.google.common.base.Optional;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -56,9 +57,9 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Flowable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        return Flowable.just(task);
+        return Flowable.just(Optional.of(task));
     }
 
     @Override

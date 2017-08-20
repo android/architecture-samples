@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -81,6 +82,8 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView.setLoadingIndicator(true);
         mCompositeDisposable.add(mTasksRepository
                 .getTask(mTaskId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe(

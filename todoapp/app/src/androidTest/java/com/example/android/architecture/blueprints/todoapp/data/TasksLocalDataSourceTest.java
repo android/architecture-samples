@@ -25,6 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.google.common.base.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -81,14 +82,15 @@ public class TasksLocalDataSourceTest {
     public void saveTask_retrievesTask() {
         // Given a new task
         final Task newTask = new Task(TITLE, "");
+        final Optional<Task> newTaskOptional = Optional.of(newTask);
 
         // When saved into the persistent repository
         mLocalDataSource.saveTask(newTask);
 
         // Then the task can be retrieved from the persistent repository
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mLocalDataSource.getTask(newTask.getId()).subscribe(testSubscriber);
-        testSubscriber.assertValue(newTask);
+        testSubscriber.assertValue(newTaskOptional);
     }
 
     @Test
@@ -101,10 +103,10 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.completeTask(newTask);
 
         // Then the task can be retrieved from the persistent repository and is complete
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mLocalDataSource.getTask(newTask.getId()).subscribe(testSubscriber);
         testSubscriber.assertValueCount(1);
-        Task result = testSubscriber.values().get(0);
+        Task result = testSubscriber.values().get(0).get();
         assertThat(result.isCompleted(), is(true));
     }
 
@@ -119,10 +121,10 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.activateTask(newTask);
 
         // Then the task can be retrieved from the persistent repository and is active
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mLocalDataSource.getTask(newTask.getId()).subscribe(testSubscriber);
         testSubscriber.assertValueCount(1);
-        Task result = testSubscriber.values().get(0);
+        Task result = testSubscriber.values().get(0).get();
         assertThat(result.isActive(), is(true));
         assertThat(result.isCompleted(), is(false));
     }
@@ -184,8 +186,8 @@ public class TasksLocalDataSourceTest {
     public void getTask_whenTaskNotSaved() {
         //Given that no task has been saved
         //When querying for a task, null is returned.
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<Optional<Task>> testSubscriber = new TestSubscriber<>();
         mLocalDataSource.getTask("1").subscribe(testSubscriber);
-        testSubscriber.assertValue((Task) null);
+        testSubscriber.assertValue(Optional.absent());
     }
 }

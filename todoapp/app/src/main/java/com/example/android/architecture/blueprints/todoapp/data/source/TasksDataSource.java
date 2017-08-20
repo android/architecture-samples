@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.common.base.Optional;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public interface TasksDataSource {
 
     Flowable<List<Task>> getTasks();
 
-    Flowable<Task> getTask(@NonNull String taskId);
+    Flowable<Optional<Task>> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 

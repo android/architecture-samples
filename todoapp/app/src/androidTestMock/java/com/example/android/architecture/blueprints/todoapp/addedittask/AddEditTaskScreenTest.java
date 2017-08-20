@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -64,7 +64,7 @@ public class AddEditTaskScreenTest {
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(
+        IdlingRegistry.getInstance().register(
                 mAddTaskIntentsTestRule.getActivity().getCountingIdlingResource());
     }
 
@@ -85,7 +85,7 @@ public class AddEditTaskScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(
+        IdlingRegistry.getInstance().register(
                 mAddTaskIntentsTestRule.getActivity().getCountingIdlingResource());
     }
 }

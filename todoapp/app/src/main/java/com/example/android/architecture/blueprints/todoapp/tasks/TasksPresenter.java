@@ -31,7 +31,6 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -113,12 +112,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         mCompositeDisposable.clear();
         Disposable disposable = mTasksRepository
                 .getTasks()
-                .flatMap(new Function<List<Task>, Flowable<Task>>() {
-                    @Override
-                    public Flowable<Task> apply(List<Task> tasks) {
-                        return Flowable.fromIterable(tasks);
-                    }
-                })
+                .flatMap(Flowable::fromIterable)
                 .filter(task -> {
                     switch (mCurrentFiltering) {
                         case ACTIVE_TASKS:
@@ -133,19 +127,20 @@ public class TasksPresenter implements TasksContract.Presenter {
                 .toList()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doAfterTerminate(() -> {
+                .doFinally(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
-                .toFlowable()
                 .subscribe(
                         // onNext
-                        this::processTasks,
+                        tasks -> {
+                            processTasks(tasks);
+                            mTasksView.setLoadingIndicator(false);
+                        },
                         // onError
-                        throwable -> mTasksView.showLoadingTasksError(),
-                        // onCompleted
-                        () -> mTasksView.setLoadingIndicator(false));
+                        throwable -> mTasksView.showLoadingTasksError());
+
         mCompositeDisposable.add(disposable);
     }
 

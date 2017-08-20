@@ -104,17 +104,19 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe(
                         // onNext
-                        task -> {
-                            if (mAddTaskView.isActive()) {
-                                mAddTaskView.setTitle(task.getTitle());
-                                mAddTaskView.setDescription(task.getDescription());
+                        taskOptional -> {
+                            if (taskOptional.isPresent()) {
+                                Task task = taskOptional.get();
+                                if (mAddTaskView.isActive()) {
+                                    mAddTaskView.setTitle(task.getTitle());
+                                    mAddTaskView.setDescription(task.getDescription());
 
-                                mIsDataMissing = false;
-                            }
-                        }, // onError
-                        __ -> {
-                            if (mAddTaskView.isActive()) {
-                                mAddTaskView.showEmptyTaskError();
+                                    mIsDataMissing = false;
+                                }
+                            } else {
+                                if (mAddTaskView.isActive()) {
+                                    mAddTaskView.showEmptyTaskError();
+                                }
                             }
                         }));
     }
