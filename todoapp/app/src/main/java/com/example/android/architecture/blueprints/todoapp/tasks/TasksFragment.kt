@@ -46,21 +46,16 @@ import java.util.ArrayList
  */
 class TasksFragment : Fragment(), TasksContract.View {
 
-    override var presenter: TasksContract.Presenter? = null
+    override lateinit var presenter: TasksContract.Presenter
 
     override var isActive: Boolean = false
         get() = isAdded
 
     private lateinit var noTasksView: View
-
     private lateinit var noTaskIcon: ImageView
-
     private lateinit var noTaskMainView: TextView
-
     private lateinit var noTaskAddView: TextView
-
     private lateinit var tasksView: LinearLayout
-
     private lateinit var filteringLabelView: TextView
 
     /**
@@ -68,15 +63,15 @@ class TasksFragment : Fragment(), TasksContract.View {
      */
     internal var itemListener: TaskItemListener = object : TaskItemListener {
         override fun onTaskClick(clickedTask: Task) {
-            presenter?.openTaskDetails(clickedTask)
+            presenter.openTaskDetails(clickedTask)
         }
 
         override fun onCompleteTaskClick(completedTask: Task) {
-            presenter?.completeTask(completedTask)
+            presenter.completeTask(completedTask)
         }
 
         override fun onActivateTaskClick(activatedTask: Task) {
-            presenter?.activateTask(activatedTask)
+            presenter.activateTask(activatedTask)
         }
     }
 
@@ -84,11 +79,11 @@ class TasksFragment : Fragment(), TasksContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        presenter?.result(requestCode, resultCode)
+        presenter.result(requestCode, resultCode)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -97,12 +92,10 @@ class TasksFragment : Fragment(), TasksContract.View {
 
         // Set up tasks view
         with(root) {
-            val listView = (findViewById<ListView>(R.id.tasks_list)).apply {
-                adapter = listAdapter
-            }
+            val listView = findViewById<ListView>(R.id.tasks_list).apply { adapter = listAdapter }
 
             // Set up progress indicator
-            (root.findViewById<ScrollChildSwipeRefreshLayout>(R.id.refresh_layout)).apply {
+            findViewById<ScrollChildSwipeRefreshLayout>(R.id.refresh_layout).apply {
                 setColorSchemeColors(
                         ContextCompat.getColor(activity, R.color.colorPrimary),
                         ContextCompat.getColor(activity, R.color.colorAccent),
@@ -110,7 +103,7 @@ class TasksFragment : Fragment(), TasksContract.View {
                 )
                 // Set the scrolling view in the custom SwipeRefreshLayout.
                 scrollUpChild = listView
-                setOnRefreshListener { presenter?.loadTasks(false) }
+                setOnRefreshListener { presenter.loadTasks(false) }
             }
 
             filteringLabelView = findViewById<TextView>(R.id.filteringLabel)
@@ -126,9 +119,9 @@ class TasksFragment : Fragment(), TasksContract.View {
         }
 
         // Set up floating action button
-        (activity.findViewById<FloatingActionButton>(R.id.fab_add_task)).apply {
+        activity.findViewById<FloatingActionButton>(R.id.fab_add_task).apply {
             setImageResource(R.drawable.ic_add)
-            setOnClickListener { presenter?.addNewTask() }
+            setOnClickListener { presenter.addNewTask() }
         }
         setHasOptionsMenu(true)
 
@@ -137,9 +130,9 @@ class TasksFragment : Fragment(), TasksContract.View {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_clear -> presenter?.clearCompletedTasks()
+            R.id.menu_clear -> presenter.clearCompletedTasks()
             R.id.menu_filter -> showFilteringPopUpMenu()
-            R.id.menu_refresh -> presenter?.loadTasks(true)
+            R.id.menu_refresh -> presenter.loadTasks(true)
         }
         return true
     }
@@ -153,11 +146,11 @@ class TasksFragment : Fragment(), TasksContract.View {
             menuInflater.inflate(R.menu.filter_tasks, menu)
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.active -> presenter?.currentFiltering = TasksFilterType.ACTIVE_TASKS
-                    R.id.completed -> presenter?.currentFiltering = TasksFilterType.COMPLETED_TASKS
-                    else -> presenter?.currentFiltering = TasksFilterType.ALL_TASKS
+                    R.id.active -> presenter.currentFiltering = TasksFilterType.ACTIVE_TASKS
+                    R.id.completed -> presenter.currentFiltering = TasksFilterType.COMPLETED_TASKS
+                    else -> presenter.currentFiltering = TasksFilterType.ALL_TASKS
                 }
-                presenter?.loadTasks(false)
+                presenter.loadTasks(false)
                 true
             }
             show()
@@ -179,18 +172,15 @@ class TasksFragment : Fragment(), TasksContract.View {
     }
 
     override fun showNoActiveTasks() {
-        showNoTasksViews(resources.getString(R.string.no_tasks_active),
-                R.drawable.ic_check_circle_24dp, false)
+        showNoTasksViews(resources.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false)
     }
 
     override fun showNoTasks() {
-        showNoTasksViews(resources.getString(R.string.no_tasks_all),
-                R.drawable.ic_assignment_turned_in_24dp, false)
+        showNoTasksViews(resources.getString(R.string.no_tasks_all), R.drawable.ic_assignment_turned_in_24dp, false)
     }
 
     override fun showNoCompletedTasks() {
-        showNoTasksViews(resources.getString(R.string.no_tasks_completed),
-                R.drawable.ic_verified_user_24dp, false)
+        showNoTasksViews(resources.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
     }
 
     override fun showSuccessfullySavedMessage() {

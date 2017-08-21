@@ -32,18 +32,17 @@ import com.example.android.architecture.blueprints.todoapp.R
  */
 class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
 
-    override var presenter: AddEditTaskContract.Presenter? = null
+    override lateinit var presenter: AddEditTaskContract.Presenter
+    override var isActive = false
+        get() = isAdded
 
     private lateinit var title: TextView
-
     private lateinit var description: TextView
 
-    override var isActive: Boolean = false
-        get() = isAdded
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter.start()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -51,7 +50,7 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
         with(activity.findViewById<FloatingActionButton>(R.id.fab_edit_task_done)) {
             setImageResource(R.drawable.ic_done)
             setOnClickListener {
-                presenter?.saveTask(title.text.toString(), description.text.toString())
+                presenter.saveTask(title.text.toString(), description.text.toString())
             }
         }
     }
@@ -89,8 +88,6 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
     companion object {
         @JvmField val ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID"
 
-        @JvmStatic fun newInstance(): AddEditTaskFragment {
-            return AddEditTaskFragment()
-        }
+        @JvmStatic fun newInstance() = AddEditTaskFragment()
     }
 }

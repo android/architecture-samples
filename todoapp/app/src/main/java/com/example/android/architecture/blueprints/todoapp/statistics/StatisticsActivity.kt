@@ -26,7 +26,7 @@ import android.view.MenuItem
 
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils
+import com.example.android.architecture.blueprints.todoapp.util.addFragment
 
 /**
  * Show statistics for tasks.
@@ -41,12 +41,11 @@ class StatisticsActivity : AppCompatActivity() {
         setContentView(R.layout.statistics_act)
 
         // Set up the toolbar.
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setTitle(R.string.statistics_title)
-            it.setHomeAsUpIndicator(R.drawable.ic_menu)
-            it.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        supportActionBar?.apply {
+            setTitle(R.string.statistics_title)
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+            setDisplayHomeAsUpEnabled(true)
         }
 
         // Set up the navigation drawer.
@@ -59,8 +58,7 @@ class StatisticsActivity : AppCompatActivity() {
         val statisticsFragment = supportFragmentManager
                 .findFragmentById(R.id.contentFrame) as StatisticsFragment?
                 ?: StatisticsFragment.newInstance().also {
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, it, R.id.contentFrame)
+            addFragment(it, R.id.contentFrame)
         }
 
         StatisticsPresenter(
@@ -69,9 +67,9 @@ class StatisticsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-                // Open the navigation drawer when the home icon is selected from the toolbar.
-                drawerLayout.openDrawer(GravityCompat.START)
-                return true
+            // Open the navigation drawer when the home icon is selected from the toolbar.
+            drawerLayout.openDrawer(GravityCompat.START)
+            return true
         }
         return super.onOptionsItemSelected(item)
     }

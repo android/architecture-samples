@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp
 
-interface BaseView<T> {
+package com.example.android.architecture.blueprints.todoapp.util
 
-    var presenter: T
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 
+
+fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int) {
+    this.supportFragmentManager.beginTransaction().run {
+        add(frameId, fragment)
+        commit()
+    }
 }

@@ -24,10 +24,10 @@ object TasksPersistenceContract {
 
     /* Inner class that defines the table contents */
     object TaskEntry : BaseColumns {
-            val TABLE_NAME = "tasks"
-            val COLUMN_NAME_ENTRY_ID = "entryid"
-            val COLUMN_NAME_TITLE = "title"
-            val COLUMN_NAME_DESCRIPTION = "description"
-            val COLUMN_NAME_COMPLETED = "completed"
+        val TABLE_NAME = "tasks"
+        val COLUMN_NAME_ENTRY_ID = "entryid"
+        val COLUMN_NAME_TITLE = "title"
+        val COLUMN_NAME_DESCRIPTION = "description"
+        val COLUMN_NAME_COMPLETED = "completed"
     }
 }

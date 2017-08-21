@@ -25,7 +25,7 @@ object EspressoIdlingResource {
 
     private val RESOURCE = "GLOBAL"
 
-    private val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
+    val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
 
     fun increment() {
         countingIdlingResource.increment()
@@ -34,7 +34,4 @@ object EspressoIdlingResource {
     fun decrement() {
         countingIdlingResource.decrement()
     }
-
-    val idlingResource: IdlingResource
-        get() = countingIdlingResource
 }

@@ -28,8 +28,8 @@ import android.view.MenuItem
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.addFragment
 
 class TasksActivity : AppCompatActivity() {
 
@@ -44,24 +44,21 @@ class TasksActivity : AppCompatActivity() {
         setContentView(R.layout.tasks_act)
 
         // Set up the toolbar.
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setHomeAsUpIndicator(R.drawable.ic_menu)
-            it.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+            setDisplayHomeAsUpEnabled(true)
         }
 
         // Set up the navigation drawer.
         drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        setupDrawerContent(navigationView)
+        setupDrawerContent(findViewById<NavigationView>(R.id.nav_view))
 
         val tasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
                 as TasksFragment? ?: TasksFragment.newInstance().also {
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, it, R.id.contentFrame)
+            addFragment(it, R.id.contentFrame)
         }
 
         // Create the presenter
@@ -76,8 +73,9 @@ class TasksActivity : AppCompatActivity() {
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, tasksPresenter.currentFiltering)
-        super.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState.apply {
+            putSerializable(CURRENT_FILTERING_KEY, tasksPresenter.currentFiltering)
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -104,5 +102,5 @@ class TasksActivity : AppCompatActivity() {
 
     val countingIdlingResource: IdlingResource
         @VisibleForTesting
-        get() = EspressoIdlingResource.idlingResource
+        get() = EspressoIdlingResource.countingIdlingResource
 }

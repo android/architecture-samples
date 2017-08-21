@@ -17,7 +17,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED
@@ -79,7 +78,7 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
                 COLUMN_NAME_DESCRIPTION, COLUMN_NAME_COMPLETED)
 
         val cursor = db.query(
-                TABLE_NAME, projection, "$COLUMN_NAME_ENTRY_ID LIKE ?",  arrayOf(taskId), null,
+                TABLE_NAME, projection, "$COLUMN_NAME_ENTRY_ID LIKE ?", arrayOf(taskId), null,
                 null, null)
 
         with(cursor) {

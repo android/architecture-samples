@@ -21,7 +21,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils
+import com.example.android.architecture.blueprints.todoapp.util.addFragment
 
 /**
  * Displays an add or edit task screen.
@@ -35,11 +35,10 @@ class AddEditTaskActivity : AppCompatActivity() {
         setContentView(R.layout.addtask_act)
 
         // Set up the toolbar.
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setDisplayShowHomeEnabled(true)
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
         }
 
         val taskId = intent.getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)
@@ -63,19 +62,16 @@ class AddEditTaskActivity : AppCompatActivity() {
     }
 
     private fun setToolbarTitle(taskId: String?) {
-        supportActionBar?.let {
-            if (taskId == null) {
-                it.setTitle(R.string.add_task)
-            } else {
-                it.setTitle(R.string.edit_task)
-            }
+        supportActionBar?.apply {
+            setTitle(if (taskId == null) R.string.add_task else R.string.edit_task)
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         // Save the state so that next time we know if we need to refresh data.
-        outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, addEditTaskPresenter.isDataMissing)
-        super.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState.apply {
+            putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, addEditTaskPresenter.isDataMissing)
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -83,19 +79,16 @@ class AddEditTaskActivity : AppCompatActivity() {
         return true
     }
 
-    fun getFragment(taskId: String?): AddEditTaskFragment  {
-        return supportFragmentManager.findFragmentById(R.id.contentFrame)
-                as AddEditTaskFragment? ?:
-                AddEditTaskFragment.newInstance().also {
-                    if (intent.hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                        it.arguments = Bundle().apply {
-                            putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId)
+    fun getFragment(taskId: String?) =
+            supportFragmentManager.findFragmentById(R.id.contentFrame) as AddEditTaskFragment? ?:
+                    AddEditTaskFragment.newInstance().also {
+                        if (intent.hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
+                            it.arguments = Bundle().apply {
+                                putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId)
+                            }
                         }
+                        addFragment(it, R.id.contentFrame)
                     }
-                    ActivityUtils.addFragmentToActivity(supportFragmentManager,
-                            it, R.id.contentFrame)
-                }
-    }
 
     companion object {
         @JvmField val SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY"

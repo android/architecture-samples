@@ -54,7 +54,7 @@ class StatisticsPresenter(
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
                 // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.idlingResource.isIdleNow) {
+                if (!EspressoIdlingResource.countingIdlingResource.isIdleNow) {
                     EspressoIdlingResource.decrement() // Set app as idle.
                 }
                 // The view may not be able to handle UI updates anymore
