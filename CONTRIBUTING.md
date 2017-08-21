@@ -19,11 +19,9 @@ have to jump a couple of legal hurdles.
 Please fill out either the individual or corporate Contributor License Agreement (CLA).
 
   * If you are an individual writing original source code and you're sure you
-    own the intellectual property, then you'll need to sign an [individual CLA]
-    (https://cla.developers.google.com).
+    own the intellectual property, then you'll need to sign an [individual CLA](https://cla.developers.google.com).
   * If you work for a company that wants to allow you to contribute your work,
-    then you'll need to sign a [corporate CLA]
-    (https://cla.developers.google.com).
+    then you'll need to sign a [corporate CLA](https://cla.developers.google.com).
   * Please make sure you sign both, Android and Google CLA
 
 Follow either of the two links above to access the appropriate CLA and
@@ -39,8 +37,7 @@ accept your pull requests.
 1. Fork the desired repo, develop and test your code changes.
 1. Ensure that your code adheres to the existing style in the sample to which
    you are contributing. Refer to the
-   [Android Code Style Guide]
-   (https://source.android.com/source/code-style.html) for the
+   [Android Code Style Guide](https://source.android.com/source/code-style.html) for the
    recommended coding standards for this organization.
 1. Ensure that your code has an appropriate set of tests which all pass.
 1. Submit a pull request.
