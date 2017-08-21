@@ -80,7 +80,7 @@ class TasksPresenter(val tasksRepository: TasksRepository, val tasksView: TasksC
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
                 // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.idlingResource.isIdleNow) {
+                if (!EspressoIdlingResource.countingIdlingResource.isIdleNow) {
                     EspressoIdlingResource.decrement() // Set app as idle.
                 }
 

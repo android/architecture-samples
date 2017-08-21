@@ -31,7 +31,7 @@ class StatisticsFragment : Fragment(), StatisticsContract.View {
 
     private lateinit var statisticsTV: TextView
 
-    override var presenter: StatisticsContract.Presenter? = null
+    override lateinit var presenter: StatisticsContract.Presenter
 
     override val isActive: Boolean
         get() = isAdded
@@ -45,7 +45,7 @@ class StatisticsFragment : Fragment(), StatisticsContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter.start()
     }
 
     override fun setProgressIndicator(active: Boolean) {

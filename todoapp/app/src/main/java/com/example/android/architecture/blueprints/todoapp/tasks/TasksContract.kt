@@ -15,9 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import com.example.android.architecture.blueprints.todoapp.BasePresenter
 import com.example.android.architecture.blueprints.todoapp.BaseView
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.BasePresenter
 
 /**
  * This specifies the contract between the view and the presenter.

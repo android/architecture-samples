@@ -44,14 +44,14 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
 
     private lateinit var detailCompleteStatus: CheckBox
 
-    override var presenter: TaskDetailContract.Presenter? = null
+    override lateinit var presenter: TaskDetailContract.Presenter
 
     override var isActive: Boolean = false
         get() = isAdded
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter.start()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -66,14 +66,14 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
 
         // Set up floating action button
         activity.findViewById<FloatingActionButton>(R.id.fab_edit_task)
-                .setOnClickListener { presenter?.editTask() }
+                .setOnClickListener { presenter.editTask() }
 
         return root
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val deletePressed = item.itemId == R.id.menu_delete
-        if (deletePressed) presenter?.deleteTask()
+        if (deletePressed) presenter.deleteTask()
         return deletePressed
     }
 
@@ -106,11 +106,11 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
     override fun showCompletionStatus(complete: Boolean) {
         with(detailCompleteStatus) {
             isChecked = complete
-            setOnCheckedChangeListener { buttonView, isChecked ->
+            setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    presenter?.completeTask()
+                    presenter.completeTask()
                 } else {
-                    presenter?.activateTask()
+                    presenter.activateTask()
                 }
             }
         }
@@ -166,14 +166,10 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
 
         private val REQUEST_EDIT_TASK = 1
 
-        fun newInstance(taskId: String?): TaskDetailFragment {
-            val fragment = TaskDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARGUMENT_TASK_ID, taskId)
+        fun newInstance(taskId: String?) =
+                TaskDetailFragment().apply {
+                    arguments = Bundle().apply { putString(ARGUMENT_TASK_ID, taskId) }
                 }
-            }
-            return fragment
-        }
     }
 
 }

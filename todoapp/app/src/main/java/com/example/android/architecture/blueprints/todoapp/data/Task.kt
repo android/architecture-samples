@@ -29,7 +29,7 @@ import java.util.UUID
  */
 data class Task @JvmOverloads constructor(
         val title: String,
-        val description: String,
+        val description: String = "",
         val id: String = UUID.randomUUID().toString()
 ) {
 

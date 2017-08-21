@@ -107,13 +107,9 @@ class TaskDetailPresenter(
         with(taskDetailView) {
             if (taskId.isEmpty()) {
                 hideTitle()
-            } else {
-                showTitle(task.title)
-            }
-
-            if (taskId.isEmpty()) {
                 hideDescription()
             } else {
+                showTitle(task.title)
                 showDescription(task.description)
             }
             showCompletionStatus(task.isCompleted)
