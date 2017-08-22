@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger
 class SimpleCountingIdlingResource(val resourceName: String) : IdlingResource {
 
     private val counter = AtomicInteger(0)
-
     // written from main thread, read from any thread.
     @Volatile private var resourceCallback: IdlingResource.ResourceCallback? = null
 

@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-
 import java.util.ArrayList
 import java.util.LinkedHashMap
 
@@ -80,19 +78,19 @@ class TasksRepository(
 
     override fun saveTask(task: Task) {
         // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task, { cachedTask ->
-            tasksRemoteDataSource.saveTask(cachedTask)
-            tasksLocalDataSource.saveTask(cachedTask)
-        })
+        cacheAndPerform(task) {
+            tasksRemoteDataSource.saveTask(it)
+            tasksLocalDataSource.saveTask(it)
+        }
     }
 
     override fun completeTask(task: Task) {
         // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task, { cachedTask ->
-            cachedTask.isCompleted = true
-            tasksRemoteDataSource.completeTask(cachedTask)
-            tasksLocalDataSource.completeTask(cachedTask)
-        })
+        cacheAndPerform(task) {
+            it.isCompleted = true
+            tasksRemoteDataSource.completeTask(it)
+            tasksLocalDataSource.completeTask(it)
+        }
     }
 
     override fun completeTask(taskId: String) {
@@ -103,11 +101,11 @@ class TasksRepository(
 
     override fun activateTask(task: Task) {
         // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task, { cachedTask ->
-            cachedTask.isCompleted = false
-            tasksRemoteDataSource.activateTask(cachedTask)
-            tasksLocalDataSource.activateTask(cachedTask)
-        })
+        cacheAndPerform(task) {
+            it.isCompleted = false
+            tasksRemoteDataSource.activateTask(it)
+            tasksLocalDataSource.activateTask(it)
+        }
     }
 
     override fun activateTask(taskId: String) {
@@ -120,15 +118,9 @@ class TasksRepository(
         tasksRemoteDataSource.clearCompletedTasks()
         tasksLocalDataSource.clearCompletedTasks()
 
-        // Do in memory cache update to keep the app UI up to date
-        with(cachedTasks.entries.iterator()) {
-            while (hasNext()) {
-                val entry = next()
-                if (entry.value.isCompleted) {
-                    remove()
-                }
-            }
-        }
+        cachedTasks = cachedTasks.filterValues {
+            !it.isCompleted
+        } as LinkedHashMap<String, Task>
     }
 
     /**
@@ -154,18 +146,18 @@ class TasksRepository(
         tasksLocalDataSource.getTask(taskId, object : TasksDataSource.GetTaskCallback {
             override fun onTaskLoaded(task: Task) {
                 // Do in memory cache update to keep the app UI up to date
-                cacheAndPerform(task, { cachedTask ->
-                    callback.onTaskLoaded(cachedTask)
-                })
+                cacheAndPerform(task) {
+                    callback.onTaskLoaded(it)
+                }
             }
 
             override fun onDataNotAvailable() {
                 tasksRemoteDataSource.getTask(taskId, object : TasksDataSource.GetTaskCallback {
                     override fun onTaskLoaded(task: Task) {
                         // Do in memory cache update to keep the app UI up to date
-                        cacheAndPerform(task, { cachedTask ->
-                            callback.onTaskLoaded(cachedTask)
-                        })
+                        cacheAndPerform(task) {
+                            callback.onTaskLoaded(it)
+                        }
                     }
 
                     override fun onDataNotAvailable() {
@@ -208,8 +200,8 @@ class TasksRepository(
 
     private fun refreshCache(tasks: List<Task>) {
         cachedTasks.clear()
-        for (task in tasks) {
-            cacheAndPerform(task, {})
+        tasks.forEach {
+            cacheAndPerform(it) {}
         }
         cacheIsDirty = false
     }
@@ -221,9 +213,7 @@ class TasksRepository(
         }
     }
 
-    private fun getTaskWithId(id: String): Task? {
-        return if (cachedTasks.isEmpty()) null else cachedTasks[id]
-    }
+    private fun getTaskWithId(id: String) = cachedTasks[id]
 
     private inline fun cacheAndPerform(task: Task, perform: (Task) -> Unit) {
         val cachedTask = Task(task.title, task.description, task.id).apply {
@@ -235,8 +225,8 @@ class TasksRepository(
 
     companion object {
 
-        private lateinit var INSTANCE: TasksRepository
-        private var needNewInstance = true
+        private var INSTANCE: TasksRepository? = null
+
         /**
          * Returns the single instance of this class, creating it if necessary.
 
@@ -248,11 +238,8 @@ class TasksRepository(
          */
         @JvmStatic fun getInstance(tasksRemoteDataSource: TasksDataSource,
                 tasksLocalDataSource: TasksDataSource): TasksRepository {
-            if (needNewInstance) {
-                INSTANCE = TasksRepository(tasksRemoteDataSource, tasksLocalDataSource)
-                needNewInstance = false
-            }
-            return INSTANCE
+            return INSTANCE ?: TasksRepository(tasksRemoteDataSource, tasksLocalDataSource)
+                    .apply { INSTANCE = this }
         }
 
         /**
@@ -260,7 +247,7 @@ class TasksRepository(
          * next time it's called.
          */
         @JvmStatic fun destroyInstance() {
-            needNewInstance = true
+            INSTANCE = null
         }
     }
 }

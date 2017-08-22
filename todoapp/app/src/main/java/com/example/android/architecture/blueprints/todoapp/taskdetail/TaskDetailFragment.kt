@@ -32,6 +32,7 @@ import android.widget.TextView
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment
+import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 
 /**
  * Main UI for the task detail screen.
@@ -127,16 +128,11 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
     }
 
     override fun showTaskMarkedComplete() {
-        view?.let {
-            Snackbar.make(it, getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG).show()
-        }
+        view?.showSnackBar(getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
     }
 
     override fun showTaskMarkedActive() {
-        view?.let {
-            Snackbar.make(it, getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                    .show()
-        }
+        view?.showSnackBar(getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

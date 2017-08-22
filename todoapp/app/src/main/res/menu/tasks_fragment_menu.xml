@@ -20,7 +20,7 @@
         android:id="@+id/menu_filter"
         android:title="@string/menu_filter"
         android:icon="@drawable/ic_filter_list"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_clear"
         android:title="@string/menu_clear"

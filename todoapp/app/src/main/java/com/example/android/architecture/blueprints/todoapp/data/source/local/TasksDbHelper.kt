@@ -41,9 +41,7 @@ class TasksDbHelper(context: Context) :
 
     companion object {
         val DATABASE_VERSION = 1
-
         val DATABASE_NAME = "Tasks.db"
-
         private val SQL_CREATE_ENTRIES =
                 "CREATE TABLE $TABLE_NAME (" +
                         "$COLUMN_NAME_ENTRY_ID TEXT PRIMARY KEY," +

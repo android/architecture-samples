@@ -23,11 +23,11 @@ import com.google.common.collect.Lists
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-class TasksRemoteDataSource : TasksDataSource {
+object TasksRemoteDataSource : TasksDataSource {
 
-    private val SERVICE_LATENCY_IN_MILLIS = 5000L
+    private const val SERVICE_LATENCY_IN_MILLIS = 5000L
 
-    private val TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(2)
+    private var TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(2)
 
     init {
         addTask("Build tower in Pisa", "Ground looks good, no foundation work required.")
@@ -97,13 +97,9 @@ class TasksRemoteDataSource : TasksDataSource {
     }
 
     override fun clearCompletedTasks() {
-        with(TASKS_SERVICE_DATA.entries.iterator()) {
-            while (hasNext()) {
-                if (next().value.isCompleted) {
-                    remove()
-                }
-            }
-        }
+        TASKS_SERVICE_DATA = TASKS_SERVICE_DATA.filterValues {
+            !it.isCompleted
+        } as LinkedHashMap<String, Task>
     }
 
     override fun refreshTasks() {
@@ -117,20 +113,5 @@ class TasksRemoteDataSource : TasksDataSource {
 
     override fun deleteTask(taskId: String) {
         TASKS_SERVICE_DATA.remove(taskId)
-    }
-
-    companion object {
-
-        private lateinit var INSTANCE: TasksRemoteDataSource
-
-        private var needNewInstance = true
-
-        @JvmStatic fun getInstance(): TasksRemoteDataSource {
-            if (needNewInstance) {
-                INSTANCE = TasksRemoteDataSource()
-                needNewInstance = false
-            }
-            return INSTANCE
-        }
     }
 }

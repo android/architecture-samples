@@ -15,21 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.support.test.espresso.NoActivityResumedException
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
-import android.support.v4.widget.DrawerLayout
-import android.view.Gravity
-
-import com.example.android.architecture.blueprints.todoapp.R
-
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
+import android.support.test.espresso.NoActivityResumedException
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions.open
@@ -38,9 +26,18 @@ import android.support.test.espresso.contrib.DrawerMatchers.isOpen
 import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
 import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnit4
+import android.support.v4.widget.DrawerLayout
+import android.view.Gravity
+import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TestUtils.getToolbarNavigationContentDescription
 import com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo
 import junit.framework.Assert.fail
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 /**
  * Tests for the [DrawerLayout] layout component in [TasksActivity] which manages

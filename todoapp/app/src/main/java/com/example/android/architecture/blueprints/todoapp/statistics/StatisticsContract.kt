@@ -24,14 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.BaseView
 interface StatisticsContract {
 
     interface View : BaseView<Presenter> {
+        val isActive: Boolean
 
         fun setProgressIndicator(active: Boolean)
 
         fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int)
 
         fun showLoadingStatisticsError()
-
-        val isActive: Boolean
     }
 
     interface Presenter : BasePresenter

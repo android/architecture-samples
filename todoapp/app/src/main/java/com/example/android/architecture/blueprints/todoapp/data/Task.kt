@@ -36,17 +36,11 @@ data class Task @JvmOverloads constructor(
     var isCompleted = false
 
     val titleForList: String
-        get() {
-            if (title.isNotEmpty()) {
-                return title
-            } else {
-                return description
-            }
-        }
+        get() = if (title.isNotEmpty()) title else description
 
-    val isActive: Boolean
+    val isActive
         get() = !isCompleted
 
-    val isEmpty: Boolean
+    val isEmpty
         get() = title.isEmpty() && description.isEmpty()
 }

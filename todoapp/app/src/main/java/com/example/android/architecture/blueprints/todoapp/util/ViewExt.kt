@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.architecture.blueprints.todoapp.util
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import android.support.design.widget.Snackbar
+import android.view.View
 
-/**
- * This provides methods to help Activities load their UI.
- */
-object ActivityUtils {
-
-    /**
-     * The `fragment` is added to the container view with id `frameId`. The operation is
-     * performed by the `fragmentManager`.
-     */
-    fun addFragmentToActivity(fragmentManager: FragmentManager,
-            fragment: Fragment, frameId: Int) {
-        fragmentManager.beginTransaction().run {
-            add(frameId, fragment)
-            commit()
-        }
-    }
-
+fun View.showSnackBar(message: String, duration: Int) {
+    Snackbar.make(this, message, duration).show()
 }

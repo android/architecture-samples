@@ -39,6 +39,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity
+import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 import java.util.ArrayList
 
 /**
@@ -239,9 +240,7 @@ class TasksFragment : Fragment(), TasksContract.View {
     }
 
     private fun showMessage(message: String) {
-        view?.let {
-            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
-        }
+        view?.showSnackBar(message, Snackbar.LENGTH_LONG)
     }
 
     private class TasksAdapter(tasks: List<Task>, private val itemListener: TaskItemListener)
@@ -253,23 +252,16 @@ class TasksFragment : Fragment(), TasksContract.View {
                 notifyDataSetChanged()
             }
 
-        override fun getCount(): Int {
-            return tasks.size
-        }
+        override fun getCount() = tasks.size
 
-        override fun getItem(i: Int): Task {
-            return tasks[i]
-        }
+        override fun getItem(i: Int) = tasks[i]
 
-        override fun getItemId(i: Int): Long {
-            return i.toLong()
-        }
+        override fun getItemId(i: Int) = i.toLong()
 
         override fun getView(i: Int, view: View?, viewGroup: ViewGroup): View {
+            val task = getItem(i)
             val rowView = view ?: LayoutInflater.from(viewGroup.context)
                     .inflate(R.layout.task_item, viewGroup, false)
-
-            val task = getItem(i)
 
             with(rowView.findViewById<TextView>(R.id.title)) {
                 text = task.titleForList
@@ -305,10 +297,7 @@ class TasksFragment : Fragment(), TasksContract.View {
     }
 
     companion object {
-
-        fun newInstance(): TasksFragment {
-            return TasksFragment()
-        }
+        fun newInstance() = TasksFragment()
     }
 
 }

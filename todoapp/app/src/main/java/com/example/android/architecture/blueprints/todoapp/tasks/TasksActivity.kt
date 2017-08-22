@@ -23,13 +23,13 @@ import android.support.test.espresso.IdlingResource
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
-import com.example.android.architecture.blueprints.todoapp.util.addFragment
+import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
+import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 
 class TasksActivity : AppCompatActivity() {
 
@@ -44,8 +44,7 @@ class TasksActivity : AppCompatActivity() {
         setContentView(R.layout.tasks_act)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        supportActionBar?.apply {
+        setupActionBar(R.id.toolbar) {
             setHomeAsUpIndicator(R.drawable.ic_menu)
             setDisplayHomeAsUpEnabled(true)
         }
@@ -54,11 +53,11 @@ class TasksActivity : AppCompatActivity() {
         drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
-        setupDrawerContent(findViewById<NavigationView>(R.id.nav_view))
+        setupDrawerContent(findViewById(R.id.nav_view))
 
         val tasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
                 as TasksFragment? ?: TasksFragment.newInstance().also {
-            addFragment(it, R.id.contentFrame)
+            replaceFragmentInActivity(it, R.id.contentFrame)
         }
 
         // Create the presenter

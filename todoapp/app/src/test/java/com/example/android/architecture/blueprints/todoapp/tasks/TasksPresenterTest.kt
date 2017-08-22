@@ -15,9 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import com.example.android.architecture.blueprints.todoapp.MockitoHelper.any
-import com.example.android.architecture.blueprints.todoapp.MockitoHelper.argumentCaptor
-import com.example.android.architecture.blueprints.todoapp.MockitoHelper.capture
+import com.example.android.architecture.blueprints.todoapp.any
+import com.example.android.architecture.blueprints.todoapp.argumentCaptor
+import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
