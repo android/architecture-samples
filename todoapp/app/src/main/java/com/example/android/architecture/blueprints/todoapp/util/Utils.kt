@@ -19,7 +19,10 @@ package com.example.android.architecture.blueprints.todoapp.util
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 
-
+/**
+ * Extension function for Activity where `fragment` is added to the container view
+ * with id `frameId`. The operation is performed by the `fragmentManager`.
+ */
 fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int) {
     this.supportFragmentManager.beginTransaction().run {
         add(frameId, fragment)

@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
  *
  * @param addTaskView the add/edit view
  *
- * @param shouldLoadDataFromRepo whether data needs to be loaded or not (for config changes)
+ * @param isDataMissing whether data needs to be loaded or not (for config changes)
  */
 class AddEditTaskPresenter(
         private val taskId: String?,

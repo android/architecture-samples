@@ -45,13 +45,11 @@ class AddEditTaskActivity : AppCompatActivity() {
         setToolbarTitle(taskId)
         val addEditTaskFragment = getFragment(taskId)
 
-        var shouldLoadDataFromRepo = true
+        val shouldLoadDataFromRepo =
+                // Prevent the presenter from loading data from the repository if this is a config change.
+                // Data might not have loaded when the config change happen, so we saved the state.
+                savedInstanceState?.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY) ?: true
 
-        // Prevent the presenter from loading data from the repository if this is a config change.
-        if (savedInstanceState != null) {
-            // Data might not have loaded when the config change happen, so we saved the state.
-            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY)
-        }
 
         // Create the presenter
         addEditTaskPresenter = AddEditTaskPresenter(

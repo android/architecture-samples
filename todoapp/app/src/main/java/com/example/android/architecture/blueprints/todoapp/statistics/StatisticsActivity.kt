@@ -41,7 +41,7 @@ class StatisticsActivity : AppCompatActivity() {
         setContentView(R.layout.statistics_act)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.apply {
             setTitle(R.string.statistics_title)
             setHomeAsUpIndicator(R.drawable.ic_menu)

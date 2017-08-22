@@ -33,7 +33,7 @@ class TaskDetailActivity : AppCompatActivity() {
         setContentView(R.layout.taskdetail_act)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

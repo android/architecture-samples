@@ -50,7 +50,7 @@ class TasksRepository(
      * available first.
      *
      *
-     * Note: [LoadTasksCallback.onDataNotAvailable] is fired if all data sources fail to
+     * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is fired if all data sources fail to
      * get the data.
      */
     override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
@@ -123,8 +123,7 @@ class TasksRepository(
         // Do in memory cache update to keep the app UI up to date
         with(cachedTasks.entries.iterator()) {
             while (hasNext()) {
-                val entry = next()
-                if (entry.value.isCompleted) {
+                if (next().value.isCompleted) {
                     remove()
                 }
             }
@@ -136,7 +135,7 @@ class TasksRepository(
      * uses the network data source. This is done to simplify the sample.
      *
      *
-     * Note: [GetTaskCallback.onDataNotAvailable] is fired if both data sources fail to
+     * Note: [TasksDataSource.GetTaskCallback.onDataNotAvailable] is fired if both data sources fail to
      * get the data.
      */
     override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {
@@ -221,9 +220,8 @@ class TasksRepository(
         }
     }
 
-    private fun getTaskWithId(id: String): Task? {
-        return if (cachedTasks.isEmpty()) null else cachedTasks[id]
-    }
+    private fun getTaskWithId(id: String) =
+         if (cachedTasks.isEmpty()) null else cachedTasks[id]
 
     private inline fun cacheAndPerform(task: Task, perform: (Task) -> Unit) {
         val cachedTask = Task(task.title, task.description, task.id).apply {
