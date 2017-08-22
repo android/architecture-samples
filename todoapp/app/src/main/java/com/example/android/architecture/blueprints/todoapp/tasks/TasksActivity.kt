@@ -54,7 +54,7 @@ class TasksActivity : AppCompatActivity() {
         drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
-        setupDrawerContent(findViewById<NavigationView>(R.id.nav_view))
+        setupDrawerContent(findViewById(R.id.nav_view))
 
         val tasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
                 as TasksFragment? ?: TasksFragment.newInstance().also {
