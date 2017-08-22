@@ -28,8 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
  */
 object Injection {
 
-    fun provideTasksRepository(context: Context): TasksRepository {
-        return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context))
-    }
+    fun provideTasksRepository(context: Context) =
+            TasksRepository.getInstance(TasksRemoteDataSource,
+                    TasksLocalDataSource.getInstance(context))
 }
