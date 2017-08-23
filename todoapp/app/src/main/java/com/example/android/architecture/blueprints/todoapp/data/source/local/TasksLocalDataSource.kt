@@ -56,7 +56,7 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
                 }
                 tasks.add(task)
             }
-            if (!tasks.isEmpty()) {
+            if (tasks.isNotEmpty()) {
                 callback.onTasksLoaded(tasks)
             } else {
                 // This will be called if the table is new or just empty.
@@ -173,15 +173,9 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
     }
 
     companion object {
-        private lateinit var INSTANCE: TasksLocalDataSource
-        private var needsNewInstance = true
+        private var INSTANCE: TasksLocalDataSource? = null
 
-        @JvmStatic fun getInstance(context: Context): TasksLocalDataSource {
-            if (needsNewInstance) {
-                INSTANCE = TasksLocalDataSource(context)
-                needsNewInstance = false
-            }
-            return INSTANCE
-        }
+        @JvmStatic fun getInstance(context: Context) =
+                INSTANCE ?: TasksLocalDataSource(context).apply { INSTANCE = this }
     }
 }

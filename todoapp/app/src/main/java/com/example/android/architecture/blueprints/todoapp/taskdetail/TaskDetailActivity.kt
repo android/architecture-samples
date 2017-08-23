@@ -17,10 +17,10 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.addFragment
+import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
+import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 
 /**
  * Displays task details screen.
@@ -33,8 +33,7 @@ class TaskDetailActivity : AppCompatActivity() {
         setContentView(R.layout.taskdetail_act)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        supportActionBar?.apply {
+        setupActionBar(R.id.toolbar) {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
@@ -45,9 +44,8 @@ class TaskDetailActivity : AppCompatActivity() {
         val taskDetailFragment = supportFragmentManager
                 .findFragmentById(R.id.contentFrame) as TaskDetailFragment? ?:
                 TaskDetailFragment.newInstance(taskId).also {
-                    addFragment(it, R.id.contentFrame)
+                    replaceFragmentInActivity(it, R.id.contentFrame)
                 }
-
         // Create the presenter
         TaskDetailPresenter(taskId, Injection.provideTasksRepository(applicationContext),
                 taskDetailFragment)
@@ -59,6 +57,6 @@ class TaskDetailActivity : AppCompatActivity() {
     }
 
     companion object {
-        @JvmField val EXTRA_TASK_ID = "TASK_ID"
+        const val EXTRA_TASK_ID = "TASK_ID"
     }
 }

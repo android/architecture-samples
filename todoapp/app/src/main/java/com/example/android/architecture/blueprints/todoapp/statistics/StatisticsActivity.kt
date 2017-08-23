@@ -21,12 +21,12 @@ import android.support.v4.app.NavUtils
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.addFragment
+import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
+import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 
 /**
  * Show statistics for tasks.
@@ -41,8 +41,7 @@ class StatisticsActivity : AppCompatActivity() {
         setContentView(R.layout.statistics_act)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        supportActionBar?.apply {
+        setupActionBar(R.id.toolbar) {
             setTitle(R.string.statistics_title)
             setHomeAsUpIndicator(R.drawable.ic_menu)
             setDisplayHomeAsUpEnabled(true)
@@ -58,7 +57,7 @@ class StatisticsActivity : AppCompatActivity() {
         val statisticsFragment = supportFragmentManager
                 .findFragmentById(R.id.contentFrame) as StatisticsFragment?
                 ?: StatisticsFragment.newInstance().also {
-            addFragment(it, R.id.contentFrame)
+            replaceFragmentInActivity(it, R.id.contentFrame)
         }
 
         StatisticsPresenter(

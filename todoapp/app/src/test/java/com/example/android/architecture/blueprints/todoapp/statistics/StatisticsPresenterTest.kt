@@ -15,7 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import com.example.android.architecture.blueprints.todoapp.MockitoHelper.capture
+import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -35,18 +35,14 @@ import org.mockito.MockitoAnnotations
 class StatisticsPresenterTest {
 
     @Mock private lateinit var tasksRepository: TasksRepository
-
     @Mock private lateinit var statisticsView: StatisticsContract.View
-
     /**
      * [ArgumentCaptor] is a powerful Mockito API to capture argument values and use them to
      * perform further actions or assertions on them.
      */
     @Captor private lateinit var loadTasksCallbackCaptor:
             ArgumentCaptor<TasksDataSource.LoadTasksCallback>
-
     private lateinit var statisticsPresenter: StatisticsPresenter
-
     private lateinit var tasks: MutableList<Task>
 
     @Before fun setupStatisticsPresenter() {

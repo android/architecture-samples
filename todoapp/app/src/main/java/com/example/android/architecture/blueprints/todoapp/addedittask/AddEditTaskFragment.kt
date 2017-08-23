@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -67,7 +68,7 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
     }
 
     override fun showEmptyTaskError() {
-        Snackbar.make(title, getString(R.string.empty_task_message), Snackbar.LENGTH_LONG).show()
+        title.showSnackBar(getString(R.string.empty_task_message), Snackbar.LENGTH_LONG)
     }
 
     override fun showTasksList() {
@@ -86,8 +87,13 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
     }
 
     companion object {
-        @JvmField val ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID"
+        const val ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID"
 
-        @JvmStatic fun newInstance() = AddEditTaskFragment()
+        fun newInstance(taskId: String?) =
+                AddEditTaskFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId)
+                    }
+                }
     }
 }

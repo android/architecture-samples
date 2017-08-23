@@ -25,6 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.BaseView
 interface AddEditTaskContract {
 
     interface View : BaseView<Presenter> {
+        var isActive: Boolean
 
         fun showEmptyTaskError()
 
@@ -34,15 +35,13 @@ interface AddEditTaskContract {
 
         fun setDescription(description: String)
 
-        var isActive: Boolean
     }
 
     interface Presenter : BasePresenter {
+        var isDataMissing: Boolean
 
         fun saveTask(title: String, description: String)
 
         fun populateTask()
-
-        var isDataMissing: Boolean
     }
 }

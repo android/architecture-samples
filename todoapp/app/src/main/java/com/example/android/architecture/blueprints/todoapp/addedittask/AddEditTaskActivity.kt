@@ -18,10 +18,10 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.addFragment
+import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
+import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 
 /**
  * Displays an add or edit task screen.
@@ -33,17 +33,20 @@ class AddEditTaskActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.addtask_act)
+        val taskId = intent.getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        supportActionBar?.apply {
+        setupActionBar(R.id.toolbar) {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
+            setTitle(if (taskId == null) R.string.add_task else R.string.edit_task)
         }
 
-        val taskId = intent.getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)
-        setToolbarTitle(taskId)
-        val addEditTaskFragment = getFragment(taskId)
+        val addEditTaskFragment =
+                supportFragmentManager.findFragmentById(R.id.contentFrame) as AddEditTaskFragment?
+                        ?: AddEditTaskFragment.newInstance(taskId).also {
+                    replaceFragmentInActivity(it, R.id.contentFrame)
+                }
 
         var shouldLoadDataFromRepo = true
 
@@ -54,17 +57,9 @@ class AddEditTaskActivity : AppCompatActivity() {
         }
 
         // Create the presenter
-        addEditTaskPresenter = AddEditTaskPresenter(
-                taskId,
-                Injection.provideTasksRepository(applicationContext),
-                addEditTaskFragment,
+        addEditTaskPresenter = AddEditTaskPresenter(taskId,
+                Injection.provideTasksRepository(applicationContext), addEditTaskFragment,
                 shouldLoadDataFromRepo)
-    }
-
-    private fun setToolbarTitle(taskId: String?) {
-        supportActionBar?.apply {
-            setTitle(if (taskId == null) R.string.add_task else R.string.edit_task)
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -79,19 +74,8 @@ class AddEditTaskActivity : AppCompatActivity() {
         return true
     }
 
-    fun getFragment(taskId: String?) =
-            supportFragmentManager.findFragmentById(R.id.contentFrame) as AddEditTaskFragment? ?:
-                    AddEditTaskFragment.newInstance().also {
-                        if (intent.hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                            it.arguments = Bundle().apply {
-                                putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId)
-                            }
-                        }
-                        addFragment(it, R.id.contentFrame)
-                    }
-
     companion object {
-        @JvmField val SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY"
-        @JvmField val REQUEST_ADD_TASK = 1
+        const val SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY"
+        const val REQUEST_ADD_TASK = 1
     }
 }

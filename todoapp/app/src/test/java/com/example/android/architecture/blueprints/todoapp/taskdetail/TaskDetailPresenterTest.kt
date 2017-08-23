@@ -15,10 +15,11 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import com.example.android.architecture.blueprints.todoapp.MockitoHelper
+import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.eq
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
@@ -82,8 +83,8 @@ class TaskDetailPresenterTest {
                 ACTIVE_TASK.id, tasksRepository, taskDetailView).apply { start() }
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(tasksRepository).getTask(MockitoHelper.eq(ACTIVE_TASK.id),
-                MockitoHelper.capture(getTaskCallbackCaptor))
+        verify(tasksRepository).getTask(eq(ACTIVE_TASK.id),
+                capture(getTaskCallbackCaptor))
         val inOrder = inOrder(taskDetailView)
         inOrder.verify(taskDetailView).setLoadingIndicator(true)
 
@@ -104,7 +105,7 @@ class TaskDetailPresenterTest {
 
         // Then task is loaded from model, callback is captured and progress indicator is shown
         verify(tasksRepository).getTask(
-                MockitoHelper.eq(COMPLETED_TASK.id), MockitoHelper.capture(getTaskCallbackCaptor))
+                eq(COMPLETED_TASK.id), capture(getTaskCallbackCaptor))
         val inOrder = inOrder(taskDetailView)
         inOrder.verify(taskDetailView).setLoadingIndicator(true)
 
@@ -119,8 +120,7 @@ class TaskDetailPresenterTest {
         verify(taskDetailView).showCompletionStatus(true)
     }
 
-    @Test
-    fun getUnknownTaskFromRepositoryAndLoadIntoView() {
+    @Test fun getUnknownTaskFromRepositoryAndLoadIntoView() {
         // When loading of a task is requested with an invalid task ID.
         taskDetailPresenter = TaskDetailPresenter(
                 INVALID_TASK_ID, tasksRepository, taskDetailView).apply { start() }
@@ -140,8 +140,7 @@ class TaskDetailPresenterTest {
         verify(taskDetailView).showTaskDeleted()
     }
 
-    @Test
-    fun completeTask() {
+    @Test fun completeTask() {
         // Given an initialized presenter with an active task
         val task = Task(TITLE_TEST, DESCRIPTION_TEST)
         taskDetailPresenter = TaskDetailPresenter(

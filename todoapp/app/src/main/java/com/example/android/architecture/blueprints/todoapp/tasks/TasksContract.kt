@@ -26,6 +26,8 @@ interface TasksContract {
 
     interface View : BaseView<Presenter> {
 
+        var isActive: Boolean
+
         fun setLoadingIndicator(active: Boolean)
 
         fun showTasks(tasks: List<Task>)
@@ -56,12 +58,12 @@ interface TasksContract {
 
         fun showSuccessfullySavedMessage()
 
-        var isActive: Boolean
-
         fun showFilteringPopUpMenu()
     }
 
     interface Presenter : BasePresenter {
+
+        var currentFiltering: TasksFilterType
 
         fun result(requestCode: Int, resultCode: Int)
 
@@ -76,11 +78,5 @@ interface TasksContract {
         fun activateTask(activeTask: Task)
 
         fun clearCompletedTasks()
-
-        /**
-         * Can be [TasksFilterType.ALL_TASKS], [TasksFilterType.COMPLETED_TASKS], or
-         * * [TasksFilterType.ACTIVE_TASKS]
-         */
-        var currentFiltering: TasksFilterType
     }
 }
