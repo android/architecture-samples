@@ -76,7 +76,7 @@ class TasksFragment : Fragment(), TasksContract.View {
         }
     }
 
-    private val listAdapter = TasksAdapter(ArrayList<Task>(0), itemListener)
+    private val listAdapter = TasksAdapter(ArrayList(0), itemListener)
 
     override fun onResume() {
         super.onResume()
@@ -107,13 +107,13 @@ class TasksFragment : Fragment(), TasksContract.View {
                 setOnRefreshListener { presenter.loadTasks(false) }
             }
 
-            filteringLabelView = findViewById<TextView>(R.id.filteringLabel)
-            tasksView = findViewById<LinearLayout>(R.id.tasksLL)
+            filteringLabelView = findViewById(R.id.filteringLabel)
+            tasksView = findViewById(R.id.tasksLL)
 
             // Set up  no tasks view
             noTasksView = findViewById(R.id.noTasks)
-            noTaskIcon = findViewById<ImageView>(R.id.noTasksIcon)
-            noTaskMainView = findViewById<TextView>(R.id.noTasksMain)
+            noTaskIcon = findViewById(R.id.noTasksIcon)
+            noTaskMainView = findViewById(R.id.noTasksMain)
             noTaskAddView = (findViewById<TextView>(R.id.noTasksAdd)).also {
                 it.setOnClickListener { showAddTask() }
             }
@@ -193,7 +193,7 @@ class TasksFragment : Fragment(), TasksContract.View {
         noTasksView.visibility = View.VISIBLE
 
         noTaskMainView.text = mainText
-        noTaskIcon.setImageDrawable(resources.getDrawable(iconRes))
+        noTaskIcon.setImageResource(iconRes)
         noTaskAddView.visibility = if (showAddView) View.VISIBLE else View.GONE
     }
 
@@ -270,10 +270,10 @@ class TasksFragment : Fragment(), TasksContract.View {
             with(rowView.findViewById<CheckBox>(R.id.complete)) {
                 // Active/completed task UI
                 isChecked = task.isCompleted
-                rowView.setBackgroundDrawable(viewGroup.context.resources.getDrawable(
+                rowView.setBackgroundResource(
                         if (task.isCompleted) R.drawable.list_completed_touch_feedback
                         else R.drawable.touch_feedback
-                ))
+                )
                 setOnClickListener {
                     if (!task.isCompleted) {
                         itemListener.onCompleteTaskClick(task)
@@ -297,6 +297,7 @@ class TasksFragment : Fragment(), TasksContract.View {
     }
 
     companion object {
+
         fun newInstance() = TasksFragment()
     }
 

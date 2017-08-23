@@ -60,9 +60,9 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
         val root = inflater.inflate(R.layout.taskdetail_frag, container, false)
         setHasOptionsMenu(true)
         with(root) {
-            detailTitle = findViewById<TextView>(R.id.task_detail_title)
-            detailDescription = findViewById<TextView>(R.id.task_detail_description)
-            detailCompleteStatus = findViewById<CheckBox>(R.id.task_detail_complete)
+            detailTitle = findViewById(R.id.task_detail_title)
+            detailDescription = findViewById(R.id.task_detail_description)
+            detailCompleteStatus = findViewById(R.id.task_detail_complete)
         }
 
         // Set up floating action button

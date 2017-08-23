@@ -48,7 +48,7 @@ class TasksRepository(
      * available first.
      *
      *
-     * Note: [LoadTasksCallback.onDataNotAvailable] is fired if all data sources fail to
+     * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is fired if all data sources fail to
      * get the data.
      */
     override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
@@ -128,7 +128,7 @@ class TasksRepository(
      * uses the network data source. This is done to simplify the sample.
      *
      *
-     * Note: [GetTaskCallback.onDataNotAvailable] is fired if both data sources fail to
+     * Note: [TasksDataSource.GetTaskCallback.onDataNotAvailable] is fired if both data sources fail to
      * get the data.
      */
     override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {

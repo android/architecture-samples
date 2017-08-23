@@ -33,11 +33,10 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
     private val dbHelper: TasksDbHelper = TasksDbHelper(context)
 
     /**
-     * Note: [LoadTasksCallback.onDataNotAvailable] is fired if the database doesn't exist
+     * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is fired if the database doesn't exist
      * or the table is empty.
      */
     override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
-        val tasks = ArrayList<Task>()
         val db = dbHelper.readableDatabase
 
         val projection = arrayOf(COLUMN_NAME_ENTRY_ID, COLUMN_NAME_TITLE,
@@ -46,6 +45,7 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
         val cursor = db.query(
                 TABLE_NAME, projection, null, null, null, null, null)
 
+        val tasks = ArrayList<Task>()
         with(cursor) {
             while (moveToNext()) {
                 val itemId = getString(getColumnIndexOrThrow(COLUMN_NAME_ENTRY_ID))
@@ -56,19 +56,20 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
                 }
                 tasks.add(task)
             }
-            if (tasks.isNotEmpty()) {
-                callback.onTasksLoaded(tasks)
-            } else {
-                // This will be called if the table is new or just empty.
-                callback.onDataNotAvailable()
-            }
             close()
         }
         db.close()
+
+        if (!tasks.isEmpty()) {
+            callback.onTasksLoaded(tasks)
+        } else {
+            // This will be called if the table is new or just empty.
+            callback.onDataNotAvailable()
+        }
     }
 
     /**
-     * Note: [GetTaskCallback.onDataNotAvailable] is fired if the [Task] isn't
+     * Note: [TasksDataSource.GetTaskCallback.onDataNotAvailable] is fired if the [Task] isn't
      * found.
      */
     override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {
@@ -80,22 +81,20 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
         val cursor = db.query(
                 TABLE_NAME, projection, "$COLUMN_NAME_ENTRY_ID LIKE ?", arrayOf(taskId), null,
                 null, null)
-
+        var task: Task? = null
         with(cursor) {
             if (moveToFirst()) {
                 val itemId = getString(getColumnIndexOrThrow(COLUMN_NAME_ENTRY_ID))
                 val title = getString(getColumnIndexOrThrow(COLUMN_NAME_TITLE))
                 val description = getString(getColumnIndexOrThrow(COLUMN_NAME_DESCRIPTION))
-                val task = Task(title, description, itemId).apply {
+                 task = Task(title, description, itemId).apply {
                     isCompleted = getInt(getColumnIndexOrThrow(COLUMN_NAME_COMPLETED)) == 1
                 }
-                callback.onTaskLoaded(task)
-            } else {
-                callback.onDataNotAvailable()
             }
             close()
         }
         db.close()
+        task?.let { callback.onTaskLoaded(it) } ?: callback.onDataNotAvailable()
     }
 
     override fun saveTask(task: Task) {

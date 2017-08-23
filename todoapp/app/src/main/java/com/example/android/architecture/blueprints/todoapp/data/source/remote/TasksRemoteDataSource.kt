@@ -40,7 +40,7 @@ object TasksRemoteDataSource : TasksDataSource {
     }
 
     /**
-     * Note: [LoadTasksCallback.onDataNotAvailable] is never fired. In a real remote data
+     * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is never fired. In a real remote data
      * source implementation, this would be fired if the server can't be contacted or the server
      * returns an error.
      */
@@ -53,7 +53,7 @@ object TasksRemoteDataSource : TasksDataSource {
     }
 
     /**
-     * Note: [GetTaskCallback.onDataNotAvailable] is never fired. In a real remote data
+     * Note: [TasksDataSource.GetTaskCallback.onDataNotAvailable] is never fired. In a real remote data
      * source implementation, this would be fired if the server can't be contacted or the server
      * returns an error.
      */
