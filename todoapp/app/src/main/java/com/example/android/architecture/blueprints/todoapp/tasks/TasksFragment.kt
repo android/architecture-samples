@@ -270,10 +270,10 @@ class TasksFragment : Fragment(), TasksContract.View {
             with(rowView.findViewById<CheckBox>(R.id.complete)) {
                 // Active/completed task UI
                 isChecked = task.isCompleted
-                rowView.setBackgroundResource(
+                val rowViewBackground =
                         if (task.isCompleted) R.drawable.list_completed_touch_feedback
                         else R.drawable.touch_feedback
-                )
+                rowView.setBackgroundResource(rowViewBackground)
                 setOnClickListener {
                     if (!task.isCompleted) {
                         itemListener.onCompleteTaskClick(task)
