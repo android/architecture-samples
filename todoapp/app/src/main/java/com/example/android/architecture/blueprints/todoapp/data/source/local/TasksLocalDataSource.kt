@@ -96,8 +96,9 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
         db.close()
         if(task!=null){
             task?.let { callback.onTaskLoaded(it) }
-        }else
+        }else {
             callback.onDataNotAvailable()
+        }
     }
 
     override fun saveTask(task: Task) {
