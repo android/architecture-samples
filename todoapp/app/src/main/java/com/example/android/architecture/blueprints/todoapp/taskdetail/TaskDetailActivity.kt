@@ -33,10 +33,10 @@ class TaskDetailActivity : AppCompatActivity() {
         setContentView(R.layout.taskdetail_act)
 
         // Set up the toolbar.
-        setupActionBar(R.id.toolbar, {
+        setupActionBar(R.id.toolbar) {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-        })
+        }
 
         // Get the requested task id
         val taskId = intent.getStringExtra(EXTRA_TASK_ID)
