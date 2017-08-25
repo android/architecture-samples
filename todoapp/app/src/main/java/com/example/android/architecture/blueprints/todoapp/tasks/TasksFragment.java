@@ -289,7 +289,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTaskIcon.setImageResource(iconRes);
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
@@ -404,11 +404,9 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             // Active/completed task UI
             completeCB.setChecked(task.isCompleted());
             if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                rowView.setBackgroundResource(R.drawable.list_completed_touch_feedback);
             } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
+                rowView.setBackgroundResource(R.drawable.touch_feedback);
             }
 
             completeCB.setOnClickListener(new View.OnClickListener() {
