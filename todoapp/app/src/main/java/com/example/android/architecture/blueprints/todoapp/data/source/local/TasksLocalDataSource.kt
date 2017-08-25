@@ -95,12 +95,9 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
         }
         db.close()
 
-        if (task != null) {
-            task?.let { callback.onTaskLoaded(it) }
-        } else {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
-        }
+        task?.also { callback.onTaskLoaded(it) }
+                // This will be called if the table is new or just empty.
+                ?: callback.onDataNotAvailable()
     }
 
     override fun saveTask(task: Task) {
