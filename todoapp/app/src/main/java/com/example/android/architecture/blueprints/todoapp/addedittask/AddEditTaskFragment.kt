@@ -67,7 +67,10 @@ class AddEditTaskFragment : LifecycleFragment() {
 
     private fun setupActionBar() {
         (activity as AppCompatActivity).supportActionBar?.setTitle(
-                if (arguments != null) R.string.edit_task else R.string.add_task
+                if (arguments != null && arguments.get(ARGUMENT_EDIT_TASK_ID) != null)
+                    R.string.edit_task
+                else
+                    R.string.add_task
         )
     }
 

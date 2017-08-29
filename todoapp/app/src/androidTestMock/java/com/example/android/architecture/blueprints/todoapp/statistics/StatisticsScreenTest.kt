@@ -17,8 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.content.Intent
 import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withText
@@ -27,6 +27,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
@@ -64,23 +65,19 @@ import org.junit.runner.RunWith
      * time, since they are isolated from any outside dependencies.
      */
     @Before fun intentWithStubbedTaskId() {
+        ViewModelFactory.destroyInstance()
         // Given some tasks
-        val tasksRepository = Injection.provideTasksRepository(
-                InstrumentationRegistry.getTargetContext())
-        tasksRepository.deleteAllTasks()
-        val task1 = Task("Title1").apply {
-            isCompleted = false
+        val tasksRepository =
+                Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
+        val task1 = Task("Title1").apply { isCompleted = false }
+        val task2 = Task("Title2").apply { isCompleted = true }
+        tasksRepository.run {
+            deleteAllTasks()
+            saveTask(task1)
+            saveTask(task2)
         }
-        tasksRepository.saveTask(task1)
-
-        val task2 = Task("Title2").apply {
-            isCompleted = true
-        }
-        tasksRepository.saveTask(task2)
-
         // Lazily start the Activity from the ActivityTestRule
-        val startIntent = Intent()
-        statisticsActivityTestRule.launchActivity(startIntent)
+        statisticsActivityTestRule.launchActivity(Intent())
     }
 
     /**
@@ -90,7 +87,7 @@ import org.junit.runner.RunWith
      * significantly more reliable.
      */
     @Before fun registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
     }
 
     @Test fun Tasks_ShowsNonEmptyMessage() {
@@ -107,6 +104,6 @@ import org.junit.runner.RunWith
      * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
      */
     @After fun unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 }

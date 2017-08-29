@@ -18,11 +18,11 @@ package com.example.android.architecture.blueprints.todoapp.data
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import com.example.android.architecture.blueprints.todoapp.util.any
-import com.example.android.architecture.blueprints.todoapp.util.mock
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
+import com.example.android.architecture.blueprints.todoapp.util.any
+import com.example.android.architecture.blueprints.todoapp.util.mock
 import org.hamcrest.core.Is.`is`
 import org.junit.After
 import org.junit.Assert.assertNotNull
