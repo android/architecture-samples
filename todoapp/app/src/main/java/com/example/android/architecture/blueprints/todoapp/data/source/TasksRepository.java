@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TasksRepository implements TasksDataSource {
 
-    private static TasksRepository INSTANCE = null;
+    private volatile static TasksRepository INSTANCE = null;
 
     private final TasksDataSource mTasksRemoteDataSource;
 
@@ -75,7 +75,11 @@ public class TasksRepository implements TasksDataSource {
     public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
                                               TasksDataSource tasksLocalDataSource) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
+            synchronized (TasksRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
+                }
+            }
         }
         return INSTANCE;
     }
