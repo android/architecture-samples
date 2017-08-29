@@ -41,6 +41,7 @@ These samples are no longer being maintained, but their implementation is still 
 | [dev‑todo‑mvvm‑live](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live/) | Uses lifecycle-aware [Architecture Components](http://developer.android.com/arch) (except Room), and the Data Binding library with an MVVM architecture. |
 | [dev‑todo‑mvp‑room](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-room/) | Uses [Room](https://developer.android.com/topic/libraries/architecture/room.html), the persistence library from the [Architecture Components](http://developer.android.com/arch), as a local data source with an MVP architecture. |
 | [dev-todo-mvp-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-kotlin/) | Conversion of todo-mvp to kotlin. |
+| [dev-todo-mvvm-live-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live-kotlin/) | Conversion of todo-mvvm-live to kotlin. |
 
 For information about planned samples, see ["New sample" issues](https://github.com/googlesamples/android-architecture/issues?q=is%3Aissue+is%3Aopen+label%3A%22New+sample%22).
 
