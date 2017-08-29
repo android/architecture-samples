@@ -76,9 +76,9 @@ import org.junit.runner.RunWith
             ActivityTestRule<TasksActivity>(TasksActivity::class.java)
 
     @Before fun resetState() {
-        ViewModelFactory.destroyInstance();
+        ViewModelFactory.destroyInstance()
         Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                .deleteAllTasks();
+                .deleteAllTasks()
     }
 
     private val toolbarNavigationContentDescription: String
@@ -97,7 +97,7 @@ import org.junit.runner.RunWith
     private fun withItemText(itemText: String): Matcher<View> {
         checkArgument(itemText.isNotEmpty(), "itemText cannot be null or empty")
         return object : TypeSafeMatcher<View>() {
-            public override fun matchesSafely(item: View) = allOf(
+            override fun matchesSafely(item: View) = allOf(
                     isDescendantOfA(isAssignableFrom(ListView::class.java)),
                     withText(itemText)
             ).matches(item)
