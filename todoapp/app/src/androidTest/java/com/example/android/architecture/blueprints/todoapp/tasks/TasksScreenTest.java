@@ -28,11 +28,12 @@ import android.widget.ListView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,20 +81,14 @@ public class TasksScreenTest {
      */
     @Rule
     public ActivityTestRule<TasksActivity> mTasksActivityTestRule =
-            new ActivityTestRule<TasksActivity>(TasksActivity.class) {
+            new ActivityTestRule<>(TasksActivity.class);
 
-                /**
-                 * To avoid a long list of tasks and the need to scroll through the list to find a
-                 * task, we call {@link TasksDataSource#deleteAllTasks()} before each test.
-                 */
-                @Override
-                protected void beforeActivityLaunched() {
-                    super.beforeActivityLaunched();
-                    // Doing this in @Before generates a race condition.
-                    Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                        .deleteAllTasks();
-                }
-            };
+    @Before
+    public void resetState() {
+        ViewModelFactory.destroyInstance();
+        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
+                .deleteAllTasks();
+    }
 
     /**
      * A custom {@link Matcher} which matches an item in a {@link ListView} by its text.

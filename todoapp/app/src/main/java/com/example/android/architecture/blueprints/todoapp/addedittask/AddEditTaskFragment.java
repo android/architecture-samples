@@ -102,8 +102,7 @@ public class AddEditTaskFragment extends LifecycleFragment {
     }
 
     private void setupFab() {
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +117,7 @@ public class AddEditTaskFragment extends LifecycleFragment {
         if (actionBar == null) {
             return;
         }
-        if (getArguments() != null) {
+        if (getArguments() != null && getArguments().get(ARGUMENT_EDIT_TASK_ID) != null) {
             actionBar.setTitle(R.string.edit_task);
         } else {
             actionBar.setTitle(R.string.add_task);

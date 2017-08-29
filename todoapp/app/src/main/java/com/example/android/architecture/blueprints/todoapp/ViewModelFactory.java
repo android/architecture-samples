@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -53,6 +54,11 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
             }
         }
         return INSTANCE;
+    }
+
+    @VisibleForTesting
+    public static void destroyInstance() {
+        INSTANCE = null;
     }
 
     private ViewModelFactory(Application application, TasksRepository repository) {
