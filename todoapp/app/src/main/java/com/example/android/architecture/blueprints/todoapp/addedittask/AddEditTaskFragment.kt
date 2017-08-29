@@ -60,8 +60,8 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
             savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         with(root) {
-            title = findViewById<TextView>(R.id.add_task_title)
-            description = findViewById<TextView>(R.id.add_task_description)
+            title = findViewById(R.id.add_task_title)
+            description = findViewById(R.id.add_task_description)
         }
         setHasOptionsMenu(true)
         return root
