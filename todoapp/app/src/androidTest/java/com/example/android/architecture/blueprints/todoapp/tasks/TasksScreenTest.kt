@@ -98,7 +98,7 @@ import org.junit.runner.RunWith
      * @return Matcher that matches text in the given view
      */
     private fun withItemText(itemText: String): Matcher<View> {
-        checkArgument(!TextUtils.isEmpty(itemText), "itemText cannot be null or empty")
+        checkArgument(itemText.isNotEmpty(), "itemText cannot be null or empty")
         return object : TypeSafeMatcher<View>() {
             public override fun matchesSafely(item: View): Boolean {
                 return allOf(
