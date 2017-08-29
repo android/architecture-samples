@@ -64,8 +64,8 @@ class TasksActivity : AppCompatActivity() {
         tasksPresenter = TasksPresenter(Injection.provideTasksRepository(applicationContext),
                 tasksFragment).apply {
             // Load previously saved state, if available.
-            savedInstanceState?.let {
-                currentFiltering = it.getSerializable(CURRENT_FILTERING_KEY)
+            if (savedInstanceState != null) {
+                currentFiltering = savedInstanceState.getSerializable(CURRENT_FILTERING_KEY)
                         as TasksFilterType
             }
         }

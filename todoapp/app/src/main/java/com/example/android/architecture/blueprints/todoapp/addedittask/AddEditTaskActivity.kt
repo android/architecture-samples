@@ -51,9 +51,9 @@ class AddEditTaskActivity : AppCompatActivity() {
         var shouldLoadDataFromRepo = true
 
         // Prevent the presenter from loading data from the repository if this is a config change.
-        savedInstanceState?.let {
+        if (savedInstanceState != null) {
             // Data might not have loaded when the config change happen, so we saved the state.
-            shouldLoadDataFromRepo = it.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY)
+            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY)
         }
 
         // Create the presenter
