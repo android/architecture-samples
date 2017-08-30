@@ -237,10 +237,12 @@ class TasksRepository(
          * @return the [TasksRepository] instance
          */
         @JvmStatic fun getInstance(tasksRemoteDataSource: TasksDataSource,
-                tasksLocalDataSource: TasksDataSource): TasksRepository {
-            return INSTANCE ?: TasksRepository(tasksRemoteDataSource, tasksLocalDataSource)
-                    .apply { INSTANCE = this }
-        }
+                tasksLocalDataSource: TasksDataSource) =
+                INSTANCE ?: synchronized(TasksRepository::class.java) {
+                    INSTANCE ?: TasksRepository(tasksRemoteDataSource, tasksLocalDataSource)
+                            .also { INSTANCE = it }
+                }
+
 
         /**
          * Used to force [getInstance] to create a new instance

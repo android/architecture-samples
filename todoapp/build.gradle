@@ -12,16 +12,16 @@ ext {
     junitVersion = '4.12'
     mockitoVersion = '2.7.22'
     hamcrestVersion = '1.3'
-    runnerVersion = '0.5'
-    rulesVersion = '0.5'
-    espressoVersion = '2.2.2'
+    runnerVersion = '1.0.0'
+    rulesVersion = '1.0.0'
+    espressoVersion = '3.0.0'
 
     // Architecture Components dependencies
     archLifecycleVersion = "1.0.0-alpha9"
 }
 
 buildscript {
-    ext.kotlin_version = '1.1.4'
+    ext.kotlin_version = '1.1.4-2'
     ext.gradleVersion = '2.3.3'
     repositories {
         jcenter()

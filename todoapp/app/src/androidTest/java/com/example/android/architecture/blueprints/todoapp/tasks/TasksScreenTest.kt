@@ -41,8 +41,8 @@ import android.view.View
 import android.widget.ListView
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.currentActivity
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
 import com.google.common.base.Preconditions.checkArgument
@@ -51,6 +51,7 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.IsNot.not
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,19 +72,13 @@ import org.junit.runner.RunWith
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.
      */
-    @Rule @JvmField var tasksActivityTestRule = object :
-            ActivityTestRule<TasksActivity>(TasksActivity::class.java) {
+    @Rule @JvmField var tasksActivityTestRule =
+            ActivityTestRule<TasksActivity>(TasksActivity::class.java)
 
-        /**
-         * To avoid a long list of tasks and the need to scroll through the list to find a
-         * task, we call [TasksDataSource.deleteAllTasks] before each test.
-         */
-        override fun beforeActivityLaunched() {
-            super.beforeActivityLaunched()
-            // Doing this in @Before generates a race condition.
-            Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                    .deleteAllTasks()
-        }
+    @Before fun resetState() {
+        ViewModelFactory.destroyInstance()
+        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
+                .deleteAllTasks()
     }
 
     private val toolbarNavigationContentDescription: String
@@ -102,11 +97,10 @@ import org.junit.runner.RunWith
     private fun withItemText(itemText: String): Matcher<View> {
         checkArgument(itemText.isNotEmpty(), "itemText cannot be null or empty")
         return object : TypeSafeMatcher<View>() {
-            public override fun matchesSafely(item: View): Boolean {
-                return allOf(
-                        isDescendantOfA(isAssignableFrom(ListView::class.java)),
-                        withText(itemText)).matches(item)
-            }
+            override fun matchesSafely(item: View) = allOf(
+                    isDescendantOfA(isAssignableFrom(ListView::class.java)),
+                    withText(itemText)
+            ).matches(item)
 
             override fun describeTo(description: Description) {
                 description.appendText("is isDescendantOfA LV with text " + itemText)
