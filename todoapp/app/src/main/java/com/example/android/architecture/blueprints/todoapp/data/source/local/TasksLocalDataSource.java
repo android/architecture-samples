@@ -60,7 +60,7 @@ public class TasksLocalDataSource implements TasksDataSource {
      */
     @Override
     public void getTasks(@NonNull LoadTasksCallback callback) {
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         String[] projection = {

@@ -42,9 +42,9 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     public final ObservableBoolean completed = new ObservableBoolean();
 
-    private SingleLiveEvent<Void> mEditTaskCommand = new SingleLiveEvent<>();
+    private final SingleLiveEvent<Void> mEditTaskCommand = new SingleLiveEvent<>();
 
-    private SingleLiveEvent<Void> mDeleteTaskCommand = new SingleLiveEvent<>();
+    private final SingleLiveEvent<Void> mDeleteTaskCommand = new SingleLiveEvent<>();
 
     private final TasksRepository mTasksRepository;
 

@@ -19,10 +19,10 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -122,7 +122,7 @@ public class TaskDetailScreenTest {
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -167,6 +167,6 @@ public class TaskDetailScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 }

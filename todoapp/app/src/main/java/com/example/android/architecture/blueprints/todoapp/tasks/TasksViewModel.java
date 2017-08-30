@@ -72,11 +72,11 @@ public class TasksViewModel extends AndroidViewModel {
 
     private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
 
-    private SingleLiveEvent<String> mOpenTaskEvent = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> mOpenTaskEvent = new SingleLiveEvent<>();
 
-    private Context mContext; // To avoid leaks, this must be an Application Context.
+    private final Context mContext; // To avoid leaks, this must be an Application Context.
 
-    private SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
+    private final SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
 
     public TasksViewModel(
             Application context,
@@ -208,7 +208,7 @@ public class TasksViewModel extends AndroidViewModel {
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<Task>();
+                List<Task> tasksToShow = new ArrayList<>();
 
                 // We filter the tasks based on the requestType
                 for (Task task : tasks) {
