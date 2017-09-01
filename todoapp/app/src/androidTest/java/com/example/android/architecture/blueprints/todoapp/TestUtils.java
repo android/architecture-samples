@@ -16,9 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static android.support.test.runner.lifecycle.Stage.RESUMED;
-
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,6 +26,9 @@ import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.v7.widget.Toolbar;
 
 import java.util.Collection;
+
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.runner.lifecycle.Stage.RESUMED;
 
 /**
  * Useful test methods common to all activities
@@ -63,7 +63,7 @@ public class TestUtils {
      */
     public static String getToolbarNavigationContentDescription(
             @NonNull Activity activity, @IdRes int toolbar1) {
-        Toolbar toolbar = (Toolbar) activity.findViewById(toolbar1);
+        Toolbar toolbar = activity.findViewById(toolbar1);
         if (toolbar != null) {
             return (String) toolbar.getNavigationContentDescription();
         } else {

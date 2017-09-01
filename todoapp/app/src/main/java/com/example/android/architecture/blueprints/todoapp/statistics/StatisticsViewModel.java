@@ -57,7 +57,7 @@ public class StatisticsViewModel extends AndroidViewModel {
 
     private int mNumberOfCompletedTasks = 0;
 
-    private Context mContext;
+    private final Context mContext;
 
     private final TasksRepository mTasksRepository;
 
