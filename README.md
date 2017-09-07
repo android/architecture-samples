@@ -1,4 +1,4 @@
-# todo-mvvm-live
+# todo-mvvm-live-kotlin
 
 This version of the app is called todo-mvvm-live-kotlin, and it is the kotlin version of [todo-mvvm-live](https://github.com/googlesamples/android-architecture/tree/todo-mvvm-live/).
 It uses some Architecture Components like ViewModel, LiveData, and other lifecycle-aware classes.

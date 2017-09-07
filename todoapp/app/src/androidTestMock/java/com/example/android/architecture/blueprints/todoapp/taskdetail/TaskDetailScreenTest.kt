@@ -20,6 +20,7 @@ import android.content.Intent
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.isChecked
 import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -104,7 +105,7 @@ import org.junit.runner.RunWith
      * significantly more reliable.
      */
     @Before fun registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
     }
 
     @Test fun activeTaskDetails_DisplayedInUi() {
@@ -145,7 +146,7 @@ import org.junit.runner.RunWith
      * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
      */
     @After fun unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 
     companion object {
