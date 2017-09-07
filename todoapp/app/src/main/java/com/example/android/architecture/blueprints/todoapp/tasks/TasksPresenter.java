@@ -131,7 +131,7 @@ public class TasksPresenter implements TasksContract.Presenter {
                     }
                 })
                 .toList()
-                .subscribeOn(mSchedulerProvider.computation())
+                .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
