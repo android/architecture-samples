@@ -49,7 +49,7 @@ Each version of the app implements the same features using a different approach 
 
 Notice also in the following illustration that this version of the app uses fragments, and this is for two reasons:
 
-* The use of both [activities](https://developer.android.com/guide/components/activities/index.html) and [fragments](https://developer.android.com/guide/components/fragments.html) allows for a better separation of concerns which compliments this implementation of MVP. In this version of the app, the Activity is the overall controller which creates and connects views and presenters.
+* The use of both [activities](https://developer.android.com/guide/components/activities/index.html) and [fragments](https://developer.android.com/guide/components/fragments.html) allows for a better separation of concerns which complements this implementation of MVP. In this version of the app, the Activity is the overall controller which creates and connects views and presenters.
 * The use of fragments supports tablet layouts or UI screens with multiple views.
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Illustration of the MVP architechture for this version of the app."/>
