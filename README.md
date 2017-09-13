@@ -1,4 +1,4 @@
-# TODO-MVP-RXJAVA
+# TODO-MVVM-RXJAVA
 
 Project owners: [Erik Hellman](https://github.com/erikhellman) & [Florina Muntenescu (upday)](https://github.com/florina-muntenescu)
 
