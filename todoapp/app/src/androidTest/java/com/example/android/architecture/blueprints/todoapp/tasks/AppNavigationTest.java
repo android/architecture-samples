@@ -50,7 +50,7 @@ public class AppNavigationTest {
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
-     * <p>
+     *
      * <p>
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.

@@ -100,7 +100,8 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
         String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
-                .mapToList(mTaskMapperFunction).toFlowable(BackpressureStrategy.BUFFER);
+                .mapToList(mTaskMapperFunction)
+                .toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @Override

@@ -65,11 +65,11 @@ public class TaskDetailScreenTest {
 
     /**
      * {@link ActivityTestRule} is a JUnit {@link Rule @Rule} to launch your activity under test.
-     * <p>
+     *
      * <p>
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.
-     * <p>
+     *
      * <p>
      * Sometimes an {@link Activity} requires a custom start {@link Intent} to receive data
      * from the source Activity. ActivityTestRule has a feature which let's you lazily start the
@@ -91,7 +91,7 @@ public class TaskDetailScreenTest {
     /**
      * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
      * a particular task id, which is then loaded from the service API.
-     * <p>
+     *
      * <p>
      * Note that this test runs hermetically and is fully isolated using a fake implementation of
      * the service API. This is a great way to make your tests more reliable and faster at the same

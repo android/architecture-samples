@@ -137,10 +137,29 @@ public class AddEditTaskPresenterTest {
     }
 
     @Test
+    public void populateTask_callsRepoAndUpdatesViewOnAbsentTask() {
+        Task testTask = new Task("TITLE", "DESCRIPTION");
+        when(mTasksRepository.getTask(testTask.getId())).thenReturn(Flowable.just(Optional.absent()));
+
+        // Get a reference to the class under test
+        mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),
+                mTasksRepository, mAddEditTaskView, true, mSchedulerProvider);
+
+        // When the presenter is asked to populate an existing task
+        mAddEditTaskPresenter.populateTask();
+
+        // Then the task repository is queried and the view updated
+        verify(mTasksRepository).getTask(eq(testTask.getId()));
+
+        verify(mAddEditTaskView).showEmptyTaskError();
+        verify(mAddEditTaskView, never()).setTitle(testTask.getTitle());
+        verify(mAddEditTaskView, never()).setDescription(testTask.getDescription());
+    }
+
+    @Test
     public void populateTask_callsRepoAndUpdatesViewOnError() {
         Task testTask = new Task("TITLE", "DESCRIPTION");
-        when(mTasksRepository.getTask(testTask.getId())).thenReturn(
-                Flowable.just(Optional.absent()));
+        when(mTasksRepository.getTask(testTask.getId())).thenReturn(Flowable.error(new Throwable("Some error")));
 
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(testTask.getId(),

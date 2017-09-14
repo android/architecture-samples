@@ -47,7 +47,7 @@ public final class NavigationViewActions {
     /**
      * Returns a {@link ViewAction} that navigates to a menu item in {@link NavigationView} using a
      * menu item resource id.
-     * <p>
+     *
      * <p>
      * View constraints:
      * <ul>

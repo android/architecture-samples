@@ -8,11 +8,11 @@ Project owners:
 
 ### Summary
 
-This sample is based on the TODO-MVP project and uses RxJava 2.x for communication between the data model and presenter layers.
+This sample is based on the TODO-MVP project and uses RxJava 2 for communication between the data model and presenter layers.
 
 Compared to the TODO-MVP, both the Presenter contracts and the implementation of the Views stay the same. The changes are done to the data model layer and in the implementation of the Presenters. For the sake of simplicity we decided to keep the RxJava usage minimal, leaving optimizations like RxJava caching aside.
 
-The data model layer exposes RxJava 2.x ``Flowable`` streams as a way of retrieving tasks. The ``TasksDataSource`` interface contains methods like:
+The data model layer exposes RxJava 2 [Flowable](http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Flowable.html) streams as a way of retrieving tasks. The ``TasksDataSource`` interface contains methods like:
 
 ```java
 Flowable<List<Task>> getTasks();
@@ -20,9 +20,9 @@ Flowable<List<Task>> getTasks();
 Flowable<Optional<Task>> getTask(@NonNull String taskId);
 ```
 
-A major different between RxJava 1.x and 2.x is that streams no longer support the propagation of null items, so we are using [Guava](https://github.com/google/guava) Optionals.
+A major difference between RxJava 1 and 2 is that streams no longer support the propagation of null items, so we are using Guava [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html).
 
-To get a better understanding of the differences between RxJava 1.x and RxJava 2.x click [here](https://github.com/ReactiveX/RxJava/wiki/What%27s-different-in-2.0).
+To get a better understanding of the differences between RxJava 1 and RxJava 2 click [here](https://github.com/ReactiveX/RxJava/wiki/What%27s-different-in-2.0).
 
 This is implemented in ``TasksLocalDataSource`` with the help of [SqlBrite](https://github.com/square/sqlbrite). The result of queries to the database being easily exposed as streams of data.
 

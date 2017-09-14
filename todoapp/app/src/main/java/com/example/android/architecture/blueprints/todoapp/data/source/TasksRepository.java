@@ -116,7 +116,8 @@ public class TasksRepository implements TasksDataSource {
             Flowable<List<Task>> localTasks = getAndCacheLocalTasks();
             return Flowable.concat(localTasks, remoteTasks)
                     .filter(tasks -> !tasks.isEmpty())
-                    .firstOrError().toFlowable();
+                    .firstOrError()
+                    .toFlowable();
         }
     }
 
@@ -124,7 +125,8 @@ public class TasksRepository implements TasksDataSource {
         return mTasksLocalDataSource.getTasks()
                 .flatMap(tasks -> Flowable.fromIterable(tasks)
                         .doOnNext(task -> mCachedTasks.put(task.getId(), task))
-                        .toList().toFlowable());
+                        .toList()
+                        .toFlowable());
     }
 
     private Flowable<List<Task>> getAndSaveRemoteTasks() {

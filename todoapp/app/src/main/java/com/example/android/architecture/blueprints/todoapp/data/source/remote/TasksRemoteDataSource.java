@@ -68,7 +68,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
         return Flowable
                 .fromIterable(TASKS_SERVICE_DATA.values())
                 .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
-                .toList().toFlowable();
+                .toList()
+                .toFlowable();
     }
 
     @Override

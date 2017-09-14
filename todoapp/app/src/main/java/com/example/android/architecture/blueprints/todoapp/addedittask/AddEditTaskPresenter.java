@@ -118,6 +118,12 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
                                     mAddTaskView.showEmptyTaskError();
                                 }
                             }
+                        },
+                        // onError
+                        throwable -> {
+                            if (mAddTaskView.isActive()) {
+                                mAddTaskView.showEmptyTaskError();
+                            }
                         }));
     }
 
