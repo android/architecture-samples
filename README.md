@@ -20,7 +20,7 @@ Flowable<List<Task>> getTasks();
 Flowable<Optional<Task>> getTask(@NonNull String taskId);
 ```
 
-A major difference between RxJava 1 and 2 is that streams no longer support the propagation of null items, so we are using Guava [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html).
+A major difference between RxJava 1 and 2 is that streams no longer support the propagation of null items, so we are using Guava's [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html).
 
 To get a better understanding of the differences between RxJava 1 and RxJava 2 click [here](https://github.com/ReactiveX/RxJava/wiki/What%27s-different-in-2.0).
 

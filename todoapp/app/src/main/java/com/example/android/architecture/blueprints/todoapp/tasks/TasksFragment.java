@@ -93,7 +93,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unSubscribe();
+        mPresenter.unsubscribe();
     }
 
     @Override

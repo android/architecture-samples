@@ -74,7 +74,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     }
 
     @Override
-    public void unSubscribe() {
+    public void unsubscribe() {
         mCompositeDisposable.clear();
     }
 

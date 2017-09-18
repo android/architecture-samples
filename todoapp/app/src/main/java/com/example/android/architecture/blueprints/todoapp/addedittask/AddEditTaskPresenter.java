@@ -80,7 +80,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     }
 
     @Override
-    public void unSubscribe() {
+    public void unsubscribe() {
         mCompositeDisposable.clear();
     }
 

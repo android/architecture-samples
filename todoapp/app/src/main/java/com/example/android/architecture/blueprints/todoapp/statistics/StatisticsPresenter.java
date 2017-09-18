@@ -23,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.primitives.Ints;
 
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -65,7 +66,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     @Override
-    public void unSubscribe() {
+    public void unsubscribe() {
         mCompositeDisposable.clear();
     }
 
@@ -92,7 +93,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                 })
                 .subscribe(
                         // onNext
-                        stats -> mStatisticsView.showStatistics(stats.first, stats.second),
+                        stats -> mStatisticsView.showStatistics(Ints.saturatedCast(stats.first), Ints.saturatedCast(stats.second)),
                         // onError
                         throwable -> mStatisticsView.showLoadingStatisticsError(),
                         // onCompleted

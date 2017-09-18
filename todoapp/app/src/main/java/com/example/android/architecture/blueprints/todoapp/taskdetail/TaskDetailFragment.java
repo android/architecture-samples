@@ -76,7 +76,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unSubscribe();
+        mPresenter.unsubscribe();
     }
 
     @Nullable
