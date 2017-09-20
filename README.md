@@ -115,6 +115,10 @@ This project is **built by the community**, and curated by Google as well as oth
 
 [Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
 
+[Mike Nakhimovich](https://github.com/digitalbuddha) - Developer (MVP Dagger sample)
+
+[Voicu Klein](https://github.com/kleinsenberg) - Developer (MVP RxJava sample)
+
 ### Googlers
 
 [Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
