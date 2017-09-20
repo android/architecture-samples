@@ -21,17 +21,14 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.common.base.Optional;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
-import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import io.reactivex.Flowable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -102,52 +99,44 @@ public class TasksRepository implements TasksDataSource {
      * available first.
      */
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Flowable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            return Observable.from(mCachedTasks.values()).toList();
+            return Flowable.fromIterable(mCachedTasks.values()).toList().toFlowable();
         } else if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         }
 
-        Observable<List<Task>> remoteTasks = getAndSaveRemoteTasks();
+        Flowable<List<Task>> remoteTasks = getAndSaveRemoteTasks();
 
         if (mCacheIsDirty) {
             return remoteTasks;
         } else {
             // Query the local storage if available. If not, query the network.
-            Observable<List<Task>> localTasks = getAndCacheLocalTasks();
-            return Observable.concat(localTasks, remoteTasks)
+            Flowable<List<Task>> localTasks = getAndCacheLocalTasks();
+            return Flowable.concat(localTasks, remoteTasks)
                     .filter(tasks -> !tasks.isEmpty())
-                    .first();
+                    .firstOrError()
+                    .toFlowable();
         }
     }
 
-    private Observable<List<Task>> getAndCacheLocalTasks() {
+    private Flowable<List<Task>> getAndCacheLocalTasks() {
         return mTasksLocalDataSource.getTasks()
-                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
-                    @Override
-                    public Observable<List<Task>> call(List<Task> tasks) {
-                        return Observable.from(tasks)
-                                .doOnNext(task -> mCachedTasks.put(task.getId(), task))
-                                .toList();
-                    }
-                });
+                .flatMap(tasks -> Flowable.fromIterable(tasks)
+                        .doOnNext(task -> mCachedTasks.put(task.getId(), task))
+                        .toList()
+                        .toFlowable());
     }
 
-    private Observable<List<Task>> getAndSaveRemoteTasks() {
+    private Flowable<List<Task>> getAndSaveRemoteTasks() {
         return mTasksRemoteDataSource
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
-                    @Override
-                    public Observable<List<Task>> call(List<Task> tasks) {
-                        return Observable.from(tasks).doOnNext(task -> {
-                            mTasksLocalDataSource.saveTask(task);
-                            mCachedTasks.put(task.getId(), task);
-                        }).toList();
-                    }
-                })
-                .doOnCompleted(() -> mCacheIsDirty = false);
+                .flatMap(tasks -> Flowable.fromIterable(tasks).doOnNext(task -> {
+                    mTasksLocalDataSource.saveTask(task);
+                    mCachedTasks.put(task.getId(), task);
+                }).toList().toFlowable())
+                .doOnComplete(() -> mCacheIsDirty = false);
     }
 
     @Override
@@ -234,14 +223,14 @@ public class TasksRepository implements TasksDataSource {
      * uses the network data source. This is done to simplify the sample.
      */
     @Override
-    public Observable<Task> getTask(@NonNull final String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull final String taskId) {
         checkNotNull(taskId);
 
         final Task cachedTask = getTaskWithId(taskId);
 
         // Respond immediately with cache if available
         if (cachedTask != null) {
-            return Observable.just(cachedTask);
+            return Flowable.just(Optional.of(cachedTask));
         }
 
         // Load from server/persisted if needed.
@@ -252,21 +241,20 @@ public class TasksRepository implements TasksDataSource {
         }
 
         // Is the task in the local data source? If not, query the network.
-        Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
-        Observable<Task> remoteTask = mTasksRemoteDataSource
+        Flowable<Optional<Task>> localTask = getTaskWithIdFromLocalRepository(taskId);
+        Flowable<Optional<Task>> remoteTask = mTasksRemoteDataSource
                 .getTask(taskId)
-                .doOnNext(task -> {
-                    mTasksLocalDataSource.saveTask(task);
-                    mCachedTasks.put(task.getId(), task);
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        Task task = taskOptional.get();
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
+                    }
                 });
 
-        return Observable.concat(localTask, remoteTask).first()
-                .map(task -> {
-                    if (task == null) {
-                        throw new NoSuchElementException("No task found with taskId " + taskId);
-                    }
-                    return task;
-                });
+        return Flowable.concat(localTask, remoteTask)
+                .firstElement()
+                .toFlowable();
     }
 
     @Override
@@ -304,10 +292,14 @@ public class TasksRepository implements TasksDataSource {
     }
 
     @NonNull
-    Observable<Task> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
+    Flowable<Optional<Task>> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
         return mTasksLocalDataSource
                 .getTask(taskId)
-                .doOnNext(task -> mCachedTasks.put(taskId, task))
-                .first();
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        mCachedTasks.put(taskId, taskOptional.get());
+                    }
+                })
+                .firstElement().toFlowable();
     }
 }

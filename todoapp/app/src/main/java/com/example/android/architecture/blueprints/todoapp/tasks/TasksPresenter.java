@@ -28,10 +28,9 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,7 +55,7 @@ public class TasksPresenter implements TasksContract.Presenter {
     private boolean mFirstLoad = true;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable mCompositeDisposable;
 
     public TasksPresenter(@NonNull TasksRepository tasksRepository,
                           @NonNull TasksContract.View tasksView,
@@ -65,7 +64,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
 
-        mSubscriptions = new CompositeSubscription();
+        mCompositeDisposable = new CompositeDisposable();
         mTasksView.setPresenter(this);
     }
 
@@ -76,7 +75,7 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        mSubscriptions.clear();
+        mCompositeDisposable.clear();
     }
 
     @Override
@@ -110,15 +109,10 @@ public class TasksPresenter implements TasksContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mSubscriptions.clear();
-        Subscription subscription = mTasksRepository
+        mCompositeDisposable.clear();
+        Disposable disposable = mTasksRepository
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
-                    @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
-                    }
-                })
+                .flatMap(Flowable::fromIterable)
                 .filter(task -> {
                     switch (mCurrentFiltering) {
                         case ACTIVE_TASKS:
@@ -133,19 +127,21 @@ public class TasksPresenter implements TasksContract.Presenter {
                 .toList()
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(() -> {
+                .doFinally(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })
                 .subscribe(
                         // onNext
-                        this::processTasks,
+                        tasks -> {
+                            processTasks(tasks);
+                            mTasksView.setLoadingIndicator(false);
+                        },
                         // onError
-                        throwable -> mTasksView.showLoadingTasksError(),
-                        // onCompleted
-                        () -> mTasksView.setLoadingIndicator(false));
-        mSubscriptions.add(subscription);
+                        throwable -> mTasksView.showLoadingTasksError());
+
+        mCompositeDisposable.add(disposable);
     }
 
     private void processTasks(@NonNull List<Task> tasks) {

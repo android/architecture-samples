@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.google.common.base.Optional;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -50,15 +51,15 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Flowable<List<Task>> getTasks() {
         Collection<Task> values = TASKS_SERVICE_DATA.values();
-        return Observable.from(values).toList();
+        return Flowable.fromIterable(values).toList().toFlowable();
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        return Observable.just(task);
+        return Flowable.just(Optional.of(task));
     }
 
     @Override

@@ -22,9 +22,10 @@ import android.support.annotation.Nullable;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,7 +48,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     private String mTaskId;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable mCompositeDisposable;
 
     public TaskDetailPresenter(@Nullable String taskId,
                                @NonNull TasksRepository tasksRepository,
@@ -58,7 +59,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
 
-        mSubscriptions = new CompositeSubscription();
+        mCompositeDisposable = new CompositeDisposable();
         mTaskDetailView.setPresenter(this);
     }
 
@@ -69,7 +70,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        mSubscriptions.clear();
+        mCompositeDisposable.clear();
     }
 
     private void openTask() {
@@ -79,8 +80,10 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         }
 
         mTaskDetailView.setLoadingIndicator(true);
-        mSubscriptions.add(mTasksRepository
+        mCompositeDisposable.add(mTasksRepository
                 .getTask(mTaskId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe(

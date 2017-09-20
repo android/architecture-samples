@@ -16,13 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-
-import static org.hamcrest.Matchers.containsString;
-
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
@@ -39,6 +32,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the statistics screen.
@@ -81,7 +80,7 @@ public class StatisticsScreenTest {
     }
 
     @Test
-    public void Tasks_ShowsNonEmptyMessage() throws Exception {
+    public void tasks_ShowsNonEmptyMessage() throws Exception {
         // Check that the active and completed tasks text is displayed
         String expectedActiveTaskText = InstrumentationRegistry.getTargetContext()
                 .getString(R.string.statistics_active_tasks);

@@ -28,13 +28,15 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.google.common.base.Optional;
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,7 +53,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     private final BriteDatabase mDatabaseHelper;
 
     @NonNull
-    private Func1<Cursor, Task> mTaskMapperFunction;
+    private Function<Cursor, Task> mTaskMapperFunction;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context,
@@ -59,7 +61,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
-        SqlBrite sqlBrite = SqlBrite.create();
+        SqlBrite sqlBrite = new SqlBrite.Builder().build();
         mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
         mTaskMapperFunction = this::getTask;
     }
@@ -89,7 +91,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Flowable<List<Task>> getTasks() {
         String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
@@ -98,11 +100,12 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
         String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
-                .mapToList(mTaskMapperFunction);
+                .mapToList(mTaskMapperFunction)
+                .toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
@@ -112,7 +115,8 @@ public class TasksLocalDataSource implements TasksDataSource {
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
                 TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
-                .mapToOneOrDefault(mTaskMapperFunction, null);
+                .mapToOneOrDefault(cursor -> Optional.of(mTaskMapperFunction.apply(cursor)), Optional.<Task>absent())
+                .toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @Override

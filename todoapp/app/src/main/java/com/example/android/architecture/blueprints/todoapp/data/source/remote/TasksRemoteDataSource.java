@@ -16,12 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.google.common.collect.Lists;
+import com.google.common.base.Optional;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -29,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 /**
  * Implementation of the data source that adds a latency simulating network.
@@ -56,7 +55,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     // Prevent direct instantiation.
-    private TasksRemoteDataSource() {}
+    private TasksRemoteDataSource() {
+    }
 
     private static void addTask(String title, String description) {
         Task newTask = new Task(title, description);
@@ -64,20 +64,21 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
-        return Observable
-                .from(TASKS_SERVICE_DATA.values())
+    public Flowable<List<Task>> getTasks() {
+        return Flowable
+                .fromIterable(TASKS_SERVICE_DATA.values())
                 .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
-                .toList();
+                .toList()
+                .toFlowable();
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Flowable<Optional<Task>> getTask(@NonNull String taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
-        if(task != null) {
-            return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+        if (task != null) {
+            return Flowable.just(Optional.of(task)).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
         } else {
-            return Observable.empty();
+            return Flowable.empty();
         }
     }
 

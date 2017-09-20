@@ -19,10 +19,12 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.common.base.Optional;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Flowable;
+
 
 /**
  * Main entry point for accessing tasks data.
@@ -30,9 +32,9 @@ import rx.Observable;
  */
 public interface TasksDataSource {
 
-    Observable<List<Task>> getTasks();
+    Flowable<List<Task>> getTasks();
 
-    Observable<Task> getTask(@NonNull String taskId);
+    Flowable<Optional<Task>> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 
