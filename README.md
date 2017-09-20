@@ -1,11 +1,5 @@
 # TODO-MVP-RXJAVA
 
-Project owners: 
-
-* [Erik Hellman](https://github.com/erikhellman)
-* [Florina Muntenescu](https://github.com/florina-muntenescu)
-* [Voicu Klein](https://github.com/kleinsenberg)
-
 ### Summary
 
 This sample is based on the TODO-MVP project and uses RxJava 2 for communication between the data model and presenter layers.
@@ -22,7 +16,7 @@ Flowable<Optional<Task>> getTask(@NonNull String taskId);
 
 A major difference between RxJava 1 and 2 is that streams no longer support the propagation of null items, so we are using Guava's [Optional](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Optional.html).
 
-To get a better understanding of the differences between RxJava 1 and RxJava 2 click [here](https://github.com/ReactiveX/RxJava/wiki/What%27s-different-in-2.0).
+To get a better understanding of the differences between RxJava 1 and RxJava 2 see [_What's different in 2.0_](https://github.com/ReactiveX/RxJava/wiki/What%27s-different-in-2.0) and the [pull request](https://github.com/googlesamples/android-architecture/pull/420) to migrate this branch to RxJava 2. To browse the code with RxJava 1, see the [last commit before the migration](https://github.com/googlesamples/android-architecture/tree/01a248f874dad42cede2297816bcee1c73ae0b9b).
 
 This is implemented in ``TasksLocalDataSource`` with the help of [SqlBrite](https://github.com/square/sqlbrite). The result of queries to the database being easily exposed as streams of data.
 
@@ -128,3 +122,8 @@ High.
 #### Learning cost
 
 Medium as RxJava is not trivial.
+
+## External contributors
+
+* [Voicu Klein](https://github.com/kleinsenberg)
+* [Erik Hellman](https://github.com/erikhellman)
