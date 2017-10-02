@@ -63,7 +63,7 @@ public class TestUtils {
      */
     public static String getToolbarNavigationContentDescription(
             @NonNull Activity activity, @IdRes int toolbar1) {
-        Toolbar toolbar = (Toolbar) activity.findViewById(toolbar1);
+        Toolbar toolbar = activity.findViewById(toolbar1);
         if (toolbar != null) {
             return (String) toolbar.getNavigationContentDescription();
         } else {

@@ -65,8 +65,8 @@ public class AddEditTaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = (TextView) root.findViewById(R.id.add_task_title);
-        mDescription = (TextView) root.findViewById(R.id.add_task_description);
+        mTitle = root.findViewById(R.id.add_task_title);
+        mDescription = root.findViewById(R.id.add_task_description);
         setHasOptionsMenu(true);
 
         setupFab();
@@ -105,6 +105,7 @@ public class AddEditTaskFragment extends Fragment {
                         // onError
                         throwable -> Log.e(TAG, "Error retrieving snackbar text", throwable)));
 
+        // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
         // every time a new UiModel is emitted update the Ui
         mSubscription.add(mViewModel.getUiModel()
@@ -140,7 +141,7 @@ public class AddEditTaskFragment extends Fragment {
 
     private void setupFab() {
         FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
+                getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
         fab.setOnClickListener(__ -> saveTask());
     }

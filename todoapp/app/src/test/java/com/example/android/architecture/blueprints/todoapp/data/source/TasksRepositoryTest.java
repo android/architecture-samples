@@ -315,7 +315,7 @@ public class TasksRepositoryTest {
     class ArrangeBuilder {
 
         ArrangeBuilder withTasksNotAvailable(TasksDataSource dataSource) {
-            when(dataSource.getTasks()).thenReturn(Observable.just(Collections.<Task>emptyList()));
+            when(dataSource.getTasks()).thenReturn(Observable.just(Collections.emptyList()));
             return this;
         }
 
@@ -326,12 +326,12 @@ public class TasksRepositoryTest {
         }
 
         ArrangeBuilder withTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-            when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.<Task>never()));
+            when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.never()));
             return this;
         }
 
         ArrangeBuilder withTaskAvailable(TasksDataSource dataSource, Task task) {
-            when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task).concatWith(Observable.<Task>never()));
+            when(dataSource.getTask(eq(task.getId()))).thenReturn(Observable.just(task).concatWith(Observable.never()));
             return this;
         }
 

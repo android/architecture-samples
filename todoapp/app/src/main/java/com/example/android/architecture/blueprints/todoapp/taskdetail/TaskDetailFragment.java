@@ -79,10 +79,10 @@ public class TaskDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
-        mLoadingProgress = (TextView) root.findViewById(R.id.loading_progress);
-        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
-        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+        mLoadingProgress = root.findViewById(R.id.loading_progress);
+        mDetailTitle = root.findViewById(R.id.task_detail_title);
+        mDetailDescription = root.findViewById(R.id.task_detail_description);
+        mDetailCompleteStatus = root.findViewById(R.id.task_detail_complete);
 
         setupFab();
 
@@ -105,7 +105,7 @@ public class TaskDetailFragment extends Fragment {
 
     private void setupFab() {
         FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+                getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(__ -> editTask());
     }
@@ -126,6 +126,7 @@ public class TaskDetailFragment extends Fragment {
                         // onError
                         __ -> showMissingTask()));
 
+        // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the loading indicator visibility
         // for every emission, update the visibility of the loading indicator
         mSubscription.add(getViewModel().getLoadingIndicatorVisibility()

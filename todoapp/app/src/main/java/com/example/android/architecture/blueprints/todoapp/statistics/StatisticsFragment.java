@@ -56,7 +56,7 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
-        mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
+        mStatisticsTV = root.findViewById(R.id.statistics);
 
         mViewModel = StatisticsModule.createStatisticsViewModel(getContext());
 
@@ -77,10 +77,11 @@ public class StatisticsFragment extends Fragment {
 
     private void bindViewModel() {
         Preconditions.checkNotNull(mViewModel);
-        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
-        // later unsubscribed together
+        // using a CompositeSubscription to gather all the subscriptions
+        // so all of them can be later unsubscribed together
         mSubscription = new CompositeSubscription();
 
+        // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
         // every time a new Ui Model is emitted, update the statistics
         mSubscription.add(mViewModel.getUiModel()

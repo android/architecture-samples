@@ -27,8 +27,8 @@ final class TaskItemViewHolder implements View.OnClickListener, CheckBox.OnCheck
 
     public TaskItemViewHolder(View rowView) {
         mRow = rowView;
-        mTitle = (TextView) rowView.findViewById(R.id.title);
-        mCheckBox = (CheckBox) rowView.findViewById(R.id.complete);
+        mTitle = rowView.findViewById(R.id.title);
+        mCheckBox = rowView.findViewById(R.id.complete);
 
         rowView.setOnClickListener(this);
     }
