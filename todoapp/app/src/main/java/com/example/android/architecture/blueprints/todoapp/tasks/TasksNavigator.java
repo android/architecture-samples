@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
 /**
  * Defines the navigation actions that can be called from the task list screen.
@@ -28,9 +28,9 @@ import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNa
 public class TasksNavigator {
 
     @NonNull
-    private final BaseNavigationProvider mNavigationProvider;
+    private final BaseNavigator mNavigationProvider;
 
-    public TasksNavigator(@NonNull BaseNavigationProvider mNavigationProvider) {
+    public TasksNavigator(@NonNull BaseNavigator mNavigationProvider) {
         this.mNavigationProvider = mNavigationProvider;
     }
 

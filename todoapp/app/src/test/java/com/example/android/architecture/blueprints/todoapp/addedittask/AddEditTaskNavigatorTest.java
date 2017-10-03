@@ -2,7 +2,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
 
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 public class AddEditTaskNavigatorTest {
 
     @Mock
-    private BaseNavigationProvider mNavigationProvider;
+    private BaseNavigator mNavigationProvider;
 
     private AddEditTaskNavigator mNavigator;
 

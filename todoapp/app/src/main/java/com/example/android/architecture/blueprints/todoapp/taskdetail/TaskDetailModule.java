@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
 /**
  * Enables inversion of control of the ViewModel and Navigator classes for task detail.
@@ -18,14 +18,14 @@ class TaskDetailModule {
             @Nullable String taskId,
             @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
-        BaseNavigationProvider navigationProvider = Injection.createNavigationProvider(activity);
+        BaseNavigator navigationProvider = Injection.createNavigationProvider(activity);
         return new TaskDetailViewModel(taskId, Injection.provideTasksRepository(appContext),
                 createTaskDetailNavigator(navigationProvider));
     }
 
     @NonNull
     public static TaskDetailNavigator createTaskDetailNavigator(
-            @NonNull BaseNavigationProvider navigationProvider) {
+            @NonNull BaseNavigator navigationProvider) {
         return new TaskDetailNavigator(navigationProvider);
     }
 

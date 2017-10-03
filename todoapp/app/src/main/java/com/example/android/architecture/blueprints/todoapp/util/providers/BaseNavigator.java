@@ -3,7 +3,7 @@ package com.example.android.architecture.blueprints.todoapp.util.providers;
 /**
  * Handles navigation between Activities in the app.
  */
-public interface BaseNavigationProvider {
+public interface BaseNavigator {
 
     /**
      * Finish an Activity

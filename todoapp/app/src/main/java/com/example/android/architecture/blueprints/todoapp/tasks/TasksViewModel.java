@@ -61,7 +61,7 @@ public final class TasksViewModel {
                           @NonNull TasksNavigator navigationProvider,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
-        mNavigator = checkNotNull(navigationProvider, "NavigationProvider cannot be null");
+        mNavigator = checkNotNull(navigationProvider, "Navigator cannot be null");
         mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
 
         mLoadingIndicatorSubject = BehaviorSubject.create(false);

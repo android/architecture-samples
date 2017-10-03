@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
 /**
  * Defines the navigation actions that can be called from the Details screen.
@@ -28,9 +28,9 @@ import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNa
 public class TaskDetailNavigator {
 
     @NonNull
-    private final BaseNavigationProvider mNavigationProvider;
+    private final BaseNavigator mNavigationProvider;
 
-    public TaskDetailNavigator(@NonNull BaseNavigationProvider navigationProvider) {
+    public TaskDetailNavigator(@NonNull BaseNavigator navigationProvider) {
         mNavigationProvider = navigationProvider;
     }
 

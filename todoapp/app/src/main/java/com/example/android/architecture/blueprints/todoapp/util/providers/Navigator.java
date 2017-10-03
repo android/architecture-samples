@@ -6,13 +6,13 @@ import android.content.Intent;
 import java.lang.ref.WeakReference;
 
 /**
- * Implementation of the {@link BaseNavigationProvider}.
+ * Implementation of the {@link BaseNavigator}.
  */
-public final class NavigationProvider implements BaseNavigationProvider {
+public final class Navigator implements BaseNavigator {
 
     private final WeakReference<Activity> mActivity;
 
-    public NavigationProvider(Activity activity) {
+    public Navigator(Activity activity) {
         mActivity = new WeakReference<>(activity);
     }
 
