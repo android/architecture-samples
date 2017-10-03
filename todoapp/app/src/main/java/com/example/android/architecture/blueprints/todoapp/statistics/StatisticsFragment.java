@@ -13,38 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.google.common.base.Preconditions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment implements StatisticsContract.View {
+public class StatisticsFragment extends Fragment {
+
+    private static final String TAG = StatisticsFragment.class.getSimpleName();
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.Presenter mPresenter;
+    @Nullable
+    private StatisticsViewModel mViewModel;
+
+    @Nullable
+    private CompositeSubscription mSubscription;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
-    }
-
-    @Override
-    public void setPresenter(@NonNull StatisticsContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
     }
 
     @Nullable
@@ -52,48 +56,51 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
-        mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
+        mStatisticsTV = root.findViewById(R.id.statistics);
+
+        mViewModel = StatisticsModule.createStatisticsViewModel(getContext());
+
         return root;
     }
 
     @Override
     public void onResume() {
+        bindViewModel();
         super.onResume();
-        mPresenter.subscribe();
     }
 
     @Override
     public void onPause() {
+        unbindViewModel();
         super.onPause();
-        mPresenter.unsubscribe();
     }
 
-    @Override
-    public void setProgressIndicator(boolean active) {
-        if (active) {
-            mStatisticsTV.setText(getString(R.string.loading));
-        }
+    private void bindViewModel() {
+        Preconditions.checkNotNull(mViewModel);
+        // using a CompositeSubscription to gather all the subscriptions
+        // so all of them can be later unsubscribed together
+        mSubscription = new CompositeSubscription();
+
+        // The ViewModel holds an observable containing the state of the UI.
+        // subscribe to the emissions of the UiModel
+        // every time a new Ui Model is emitted, update the statistics
+        mSubscription.add(mViewModel.getUiModel()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::updateStatistics,
+                        // onError
+                        throwable -> Log.e(TAG, "Error retrieving statistics text", throwable)));
     }
 
-    @Override
-    public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
-        if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
-            mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
-        } else {
-            String displayString = getResources().getString(R.string.statistics_active_tasks) + " "
-                    + numberOfIncompleteTasks + "\n" + getResources().getString(
-                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
-            mStatisticsTV.setText(displayString);
-        }
+    private void unbindViewModel() {
+        Preconditions.checkNotNull(mSubscription);
+        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
+        mSubscription.unsubscribe();
     }
 
-    @Override
-    public void showLoadingStatisticsError() {
-        mStatisticsTV.setText(getResources().getString(R.string.statistics_error));
-    }
-
-    @Override
-    public boolean isActive() {
-        return isAdded();
+    private void updateStatistics(@NonNull StatisticsUiModel statistics) {
+        mStatisticsTV.setText(statistics.getText());
     }
 }

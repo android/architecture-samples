@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
@@ -30,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
  */
 public class TaskDetailActivity extends AppCompatActivity {
 
+    public static final int REQUEST_EDIT_TASK = 1;
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
     @Override
@@ -39,7 +41,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         setContentView(R.layout.taskdetail_act);
 
         // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
@@ -57,13 +59,15 @@ public class TaskDetailActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     taskDetailFragment, R.id.contentFrame);
         }
+    }
 
-        // Create the presenter
-        new TaskDetailPresenter(
-                taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                taskDetailFragment,
-                Injection.provideSchedulerProvider());
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // forward the result to the fragment
+        Fragment tasksFragment = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (tasksFragment != null) {
+            tasksFragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -34,18 +33,14 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
-
-    public static final String SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY";
-
-    private AddEditTaskPresenter mAddEditTaskPresenter;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addtask_act);
 
         // Set up the toolbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -57,7 +52,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
 
         if (addEditTaskFragment == null) {
-            addEditTaskFragment = AddEditTaskFragment.newInstance();
+            addEditTaskFragment = AddEditTaskFragment.newInstance(taskId);
 
             if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
                 actionBar.setTitle(R.string.edit_task);
@@ -68,31 +63,6 @@ public class AddEditTaskActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
-
-        boolean shouldLoadDataFromRepo = true;
-
-        // Prevent the presenter from loading data from the repository if this is a config change.
-        if (savedInstanceState != null) {
-            // Data might not have loaded when the config change happen, so we saved the state.
-            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY);
-        }
-
-        // Create the presenter
-        mAddEditTaskPresenter = new AddEditTaskPresenter(
-                taskId,
-                Injection.provideTasksRepository(getApplicationContext()),
-                addEditTaskFragment,
-                shouldLoadDataFromRepo,
-                Injection.provideSchedulerProvider());
-
-        addEditTaskFragment.setPresenter(mAddEditTaskPresenter);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // Save the state so that next time we know if we need to refresh data.
-        outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, mAddEditTaskPresenter.isDataMissing());
-        super.onSaveInstanceState(outState);
     }
 
     @Override

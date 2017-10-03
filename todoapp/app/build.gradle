@@ -12,10 +12,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-
-        jackOptions {
-            enabled true
-        }
     }
 
     compileOptions {
@@ -41,13 +37,17 @@ android {
         }
     }
 
+    // Using gradle plugin 3 you need to specify flavor dimensions.
+    flavorDimensions 'buildType'
+
     // If you need to add more flavors, consider using flavor dimensions.
     productFlavors {
         mock {
+            dimension 'buildType'
             applicationIdSuffix = ".mock"
         }
         prod {
-
+            dimension 'buildType'
         }
     }
 
@@ -55,7 +55,7 @@ android {
     android.variantFilter { variant ->
         if(variant.buildType.name.equals('release')
                 && variant.getFlavors().get(0).name.equals('mock')) {
-            variant.setIgnore(true);
+            variant.setIgnore(true)
         }
     }
 

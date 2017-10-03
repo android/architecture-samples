@@ -7,7 +7,7 @@ machine:
 dependencies:
   pre:
     - sudo pip install -U crcmod
-    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-24.0.2,android-24,extra-android-m2repository"
+    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-26.0.1,android-26,extra-android-m2repository,extra-google-m2repository"
 
   post:
     - cd todoapp;./gradlew :app:assembleDebug -PdisablePreDex

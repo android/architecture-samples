@@ -16,14 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,34 +32,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.google.common.base.Preconditions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
+public class TaskDetailFragment extends Fragment {
+
+    private static final String TAG = TaskDetailFragment.class.getSimpleName();
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
 
-    @NonNull
-    private static final int REQUEST_EDIT_TASK = 1;
-
-    private TaskDetailContract.Presenter mPresenter;
+    private TextView mLoadingProgress;
 
     private TextView mDetailTitle;
 
     private TextView mDetailDescription;
 
     private CheckBox mDetailCompleteStatus;
+
+    @Nullable
+    private TaskDetailViewModel mViewModel;
+
+    @Nullable
+    private CompositeSubscription mSubscription;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();
@@ -68,47 +73,93 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return fragment;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.subscribe();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mPresenter.unsubscribe();
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
-        mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
-        mDetailDescription = (TextView) root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
+        mLoadingProgress = root.findViewById(R.id.loading_progress);
+        mDetailTitle = root.findViewById(R.id.task_detail_title);
+        mDetailDescription = root.findViewById(R.id.task_detail_description);
+        mDetailCompleteStatus = root.findViewById(R.id.task_detail_complete);
 
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+        setupFab();
 
-        fab.setOnClickListener(__ -> mPresenter.editTask());
+        mViewModel = TaskDetailModule.createTaskDetailsViewModel(getTaskId(), getActivity());
 
         return root;
     }
 
     @Override
-    public void setPresenter(@NonNull TaskDetailContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void onResume() {
+        bindViewModel();
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        unbindViewModel();
+        super.onPause();
+    }
+
+    private void setupFab() {
+        FloatingActionButton fab =
+                getActivity().findViewById(R.id.fab_edit_task);
+
+        fab.setOnClickListener(__ -> editTask());
+    }
+
+    private void bindViewModel() {
+        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
+        // later unsubscribed together
+        mSubscription = new CompositeSubscription();
+
+        // subscribe to the emissions of the Ui Model
+        // every time a new Ui Model, update the View
+        mSubscription.add(getViewModel().getTaskUiModel()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::updateView,
+                        // onError
+                        __ -> showMissingTask()));
+
+        // The ViewModel holds an observable containing the state of the UI.
+        // subscribe to the emissions of the loading indicator visibility
+        // for every emission, update the visibility of the loading indicator
+        mSubscription.add(getViewModel().getLoadingIndicatorVisibility()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::setLoadingIndicatorVisibility,
+                        // onError
+                        __ -> showMissingTask()));
+
+        // subscribe to the emissions of the snackbar text
+        // every time the snackbar text emits, show the snackbar
+        mSubscription.add(getViewModel().getSnackbarText()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        this::showSnackbar,
+                        // onError
+                        throwable -> Log.e(TAG, "Unable to display snackbar text", throwable)));
+    }
+
+    private void unbindViewModel() {
+        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
+        getSubscription().unsubscribe();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                mPresenter.deleteTask();
+                deleteTask();
                 return true;
         }
         return false;
@@ -120,95 +171,97 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public void setLoadingIndicator(boolean active) {
-        if (active) {
-            mDetailTitle.setText("");
-            mDetailDescription.setText(getString(R.string.loading));
-        }
+    private void updateView(TaskUiModel model) {
+        int titleVisibility = model.isShowTitle() ? View.VISIBLE : View.GONE;
+        int descriptionVisibility = model.isShowDescription() ? View.VISIBLE : View.GONE;
+
+        mDetailTitle.setVisibility(titleVisibility);
+        mDetailTitle.setText(model.getTitle());
+        mDetailDescription.setVisibility(descriptionVisibility);
+        mDetailDescription.setText(model.getDescription());
+        showCompletionStatus(model.isChecked());
     }
 
-    @Override
-    public void hideDescription() {
-        mDetailDescription.setVisibility(View.GONE);
+    private void setLoadingIndicatorVisibility(boolean isVisible) {
+        int visibility = isVisible ? View.VISIBLE : View.GONE;
+        mLoadingProgress.setVisibility(visibility);
     }
 
-    @Override
-    public void hideTitle() {
-        mDetailTitle.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void showDescription(@NonNull String description) {
-        mDetailDescription.setVisibility(View.VISIBLE);
-        mDetailDescription.setText(description);
-    }
-
-    @Override
-    public void showCompletionStatus(final boolean complete) {
-        Preconditions.checkNotNull(mDetailCompleteStatus);
-
+    private void showCompletionStatus(final boolean complete) {
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-                    if (isChecked) {
-                        mPresenter.completeTask();
-                    } else {
-                        mPresenter.activateTask();
-                    }
-                });
+                (buttonView, isChecked) -> taskCheckChanged(isChecked));
     }
 
-    @Override
-    public void showEditTask(@NonNull String taskId) {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-        startActivityForResult(intent, REQUEST_EDIT_TASK);
+    private void taskCheckChanged(final boolean checked) {
+        getSubscription().add(getViewModel().taskCheckChanged(checked)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        () -> {
+                            // nothing to do here
+                        },
+                        // onError
+                        throwable -> showMissingTask()));
     }
 
-    @Override
-    public void showTaskDeleted() {
-        getActivity().finish();
+    private void deleteTask() {
+        getSubscription().add(getViewModel().deleteTask()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        // onNext
+                        () -> {
+                            //nothing to do here
+                        },
+                        // onError
+                        __ -> showMissingTask()));
     }
 
-    public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
+    private void editTask() {
+        getSubscription().add(getViewModel().editTask()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(  // onNext
+                        () -> {
+                            //nothing to do here
+                        },
+                        // onError
+                        __ -> showMissingTask()));
     }
 
-    @Override
-    public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
+    private void showSnackbar(@StringRes int text) {
+        Snackbar.make(getView(), text, Snackbar.LENGTH_LONG)
                 .show();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_TASK) {
-            // If the task was edited successfully, go back to the list.
-            if (resultCode == Activity.RESULT_OK) {
-                getActivity().finish();
-                return;
-            }
-        }
+        mViewModel.handleActivityResult(requestCode, resultCode);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void showTitle(@NonNull String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
-        mDetailTitle.setText(title);
-    }
-
-    @Override
-    public void showMissingTask() {
+    private void showMissingTask() {
         mDetailTitle.setText("");
         mDetailDescription.setText(getString(R.string.no_data));
     }
 
-    @Override
-    public boolean isActive() {
-        return isAdded();
+    @NonNull
+    private TaskDetailViewModel getViewModel() {
+        return Preconditions.checkNotNull(mViewModel);
     }
 
+    @NonNull
+    private CompositeSubscription getSubscription() {
+        return Preconditions.checkNotNull(mSubscription);
+    }
+
+    @Nullable
+    private String getTaskId() {
+        if (getArguments() != null) {
+            return getArguments().getString(ARGUMENT_TASK_ID);
+        }
+        return null;
+    }
 }
