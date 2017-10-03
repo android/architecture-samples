@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -30,8 +32,6 @@ import com.example.android.architecture.blueprints.todoapp.util.providers.Naviga
 import com.example.android.architecture.blueprints.todoapp.util.providers.ResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of mock implementations for

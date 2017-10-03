@@ -24,9 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
-import com.example.android.architecture.blueprints.todoapp.util.providers.NavigationProvider;
+import com.example.android.architecture.blueprints.todoapp.util.providers.Navigator;
 import com.example.android.architecture.blueprints.todoapp.util.providers.ResourceProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.SchedulerProvider;
@@ -58,7 +58,7 @@ public class Injection {
     }
 
     @NonNull
-    public static BaseNavigationProvider createNavigationProvider(@NonNull Activity activity) {
-        return new NavigationProvider(activity);
+    public static BaseNavigator createNavigationProvider(@NonNull Activity activity) {
+        return new Navigator(activity);
     }
 }
