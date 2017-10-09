@@ -54,7 +54,7 @@ Notice also in the following illustration that this version of the app uses frag
 
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Illustration of the MVP architechture for this version of the app."/>
 
-This version of the app includes a number of unit tests which cover presenters, repositories, and data sources. The sample also includes UI tests, that rely on fake data, and are faciliated by dependency injection to provide fake modules. For more information on using dependency injection to faciliate testing, see [Leveraging product flavors in Android Studio for hermetic testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
+This version of the app includes a number of unit tests which cover presenters, repositories, and data sources. The sample also includes UI tests, that rely on fake data, and are facilitated by dependency injection to provide fake modules. For more information on using dependency injection to facilitate testing, see [Leveraging product flavors in Android Studio for hermetic testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 
 ### Maintaining the app
 
