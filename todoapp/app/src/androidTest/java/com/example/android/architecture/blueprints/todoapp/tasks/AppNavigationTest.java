@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import android.support.test.espresso.NoActivityResumedException;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.widget.DrawerLayout;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.DrawerActions.open;
@@ -39,6 +41,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.example.android.architecture.blueprints.todoapp.TestUtils.getToolbarNavigationContentDescription;
 import static com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo;
+import static junit.framework.Assert.fail;
 
 /**
  * Tests for the {@link DrawerLayout} layout component in {@link TasksActivity} which manages
@@ -61,14 +64,7 @@ public class AppNavigationTest {
 
     @Test
     public void clickOnStatisticsNavigationItem_ShowsStatisticsScreen() {
-        // Open Drawer to click on navigation.
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
-                .perform(open()); // Open Drawer
-
-        // Start statistics screen.
-        onView(withId(R.id.nav_view))
-                .perform(navigateTo(R.id.statistics_navigation_menu_item));
+        openStatisticsScreen();
 
         // Check that statistics Activity was opened.
         onView(withId(R.id.statistics)).check(matches(isDisplayed()));
@@ -76,23 +72,9 @@ public class AppNavigationTest {
 
     @Test
     public void clickOnListNavigationItem_ShowsListScreen() {
-        // Open Drawer to click on navigation.
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
-                .perform(open()); // Open Drawer
+        openStatisticsScreen();
 
-        // Start statistics screen.
-        onView(withId(R.id.nav_view))
-                .perform(navigateTo(R.id.statistics_navigation_menu_item));
-
-        // Open Drawer to click on navigation.
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
-                .perform(open()); // Open Drawer
-
-        // Start tasks list screen.
-        onView(withId(R.id.nav_view))
-                .perform(navigateTo(R.id.list_navigation_menu_item));
+        openTasksScreen();
 
         // Check that Tasks Activity was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()));
@@ -111,5 +93,67 @@ public class AppNavigationTest {
         // Check if drawer is open
         onView(withId(R.id.drawer_layout))
                 .check(matches(isOpen(Gravity.LEFT))); // Left drawer is open open.
+    }
+
+    @Test
+    public void Statistics_backNavigatesToTasks() {
+        openStatisticsScreen();
+
+        // Press back to go back to the tasks list
+        pressBack();
+
+        // Check that Tasks Activity was restored.
+        onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void backFromTasksScreen_ExitsApp() {
+        // From the tasks screen, press back should exit the app.
+        assertPressingBackExitsApp();
+    }
+
+    @Test
+    public void backFromTasksScreenAfterStats_ExitsApp() {
+        // This test checks that TasksActivity is a parent of StatisticsActivity
+
+        // Open the stats screen
+        openStatisticsScreen();
+
+        // Open the tasks screen to restore the task
+        openTasksScreen();
+
+        // Pressing back should exit app
+        assertPressingBackExitsApp();
+    }
+
+    private void assertPressingBackExitsApp() {
+        try {
+            pressBack();
+            fail("Should kill the app and throw an exception");
+        } catch (NoActivityResumedException e) {
+            // Test OK
+        }
+    }
+
+    private void openTasksScreen() {
+        // Open Drawer to click on navigation item.
+        onView(withId(R.id.drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
+                .perform(open()); // Open Drawer
+
+        // Start tasks list screen.
+        onView(withId(R.id.nav_view))
+                .perform(navigateTo(R.id.list_navigation_menu_item));
+    }
+
+    private void openStatisticsScreen() {
+        // Open Drawer to click on navigation item.
+        onView(withId(R.id.drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
+                .perform(open()); // Open Drawer
+
+        // Start statistics screen.
+        onView(withId(R.id.nav_view))
+                .perform(navigateTo(R.id.statistics_navigation_menu_item));
     }
 }
