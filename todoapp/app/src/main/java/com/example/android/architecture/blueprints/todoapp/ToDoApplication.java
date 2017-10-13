@@ -23,9 +23,7 @@ public class ToDoApplication extends DaggerApplication {
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-        AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
-        appComponent.inject(this);
-        return appComponent;
+        return DaggerAppComponent.builder().application(this).build();
     }
 
     /**
