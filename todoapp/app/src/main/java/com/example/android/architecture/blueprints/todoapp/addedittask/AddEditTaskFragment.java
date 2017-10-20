@@ -128,8 +128,11 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupActionBar() {
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (getArguments() != null) {
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+        if (getArguments().get(ARGUMENT_EDIT_TASK_ID) != null) {
             actionBar.setTitle(R.string.edit_task);
         } else {
             actionBar.setTitle(R.string.add_task);
