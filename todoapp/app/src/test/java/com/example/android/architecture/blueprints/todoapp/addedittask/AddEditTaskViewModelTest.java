@@ -69,6 +69,16 @@ public class AddEditTaskViewModelTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView(){
+        // Get a reference to the class under test
+        mAddEditTaskPresenter = new AddEditTaskPresenter(
+                null, mTasksRepository, mAddEditTaskView, true);
+
+        // Then the presenter is set to the view
+        verify(mAddEditTaskView).setPresenter(mAddEditTaskPresenter);
+    }
+
+    @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the ViewModel is asked to save a task
         mAddEditTaskViewModel.description.set("Some Task Description");

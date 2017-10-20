@@ -18,15 +18,14 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,19 +56,11 @@ public class StatisticsScreenTest {
     public ActivityTestRule<StatisticsActivity> mStatisticsActivityTestRule =
             new ActivityTestRule<>(StatisticsActivity.class, true, false);
 
-    /**
-     * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
-     * a particular task id, which is then loaded from the service API.
-     *
-     * <p>
-     * Note that this test runs hermetically and is fully isolated using a fake implementation of
-     * the service API. This is a great way to make your tests more reliable and faster at the same
-     * time, since they are isolated from any outside dependencies.
-     */
     @Before
-    public void intentWithStubbedTaskId() {
+    public void startWithTwoTasks() {
         // Given some tasks
         TasksRepository.destroyInstance();
+        FakeTasksRemoteDataSource.getInstance().deleteAllTasks();
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
         FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
 

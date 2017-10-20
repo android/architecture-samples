@@ -149,8 +149,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
                             case R.id.statistics_navigation_menu_item:
                                 Intent intent =
                                         new Intent(TasksActivity.this, StatisticsActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 break;
                             default:

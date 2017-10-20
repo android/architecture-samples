@@ -40,6 +40,7 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
     public static final int ADD_EDIT_RESULT_OK = RESULT_FIRST_USER + 1;
 
     public static final String ADD_EDIT_VIEWMODEL_TAG = "ADD_EDIT_VIEWMODEL_TAG";
+
     private AddEditTaskViewModel mViewModel;
 
     @Override
