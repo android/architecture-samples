@@ -52,9 +52,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/title_hint"
+                    android:maxLines="1"
                     android:text="@={viewmodel.title}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:maxLines="1"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
                 <EditText
                     android:id="@+id/add_task_description"
