@@ -16,18 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.android.architecture.blueprints.todoapp.TestUseCaseScheduler;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +30,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskPresenter}.
@@ -131,6 +131,6 @@ public class AddEditTaskPresenterTest {
         SaveTask saveTask = new SaveTask(mTasksRepository);
 
         return new AddEditTaskPresenter(useCaseHandler, taskId, mAddEditTaskView, getTask,
-                saveTask);
+                saveTask, true);
     }
 }

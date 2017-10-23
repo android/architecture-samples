@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
 
@@ -27,6 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.domain.us
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.filter.FilterFactory;
@@ -34,6 +33,9 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.ClearCompleteTasks;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of production implementations for
@@ -43,8 +45,10 @@ public class Injection {
 
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
         checkNotNull(context);
+        ToDoDatabase database = ToDoDatabase.getInstance(context);
         return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+                TasksLocalDataSource.getInstance(new AppExecutors(),
+                        database.taskDao()));
     }
 
     public static GetTasks provideGetTasks(@NonNull Context context) {
