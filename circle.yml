@@ -7,7 +7,7 @@ machine:
 dependencies:
   pre:
     - sudo pip install -U crcmod
-    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-26.0.1,android-26,extra-android-m2repository"
+    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,build-tools-26.0.2,android-26,extra-android-m2repository"
 
   post:
     - cd todoapp;./gradlew :app:assembleDebug -PdisablePreDex
@@ -19,7 +19,7 @@ dependencies:
 
 test:
   override:
-    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud firebase test android run --app todoapp/app/build/outputs/apk/app-mock-debug.apk --test todoapp/app/build/outputs/apk/app-mock-debug-androidTest.apk -d Nexus5X,Nexus10 -v 21,25 -l fr --results-bucket cloud-test-android-devrel-ci
+    - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud firebase test android run --app todoapp/app/build/outputs/apk/mock/debug/app-mock-debug.apk --test todoapp/app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk -d Nexus5X -v 26  -l fr --results-bucket cloud-test-android-devrel-ci
   post:
     - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U `sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-android-devrel-ci | tail -1` $CIRCLE_ARTIFACTS/ | true
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
