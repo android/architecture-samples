@@ -16,7 +16,7 @@ Before exploring this sample, you might find it useful to familiarize yourself w
 
 * The [project README](https://github.com/googlesamples/android-architecture/tree/master)
 * The [MVP](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) architecture
-  
+
 The todo-mvp sample uses the following dependencies:
 * [Common Android support libraries](https://developer.android.com/topic/libraries/support-library/index.html) -  Packages in the com.android.support.* namespace provide backwards compatibility and other features.
 * [Android Testing Support Library](https://developer.android.com/topic/libraries/testing-support-library/index.html) -  A framework used to support UI tests, using both Espresso, and AndroidJUnitRunner.
@@ -25,7 +25,7 @@ The todo-mvp sample uses the following dependencies:
 
 ### Designing the app
 
-All versions of the Android Blueprints app include the same common features in a simple to-do type app. The app consists of four UI screens: 
+All versions of the Android Blueprints app include the same common features in a simple to-do type app. The app consists of four UI screens:
 * Tasks - Used to manage a list of tasks.
 * TaskDetail - Used to read or delete a task.
 * AddEditTask - Used to create or edit tasks.
@@ -44,15 +44,16 @@ A presenter typically hosts business logic associated with a particular feature,
 
 Each version of the app implements the same features using a different approach to showcase and contrast a variety of architectural designs. For example, this version takes the following approaches to solving common implementation questions:
 
-* This sample uses [product flavors](https://developer.android.com/studio/build/build-variants.html) to replace modules at compile time, providing fake data for both manual and automated testing. 
-* This version uses callbacks to handle asynchronous tasks. 
+* This sample uses [product flavors](https://developer.android.com/studio/build/build-variants.html) to replace modules at compile time, providing fake data for both manual and automated testing.
+* This version uses callbacks to handle asynchronous tasks.
+* The data is stored locally in a SQLite database, using [Room](https://developer.android.com/topic/libraries/architecture/room.html).
 
 Notice also in the following illustration that this version of the app uses fragments, and this is for two reasons:
 
 * The use of both [activities](https://developer.android.com/guide/components/activities/index.html) and [fragments](https://developer.android.com/guide/components/fragments.html) allows for a better separation of concerns which complements this implementation of MVP. In this version of the app, the Activity is the overall controller which creates and connects views and presenters.
 * The use of fragments supports tablet layouts or UI screens with multiple views.
 
-<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Illustration of the MVP architechture for this version of the app."/>
+<img src="https://github.com/googlesamples/android-architecture/wiki/images/mvp.png" alt="Illustration of the MVP architecture for this version of the app."/>
 
 This version of the app includes a number of unit tests which cover presenters, repositories, and data sources. The sample also includes UI tests, that rely on fake data, and are facilitated by dependency injection to provide fake modules. For more information on using dependency injection to facilitate testing, see [Leveraging product flavors in Android Studio for hermetic testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 
@@ -64,6 +65,7 @@ The table below summarizes the amount of code used to implement this version of 
 
 | Language      | Number of files | Blank lines | Comment lines | Lines of code |
 | ------------- | --------------- | ----------- | ------------- | ------------- |
-| **Java**      |               46|         1075|           1451|           3451|
-| **XML**       |               34|           97|            337|            601|
-| **Total**     |               80|         1172|           1788|           4052|
+| **Java**      |               51|         1216|           1685|           3901|
+| **XML**       |               34|           97|            338|            608|
+| **Total**     |               85|         1313|           2023|           4509|
+
