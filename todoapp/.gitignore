@@ -5,5 +5,6 @@ build
 .gradle
 # Eclipse project files
 .project
-.settings/	
+.settings/
 .classpath
+.DS_Store

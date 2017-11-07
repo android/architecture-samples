@@ -62,11 +62,11 @@ The Data Binding Library takes care of the communication between some components
 
 The table below summarizes the amount of code used to implement this version of the app. You can use it as a basis for comparison with similar tables provided for each of the other samples in this project.
 
-| Language      | Number of files | Blank lines | Comment lines | Lines of code |
-| ------------- | --------------- | ----------- | ------------- | ------------- |
-| **Java**    |                   52          |  1166      |      1627     |       3655 (3450 in todo-mvp) |
-| **XML**                 |             35        |     127       |      352       |      745 |
-| **Total**            |        87       |     1293         |   1979       |     4400 |
+| Language      | Number of files | Blank lines | Lines of code |
+| ------------- | --------------- | ----------- | ------------- |
+| **Java**      |    56           |      1627   |       4093 (3901 in todo-mvp) |
+| **XML**       |             35  |      352    |      751      |
+| **Total**     |        91       |   1979      |     4844      |
 
 ## Comparing this sample
 
