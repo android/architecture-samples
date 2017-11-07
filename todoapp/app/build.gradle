@@ -30,6 +30,7 @@ android {
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
     }
+    flavorDimensions "default"
 
     flavorDimensions "default"
 
