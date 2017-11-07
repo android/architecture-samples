@@ -28,7 +28,7 @@ Instead of holding data, it dispatches data once. This is important to prevent e
 A convenient use for this is navigation. There is no reference to the View from a ViewModel so the communication between them must happen via a subscription. ViewModels expose
 events like `openTaskEvent` and views subscribe to them. For example:
 
-```
+```java
 private void subscribeToNavigationChanges(TaskDetailViewModel viewModel) {
     // The activity observes the navigation commands in the ViewModel
     viewModel.getEditTaskCommand().observe(this, new Observer<Void>() {
