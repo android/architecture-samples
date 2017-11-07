@@ -1,7 +1,5 @@
 # Android Architecture Blueprints [beta] - MVP + Clean Architecture
 
-Project owner: Jorge J. Barroso ([Karumi](http://github.com/Karumi))
-
 ### Summary
 This sample stands on the principles of [Clean Architecture](https://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
@@ -60,10 +58,10 @@ Adding a domain layer produces more classes and Java code.
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Java                            64           1278           1777           4121 (3450 in MVP)
-XML                             34             97            337            601
+Java                            70           1456           1999           4620 (3901 in MVP)
+XML                             34             97            338            601
 -------------------------------------------------------------------------------
-SUM:                            98           1375           2114           4722
+SUM:                            104           1553           2337           4722
 -------------------------------------------------------------------------------
 
 ```
@@ -72,6 +70,9 @@ SUM:                            98           1375           2114           4722
 #### Ease of amending or adding a feature / Learning cost
 Very easy. This approach is more verbose, making the maintenance tasks more obvious.
 
+## External contributors
+
+Jorge J. Barroso ([Karumi](http://github.com/Karumi))
 
 
 

@@ -35,6 +35,7 @@ import java.util.UUID;
 public final class Task {
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo(name = "entryid")
     private final String mId;
 
