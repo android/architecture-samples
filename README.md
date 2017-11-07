@@ -39,7 +39,6 @@ These samples are no longer being maintained, but their implementation is still 
 | [dev‑todo‑mvp‑tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Adds a master and detail view for tablets. |
 | [dev‑todo‑mvvm‑rxjava](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-rxjava/) | Based on the todo-rxjava sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
 | [dev‑todo‑mvvm‑live](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live/) | Uses lifecycle-aware [Architecture Components](http://developer.android.com/arch) (except Room), and the Data Binding library with an MVVM architecture. |
-| [dev‑todo‑mvp‑room](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-room/) | Uses [Room](https://developer.android.com/topic/libraries/architecture/room.html), the persistence library from the [Architecture Components](http://developer.android.com/arch), as a local data source with an MVP architecture. |
 | [dev-todo-mvp-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-kotlin/) | Conversion of todo-mvp to Kotlin. |
 | [dev-todo-mvvm-live-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live-kotlin/) | Conversion of todo-mvvm-live to Kotlin. |
 
