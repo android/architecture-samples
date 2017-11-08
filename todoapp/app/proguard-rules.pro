@@ -3,6 +3,7 @@
 
 -keep class android.support.v4.widget.DrawerLayout { *; }
 -keep class android.support.test.espresso.IdlingResource { *; }
+-keep class android.support.test.espresso.IdlingRegistry { *; }
 -keep class com.google.common.base.Preconditions { *; }
 
 # For Guava:

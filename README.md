@@ -6,8 +6,6 @@ This version of the app is called todo-mvp-kotlin, and provides a foundation for
 * Act as a reference point for comparing and contrasting the other kotlin samples in this project.
 * Leverage idiomatic kotlin to improve readability and limit verbosity, as compared to the TODO-MVP java project.
 
-This sample is a work in progress.
-
 # Dependencies
 *  Kotlin stdlib
 *  kotlin-android plugin
@@ -30,13 +28,13 @@ Same as TODO-MVP.
 
 ### Code metrics
 
-Files were converted 1:1 from TODO-MVP's Java code.
+Files were converted mostly 1:1 from TODO-MVP's Java code.
 
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Kotlin                          48            907           1539           3008 (3450 in MVP)
+Kotlin                          48            907           1539           3008 (3901 in MVP)
 XML                             34             95            338            816
 -------------------------------------------------------------------------------
 SUM:                            82           1002           1977           3824
