@@ -15,28 +15,29 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data
 
+import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import android.arch.persistence.room.ColumnInfo
 import java.util.UUID
 
 /**
- * Immutable model class for a Task.
+ * Immutable model class for a Task. In order to compile with Room, we can't use @JvmOverloads to
+ * generate multiple constructors.
+ *
  * @param title       title of the task
- *
  * @param description description of the task
- *
  * @param id          id of the task
- *
- * @param completed   true if the task is completed, false if it's active
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
-        @ColumnInfo(name = "title") val title: String,
-        @ColumnInfo(name = "description") val description: String = "",
-        @PrimaryKey @ColumnInfo(name = "entryid") val id: String = UUID.randomUUID().toString()
+        @ColumnInfo(name = "title") var title: String = "",
+        @ColumnInfo(name = "description") var description: String = "",
+        @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 
+    /**
+     * True if the task is completed, false if it's active.
+     */
     @ColumnInfo(name = "completed") var isCompleted = false
 
     val titleForList: String
