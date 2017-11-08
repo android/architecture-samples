@@ -45,8 +45,8 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupFab() {
-        with(activity.findViewById<View>(R.id.fab_edit_task)) {
-            setOnClickListener { viewDataBinding.viewmodel?.editTask() }
+        activity.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
+            viewDataBinding.viewmodel?.editTask()
         }
     }
 
@@ -55,8 +55,11 @@ class TaskDetailFragment : Fragment() {
         viewDataBinding.viewmodel?.start(arguments.getString(ARGUMENT_TASK_ID))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {
             viewmodel = (activity as TaskDetailActivity).obtainViewModel()
@@ -70,14 +73,15 @@ class TaskDetailFragment : Fragment() {
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
-            when (item.itemId) {
-                R.id.menu_delete -> {
-                    viewDataBinding.viewmodel?.deleteTask()
-                    true
-                }
-                else -> false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_delete -> {
+                viewDataBinding.viewmodel?.deleteTask()
+                return true
             }
+            else -> return false
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
@@ -93,6 +97,5 @@ class TaskDetailFragment : Fragment() {
                 putString(ARGUMENT_TASK_ID, taskId)
             }
         }
-
     }
 }
