@@ -39,41 +39,44 @@ import org.junit.runner.RunWith
                 ToDoDatabase::class.java).build()
     }
 
-    @After fun closeDb() {
-        database.close()
-    }
+    @After fun closeDb() = database.close()
+
 
     @Test fun insertTaskAndGetById() {
         // When inserting a task
-        database.taskDao().insertTask(TASK)
+        database.taskDao().insertTask(DEFAULT_TASK)
 
         // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(TASK.id)
+        val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
 
         // The loaded data contains the expected values
-        assertTask(loaded, "id", "title", "description", true)
+        assertTask(loaded, DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
     }
 
     @Test fun insertTaskReplacesOnConflict() {
-        //Given that a task is inserted
-        database.taskDao().insertTask(TASK)
+        // Given that a task is inserted
+        database.taskDao().insertTask(DEFAULT_TASK)
 
+        val newTitle = "title2"
+        val newDescription = "description2"
+        val newId = "id"
+        val newIsCompleted = true
         // When a task with the same id is inserted
-        val newTask = Task("title2", "description2", "id").apply {
-            isCompleted = true
+        val newTask = Task(newTitle, newDescription, newId).apply {
+            isCompleted = newIsCompleted
         }
         database.taskDao().insertTask(newTask)
 
         // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(TASK.id)
+        val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
 
         // The loaded data contains the expected values
-        assertTask(loaded, "id", "title2", "description2", true)
+        assertTask(loaded, newId, newTitle, newDescription, newIsCompleted)
     }
 
     @Test fun insertTaskAndGetTasks() {
         // When inserting a task
-        database.taskDao().insertTask(TASK)
+        database.taskDao().insertTask(DEFAULT_TASK)
 
         // When getting the tasks from the database
         val tasks = database.taskDao().getTasks()
@@ -81,48 +84,53 @@ import org.junit.runner.RunWith
         // There is only 1 task in the database
         assertThat(tasks.size, `is`(1))
         // The loaded data contains the expected values
-        assertTask(tasks[0], "id", "title", "description", true)
+        assertTask(tasks[0], DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
     }
 
     @Test fun updateTaskAndGetById() {
         // When inserting a task
-        database.taskDao().insertTask(TASK)
+        database.taskDao().insertTask(DEFAULT_TASK)
+
+        val updatedTitle = "title2"
+        val updatedDescription = "description2"
+        val updatedId = "id"
+        val updatedIsCompleted = true
 
         // When the task is updated
-        val updatedTask = Task("title2", "description2", "id").apply {
-            isCompleted = true
+        val updatedTask = Task(updatedTitle, updatedDescription, updatedId).apply {
+            isCompleted = updatedIsCompleted
         }
         database.taskDao().updateTask(updatedTask)
 
         // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById("id")
+        val loaded = database.taskDao().getTaskById(updatedId)
 
         // The loaded data contains the expected values
-        assertTask(loaded, "id", "title2", "description2", true)
+        assertTask(loaded, updatedId, updatedTitle, updatedDescription, updatedIsCompleted)
     }
 
     @Test fun updateCompletedAndGetById() {
         // When inserting a task
-        database.taskDao().insertTask(TASK)
+        database.taskDao().insertTask(DEFAULT_TASK)
 
         // When the task is updated
-        database.taskDao().updateCompleted(TASK.id, false)
+        database.taskDao().updateCompleted(DEFAULT_TASK.id, false)
 
         // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById("id")
+        val loaded = database.taskDao().getTaskById(DEFAULT_ID)
 
         // The loaded data contains the expected values
-        assertTask(loaded, TASK.id, TASK.title, TASK.description, false)
+        assertTask(loaded, DEFAULT_TASK.id, DEFAULT_TASK.title, DEFAULT_TASK.description, false)
     }
 
     @Test fun deleteTaskByIdAndGettingTasks() {
-        //Given a task inserted
-        database.taskDao().insertTask(TASK)
+        // Given a task inserted
+        database.taskDao().insertTask(DEFAULT_TASK)
 
-        //When deleting a task by id
-        database.taskDao().deleteTaskById(TASK.id)
+        // When deleting a task by id
+        database.taskDao().deleteTaskById(DEFAULT_TASK.id)
 
-        //When getting the tasks
+        // When getting the tasks
         val tasks = database.taskDao().getTasks()
 
         // The list is empty
@@ -130,33 +138,40 @@ import org.junit.runner.RunWith
     }
 
     @Test fun deleteTasksAndGettingTasks() {
-        //Given a task inserted
-        database.taskDao().insertTask(TASK)
+        // Given a task inserted
+        database.taskDao().insertTask(DEFAULT_TASK)
 
-        //When deleting all tasks
+        // When deleting all tasks
         database.taskDao().deleteTasks()
 
-        //When getting the tasks
+        // When getting the tasks
         val tasks = database.taskDao().getTasks()
+
         // The list is empty
         assertThat(tasks.size, `is`(0))
     }
 
     @Test fun deleteCompletedTasksAndGettingTasks() {
-        //Given a completed task inserted
-        database.taskDao().insertTask(TASK)
+        // Given a completed task inserted
+        database.taskDao().insertTask(DEFAULT_TASK)
 
-        //When deleting completed tasks
+        // When deleting completed tasks
         database.taskDao().deleteCompletedTasks()
 
-        //When getting the tasks
+        // When getting the tasks
         val tasks = database.taskDao().getTasks()
+
         // The list is empty
         assertThat(tasks.size, `is`(0))
     }
 
-    private fun assertTask(task: Task?, id: String, title: String,
-            description: String, completed: Boolean) {
+    private fun assertTask(
+            task: Task?,
+            id: String,
+            title: String,
+            description: String,
+            completed: Boolean
+    ) {
         assertThat<Task>(task as Task, notNullValue())
         assertThat(task.id, `is`(id))
         assertThat(task.title, `is`(title))
@@ -165,8 +180,12 @@ import org.junit.runner.RunWith
     }
 
     companion object {
-        private val TASK = Task("title", "description", "id").apply {
-            isCompleted = true
+        private val DEFAULT_TITLE = "title"
+        private val DEFAULT_DESCRIPTION = "description"
+        private val DEFAULT_ID = "id"
+        private val DEFAULT_IS_COMPLETED = true
+        private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_ID).apply {
+            isCompleted = DEFAULT_IS_COMPLETED
         }
     }
 }

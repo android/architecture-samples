@@ -15,11 +15,8 @@
  */
 package com.example.android.architecture.blueprints.todoapp.utils
 
-
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
-
 import java.util.concurrent.Executor
-
 
 /**
  * Allow instant execution of tasks.
