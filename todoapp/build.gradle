@@ -18,7 +18,7 @@ ext {
     roomVersion = "1.0.0"
 
     // Architecture Components dependencies
-    archLifecycleVersion = "1.0.0-alpha9"
+    archLifecycleVersion = "1.0.0"
 }
 
 buildscript {
