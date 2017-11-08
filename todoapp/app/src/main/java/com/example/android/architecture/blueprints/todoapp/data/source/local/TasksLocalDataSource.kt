@@ -65,15 +65,11 @@ class TasksLocalDataSource private constructor(
     }
 
     override fun saveTask(task: Task) {
-        appExecutors.diskIO.execute {
-            tasksDao.insertTask(task)
-        }
+        appExecutors.diskIO.execute { tasksDao.insertTask(task) }
     }
 
     override fun completeTask(task: Task) {
-        appExecutors.diskIO.execute {
-            tasksDao.updateCompleted(task.id, true)
-        }
+        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, true) }
     }
 
     override fun completeTask(taskId: String) {
@@ -82,9 +78,7 @@ class TasksLocalDataSource private constructor(
     }
 
     override fun activateTask(task: Task) {
-        appExecutors.diskIO.execute {
-            tasksDao.updateCompleted(task.id, false)
-        }
+        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, false) }
     }
 
     override fun activateTask(taskId: String) {

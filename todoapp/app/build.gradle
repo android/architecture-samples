@@ -128,6 +128,6 @@ dependencies {
     androidTestCompile "android.arch.persistence.room:testing:$rootProject.roomVersion"
     compile "com.google.code.findbugs:jsr305:2.0.1"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    kapt "com.android.databinding:compiler:$gradleVersion"
+    kapt "com.android.databinding:compiler:$gradlePluginVersion"
 }
 
