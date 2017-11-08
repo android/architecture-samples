@@ -29,7 +29,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
  */
 object Injection {
 
-    fun provideTasksRepository(context: Context) =
-            TasksRepository.getInstance(TasksRemoteDataSource,
-                    TasksLocalDataSource.getInstance(context.applicationContext))
+    fun provideTasksRepository(context: Context) {
+        val database = ToDoDatabase.getInstance(context)
+        return TasksRepository.getInstance(FakeTasksRemoteDataSource,
+                TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()))
+    }
 }
