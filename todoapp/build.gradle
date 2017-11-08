@@ -1,15 +1,11 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
 
-        // Better IDE support for annotations (so Android Studio interacts better with Dagger)
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -18,9 +14,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
+        google()
     }
 }
 
@@ -31,24 +25,28 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
+    // Support library and architecture components support minSdk 14 and above.
     minSdkVersion = 14
     targetSdkVersion = 26
     compileSdkVersion = 26
-    buildToolsVersion = '26.0.1'
+    buildToolsVersion = '26.0.2'
 
     // App dependencies
-    supportLibraryVersion = '26.0.0'
+    supportLibraryVersion = '26.1.0'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
     hamcrestVersion = '1.3'
-    runnerVersion = '1.0.0'
-    rulesVersion = '1.0.0'
-    espressoVersion = '3.0.0'
+    runnerVersion = '1.0.1'
+    rulesVersion = '1.0.1'
+    espressoVersion = '3.0.1'
+    roomVersion = "1.0.0"
     daggerVersion = '2.11'
     dexmakerVersion = '1.2'
 }
+
+
 
 //When there is an error in code generation you will may see
 //lots of errors due too missing generated code in your logs, we increase
