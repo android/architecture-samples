@@ -15,56 +15,35 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import android.content.ContentValues
-import android.content.Context
+import android.support.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry.TABLE_NAME
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
+
 
 /**
  * Concrete implementation of a data source as a db.
  */
-class TasksLocalDataSource private constructor(context: Context) : TasksDataSource {
-
-    private val dbHelper: TasksDbHelper = TasksDbHelper(context)
+class TasksLocalDataSource private constructor(
+        val appExecutors: AppExecutors,
+        val tasksDao: TasksDao
+) : TasksDataSource {
 
     /**
      * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is fired if the database doesn't exist
      * or the table is empty.
      */
     override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
-        val db = dbHelper.readableDatabase
-
-        val projection = arrayOf(COLUMN_NAME_ENTRY_ID, COLUMN_NAME_TITLE,
-                COLUMN_NAME_DESCRIPTION, COLUMN_NAME_COMPLETED)
-
-        val cursor = db.query(
-                TABLE_NAME, projection, null, null, null, null, null)
-
-        val tasks = ArrayList<Task>()
-        with(cursor) {
-            while (moveToNext()) {
-                val itemId = getString(getColumnIndexOrThrow(COLUMN_NAME_ENTRY_ID))
-                val title = getString(getColumnIndexOrThrow(COLUMN_NAME_TITLE))
-                val description = getString(getColumnIndexOrThrow(COLUMN_NAME_DESCRIPTION))
-                val task = Task(title, description, itemId).apply {
-                    isCompleted = getInt(getColumnIndexOrThrow(COLUMN_NAME_COMPLETED)) == 1
+        appExecutors.diskIO.execute {
+            val tasks = tasksDao.getTasks()
+            appExecutors.mainThread.execute {
+                if (tasks.isEmpty()) {
+                    // This will be called if the table is new or just empty.
+                    callback.onDataNotAvailable()
+                } else {
+                    callback.onTasksLoaded(tasks)
                 }
-                tasks.add(task)
             }
-            close()
-        }
-        db.close()
-
-        if (tasks.isNotEmpty()) {
-            callback.onTasksLoaded(tasks)
-        } else {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
         }
     }
 
@@ -73,53 +52,27 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
      * found.
      */
     override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {
-        val db = dbHelper.readableDatabase
-
-        val projection = arrayOf(COLUMN_NAME_ENTRY_ID, COLUMN_NAME_TITLE,
-                COLUMN_NAME_DESCRIPTION, COLUMN_NAME_COMPLETED)
-
-        val cursor = db.query(
-                TABLE_NAME, projection, "$COLUMN_NAME_ENTRY_ID LIKE ?", arrayOf(taskId), null,
-                null, null)
-        var task: Task? = null
-        with(cursor) {
-            if (moveToFirst()) {
-                val itemId = getString(getColumnIndexOrThrow(COLUMN_NAME_ENTRY_ID))
-                val title = getString(getColumnIndexOrThrow(COLUMN_NAME_TITLE))
-                val description = getString(getColumnIndexOrThrow(COLUMN_NAME_DESCRIPTION))
-                 task = Task(title, description, itemId).apply {
-                    isCompleted = getInt(getColumnIndexOrThrow(COLUMN_NAME_COMPLETED)) == 1
+        appExecutors.diskIO.execute {
+            val task = tasksDao.getTaskById(taskId)
+            appExecutors.mainThread.execute {
+                if (task != null) {
+                    callback.onTaskLoaded(task)
+                } else {
+                    callback.onDataNotAvailable()
                 }
             }
-            close()
         }
-        db.close()
-
-        task?.also { callback.onTaskLoaded(it) }
-                // This will be called if the table is new or just empty.
-                ?: callback.onDataNotAvailable()
     }
 
     override fun saveTask(task: Task) {
-        val values = ContentValues().apply {
-            put(COLUMN_NAME_ENTRY_ID, task.id)
-            put(COLUMN_NAME_TITLE, task.title)
-            put(COLUMN_NAME_DESCRIPTION, task.description)
-            put(COLUMN_NAME_COMPLETED, task.isCompleted)
-        }
-        with(dbHelper.writableDatabase) {
-            insert(TABLE_NAME, null, values)
-            close()
+        appExecutors.diskIO.execute {
+            tasksDao.insertTask(task)
         }
     }
 
     override fun completeTask(task: Task) {
-        val values = ContentValues().apply {
-            put(COLUMN_NAME_COMPLETED, true)
-        }
-        with(dbHelper.writableDatabase) {
-            update(TABLE_NAME, values, "$COLUMN_NAME_ENTRY_ID LIKE ?", arrayOf(task.id))
-            close()
+        appExecutors.diskIO.execute {
+            tasksDao.updateCompleted(task.id, true)
         }
     }
 
@@ -129,13 +82,8 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
     }
 
     override fun activateTask(task: Task) {
-        val values = ContentValues().apply {
-            put(COLUMN_NAME_COMPLETED, false)
-        }
-
-        with(dbHelper.writableDatabase) {
-            update(TABLE_NAME, values, "$COLUMN_NAME_ENTRY_ID LIKE ?", arrayOf(task.id))
-            close()
+        appExecutors.diskIO.execute {
+            tasksDao.updateCompleted(task.id, false)
         }
     }
 
@@ -145,12 +93,7 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
     }
 
     override fun clearCompletedTasks() {
-        val selection = "$COLUMN_NAME_COMPLETED LIKE ?"
-        val selectionArgs = arrayOf("1")
-        with(dbHelper.writableDatabase) {
-            delete(TABLE_NAME, selection, selectionArgs)
-            close()
-        }
+        appExecutors.diskIO.execute { tasksDao.deleteCompletedTasks() }
     }
 
     override fun refreshTasks() {
@@ -159,25 +102,29 @@ class TasksLocalDataSource private constructor(context: Context) : TasksDataSour
     }
 
     override fun deleteAllTasks() {
-        with(dbHelper.writableDatabase) {
-            delete(TABLE_NAME, null, null)
-            close()
-        }
+        appExecutors.diskIO.execute { tasksDao.deleteTasks() }
     }
 
     override fun deleteTask(taskId: String) {
-        val selection = "$COLUMN_NAME_ENTRY_ID LIKE ?"
-        val selectionArgs = arrayOf(taskId)
-        with(dbHelper.writableDatabase) {
-            delete(TABLE_NAME, selection, selectionArgs)
-            close()
-        }
+        appExecutors.diskIO.execute { tasksDao.deleteTaskById(taskId) }
     }
 
     companion object {
         private var INSTANCE: TasksLocalDataSource? = null
 
-        @JvmStatic fun getInstance(context: Context) =
-                INSTANCE ?: TasksLocalDataSource(context).apply { INSTANCE = this }
+        @JvmStatic
+        fun getInstance(appExecutors: AppExecutors, tasksDao: TasksDao): TasksLocalDataSource {
+            if (INSTANCE == null) {
+                synchronized(TasksLocalDataSource::javaClass) {
+                    INSTANCE = TasksLocalDataSource(appExecutors, tasksDao)
+                }
+            }
+            return INSTANCE!!
+        }
+
+        @VisibleForTesting
+        fun clearInstance() {
+            INSTANCE = null
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.data.source.local
+package com.example.android.architecture.blueprints.todoapp.utils
 
-import android.provider.BaseColumns
+
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
+
+import java.util.concurrent.Executor
+
 
 /**
- * The contract used for the db to save the tasks locally.
+ * Allow instant execution of tasks.
  */
-object TasksPersistenceContract {
-
-    /* Inner class that defines the table contents */
-    object TaskEntry : BaseColumns {
-        val TABLE_NAME = "tasks"
-        val COLUMN_NAME_ENTRY_ID = "entryid"
-        val COLUMN_NAME_TITLE = "title"
-        val COLUMN_NAME_DESCRIPTION = "description"
-        val COLUMN_NAME_COMPLETED = "completed"
+class SingleExecutors : AppExecutors(instant, instant, instant) {
+    companion object {
+        private val instant = Executor { command -> command.run() }
     }
 }

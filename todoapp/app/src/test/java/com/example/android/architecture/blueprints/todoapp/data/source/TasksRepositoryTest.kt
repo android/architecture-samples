@@ -15,7 +15,6 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import android.content.Context
 import com.example.android.architecture.blueprints.todoapp.any
 import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -51,7 +50,6 @@ class TasksRepositoryTest {
 
     @Mock private lateinit var tasksRemoteDataSource: TasksDataSource
     @Mock private lateinit var tasksLocalDataSource: TasksDataSource
-    @Mock private lateinit var context: Context
     @Mock private lateinit var getTaskCallback: TasksDataSource.GetTaskCallback
     @Mock private lateinit var loadTasksCallback: TasksDataSource.LoadTasksCallback
 
