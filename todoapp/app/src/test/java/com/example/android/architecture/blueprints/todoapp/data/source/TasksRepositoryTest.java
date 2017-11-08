@@ -63,9 +63,6 @@ public class TasksRepositoryTest {
     private TasksDataSource mTasksLocalDataSource;
 
     @Mock
-    private Context mContext;
-
-    @Mock
     private TasksDataSource.GetTaskCallback mGetTaskCallback;
 
     @Mock
@@ -380,4 +377,4 @@ public class TasksRepositoryTest {
         verify(dataSource).getTask(eq(task.getId()), mTaskCallbackCaptor.capture());
         mTaskCallbackCaptor.getValue().onTaskLoaded(task);
     }
- }
+}

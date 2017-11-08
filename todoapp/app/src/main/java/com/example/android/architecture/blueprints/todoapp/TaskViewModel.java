@@ -83,7 +83,8 @@ public abstract class TaskViewModel extends BaseObservable
     // annotation and process it in the setter.
     @Bindable
     public boolean getCompleted() {
-        return mTaskObservable.get().isCompleted();
+        Task task = mTaskObservable.get();
+        return task != null && task.isCompleted();
     }
 
     public void setCompleted(boolean completed) {
@@ -91,8 +92,6 @@ public abstract class TaskViewModel extends BaseObservable
             return;
         }
         Task task = mTaskObservable.get();
-        // Update the entity
-        task.setCompleted(completed);
 
         // Notify repository and user
         if (completed) {
