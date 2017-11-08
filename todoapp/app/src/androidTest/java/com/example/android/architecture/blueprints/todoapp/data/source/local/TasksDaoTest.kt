@@ -57,13 +57,9 @@ import org.junit.runner.RunWith
         // Given that a task is inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
-        val newTitle = "title2"
-        val newDescription = "description2"
-        val newId = "id"
-        val newIsCompleted = true
         // When a task with the same id is inserted
-        val newTask = Task(newTitle, newDescription, newId).apply {
-            isCompleted = newIsCompleted
+        val newTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
+            isCompleted = NEW_IS_COMPLETED
         }
         database.taskDao().insertTask(newTask)
 
@@ -71,7 +67,7 @@ import org.junit.runner.RunWith
         val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
 
         // The loaded data contains the expected values
-        assertTask(loaded, newId, newTitle, newDescription, newIsCompleted)
+        assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
     }
 
     @Test fun insertTaskAndGetTasks() {
@@ -91,22 +87,17 @@ import org.junit.runner.RunWith
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
-        val updatedTitle = "title2"
-        val updatedDescription = "description2"
-        val updatedId = "id"
-        val updatedIsCompleted = true
-
         // When the task is updated
-        val updatedTask = Task(updatedTitle, updatedDescription, updatedId).apply {
-            isCompleted = updatedIsCompleted
+        val updatedTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
+            isCompleted = NEW_IS_COMPLETED
         }
         database.taskDao().updateTask(updatedTask)
 
         // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(updatedId)
+        val loaded = database.taskDao().getTaskById(DEFAULT_ID)
 
         // The loaded data contains the expected values
-        assertTask(loaded, updatedId, updatedTitle, updatedDescription, updatedIsCompleted)
+        assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
     }
 
     @Test fun updateCompletedAndGetById() {
@@ -180,6 +171,7 @@ import org.junit.runner.RunWith
     }
 
     companion object {
+
         private val DEFAULT_TITLE = "title"
         private val DEFAULT_DESCRIPTION = "description"
         private val DEFAULT_ID = "id"
@@ -187,5 +179,9 @@ import org.junit.runner.RunWith
         private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_ID).apply {
             isCompleted = DEFAULT_IS_COMPLETED
         }
+
+        private val NEW_TITLE = "title2"
+        private val NEW_DESCRIPTION = "description2"
+        private val NEW_IS_COMPLETED = true
     }
 }
