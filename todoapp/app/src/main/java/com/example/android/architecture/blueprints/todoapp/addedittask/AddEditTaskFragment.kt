@@ -15,10 +15,10 @@
  */
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
-import android.arch.lifecycle.LifecycleFragment
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -30,21 +30,23 @@ import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-class AddEditTaskFragment : LifecycleFragment() {
+class AddEditTaskFragment : Fragment() {
 
     private lateinit var viewDataBinding: AddtaskFragBinding
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
-        view?.setupSnackbar(this, viewDataBinding.viewmodel.snackbarMessage, Snackbar.LENGTH_LONG)
+        viewDataBinding.viewmodel?.let {
+            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
+        }
         setupActionBar()
         loadData()
     }
 
     private fun loadData() {
         // Add or edit an existing task?
-        viewDataBinding.viewmodel.start(arguments?.getString(ARGUMENT_EDIT_TASK_ID))
+        viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_EDIT_TASK_ID))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +63,7 @@ class AddEditTaskFragment : LifecycleFragment() {
     private fun setupFab() {
         activity.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
             setImageResource(R.drawable.ic_done)
-            setOnClickListener { viewDataBinding.viewmodel.saveTask() }
+            setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
         }
     }
 

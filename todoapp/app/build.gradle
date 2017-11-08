@@ -45,19 +45,24 @@ android {
         }
     }
 
+    flavorDimensions "default"
+
     // If you need to add more flavors, consider using flavor dimensions.
     productFlavors {
         mock {
             applicationIdSuffix = ".mock"
+            dimension "default"
         }
-        prod
+        prod {
+            dimension "default"
+        }
     }
 
     // Remove mockRelease as it's not needed.
     android.variantFilter { variant ->
-        if(variant.buildType.name == 'release'
-                && variant.getFlavors().get(0).name == 'mock') {
-            variant.setIgnore(true);
+        if (variant.buildType.name == 'release'
+                && variant.flavors[0].name == 'mock') {
+            variant.ignore = true
         }
     }
 
@@ -84,6 +89,8 @@ dependencies {
     compile "com.android.support:design:$rootProject.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
 
     compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
@@ -118,8 +125,9 @@ dependencies {
     androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:support-compat:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
+    androidTestCompile "android.arch.persistence.room:testing:$rootProject.roomVersion"
     compile "com.google.code.findbugs:jsr305:2.0.1"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    kapt "com.android.databinding:compiler:$gradleVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    kapt "com.android.databinding:compiler:$gradlePluginVersion"
 }
 

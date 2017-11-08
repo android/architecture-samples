@@ -15,9 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import android.arch.lifecycle.LifecycleFragment
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -32,35 +32,40 @@ import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 /**
  * Main UI for the task detail screen.
  */
-class TaskDetailFragment : LifecycleFragment() {
+class TaskDetailFragment : Fragment() {
 
     private lateinit var viewDataBinding: TaskdetailFragBinding
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
-        view?.setupSnackbar(this, viewDataBinding.viewmodel.snackbarMessage, Snackbar.LENGTH_LONG)
+        viewDataBinding.viewmodel?.let {
+            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
+        }
     }
 
     private fun setupFab() {
-        with(activity.findViewById<View>(R.id.fab_edit_task)) {
-            setOnClickListener { viewDataBinding.viewmodel.editTask() }
+        activity.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
+            viewDataBinding.viewmodel?.editTask()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewDataBinding.viewmodel.start(arguments.getString(ARGUMENT_TASK_ID))
+        viewDataBinding.viewmodel?.start(arguments.getString(ARGUMENT_TASK_ID))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {
             viewmodel = (activity as TaskDetailActivity).obtainViewModel()
             listener = object : TaskDetailUserActionsListener {
                 override fun onCompleteChanged(v: View) {
-                    viewmodel.setCompleted((v as CheckBox).isChecked)
+                    viewmodel?.setCompleted((v as CheckBox).isChecked)
                 }
             }
         }
@@ -68,14 +73,15 @@ class TaskDetailFragment : LifecycleFragment() {
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
-            when (item.itemId) {
-                R.id.menu_delete -> {
-                    viewDataBinding.viewmodel.deleteTask()
-                    true
-                }
-                else -> false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_delete -> {
+                viewDataBinding.viewmodel?.deleteTask()
+                return true
             }
+            else -> return false
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
@@ -91,6 +97,5 @@ class TaskDetailFragment : LifecycleFragment() {
                 putString(ARGUMENT_TASK_ID, taskId)
             }
         }
-
     }
 }
