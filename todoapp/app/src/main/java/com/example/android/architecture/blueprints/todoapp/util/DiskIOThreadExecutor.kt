@@ -23,13 +23,7 @@ import java.util.concurrent.Executors
  */
 class DiskIOThreadExecutor : Executor {
 
-    private val diskIO: Executor
+    private val diskIO = Executors.newSingleThreadExecutor()
 
-    init {
-        diskIO = Executors.newSingleThreadExecutor()
-    }
-
-    override fun execute(command: Runnable) {
-        diskIO.execute(command)
-    }
+    override fun execute(command: Runnable) { diskIO.execute(command) }
 }
