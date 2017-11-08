@@ -28,7 +28,7 @@ public class TasksRepositoryModule {
     @Provides
     @Local
     TasksDataSource provideTasksLocalDataSource(TasksDao dao, AppExecutors executors) {
-        return new TasksLocalDataSource(dao, executors);
+        return new TasksLocalDataSource(executors, dao);
     }
 
     @Singleton
@@ -47,7 +47,8 @@ public class TasksRepositoryModule {
     @Singleton
     @Provides
     AppExecutors provideAppExecutors() {
-        return new AppExecutors(new DiskIOThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
+        return new AppExecutors(new DiskIOThreadExecutor(),
+                Executors.newFixedThreadPool(THREAD_COUNT),
                 new AppExecutors.MainThreadExecutor());
     }
 }
