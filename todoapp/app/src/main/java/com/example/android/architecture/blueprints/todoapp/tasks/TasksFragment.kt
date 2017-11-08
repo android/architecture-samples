@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.arch.lifecycle.LifecycleFragment
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.PopupMenu
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -37,12 +38,12 @@ import java.util.ArrayList
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : LifecycleFragment() {
+class TasksFragment : Fragment() {
 
     private lateinit var viewDataBinding: TasksFragBinding
     private lateinit var listAdapter: TasksAdapter
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = (activity as TasksActivity).obtainViewModel()
@@ -53,13 +54,13 @@ class TasksFragment : LifecycleFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewDataBinding.viewmodel.start()
+        viewDataBinding.viewmodel?.start()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
             when (item.itemId) {
                 R.id.menu_clear -> {
-                    viewDataBinding.viewmodel.clearCompletedTasks()
+                    viewDataBinding.viewmodel?.clearCompletedTasks()
                     true
                 }
                 R.id.menu_filter -> {
@@ -67,7 +68,7 @@ class TasksFragment : LifecycleFragment() {
                     true
                 }
                 R.id.menu_refresh -> {
-                    viewDataBinding.viewmodel.loadTasks(true)
+                    viewDataBinding.viewmodel?.loadTasks(true)
                     true
                 }
                 else -> false
@@ -79,7 +80,9 @@ class TasksFragment : LifecycleFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        view?.setupSnackbar(this, viewDataBinding.viewmodel.snackbarMessage, Snackbar.LENGTH_LONG)
+        viewDataBinding.viewmodel?.let {
+            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
+        }
         setupFab()
         setupListAdapter()
         setupRefreshLayout()
@@ -90,7 +93,7 @@ class TasksFragment : LifecycleFragment() {
             menuInflater.inflate(R.menu.filter_tasks, menu)
 
             setOnMenuItemClickListener {
-                viewDataBinding.viewmodel.run {
+                viewDataBinding.viewmodel?.run {
                     currentFiltering =
                             when (it.itemId) {
                                 R.id.active -> TasksFilterType.ACTIVE_TASKS
@@ -98,8 +101,8 @@ class TasksFragment : LifecycleFragment() {
                                 else -> TasksFilterType.ALL_TASKS
                             }
                     loadTasks(false)
-                    true
                 }
+                true
             }
             show()
         }
@@ -109,14 +112,19 @@ class TasksFragment : LifecycleFragment() {
         activity.findViewById<FloatingActionButton>(R.id.fab_add_task).run {
             setImageResource(R.drawable.ic_add)
             setOnClickListener {
-                viewDataBinding.viewmodel.addNewTask()
+                viewDataBinding.viewmodel?.addNewTask()
             }
         }
     }
 
     private fun setupListAdapter() {
-        listAdapter = TasksAdapter(ArrayList(0), viewDataBinding.viewmodel)
-        viewDataBinding.tasksList.adapter = listAdapter
+        val viewModel = viewDataBinding.viewmodel
+        if (viewModel != null) {
+            listAdapter = TasksAdapter(ArrayList(0), viewModel)
+            viewDataBinding.tasksList.adapter = listAdapter
+        } else {
+            Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
+        }
     }
 
     private fun setupRefreshLayout() {
@@ -133,6 +141,7 @@ class TasksFragment : LifecycleFragment() {
 
     companion object {
         fun newInstance() = TasksFragment()
-    }
+        private const val TAG = "TasksFragment"
 
+    }
 }

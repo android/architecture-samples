@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity
+import android.support.v7.app.AppCompatActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment
@@ -33,7 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 /**
  * Displays task details screen.
  */
-class TaskDetailActivity : LifecycleAppCompatActivity(), TaskDetailNavigator {
+class TaskDetailActivity : AppCompatActivity(), TaskDetailNavigator {
 
     private lateinit var taskViewModel: TaskDetailViewModel
 

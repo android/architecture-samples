@@ -21,7 +21,9 @@ import android.content.Context
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
 
 /**
  * Enables injection of production implementations for
@@ -29,7 +31,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
  */
 object Injection {
 
-    fun provideTasksRepository(context: Context) =
-            TasksRepository.getInstance(TasksRemoteDataSource,
-                    TasksLocalDataSource.getInstance(context.applicationContext))
+    fun provideTasksRepository(context: Context): TasksRepository {
+        val database = ToDoDatabase.getInstance(context)
+        return TasksRepository.getInstance(TasksRemoteDataSource,
+                TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()))
+    }
 }
