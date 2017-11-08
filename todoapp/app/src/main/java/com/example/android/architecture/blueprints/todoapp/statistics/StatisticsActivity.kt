@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
@@ -31,7 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 /**
  * Show statistics for tasks.
  */
-class StatisticsActivity : LifecycleAppCompatActivity() {
+class StatisticsActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
 
