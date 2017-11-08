@@ -40,11 +40,9 @@ import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 class TaskDetailFragment : Fragment(), TaskDetailContract.View {
 
     private lateinit var detailTitle: TextView
-
     private lateinit var detailDescription: TextView
-
     private lateinit var detailCompleteStatus: CheckBox
-
+    
     override lateinit var presenter: TaskDetailContract.Presenter
 
     override var isActive: Boolean = false
@@ -55,8 +53,11 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
         presenter.start()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
         val root = inflater.inflate(R.layout.taskdetail_frag, container, false)
         setHasOptionsMenu(true)
         with(root) {

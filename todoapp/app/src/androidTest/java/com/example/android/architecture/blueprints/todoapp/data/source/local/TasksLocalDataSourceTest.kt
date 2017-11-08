@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import android.support.test.InstrumentationRegistry
@@ -34,9 +33,11 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import java.util.LinkedList
+import android.arch.persistence.room.Room
+import com.example.android.architecture.blueprints.todoapp.utils.SingleExecutors
 
 /**
- * Integration test for the [TasksDataSource], which uses the [TasksDbHelper].
+ * Integration test for the [TasksDataSource].
  */
 @RunWith(AndroidJUnit4::class) @LargeTest class TasksLocalDataSourceTest {
 
@@ -45,14 +46,24 @@ import java.util.LinkedList
     private val TITLE3 = "title3"
 
     private lateinit var localDataSource: TasksLocalDataSource
+    private lateinit var database: ToDoDatabase
 
-    @Before fun setup() {
-        localDataSource = TasksLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext())
+    @Before
+    fun setup() {
+        // using an in-memory database for testing, since it doesn't survive killing the process
+        database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
+                ToDoDatabase::class.java)
+                .build()
+
+        // Make sure that we're not keeping a reference to the wrong instance.
+        TasksLocalDataSource.clearInstance()
+        localDataSource = TasksLocalDataSource.getInstance(SingleExecutors(), database.taskDao())
     }
 
-    @After fun cleanUp() {
-        localDataSource.deleteAllTasks()
+    @After
+    fun cleanUp() {
+        database.close()
+        TasksLocalDataSource.clearInstance()
     }
 
     @Test fun testPreConditions() {
