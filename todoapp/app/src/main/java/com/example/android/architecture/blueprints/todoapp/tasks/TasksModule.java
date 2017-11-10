@@ -18,5 +18,5 @@ public abstract class TasksModule {
     abstract TasksFragment tasksFragment();
 
     @ActivityScoped
-    @Binds abstract TasksContract.Presenter taskPresenter(TasksPresenter presenter);
+    @Binds abstract TasksContract.Presenter tasksPresenter(TasksPresenter presenter);
 }

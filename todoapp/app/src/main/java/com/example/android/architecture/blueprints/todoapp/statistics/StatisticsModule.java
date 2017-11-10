@@ -20,5 +20,5 @@ public abstract class StatisticsModule {
 
     @ActivityScoped
     @Binds
-    abstract StatisticsContract.Presenter statitsticsPresenter(StatisticsPresenter presenter);
+    abstract StatisticsContract.Presenter statisticsPresenter(StatisticsPresenter presenter);
 }

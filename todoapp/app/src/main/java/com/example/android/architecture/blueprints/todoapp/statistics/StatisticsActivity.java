@@ -38,7 +38,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 public class StatisticsActivity extends DaggerAppCompatActivity {
 
     @Inject
-    StatisticsPresenter mStatiticsPresenter;
+    StatisticsPresenter mPresenter;
     @Inject
     StatisticsFragment fragment;
     private DrawerLayout mDrawerLayout;

@@ -24,7 +24,7 @@ public abstract class TaskDetailPresenterModule {
 
     @ActivityScoped
     @Binds
-    abstract TaskDetailContract.Presenter statitsticsPresenter(TaskDetailPresenter presenter);
+    abstract TaskDetailContract.Presenter taskDetailPresenter(TaskDetailPresenter presenter);
 
     @Provides
     @ActivityScoped
