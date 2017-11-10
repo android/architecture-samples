@@ -16,11 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends LifecycleFragment {
+public class TaskDetailFragment extends Fragment {
 
     public static final String ARGUMENT_TASK_ID = "TASK_ID";
 

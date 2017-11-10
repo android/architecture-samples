@@ -26,10 +26,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -38,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 
-public class TasksActivity extends LifecycleAppCompatActivity implements TaskItemNavigator, TasksNavigator {
+public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
 
     private DrawerLayout mDrawerLayout;
 
