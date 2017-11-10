@@ -85,7 +85,6 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
             return;
         }
         Task task = this.task.get();
-        task.setCompleted(completed);
         if (completed) {
             mTasksRepository.completeTask(task);
             showSnackbarMessage(R.string.task_marked_complete);

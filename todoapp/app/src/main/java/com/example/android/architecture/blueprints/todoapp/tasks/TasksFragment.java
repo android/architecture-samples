@@ -16,11 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends LifecycleFragment {
+public class TasksFragment extends Fragment {
 
     private TasksViewModel mTasksViewModel;
 

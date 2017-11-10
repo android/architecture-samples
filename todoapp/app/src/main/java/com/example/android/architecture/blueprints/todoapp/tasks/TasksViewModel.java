@@ -140,9 +140,6 @@ public class TasksViewModel extends AndroidViewModel {
     }
 
     public void completeTask(Task task, boolean completed) {
-        // Update the entity
-        task.setCompleted(completed);
-
         // Notify repository
         if (completed) {
             mTasksRepository.completeTask(task);

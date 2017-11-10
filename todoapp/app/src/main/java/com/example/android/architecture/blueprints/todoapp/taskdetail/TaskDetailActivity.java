@@ -24,9 +24,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.example.android.architecture.blueprints.todoapp.LifecycleAppCompatActivity;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -39,7 +39,7 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends LifecycleAppCompatActivity implements TaskDetailNavigator {
+public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
