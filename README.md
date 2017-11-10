@@ -2,8 +2,6 @@
 
 This version of the app is called todo-mvvm-live, and it uses some Architecture Components like ViewModel, LiveData, and other lifecycle-aware classes. It's based on the [todo-mvvm-databinding](https://github.com/googlesamples/android-architecture/tree/todo-mvvm-databinding/) sample, which uses the [Data Binding Library](http://developer.android.com/tools/data-binding/guide.html#data_objects) to display data and bind UI elements to actions.
 
-This sample is not final, as the Architecture Components are in alpha stage at the time of writing this document.
-
 ## What you need
 
 Before exploring this sample, you should familiarize yourself with the following topics:
