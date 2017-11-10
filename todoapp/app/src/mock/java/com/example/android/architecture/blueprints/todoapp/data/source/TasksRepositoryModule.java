@@ -1,6 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import android.content.Context;
+import android.app.Application;
+import android.arch.persistence.room.Room;
 
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao;
@@ -37,14 +38,22 @@ abstract public class TasksRepositoryModule {
 
     @Singleton
     @Provides
-    static TasksDao provideTasksDao(Context context) {
-        return ToDoDatabase.getInstance(context).taskDao();
+    static ToDoDatabase provideDb(Application context) {
+        return Room.databaseBuilder(context.getApplicationContext(), ToDoDatabase.class, "Tasks.db")
+                .build();
+    }
+
+    @Singleton
+    @Provides
+    static TasksDao provideTasksDao(ToDoDatabase db) {
+        return db.taskDao();
     }
 
     @Singleton
     @Provides
     static AppExecutors provideAppExecutors() {
-        return new AppExecutors(new DiskIOThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
+        return new AppExecutors(new DiskIOThreadExecutor(),
+                Executors.newFixedThreadPool(THREAD_COUNT),
                 new AppExecutors.MainThreadExecutor());
     }
 }
