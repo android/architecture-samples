@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data;
+package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
+import android.arch.persistence.room.Room;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
+import com.example.android.architecture.blueprints.todoapp.util.SingleExecutors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,29 +43,39 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
- * Integration test for the {@link TasksDataSource}, which uses the {@link TasksDbHelper}.
+ * Integration test for the {@link TasksDataSource}.
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TasksLocalDataSourceTest {
 
-    private static final String TITLE = "title";
+    private final static String TITLE = "title";
 
-    private static final String TITLE2 = "title2";
+    private final static String TITLE2 = "title2";
 
-    private static final String TITLE3 = "title3";
+    private final static String TITLE3 = "title3";
 
     private TasksLocalDataSource mLocalDataSource;
 
+    private ToDoDatabase mDatabase;
+
     @Before
     public void setup() {
-         mLocalDataSource = TasksLocalDataSource.getInstance(
-                 InstrumentationRegistry.getTargetContext());
+        // using an in-memory database for testing, since it doesn't survive killing the process
+        mDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
+                ToDoDatabase.class)
+                .build();
+        TasksDao tasksDao = mDatabase.taskDao();
+
+        // Make sure that we're not keeping a reference to the wrong instance.
+        TasksLocalDataSource.clearInstance();
+        mLocalDataSource = TasksLocalDataSource.getInstance(new SingleExecutors(), tasksDao);
     }
 
     @After
     public void cleanUp() {
-        mLocalDataSource.deleteAllTasks();
+        mDatabase.close();
+        TasksLocalDataSource.clearInstance();
     }
 
     @Test
@@ -172,7 +182,7 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.getTask(newTask2.getId(), callback2);
 
         verify(callback2).onDataNotAvailable();
-        verify(callback2, never()).onTaskLoaded(newTask1);
+        verify(callback2, never()).onTaskLoaded(newTask2);
 
         mLocalDataSource.getTask(newTask3.getId(), callback3);
 
@@ -214,7 +224,7 @@ public class TasksLocalDataSourceTest {
 
                 boolean newTask1IdFound = false;
                 boolean newTask2IdFound = false;
-                for (Task task: tasks) {
+                for (Task task : tasks) {
                     if (task.getId().equals(newTask1.getId())) {
                         newTask1IdFound = true;
                     }

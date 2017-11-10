@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -26,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.SaveTask;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and
@@ -45,27 +45,31 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     @Nullable
     private String mTaskId;
 
+    private boolean mIsDataMissing;
+
     /**
      * Creates a presenter for the add/edit view.
      *
      * @param taskId      ID of the task to edit or null for a new task
      * @param addTaskView the add/edit view
+     * @param shouldLoadDataFromRepo whether data needs to be loaded or not (for config changes)
      */
     public AddEditTaskPresenter(@NonNull UseCaseHandler useCaseHandler, @Nullable String taskId,
             @NonNull AddEditTaskContract.View addTaskView, @NonNull GetTask getTask,
-            @NonNull SaveTask saveTask) {
+            @NonNull SaveTask saveTask, boolean shouldLoadDataFromRepo) {
         mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mTaskId = taskId;
         mAddTaskView = checkNotNull(addTaskView, "addTaskView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");
         mSaveTask = checkNotNull(saveTask, "saveTask cannot be null!");
+        mIsDataMissing = shouldLoadDataFromRepo;
 
         mAddTaskView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        if (mTaskId != null) {
+        if (!isNewTask() && mIsDataMissing) {
             populateTask();
         }
     }
@@ -81,7 +85,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     @Override
     public void populateTask() {
-        if (mTaskId == null) {
+        if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
@@ -105,6 +109,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             mAddTaskView.setTitle(task.getTitle());
             mAddTaskView.setDescription(task.getDescription());
         }
+        mIsDataMissing = false;
     }
 
     private void showSaveError() {
@@ -116,6 +121,11 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (mAddTaskView.isActive()) {
             mAddTaskView.showEmptyTaskError();
         }
+    }
+
+    @Override
+    public boolean isDataMissing() {
+        return mIsDataMissing;
     }
 
     private boolean isNewTask() {
@@ -143,7 +153,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     }
 
     private void updateTask(String title, String description) {
-        if (mTaskId == null) {
+        if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         Task newTask = new Task(title, description, mTaskId);

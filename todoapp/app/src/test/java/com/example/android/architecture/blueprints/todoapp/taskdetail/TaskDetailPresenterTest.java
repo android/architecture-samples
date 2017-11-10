@@ -81,6 +81,15 @@ public class TaskDetailPresenterTest {
     }
 
     @Test
+    public void createPresenter_setsThePresenterToView() {
+        // Get a reference to the class under test
+        mTaskDetailPresenter = givenTaskDetailPresenter(ACTIVE_TASK.getId());
+
+        // Then the presenter is set to the view
+        verify(mTaskDetailView).setPresenter(mTaskDetailPresenter);
+    }
+
+    @Test
     public void getActiveTaskFromRepositoryAndLoadIntoView() {
         // When tasks presenter is asked to open a task
         mTaskDetailPresenter = givenTaskDetailPresenter(ACTIVE_TASK.getId());
