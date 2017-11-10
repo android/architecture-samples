@@ -1,6 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import android.app.Application;
+import android.arch.persistence.room.Room;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
@@ -40,8 +41,15 @@ public class TasksRepositoryModule {
 
     @Singleton
     @Provides
-    TasksDao provideTasksDao(Application context) {
-        return ToDoDatabase.getInstance(context).taskDao();
+    ToDoDatabase provideDb(Application context) {
+        return Room.databaseBuilder(context.getApplicationContext(), ToDoDatabase.class, "Tasks.db")
+                .build();
+    }
+
+    @Singleton
+    @Provides
+    TasksDao provideTasksDao(ToDoDatabase db) {
+        return db.taskDao();
     }
 
     @Singleton
