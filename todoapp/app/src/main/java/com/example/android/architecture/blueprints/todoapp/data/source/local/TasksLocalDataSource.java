@@ -16,17 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,12 +36,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class TasksLocalDataSource implements TasksDataSource {
 
-    private TasksDbHelper mDbHelper;
+    private final TasksDao mTasksDao;
+
+    private final AppExecutors mAppExecutors;
 
     @Inject
-    public TasksLocalDataSource(@NonNull Context context) {
-        checkNotNull(context);
-        mDbHelper = new TasksDbHelper(context);
+    public TasksLocalDataSource(@NonNull AppExecutors executors, @NonNull TasksDao tasksDao) {
+        mTasksDao = tasksDao;
+        mAppExecutors = executors;
     }
 
     /**
@@ -54,45 +51,26 @@ public class TasksLocalDataSource implements TasksDataSource {
      * or the table is empty.
      */
     @Override
-    public void getTasks(@NonNull LoadTasksCallback callback) {
-        List<Task> tasks = new ArrayList<Task>();
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String[] projection = {
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
+    public void getTasks(@NonNull final LoadTasksCallback callback) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final List<Task> tasks = mTasksDao.getTasks();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (tasks.isEmpty()) {
+                            // This will be called if the table is new or just empty.
+                            callback.onDataNotAvailable();
+                        } else {
+                            callback.onTasksLoaded(tasks);
+                        }
+                    }
+                });
+            }
         };
 
-        Cursor c = db.query(
-                TaskEntry.TABLE_NAME, projection, null, null, null, null, null);
-
-        if (c != null && c.getCount() > 0) {
-            while (c.moveToNext()) {
-                String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-                String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-                String description =
-                        c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-                boolean completed =
-                        c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-                Task task = new Task(title, description, itemId, completed);
-                tasks.add(task);
-            }
-        }
-        if (c != null) {
-            c.close();
-        }
-
-        db.close();
-
-        if (tasks.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable();
-        } else {
-            callback.onTasksLoaded(tasks);
-        }
-
+        mAppExecutors.diskIO().execute(runnable);
     }
 
     /**
@@ -100,76 +78,50 @@ public class TasksLocalDataSource implements TasksDataSource {
      * found.
      */
     @Override
-    public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+    public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final Task task = mTasksDao.getTaskById(taskId);
 
-        String[] projection = {
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (task != null) {
+                            callback.onTaskLoaded(task);
+                        } else {
+                            callback.onDataNotAvailable();
+                        }
+                    }
+                });
+            }
         };
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { taskId };
-
-        Cursor c = db.query(
-                TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-
-        Task task = null;
-
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-            String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-            String description =
-                    c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-            boolean completed =
-                    c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-            task = new Task(title, description, itemId, completed);
-        }
-        if (c != null) {
-            c.close();
-        }
-
-        db.close();
-
-        if (task != null) {
-            callback.onTaskLoaded(task);
-        } else {
-            callback.onDataNotAvailable();
-        }
+        mAppExecutors.diskIO().execute(runnable);
     }
 
     @Override
-    public void saveTask(@NonNull Task task) {
+    public void saveTask(@NonNull final Task task) {
         checkNotNull(task);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
-        values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
-        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-
-        db.insert(TaskEntry.TABLE_NAME, null, values);
-
-        db.close();
+        Runnable saveRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.insertTask(task);
+            }
+        };
+        mAppExecutors.diskIO().execute(saveRunnable);
     }
 
     @Override
-    public void completeTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public void completeTask(@NonNull final Task task) {
+        Runnable completeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.updateCompleted(task.getId(), true);
+            }
+        };
 
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { task.getId() };
-
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-
-        db.close();
+        mAppExecutors.diskIO().execute(completeRunnable);
     }
 
     @Override
@@ -179,18 +131,14 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void activateTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { task.getId() };
-
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-
-        db.close();
+    public void activateTask(@NonNull final Task task) {
+        Runnable activateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.updateCompleted(task.getId(), false);
+            }
+        };
+        mAppExecutors.diskIO().execute(activateRunnable);
     }
 
     @Override
@@ -201,14 +149,15 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void clearCompletedTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Runnable clearTasksRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.deleteCompletedTasks();
 
-        String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
-        String[] selectionArgs = { "1" };
+            }
+        };
 
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-
-        db.close();
+        mAppExecutors.diskIO().execute(clearTasksRunnable);
     }
 
     @Override
@@ -219,22 +168,25 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void deleteAllTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Runnable deleteRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.deleteTasks();
+            }
+        };
 
-        db.delete(TaskEntry.TABLE_NAME, null, null);
-
-        db.close();
+        mAppExecutors.diskIO().execute(deleteRunnable);
     }
 
     @Override
-    public void deleteTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public void deleteTask(@NonNull final String taskId) {
+        Runnable deleteRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTasksDao.deleteTaskById(taskId);
+            }
+        };
 
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { taskId };
-
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-
-        db.close();
+        mAppExecutors.diskIO().execute(deleteRunnable);
     }
 }

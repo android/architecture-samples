@@ -5,6 +5,7 @@
 -keep class android.support.test.espresso.IdlingResource { *; }
 -keep class android.support.test.espresso.IdlingRegistry { *; }
 -keep class com.google.common.base.Preconditions { *; }
+-keep class android.arch.** { *; }
 
 # For Guava:
 -dontwarn javax.annotation.**

@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -48,6 +47,8 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
     @Nullable
     String mTaskId;
 
+    private ActionBar mActionBar;
+
     // In a rotation it's important to know if we want to let the framework restore view state or
     // need to load data from the repository. This is saved into the state bundle.
     private boolean mIsDataMissing = true;
@@ -57,18 +58,20 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addtask_act);
 
-        ActionBar actionBar = setupToolbar();
+        // Set up the toolbar.
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setDisplayShowHomeEnabled(true);
+        setToolbarTitle(mTaskId);
 
         AddEditTaskFragment addEditTaskFragment =
                 (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (addEditTaskFragment == null) {
             addEditTaskFragment = mFragment;
-            if (mTaskId != null) {
-                actionBar.setTitle(R.string.edit_task);
-            } else {
-                actionBar.setTitle(R.string.add_task);
-            }
+
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     addEditTaskFragment, R.id.contentFrame);
         }
@@ -83,14 +86,12 @@ public class AddEditTaskActivity extends DaggerAppCompatActivity {
         }
     }
 
-    @NonNull
-    private ActionBar setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        return actionBar;
+    private void setToolbarTitle(@Nullable String taskId) {
+        if(taskId == null) {
+            mActionBar.setTitle(R.string.add_task);
+        } else {
+            mActionBar.setTitle(R.string.edit_task);
+        }
     }
 
     @Override
