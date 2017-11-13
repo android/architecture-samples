@@ -51,7 +51,7 @@ For information about planned samples, see ["New sample" issues](https://github.
 | ------------- | ------------- |
 | [todo‑mvp‑fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | Uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
 | [todo‑mvp‑conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | Uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
-
+| [todo‑mvi-rxjava](https://github.com/oldergod/android-architecture/tree/todo-mvi-rxjava) | Adapts the [Model-View-Intent](https://cycle.js.org/model-view-intent.html) pattern to Android to create a fully reactive architecture. |
 
 
 ## Why a to-do app?
