@@ -50,7 +50,7 @@ class AddEditTaskFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             viewmodel = (activity as AddEditTaskActivity).obtainViewModel()
@@ -61,18 +61,25 @@ class AddEditTaskFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
-            setImageResource(R.drawable.ic_done)
-            setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
+        activity?.let { act ->
+            act.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
+                setImageResource(R.drawable.ic_done)
+                setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
+            }
         }
     }
 
     private fun setupActionBar() {
         (activity as AppCompatActivity).supportActionBar?.setTitle(
-                if (arguments != null && arguments.get(ARGUMENT_EDIT_TASK_ID) != null)
-                    R.string.edit_task
-                else
+                arguments?.let { args ->
+                    args.get(ARGUMENT_EDIT_TASK_ID)?.let {
+                        R.string.edit_task
+                    } ?: kotlin.run {
+                        R.string.add_task
+                    }
+                } ?: kotlin.run {
                     R.string.add_task
+                }
         )
     }
 
