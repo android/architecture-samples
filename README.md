@@ -20,6 +20,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | [todo‑mvp‑dagger](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/) | Uses [Dagger 2](https://google.github.io/dagger/) to add support for [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection). |
 | [todo‑mvp‑rxjava](https://github.com/googlesamples/android-architecture/tree/todo-mvp-rxjava/) | Uses [RxJava 2](https://github.com/ReactiveX/RxJava) to implement concurrency, and abstract the data layer. |
 | [todo‑mvvm‑databinding](https://github.com/googlesamples/android-architecture/tree/todo-mvvm-databinding/) | Based on the todo-databinding sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
+| [todo‑mvvm‑live](https://github.com/googlesamples/android-architecture/tree/todo-mvvm-live/) | Uses ViewModels and LiveData from [Architecture Components](http://developer.android.com/arch) and the Data Binding library with an MVVM architecture. |
 
 
 ### Deprecated samples
@@ -38,7 +39,6 @@ These samples are no longer being maintained, but their implementation is still 
 | ------------- | ------------- |
 | [dev‑todo‑mvp‑tablet](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-tablet/) | Adds a master and detail view for tablets. |
 | [dev‑todo‑mvvm‑rxjava](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-rxjava/) | Based on the todo-rxjava sample, this version incorporates the [Model‑View‑ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) pattern.|
-| [dev‑todo‑mvvm‑live](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live/) | Uses lifecycle-aware [Architecture Components](http://developer.android.com/arch) (except Room), and the Data Binding library with an MVVM architecture. |
 | [dev-todo-mvp-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvp-kotlin/) | Conversion of todo-mvp to Kotlin. |
 | [dev-todo-mvvm-live-kotlin](https://github.com/googlesamples/android-architecture/tree/dev-todo-mvvm-live-kotlin/) | Conversion of todo-mvvm-live to Kotlin. |
 
@@ -51,7 +51,7 @@ For information about planned samples, see ["New sample" issues](https://github.
 | ------------- | ------------- |
 | [todo‑mvp‑fragmentless](https://github.com/Syhids/android-architecture/tree/todo-mvp-fragmentless) | Uses [View](https://developer.android.com/reference/android/view/View.html) objects instead of [Fragment](https://developer.android.com/reference/android/app/Fragment.html) objects.|
 | [todo‑mvp‑conductor](https://github.com/grepx/android-architecture/tree/todo-mvp-conductor) | Uses the [Conductor](https://github.com/bluelinelabs/Conductor) framework to refactor the app to use a single Activity architecture. |
-
+| [todo‑mvi-rxjava](https://github.com/oldergod/android-architecture/tree/todo-mvi-rxjava) | Adapts the [Model-View-Intent](https://cycle.js.org/model-view-intent.html) pattern to Android to create a fully reactive architecture. |
 
 
 ## Why a to-do app?
