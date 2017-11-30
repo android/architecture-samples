@@ -18,7 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
@@ -40,10 +45,8 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.run {
-            findViewById<View>(R.id.fab_edit_task).setOnClickListener {
-                viewDataBinding.viewmodel?.editTask()
-            }
+        activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
+            viewDataBinding.viewmodel?.editTask()
         }
     }
 
@@ -70,14 +73,14 @@ class TaskDetailFragment : Fragment() {
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return item.itemId.takeIf { it == R.id.menu_delete }
-                ?.let {
-                    viewDataBinding.viewmodel?.deleteTask()
-                    true
-                }
-                ?: kotlin.run { false }
-
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId == R.id.menu_delete) {
+        true -> {
+            viewDataBinding.viewmodel?.deleteTask()
+            true
+        }
+        else -> {
+            false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -23,12 +23,16 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.PopupMenu
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
-import java.util.*
 
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
@@ -107,12 +111,10 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.run {
-            findViewById<FloatingActionButton>(R.id.fab_add_task).run {
-                setImageResource(R.drawable.ic_add)
-                setOnClickListener {
-                    viewDataBinding.viewmodel?.addNewTask()
-                }
+        activity?.findViewById<FloatingActionButton>(R.id.fab_add_task)?.apply {
+            setImageResource(R.drawable.ic_add)
+            setOnClickListener {
+                viewDataBinding.viewmodel?.addNewTask()
             }
         }
     }

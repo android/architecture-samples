@@ -60,12 +60,10 @@ class AddEditTaskFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.let { act ->
-            act.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
+        activity?.findViewById<FloatingActionButton>(R.id.fab_edit_task_done)?.apply {
                 setImageResource(R.drawable.ic_done)
                 setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
             }
-        }
     }
 
     private fun setupActionBar() {
