@@ -40,8 +40,8 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.let { act ->
-            act.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
+        activity?.run {
+            findViewById<View>(R.id.fab_edit_task).setOnClickListener {
                 viewDataBinding.viewmodel?.editTask()
             }
         }

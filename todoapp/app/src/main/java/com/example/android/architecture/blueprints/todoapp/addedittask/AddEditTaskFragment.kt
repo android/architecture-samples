@@ -49,8 +49,7 @@ class AddEditTaskFragment : Fragment() {
         viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_EDIT_TASK_ID))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             viewmodel = (activity as AddEditTaskActivity).obtainViewModel()
@@ -71,15 +70,9 @@ class AddEditTaskFragment : Fragment() {
 
     private fun setupActionBar() {
         (activity as AppCompatActivity).supportActionBar?.setTitle(
-                arguments?.let { args ->
-                    args.get(ARGUMENT_EDIT_TASK_ID)?.let {
-                        R.string.edit_task
-                    } ?: kotlin.run {
-                        R.string.add_task
-                    }
-                } ?: kotlin.run {
-                    R.string.add_task
-                }
+                arguments?.get(ARGUMENT_EDIT_TASK_ID)
+                        ?.run { R.string.edit_task }
+                        ?: kotlin.run { R.string.add_task }
         )
     }
 

@@ -38,8 +38,7 @@ class TasksFragment : Fragment() {
     private lateinit var viewDataBinding: TasksFragBinding
     private lateinit var listAdapter: TasksAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = (activity as TasksActivity).obtainViewModel()
         }
@@ -108,8 +107,8 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.let { act ->
-            act.findViewById<FloatingActionButton>(R.id.fab_add_task).run {
+        activity?.run {
+            findViewById<FloatingActionButton>(R.id.fab_add_task).run {
                 setImageResource(R.drawable.ic_add)
                 setOnClickListener {
                     viewDataBinding.viewmodel?.addNewTask()
@@ -129,12 +128,12 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupRefreshLayout() {
-        activity?.let { act ->
-            viewDataBinding.refreshLayout.run {
+        viewDataBinding.refreshLayout.run {
+            activity?.run {
                 setColorSchemeColors(
-                        ContextCompat.getColor(act, R.color.colorPrimary),
-                        ContextCompat.getColor(act, R.color.colorAccent),
-                        ContextCompat.getColor(act, R.color.colorPrimaryDark)
+                        ContextCompat.getColor(this, R.color.colorPrimary),
+                        ContextCompat.getColor(this, R.color.colorAccent),
+                        ContextCompat.getColor(this, R.color.colorPrimaryDark)
                 )
                 // Set the scrolling view in the custom SwipeRefreshLayout.
                 scrollUpChild = viewDataBinding.tasksList
