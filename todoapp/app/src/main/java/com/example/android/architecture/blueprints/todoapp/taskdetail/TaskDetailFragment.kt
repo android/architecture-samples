@@ -73,8 +73,8 @@ class TaskDetailFragment : Fragment() {
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId == R.id.menu_delete) {
-        true -> {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.menu_delete -> {
             viewDataBinding.viewmodel?.deleteTask()
             true
         }
