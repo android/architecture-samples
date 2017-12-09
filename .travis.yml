@@ -7,6 +7,8 @@ android:
     - android-27
     - extra-android-m2repository
     - extra-google-m2repository
+before_install:
+      - yes | sdkmanager "platforms;android-27"
 jdk:
   - oraclejdk8
 script:
