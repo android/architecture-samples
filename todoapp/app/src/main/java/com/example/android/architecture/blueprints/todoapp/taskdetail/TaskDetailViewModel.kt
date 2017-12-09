@@ -27,7 +27,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment
 
-
 /**
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
@@ -62,15 +61,16 @@ class TaskDetailViewModel(
         if (isDataLoading) {
             return
         }
-        val task = this.task.get().apply {
+
+        task.get()?.run {
             isCompleted = completed
-        }
-        if (completed) {
-            tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
-        } else {
-            tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+            if (completed) {
+                tasksRepository.completeTask(this)
+                showSnackbarMessage(R.string.task_marked_complete)
+            } else {
+                tasksRepository.activateTask(this)
+                showSnackbarMessage(R.string.task_marked_active)
+            }
         }
     }
 
@@ -97,8 +97,8 @@ class TaskDetailViewModel(
     }
 
     fun onRefresh() {
-        if (task.get() != null) {
-            start(task.get().id)
+        task.get()?.let {
+            start(it.id)
         }
     }
 

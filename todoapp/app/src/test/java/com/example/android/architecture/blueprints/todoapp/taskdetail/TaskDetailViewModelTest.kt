@@ -37,9 +37,7 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 /**
@@ -85,8 +83,8 @@ class TaskDetailViewModelTest {
         setupViewModelRepositoryCallback()
 
         // Then verify that the view was notified
-        assertEquals(taskDetailViewModel.task.get().title, task.title)
-        assertEquals(taskDetailViewModel.task.get().description, task.description)
+        assertEquals(taskDetailViewModel.task.get()?.title, task.title)
+        assertEquals(taskDetailViewModel.task.get()?.description, task.description)
     }
 
     @Test fun deleteTask() {
