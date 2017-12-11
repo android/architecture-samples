@@ -30,13 +30,16 @@ import java.util.concurrent.TimeUnit;
  * {@link java.util.concurrent.ExecutorService}s for different scenarios.
  */
 public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
+    /* Constants for thread-pool */
+    private static final int POOL_SIZE     = 2;
+    private static final int MAX_POOL_SIZE = 4;
+    private static final int TIMEOUT      = 30;
+
+    /* Stores reference to handler for UI-Thread */
     private final Handler mHandler = new Handler();
 
-    public static final int POOL_SIZE = 2;
-    public static final int MAX_POOL_SIZE = 4;
-    public static final int TIMEOUT = 30;
-
-    static ThreadPoolExecutor mThreadPoolExecutor;
+    /* Stores reference to thread-pool executor */
+    private static ThreadPoolExecutor mThreadPoolExecutor;
 
 
     @Override
@@ -85,7 +88,7 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
      *
      * @return {@link ThreadPoolExecutor}
      */
-    static synchronized ThreadPoolExecutor getExecutor() {
+    private static synchronized ThreadPoolExecutor getExecutor() {
         if (mThreadPoolExecutor == null) {
             mThreadPoolExecutor = new ThreadPoolExecutor(POOL_SIZE, MAX_POOL_SIZE, TIMEOUT,
                     TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(POOL_SIZE));
