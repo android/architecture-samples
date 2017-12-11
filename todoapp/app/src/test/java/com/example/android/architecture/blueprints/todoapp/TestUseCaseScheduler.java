@@ -26,6 +26,11 @@ public class TestUseCaseScheduler implements UseCaseScheduler {
     }
 
     @Override
+    public void shutdownExecution() {
+        // No implementation
+    }
+
+    @Override
     public <R extends UseCase.ResponseValue> void notifyResponse(R response,
             UseCase.UseCaseCallback<R> useCaseCallback) {
         useCaseCallback.onSuccess(response);
