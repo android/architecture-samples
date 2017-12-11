@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.AbstractBasePresenter;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
@@ -32,18 +33,15 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Ta
  * updates
  * the UI as required.
  */
-public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
-
-    private final AddEditTaskContract.View mAddTaskView;
-
+public class AddEditTaskPresenter
+        extends AbstractBasePresenter<AddEditTaskContract.View>
+        implements AddEditTaskContract.Presenter {
     private final GetTask mGetTask;
-
     private final SaveTask mSaveTask;
-
-    private final UseCaseHandler mUseCaseHandler;
 
     @Nullable
     private String mTaskId;
+
 
     /**
      * Creates a presenter for the add/edit view.
@@ -54,13 +52,13 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     public AddEditTaskPresenter(@NonNull UseCaseHandler useCaseHandler, @Nullable String taskId,
             @NonNull AddEditTaskContract.View addTaskView, @NonNull GetTask getTask,
             @NonNull SaveTask saveTask) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
+        super(addTaskView, useCaseHandler);
+
         mTaskId = taskId;
-        mAddTaskView = checkNotNull(addTaskView, "addTaskView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");
         mSaveTask = checkNotNull(saveTask, "saveTask cannot be null!");
 
-        mAddTaskView.setPresenter(this);
+        mView.setPresenter(this);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
-        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
+        schedule(mGetTask, new GetTask.RequestValues(mTaskId),
                 new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
                     @Override
                     public void onSuccess(GetTask.ResponseValue response) {
@@ -101,9 +99,9 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     private void showTask(Task task) {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.setTitle(task.getTitle());
-            mAddTaskView.setDescription(task.getDescription());
+        if (mView.isActive()) {
+            mView.setTitle(task.getTitle());
+            mView.setDescription(task.getDescription());
         }
     }
 
@@ -113,8 +111,8 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
     private void showEmptyTaskError() {
         // The view may not be able to handle UI updates anymore
-        if (mAddTaskView.isActive()) {
-            mAddTaskView.showEmptyTaskError();
+        if (mView.isActive()) {
+            mView.showEmptyTaskError();
         }
     }
 
@@ -125,13 +123,13 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     private void createTask(String title, String description) {
         Task newTask = new Task(title, description);
         if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+            mView.showEmptyTaskError();
         } else {
-            mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+            schedule(mSaveTask, new SaveTask.RequestValues(newTask),
                     new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
                         @Override
                         public void onSuccess(SaveTask.ResponseValue response) {
-                            mAddTaskView.showTasksList();
+                            mView.showTasksList();
                         }
 
                         @Override
@@ -147,12 +145,12 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         Task newTask = new Task(title, description, mTaskId);
-        mUseCaseHandler.execute(mSaveTask, new SaveTask.RequestValues(newTask),
+        schedule(mSaveTask, new SaveTask.RequestValues(newTask),
                 new UseCase.UseCaseCallback<SaveTask.ResponseValue>() {
                     @Override
                     public void onSuccess(SaveTask.ResponseValue response) {
                         // After an edit, go back to the list.
-                        mAddTaskView.showTasksList();
+                        mView.showTasksList();
                     }
 
                     @Override

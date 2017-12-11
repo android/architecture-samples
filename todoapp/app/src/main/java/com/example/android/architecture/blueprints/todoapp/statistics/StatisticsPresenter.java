@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.AbstractBasePresenter;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
@@ -29,21 +30,21 @@ import com.example.android.architecture.blueprints.todoapp.statistics.domain.mod
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class StatisticsPresenter implements StatisticsContract.Presenter {
-
-    private final StatisticsContract.View mStatisticsView;
-    private final UseCaseHandler mUseCaseHandler;
+public class StatisticsPresenter
+        extends AbstractBasePresenter<StatisticsContract.View>
+        implements StatisticsContract.Presenter {
     private final GetStatistics mGetStatistics;
+
 
     public StatisticsPresenter(
             @NonNull UseCaseHandler useCaseHandler,
             @NonNull StatisticsContract.View statisticsView,
             @NonNull GetStatistics getStatistics) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
-        mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
+        super(statisticsView, useCaseHandler);
+
         mGetStatistics = checkNotNull(getStatistics,"getStatistics cannot be null!");
 
-        mStatisticsView.setPresenter(this);
+        mView.setPresenter(this);
     }
 
     @Override
@@ -52,29 +53,29 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     private void loadStatistics() {
-        mStatisticsView.setProgressIndicator(true);
+        mView.setProgressIndicator(true);
 
-        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
+        schedule(mGetStatistics, new GetStatistics.RequestValues(),
                 new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
             @Override
             public void onSuccess(GetStatistics.ResponseValue response) {
                 Statistics statistics = response.getStatistics();
                 // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
+                if (!mView.isActive()) {
                     return;
                 }
-                mStatisticsView.setProgressIndicator(false);
+                mView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
+                mView.showStatistics(statistics.getActiveTasks(), statistics.getCompletedTasks());
             }
 
             @Override
             public void onError() {
                 // The view may not be able to handle UI updates anymore
-                if (!mStatisticsView.isActive()) {
+                if (!mView.isActive()) {
                     return;
                 }
-                mStatisticsView.showLoadingStatisticsError();
+                mView.showLoadingStatisticsError();
             }
         });
     }

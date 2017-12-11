@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.AbstractBasePresenter;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -37,10 +38,9 @@ import java.util.List;
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the
  * UI as required.
  */
-public class TasksPresenter implements TasksContract.Presenter {
-
-
-    private final TasksContract.View mTasksView;
+public class TasksPresenter
+        extends AbstractBasePresenter<TasksContract.View>
+        implements TasksContract.Presenter {
     private final GetTasks mGetTasks;
     private final CompleteTask mCompleteTask;
     private final ActivateTask mActivateTask;
@@ -50,22 +50,20 @@ public class TasksPresenter implements TasksContract.Presenter {
 
     private boolean mFirstLoad = true;
 
-    private final UseCaseHandler mUseCaseHandler;
 
     public TasksPresenter(@NonNull UseCaseHandler useCaseHandler,
             @NonNull TasksContract.View tasksView, @NonNull GetTasks getTasks,
             @NonNull CompleteTask completeTask, @NonNull ActivateTask activateTask,
             @NonNull ClearCompleteTasks clearCompleteTasks) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "usecaseHandler cannot be null");
-        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        super(tasksView, useCaseHandler);
+
         mGetTasks = checkNotNull(getTasks, "getTask cannot be null!");
         mCompleteTask = checkNotNull(completeTask, "completeTask cannot be null!");
         mActivateTask = checkNotNull(activateTask, "activateTask cannot be null!");
         mClearCompleteTasks = checkNotNull(clearCompleteTasks,
                 "clearCompleteTasks cannot be null!");
 
-
-        mTasksView.setPresenter(this);
+        mView.setPresenter(this);
     }
 
     @Override
@@ -78,7 +76,7 @@ public class TasksPresenter implements TasksContract.Presenter {
         // If a task was successfully added, show snackbar
         if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
                 && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
+            mView.showSuccessfullySavedMessage();
         }
     }
 
@@ -95,23 +93,23 @@ public class TasksPresenter implements TasksContract.Presenter {
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setLoadingIndicator(true);
+            mView.setLoadingIndicator(true);
         }
 
         GetTasks.RequestValues requestValue = new GetTasks.RequestValues(forceUpdate,
                 mCurrentFiltering);
 
-        mUseCaseHandler.execute(mGetTasks, requestValue,
+        schedule(mGetTasks, requestValue,
                 new UseCase.UseCaseCallback<GetTasks.ResponseValue>() {
                     @Override
                     public void onSuccess(GetTasks.ResponseValue response) {
                         List<Task> tasks = response.getTasks();
                         // The view may not be able to handle UI updates anymore
-                        if (!mTasksView.isActive()) {
+                        if (!mView.isActive()) {
                             return;
                         }
                         if (showLoadingUI) {
-                            mTasksView.setLoadingIndicator(false);
+                            mView.setLoadingIndicator(false);
                         }
 
                         processTasks(tasks);
@@ -120,10 +118,10 @@ public class TasksPresenter implements TasksContract.Presenter {
                     @Override
                     public void onError() {
                         // The view may not be able to handle UI updates anymore
-                        if (!mTasksView.isActive()) {
+                        if (!mView.isActive()) {
                             return;
                         }
-                        mTasksView.showLoadingTasksError();
+                        mView.showLoadingTasksError();
                     }
                 });
     }
@@ -134,7 +132,7 @@ public class TasksPresenter implements TasksContract.Presenter {
             processEmptyTasks();
         } else {
             // Show the list of tasks
-            mTasksView.showTasks(tasks);
+            mView.showTasks(tasks);
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -143,13 +141,13 @@ public class TasksPresenter implements TasksContract.Presenter {
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                mTasksView.showActiveFilterLabel();
+                mView.showActiveFilterLabel();
                 break;
             case COMPLETED_TASKS:
-                mTasksView.showCompletedFilterLabel();
+                mView.showCompletedFilterLabel();
                 break;
             default:
-                mTasksView.showAllFilterLabel();
+                mView.showAllFilterLabel();
                 break;
         }
     }
@@ -157,43 +155,43 @@ public class TasksPresenter implements TasksContract.Presenter {
     private void processEmptyTasks() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                mTasksView.showNoActiveTasks();
+                mView.showNoActiveTasks();
                 break;
             case COMPLETED_TASKS:
-                mTasksView.showNoCompletedTasks();
+                mView.showNoCompletedTasks();
                 break;
             default:
-                mTasksView.showNoTasks();
+                mView.showNoTasks();
                 break;
         }
     }
 
     @Override
     public void addNewTask() {
-        mTasksView.showAddTask();
+        mView.showAddTask();
     }
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+        mView.showTaskDetailsUi(requestedTask.getId());
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(
+        schedule(mCompleteTask, new CompleteTask.RequestValues(
                         completedTask.getId()),
                 new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
                     @Override
                     public void onSuccess(CompleteTask.ResponseValue response) {
-                        mTasksView.showTaskMarkedComplete();
+                        mView.showTaskMarkedComplete();
                         loadTasks(false, false);
                     }
 
                     @Override
                     public void onError() {
-                        mTasksView.showLoadingTasksError();
+                        mView.showLoadingTasksError();
                     }
                 });
     }
@@ -201,34 +199,34 @@ public class TasksPresenter implements TasksContract.Presenter {
     @Override
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
-        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
+        schedule(mActivateTask, new ActivateTask.RequestValues(activeTask.getId()),
                 new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
                     @Override
                     public void onSuccess(ActivateTask.ResponseValue response) {
-                        mTasksView.showTaskMarkedActive();
+                        mView.showTaskMarkedActive();
                         loadTasks(false, false);
                     }
 
                     @Override
                     public void onError() {
-                        mTasksView.showLoadingTasksError();
+                        mView.showLoadingTasksError();
                     }
                 });
     }
 
     @Override
     public void clearCompletedTasks() {
-        mUseCaseHandler.execute(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
+        schedule(mClearCompleteTasks, new ClearCompleteTasks.RequestValues(),
                 new UseCase.UseCaseCallback<ClearCompleteTasks.ResponseValue>() {
                     @Override
                     public void onSuccess(ClearCompleteTasks.ResponseValue response) {
-                        mTasksView.showCompletedTasksCleared();
+                        mView.showCompletedTasksCleared();
                         loadTasks(false, false);
                     }
 
                     @Override
                     public void onError() {
-                        mTasksView.showLoadingTasksError();
+                        mView.showLoadingTasksError();
                     }
                 });
     }
