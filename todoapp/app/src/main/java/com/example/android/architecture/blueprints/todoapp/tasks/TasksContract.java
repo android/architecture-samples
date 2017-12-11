@@ -66,7 +66,7 @@ public interface TasksContract {
         void showFilteringPopUpMenu();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
 
         void result(int requestCode, int resultCode);
 

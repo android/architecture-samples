@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
+import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsContract;
 
 /**
  * This specifies the contract between the view and the presenter.
@@ -37,7 +38,7 @@ public interface AddEditTaskContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<AddEditTaskContract.View> {
 
         void saveTask(String title, String description);
 

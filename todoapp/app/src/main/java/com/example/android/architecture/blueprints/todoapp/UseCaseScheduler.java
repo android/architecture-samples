@@ -23,6 +23,12 @@ public interface UseCaseScheduler {
 
     void execute(Runnable runnable);
 
+    /**
+     * Attempts to shutdown all active executions and will cancel any
+     * pending executions.
+     */
+    void shutdownExecution();
+
     <V extends UseCase.ResponseValue> void notifyResponse(final V response,
             final UseCase.UseCaseCallback<V> useCaseCallback);
 

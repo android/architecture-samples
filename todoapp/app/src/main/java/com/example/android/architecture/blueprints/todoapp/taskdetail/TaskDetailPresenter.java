@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.architecture.blueprints.todoapp.AbstractBasePresenter;
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
@@ -34,10 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates
  * the UI as required.
  */
-public class TaskDetailPresenter implements TaskDetailContract.Presenter {
-
-    private final TaskDetailContract.View mTaskDetailView;
-    private final UseCaseHandler mUseCaseHandler;
+public class TaskDetailPresenter
+        extends AbstractBasePresenter<TaskDetailContract.View>
+        implements TaskDetailContract.Presenter {
     private final GetTask mGetTask;
     private final CompleteTask mCompleteTask;
     private final ActivateTask mActivateTask;
@@ -46,6 +46,7 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Nullable
     private String mTaskId;
 
+
     public TaskDetailPresenter(@NonNull UseCaseHandler useCaseHandler,
             @Nullable String taskId,
             @NonNull TaskDetailContract.View taskDetailView,
@@ -53,14 +54,15 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
             @NonNull CompleteTask completeTask,
             @NonNull ActivateTask activateTask,
             @NonNull DeleteTask deleteTask) {
+        super(taskDetailView, useCaseHandler);
+
         mTaskId = taskId;
-        mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
-        mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
         mGetTask = checkNotNull(getTask, "getTask cannot be null!");
         mCompleteTask = checkNotNull(completeTask, "completeTask cannot be null!");
         mActivateTask = checkNotNull(activateTask, "activateTask cannot be null!");
         mDeleteTask = checkNotNull(deleteTask, "deleteTask cannot be null!");
-        mTaskDetailView.setPresenter(this);
+
+        mView.setPresenter(this);
     }
 
     @Override
@@ -70,33 +72,33 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private void openTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            mView.showMissingTask();
             return;
         }
 
-        mTaskDetailView.setLoadingIndicator(true);
+        mView.setLoadingIndicator(true);
 
-        mUseCaseHandler.execute(mGetTask, new GetTask.RequestValues(mTaskId),
+        schedule(mGetTask, new GetTask.RequestValues(mTaskId),
                 new UseCase.UseCaseCallback<GetTask.ResponseValue>() {
                     @Override
                     public void onSuccess(GetTask.ResponseValue response) {
                         Task task = response.getTask();
 
                         // The view may not be able to handle UI updates anymore
-                        if (!mTaskDetailView.isActive()) {
+                        if (!mView.isActive()) {
                             return;
                         }
-                        mTaskDetailView.setLoadingIndicator(false);
+                        mView.setLoadingIndicator(false);
                         showTask(task);
                     }
 
                     @Override
                     public void onError() {
                         // The view may not be able to handle UI updates anymore
-                        if (!mTaskDetailView.isActive()) {
+                        if (!mView.isActive()) {
                             return;
                         }
-                        mTaskDetailView.showMissingTask();
+                        mView.showMissingTask();
                     }
                 });
     }
@@ -104,19 +106,19 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void editTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            mView.showMissingTask();
             return;
         }
-        mTaskDetailView.showEditTask(mTaskId);
+        mView.showEditTask(mTaskId);
     }
 
     @Override
     public void deleteTask() {
-        mUseCaseHandler.execute(mDeleteTask, new DeleteTask.RequestValues(mTaskId),
+        schedule(mDeleteTask, new DeleteTask.RequestValues(mTaskId),
                 new UseCase.UseCaseCallback<DeleteTask.ResponseValue>() {
                     @Override
                     public void onSuccess(DeleteTask.ResponseValue response) {
-                        mTaskDetailView.showTaskDeleted();
+                        mView.showTaskDeleted();
                     }
 
                     @Override
@@ -129,15 +131,15 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void completeTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            mView.showMissingTask();
             return;
         }
 
-        mUseCaseHandler.execute(mCompleteTask, new CompleteTask.RequestValues(mTaskId),
+        schedule(mCompleteTask, new CompleteTask.RequestValues(mTaskId),
                 new UseCase.UseCaseCallback<CompleteTask.ResponseValue>() {
                     @Override
                     public void onSuccess(CompleteTask.ResponseValue response) {
-                        mTaskDetailView.showTaskMarkedComplete();
+                        mView.showTaskMarkedComplete();
                     }
 
                     @Override
@@ -150,14 +152,14 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
     @Override
     public void activateTask() {
         if (Strings.isNullOrEmpty(mTaskId)) {
-            mTaskDetailView.showMissingTask();
+            mView.showMissingTask();
             return;
         }
-        mUseCaseHandler.execute(mActivateTask, new ActivateTask.RequestValues(mTaskId),
+        schedule(mActivateTask, new ActivateTask.RequestValues(mTaskId),
                 new UseCase.UseCaseCallback<ActivateTask.ResponseValue>() {
                     @Override
                     public void onSuccess(ActivateTask.ResponseValue response) {
-                        mTaskDetailView.showTaskMarkedActive();
+                        mView.showTaskMarkedActive();
                     }
 
                     @Override
@@ -172,16 +174,16 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
         String description = task.getDescription();
 
         if (Strings.isNullOrEmpty(title)) {
-            mTaskDetailView.hideTitle();
+            mView.hideTitle();
         } else {
-            mTaskDetailView.showTitle(title);
+            mView.showTitle(title);
         }
 
         if (Strings.isNullOrEmpty(description)) {
-            mTaskDetailView.hideDescription();
+            mView.hideDescription();
         } else {
-            mTaskDetailView.showDescription(description);
+            mView.showDescription(description);
         }
-        mTaskDetailView.showCompletionStatus(task.isCompleted());
+        mView.showCompletionStatus(task.isCompleted());
     }
 }

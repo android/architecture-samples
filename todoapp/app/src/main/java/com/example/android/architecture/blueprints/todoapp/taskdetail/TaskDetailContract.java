@@ -51,7 +51,7 @@ public interface TaskDetailContract {
         boolean isActive();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter extends BasePresenter<View> {
 
         void editTask();
 
