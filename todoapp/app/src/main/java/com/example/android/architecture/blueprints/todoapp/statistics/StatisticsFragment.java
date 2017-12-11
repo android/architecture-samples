@@ -63,6 +63,12 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPresenter.detach();
+    }
+
+    @Override
     public void setProgressIndicator(boolean active) {
         if (active) {
             mStatisticsTV.setText(getString(R.string.loading));

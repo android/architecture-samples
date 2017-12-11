@@ -85,6 +85,12 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPresenter.detach();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mPresenter.start();
