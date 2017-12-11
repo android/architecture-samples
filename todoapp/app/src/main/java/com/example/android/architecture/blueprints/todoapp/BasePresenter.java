@@ -16,8 +16,24 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
-public interface BasePresenter {
-
+/**
+ * We'll use generics here too for the view's type.
+ */
+public interface BasePresenter<IView extends BaseView> {
     void start();
 
+    /**
+     * Attaches a view to this presenter.
+     * @param view {@link IView}
+     */
+    void attach(IView view);
+
+    /**
+     * Detaches the view from this presenter... this is the core solution
+     * for the memory leak issue.
+     *
+     * We need to ensure we remove the reference of the view (Activity/Fragment/View)
+     * from the presenter whenever the Android component's life ends.
+     */
+    void detach();
 }
