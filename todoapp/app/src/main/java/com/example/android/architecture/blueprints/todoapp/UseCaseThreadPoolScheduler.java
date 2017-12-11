@@ -30,25 +30,26 @@ import java.util.concurrent.TimeUnit;
  * {@link java.util.concurrent.ExecutorService}s for different scenarios.
  */
 public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
-
     private final Handler mHandler = new Handler();
 
     public static final int POOL_SIZE = 2;
-
     public static final int MAX_POOL_SIZE = 4;
-
     public static final int TIMEOUT = 30;
 
-    ThreadPoolExecutor mThreadPoolExecutor;
+    static ThreadPoolExecutor mThreadPoolExecutor;
 
-    public UseCaseThreadPoolScheduler() {
-        mThreadPoolExecutor = new ThreadPoolExecutor(POOL_SIZE, MAX_POOL_SIZE, TIMEOUT,
-                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(POOL_SIZE));
-    }
 
     @Override
     public void execute(Runnable runnable) {
-        mThreadPoolExecutor.execute(runnable);
+        getExecutor().execute(runnable);
+    }
+
+    @Override
+    public void shutdownExecution() {
+        if (mThreadPoolExecutor != null) {
+            mThreadPoolExecutor.shutdownNow();
+            mThreadPoolExecutor = null;
+        }
     }
 
     @Override
@@ -73,4 +74,22 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
         });
     }
 
+
+    /**
+     * Lazy loads an instance of the {@link ThreadPoolExecutor}.
+     *
+     * We will use this method for referencing the executor because it will allow us to
+     * stop active and pending executions. Calling {@link ThreadPoolExecutor#shutdownNow()}
+     * will prevent that instance from being able to execute any further requests, so we can
+     * effectively set the instance to null so that this method will create a new instance.
+     *
+     * @return {@link ThreadPoolExecutor}
+     */
+    static synchronized ThreadPoolExecutor getExecutor() {
+        if (mThreadPoolExecutor == null) {
+            mThreadPoolExecutor = new ThreadPoolExecutor(POOL_SIZE, MAX_POOL_SIZE, TIMEOUT,
+                    TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(POOL_SIZE));
+        }
+        return mThreadPoolExecutor;
+    }
 }
