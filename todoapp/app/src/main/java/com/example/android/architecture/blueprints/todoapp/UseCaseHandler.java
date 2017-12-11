@@ -36,7 +36,7 @@ public class UseCaseHandler {
     public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> void execute(
             final UseCase<T, R> useCase, T values, UseCase.UseCaseCallback<R> callback) {
         useCase.setRequestValues(values);
-        useCase.setUseCaseCallback(new UiCallbackWrapper(callback, this));
+        useCase.setUseCaseCallback(new UiCallbackWrapper<>(callback, this));
         final WeakReference<UseCase<T, R>> weakUseCase = new WeakReference<>(useCase);
 
         // The network request might be handled in a different thread so make sure
