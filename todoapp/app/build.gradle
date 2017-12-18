@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jetbrains.dokka-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -60,6 +61,11 @@ android {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
     }
+}
+
+task dokkaDac(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'dac'
+    outputDirectory = "$buildDir/dac"
 }
 
 /*
