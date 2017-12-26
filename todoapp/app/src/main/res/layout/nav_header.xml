@@ -19,7 +19,6 @@
     android:layout_height="192dp"
     android:background="?attr/colorPrimaryDark"
     android:gravity="bottom"
-    android:orientation="vertical"
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 

@@ -23,8 +23,7 @@
         android:id="@+id/tasksContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:orientation="vertical">
+        android:clickable="true">
 
         <LinearLayout
             android:id="@+id/tasksLL"
