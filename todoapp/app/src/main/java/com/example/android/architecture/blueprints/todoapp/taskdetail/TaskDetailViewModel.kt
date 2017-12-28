@@ -42,8 +42,7 @@ class TaskDetailViewModel(
     val editTaskCommand = SingleLiveEvent<Void>()
     val deleteTaskCommand = SingleLiveEvent<Void>()
     val snackbarMessage = SingleLiveEvent<Int>()
-    var isDataLoading = false
-        private set
+    var dataLoading = ObservableBoolean(false)
     val isDataAvailable
         get() = task.get() != null
 
@@ -59,7 +58,7 @@ class TaskDetailViewModel(
     }
 
     fun setCompleted(completed: Boolean) {
-        if (isDataLoading) {
+        if (dataLoading.get()) {
             return
         }
         val task = this.task.get().apply {
@@ -76,7 +75,7 @@ class TaskDetailViewModel(
 
     fun start(taskId: String?) {
         taskId?.let {
-            isDataLoading = true
+            dataLoading.set(true)
             tasksRepository.getTask(it, this)
         }
     }
@@ -88,12 +87,12 @@ class TaskDetailViewModel(
 
     override fun onTaskLoaded(task: Task) {
         setTask(task)
-        isDataLoading = false
+        dataLoading.set(false)
     }
 
     override fun onDataNotAvailable() {
         task.set(null)
-        isDataLoading = false
+        dataLoading.set(false)
     }
 
     fun onRefresh() {
