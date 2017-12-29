@@ -42,7 +42,7 @@ class TaskDetailViewModel(
     val editTaskCommand = SingleLiveEvent<Void>()
     val deleteTaskCommand = SingleLiveEvent<Void>()
     val snackbarMessage = SingleLiveEvent<Int>()
-    var dataLoading = ObservableBoolean(false)
+    val dataLoading = ObservableBoolean(false)
     val isDataAvailable
         get() = task.get() != null
 
