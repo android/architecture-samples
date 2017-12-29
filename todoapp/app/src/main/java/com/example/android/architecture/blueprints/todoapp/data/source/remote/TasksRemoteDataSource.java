@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
@@ -45,6 +46,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
     }
 
+    @Inject
     public TasksRemoteDataSource() {}
 
     private static void addTask(String title, String description) {
