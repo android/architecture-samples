@@ -37,7 +37,7 @@ class StatisticsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
-                false)
+                false)!!
         return viewDataBinding.root
     }
 

@@ -132,3 +132,12 @@ dependencies {
     kapt "com.android.databinding:compiler:$gradlePluginVersion"
 }
 
+
+afterEvaluate {
+    android.applicationVariants.all {
+        def name = it.name.capitalize()
+        tasks["kapt${name}Kotlin"].dependsOn("transformDataBindingWithDataBindingMergeArtifactsFor${name}")
+
+    }
+}
+

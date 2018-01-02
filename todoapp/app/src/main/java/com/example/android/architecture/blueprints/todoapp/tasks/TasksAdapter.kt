@@ -51,7 +51,7 @@ class TasksAdapter(
             binding = TaskItemBinding.inflate(inflater, viewGroup, false)
         } else {
             // Recycling view
-            binding = DataBindingUtil.getBinding<TaskItemBinding>(view)
+            binding = DataBindingUtil.getBinding(view)!!
         }
 
         val userActionsListener = object : TaskItemUserActionsListener {
