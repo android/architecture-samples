@@ -56,9 +56,6 @@ class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
         }
     }
 
-    /**
-     * This is a test of Kdocs. Here is a link to [that method][showEmptyTaskError].
-     */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
