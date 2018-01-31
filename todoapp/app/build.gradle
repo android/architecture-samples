@@ -84,50 +84,50 @@ android {
  */
 dependencies {
     // App's dependencies, including test
-    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:design:$rootProject.supportLibraryVersion"
-    compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
-    compile "com.google.guava:guava:$rootProject.guavaVersion"
+    implementation "com.google.guava:guava:$rootProject.guavaVersion"
 
-    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
-    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
+    implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+    kapt "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
 
     // Dependencies for local unit tests
-    testCompile "junit:junit:$rootProject.ext.junitVersion"
-    testCompile "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
-    testCompile "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
+    testImplementation "junit:junit:$rootProject.ext.junitVersion"
+    testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
+    testImplementation "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
 
-    testCompile "android.arch.core:core-testing:$rootProject.archLifecycleVersion"
+    testImplementation "android.arch.core:core-testing:$rootProject.archLifecycleVersion"
 
     // Android Testing Support Library's runner and rules
-    androidTestCompile "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestCompile "com.android.support.test:rules:$rootProject.ext.rulesVersion"
+    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
+    androidTestImplementation "com.android.support.test:rules:$rootProject.ext.rulesVersion"
 
     // Dependencies for Android unit tests
-    androidTestCompile "junit:junit:$rootProject.ext.junitVersion"
-    androidTestCompile "org.mockito:mockito-android:$rootProject.ext.mockitoVersion"
+    androidTestImplementation "junit:junit:$rootProject.ext.junitVersion"
+    androidTestImplementation "org.mockito:mockito-android:$rootProject.ext.mockitoVersion"
 
     // Espresso UI Testing
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
-    compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
 
     // Resolve conflicts between main and test APK:
-    androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:support-compat:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
-    androidTestCompile "android.arch.persistence.room:testing:$rootProject.roomVersion"
-    compile "com.google.code.findbugs:jsr305:2.0.1"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    androidTestImplementation "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support:support-compat:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support:design:$rootProject.supportLibraryVersion"
+    androidTestImplementation "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
+    androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
+    implementation "com.google.code.findbugs:jsr305:2.0.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     kapt "com.android.databinding:compiler:$gradlePluginVersion"
 }
