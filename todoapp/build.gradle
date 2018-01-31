@@ -15,10 +15,10 @@ ext {
     runnerVersion = '1.0.1'
     rulesVersion = '1.0.1'
     espressoVersion = '3.0.1'
-    roomVersion = "1.0.0"
+    roomVersion = "1.1.0-alpha1"
 
     // Architecture Components dependencies
-    archLifecycleVersion = "1.0.0"
+    archLifecycleVersion = "1.1.0"
 }
 
 buildscript {
