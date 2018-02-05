@@ -18,10 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 import android.app.Activity
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.DataNotAvailableException
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
-import java.util.ArrayList
+import kotlinx.coroutines.experimental.runBlocking
+import java.util.*
 
 /**
  * Listens to user actions from the UI ([TasksFragment]), retrieves the data and updates the
@@ -73,48 +75,44 @@ class TasksPresenter(val tasksRepository: TasksRepository, val tasksView: TasksC
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment() // App is busy until further notice
 
-        tasksRepository.getTasks(object : TasksDataSource.LoadTasksCallback {
-            override fun onTasksLoaded(tasks: List<Task>) {
-                val tasksToShow = ArrayList<Task>()
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
+        runBlocking {
+            var tasks : List<Task>
+            try {
+                tasks = tasksRepository.getTasks()
+            } catch (e : DataNotAvailableException) {
+                if (showLoadingUI) {
+                    tasksView.showLoadingTasksError()
+                }
+                return@runBlocking
+            } finally {
                 if (!EspressoIdlingResource.countingIdlingResource.isIdleNow) {
                     EspressoIdlingResource.decrement() // Set app as idle.
                 }
+            }
 
-                // We filter the tasks based on the requestType
-                for (task in tasks) {
-                    when (currentFiltering) {
-                        TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                        TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
-                        }
-                        TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
-                        }
+            val tasksToShow = ArrayList<Task>()
+            // We filter the tasks based on the requestType
+            for (task in tasks) {
+                when (currentFiltering) {
+                    TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
+                    TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
+                        tasksToShow.add(task)
+                    }
+                    TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
+                        tasksToShow.add(task)
                     }
                 }
-                // The view may not be able to handle UI updates anymore
-                if (!tasksView.isActive) {
-                    return
-                }
-                if (showLoadingUI) {
-                    tasksView.setLoadingIndicator(false)
-                }
-
-                processTasks(tasksToShow)
+            }
+            // The view may not be able to handle UI updates anymore
+            if (!tasksView.isActive) {
+                return@runBlocking
+            }
+            if (showLoadingUI) {
+                tasksView.setLoadingIndicator(false)
             }
 
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!tasksView.isActive) {
-                    return
-                }
-                tasksView.showLoadingTasksError()
-            }
-        })
+            processTasks(tasksToShow)
+        }
     }
 
     private fun processTasks(tasks: List<Task>) {

@@ -16,8 +16,10 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 import android.support.annotation.VisibleForTesting
+import com.example.android.architecture.blueprints.todoapp.data.source.DataNotAvailableException
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.google.common.collect.Lists
+import kotlinx.coroutines.experimental.delay
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -26,16 +28,18 @@ class FakeTasksRemoteDataSource private constructor() : TasksDataSource {
 
     private val TASKS_SERVICE_DATA = LinkedHashMap<String, Task>()
 
-    override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
-        callback.onTasksLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values))
+    override suspend fun getTasks() : List<Task> {
+        delay(5000)
+        return Lists.newArrayList(TASKS_SERVICE_DATA.values)
     }
 
-    override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {
+    override suspend fun getTask(taskId: String) : Task? {
+        delay(500)
         val task = TASKS_SERVICE_DATA[taskId]
         if (task != null) {
-            callback.onTaskLoaded(task)
+            return task
         } else {
-            callback.onDataNotAvailable()
+            throw DataNotAvailableException("Task for ${taskId} is not found")
         }
     }
 

@@ -19,18 +19,15 @@ import com.example.android.architecture.blueprints.todoapp.any
 import com.example.android.architecture.blueprints.todoapp.argumentCaptor
 import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback
+import com.example.android.architecture.blueprints.todoapp.data.source.DataNotAvailableException
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.google.common.collect.Lists
+import kotlinx.coroutines.experimental.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.inOrder
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 /**
@@ -41,12 +38,6 @@ class TasksPresenterTest {
     @Mock private lateinit var tasksRepository: TasksRepository
 
     @Mock private lateinit var tasksView: TasksContract.View
-
-    /**
-     * [ArgumentCaptor] is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor private lateinit var loadTasksCallbackCaptor: ArgumentCaptor<LoadTasksCallback>
 
     private lateinit var tasksPresenter: TasksPresenter
 
@@ -78,63 +69,70 @@ class TasksPresenterTest {
     }
 
     @Test fun loadAllTasksFromRepositoryAndLoadIntoView() {
-        with(tasksPresenter) {
-            // Given an initialized TasksPresenter with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.ALL_TASKS
-            loadTasks(true)
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenReturn(tasks)
+            with(tasksPresenter) {
+                // Given an initialized TasksPresenter with initialized tasks
+                // When loading of Tasks is requested
+                currentFiltering = TasksFilterType.ALL_TASKS
+                loadTasks(true)
+            }
+
+            // Callback is captured and invoked with stubbed tasks
+            verify(tasksRepository).getTasks()
+
+            // Then progress indicator is shown
+            val inOrder = inOrder(tasksView)
+            inOrder.verify(tasksView).setLoadingIndicator(true)
+            // Then progress indicator is hidden and all tasks are shown in UI
+            inOrder.verify(tasksView).setLoadingIndicator(false)
+            val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
+            verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
+            assertTrue(showTasksArgumentCaptor.value.size == 3)
         }
-
-        // Callback is captured and invoked with stubbed tasks
-        verify(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
-
-        // Then progress indicator is shown
-        val inOrder = inOrder(tasksView)
-        inOrder.verify(tasksView).setLoadingIndicator(true)
-        // Then progress indicator is hidden and all tasks are shown in UI
-        inOrder.verify(tasksView).setLoadingIndicator(false)
-        val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
-        verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
-        assertTrue(showTasksArgumentCaptor.value.size == 3)
     }
 
     @Test fun loadActiveTasksFromRepositoryAndLoadIntoView() {
-        with(tasksPresenter) {
-            // Given an initialized TasksPresenter with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.ACTIVE_TASKS
-            loadTasks(true)
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenReturn(tasks)
+            with(tasksPresenter) {
+                // Given an initialized TasksPresenter with initialized tasks
+                // When loading of Tasks is requested
+                currentFiltering = TasksFilterType.ACTIVE_TASKS
+                loadTasks(true)
+            }
+
+            // Callback is captured and invoked with stubbed tasks
+            verify(tasksRepository).getTasks()
+
+            // Then progress indicator is hidden and active tasks are shown in UI
+            verify(tasksView).setLoadingIndicator(false)
+            val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
+            verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
+            assertTrue(showTasksArgumentCaptor.value.size == 1)
         }
-
-        // Callback is captured and invoked with stubbed tasks
-        verify(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
-
-        // Then progress indicator is hidden and active tasks are shown in UI
-        verify(tasksView).setLoadingIndicator(false)
-        val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
-        verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
-        assertTrue(showTasksArgumentCaptor.value.size == 1)
     }
 
     @Test fun loadCompletedTasksFromRepositoryAndLoadIntoView() {
-        with(tasksPresenter) {
-            // Given an initialized TasksPresenter with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.COMPLETED_TASKS
-            loadTasks(true)
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenReturn(tasks)
+
+            with(tasksPresenter) {
+                // Given an initialized TasksPresenter with initialized tasks
+                // When loading of Tasks is requested
+                currentFiltering = TasksFilterType.COMPLETED_TASKS
+                loadTasks(true)
+            }
+
+            // Callback is captured and invoked with stubbed tasks
+            verify(tasksRepository).getTasks()
+
+            // Then progress indicator is hidden and completed tasks are shown in UI
+            verify(tasksView).setLoadingIndicator(false)
+            val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
+            verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
+            assertTrue(showTasksArgumentCaptor.value.size == 2)
         }
-
-        // Callback is captured and invoked with stubbed tasks
-        verify(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
-
-        // Then progress indicator is hidden and completed tasks are shown in UI
-        verify(tasksView).setLoadingIndicator(false)
-        val showTasksArgumentCaptor = argumentCaptor<List<Task>>()
-        verify(tasksView).showTasks(capture(showTasksArgumentCaptor))
-        assertTrue(showTasksArgumentCaptor.value.size == 2)
     }
 
     @Test fun clickOnFab_ShowsAddTaskUi() {
@@ -157,6 +155,10 @@ class TasksPresenterTest {
     }
 
     @Test fun completeTask_ShowsTaskMarkedComplete() {
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenReturn(tasks)
+        }
+
         // Given a stubbed task
         val task = Task("Details Requested", "For this task")
 
@@ -169,6 +171,10 @@ class TasksPresenterTest {
     }
 
     @Test fun activateTask_ShowsTaskMarkedActive() {
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenReturn(tasks)
+        }
+
         // Given a stubbed completed task
         val task = Task("Details Requested", "For this task").apply { isCompleted = true }
         with(tasksPresenter) {
@@ -184,16 +190,19 @@ class TasksPresenterTest {
     }
 
     @Test fun unavailableTasks_ShowsError() {
-        with(tasksPresenter) {
-            // When tasks are loaded
-            currentFiltering = TasksFilterType.ALL_TASKS
-            loadTasks(true)
-        }
-        // And the tasks aren't available in the repository
-        verify(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-        loadTasksCallbackCaptor.value.onDataNotAvailable()
+        runBlocking {
+            `when`(tasksRepository.getTasks()).thenThrow(DataNotAvailableException(""))
 
-        // Then an error message is shown
-        verify(tasksView).showLoadingTasksError()
+            with(tasksPresenter) {
+                // When tasks are loaded
+                currentFiltering = TasksFilterType.ALL_TASKS
+                loadTasks(true)
+            }
+            // And the tasks aren't available in the repository
+            verify(tasksRepository).getTasks()
+
+            // Then an error message is shown
+            verify(tasksView).showLoadingTasksError()
+        }
     }
 }

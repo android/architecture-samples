@@ -16,8 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import java.util.ArrayList
-import java.util.LinkedHashMap
+import java.util.*
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -47,32 +46,28 @@ class TasksRepository(
      * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
      * available first.
      *
-     *
      * Note: [TasksDataSource.LoadTasksCallback.onDataNotAvailable] is fired if all data sources fail to
      * get the data.
      */
-    override fun getTasks(callback: TasksDataSource.LoadTasksCallback) {
-        // Respond immediately with cache if available and not dirty
+    override suspend fun getTasks() : List<Task> {
+
         if (cachedTasks.isNotEmpty() && !cacheIsDirty) {
-            callback.onTasksLoaded(ArrayList(cachedTasks.values))
-            return
+            return ArrayList(cachedTasks.values)
         }
 
         if (cacheIsDirty) {
             // If the cache is dirty we need to fetch new data from the network.
-            getTasksFromRemoteDataSource(callback)
+            return getTasksFromRemoteDataSource()
         } else {
             // Query the local storage if available. If not, query the network.
-            tasksLocalDataSource.getTasks(object : TasksDataSource.LoadTasksCallback {
-                override fun onTasksLoaded(tasks: List<Task>) {
-                    refreshCache(tasks)
-                    callback.onTasksLoaded(ArrayList(cachedTasks.values))
-                }
-
-                override fun onDataNotAvailable() {
-                    getTasksFromRemoteDataSource(callback)
-                }
-            })
+            var tasks : List<Task>
+            try {
+                tasks = tasksLocalDataSource.getTasks()
+            } catch (e : DataNotAvailableException) {
+                tasks = tasksRemoteDataSource.getTasks()
+            }
+            refreshCache(tasks)
+            return tasks
         }
     }
 
@@ -131,41 +126,23 @@ class TasksRepository(
      * Note: [TasksDataSource.GetTaskCallback.onDataNotAvailable] is fired if both data sources fail to
      * get the data.
      */
-    override fun getTask(taskId: String, callback: TasksDataSource.GetTaskCallback) {
+    override suspend fun getTask(taskId: String) : Task? {
         val taskInCache = getTaskWithId(taskId)
 
-        // Respond immediately with cache if available
         if (taskInCache != null) {
-            callback.onTaskLoaded(taskInCache)
-            return
+            return taskInCache
         }
 
         // Load from server/persisted if needed.
 
         // Is the task in the local data source? If not, query the network.
-        tasksLocalDataSource.getTask(taskId, object : TasksDataSource.GetTaskCallback {
-            override fun onTaskLoaded(task: Task) {
-                // Do in memory cache update to keep the app UI up to date
-                cacheAndPerform(task) {
-                    callback.onTaskLoaded(it)
-                }
-            }
-
-            override fun onDataNotAvailable() {
-                tasksRemoteDataSource.getTask(taskId, object : TasksDataSource.GetTaskCallback {
-                    override fun onTaskLoaded(task: Task) {
-                        // Do in memory cache update to keep the app UI up to date
-                        cacheAndPerform(task) {
-                            callback.onTaskLoaded(it)
-                        }
-                    }
-
-                    override fun onDataNotAvailable() {
-                        callback.onDataNotAvailable()
-                    }
-                })
-            }
-        })
+        var task : Task?
+        try {
+            task = tasksLocalDataSource.getTask(taskId)
+        } catch (e : DataNotAvailableException) {
+            task = tasksRemoteDataSource.getTask(taskId)
+        }
+        return task
     }
 
     override fun refreshTasks() {
@@ -184,7 +161,13 @@ class TasksRepository(
         cachedTasks.remove(taskId)
     }
 
-    private fun getTasksFromRemoteDataSource(callback: TasksDataSource.LoadTasksCallback) {
+    private suspend fun getTasksFromRemoteDataSource() : List<Task> {
+        val tasks = tasksRemoteDataSource.getTasks()
+        refreshLocalDataSource(tasks)
+        return tasks
+    }
+
+/*    private fun getTasksFromRemoteDataSource(callback: TasksDataSource.LoadTasksCallback) {
         tasksRemoteDataSource.getTasks(object : TasksDataSource.LoadTasksCallback {
             override fun onTasksLoaded(tasks: List<Task>) {
                 refreshCache(tasks)
@@ -196,7 +179,7 @@ class TasksRepository(
                 callback.onDataNotAvailable()
             }
         })
-    }
+    }*/
 
     private fun refreshCache(tasks: List<Task>) {
         cachedTasks.clear()

@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import kotlinx.coroutines.experimental.runBlocking
 
 /**
  * Listens to user actions from the UI ([AddEditTaskFragment]), retrieves the data and updates
@@ -35,7 +36,7 @@ class AddEditTaskPresenter(
         val tasksRepository: TasksDataSource,
         val addTaskView: AddEditTaskContract.View,
         override var isDataMissing: Boolean
-) : AddEditTaskContract.Presenter, TasksDataSource.GetTaskCallback {
+) : AddEditTaskContract.Presenter {
 
     init {
         addTaskView.presenter = this
@@ -59,10 +60,15 @@ class AddEditTaskPresenter(
         if (taskId == null) {
             throw RuntimeException("populateTask() was called but task is new.")
         }
-        tasksRepository.getTask(taskId, this)
+        runBlocking {
+            val task = tasksRepository.getTask(taskId)
+            if (task != null) {
+                onTaskLoaded(task)
+            }
+        }
     }
 
-    override fun onTaskLoaded(task: Task) {
+    fun onTaskLoaded(task: Task) {
         // The view may not be able to handle UI updates anymore
         if (addTaskView.isActive) {
             addTaskView.setTitle(task.title)
@@ -71,7 +77,7 @@ class AddEditTaskPresenter(
         isDataMissing = false
     }
 
-    override fun onDataNotAvailable() {
+    fun onDataNotAvailable() {
         // The view may not be able to handle UI updates anymore
         if (addTaskView.isActive) {
             addTaskView.showEmptyTaskError()

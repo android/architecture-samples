@@ -77,6 +77,7 @@ dependencies {
     compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.1"
 
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"

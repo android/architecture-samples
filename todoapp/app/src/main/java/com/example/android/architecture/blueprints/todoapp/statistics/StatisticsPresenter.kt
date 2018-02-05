@@ -16,10 +16,10 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.DataNotAvailableException
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import kotlinx.coroutines.experimental.runBlocking
 
 /**
  * Listens to user actions from the UI ([StatisticsFragment]), retrieves the data and updates
@@ -45,9 +45,9 @@ class StatisticsPresenter(
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment() // App is busy until further notice
 
-        tasksRepository.getTasks(object : TasksDataSource.LoadTasksCallback {
-            override fun onTasksLoaded(tasks: List<Task>) {
-                // We calculate number of active and completed tasks
+        runBlocking {
+            try {
+                val tasks = tasksRepository.getTasks()
                 val completedTasks = tasks.filter { it.isCompleted }.size
                 val activeTasks = tasks.size - completedTasks
 
@@ -59,19 +59,17 @@ class StatisticsPresenter(
                 }
                 // The view may not be able to handle UI updates anymore
                 if (!statisticsView.isActive) {
-                    return
+                    return@runBlocking
                 }
                 statisticsView.setProgressIndicator(false)
                 statisticsView.showStatistics(activeTasks, completedTasks)
-            }
-
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
+            } catch (e: DataNotAvailableException) {
                 if (!statisticsView.isActive) {
-                    return
+                    return@runBlocking
                 }
                 statisticsView.showLoadingStatisticsError()
             }
-        })
+        }
+
     }
 }

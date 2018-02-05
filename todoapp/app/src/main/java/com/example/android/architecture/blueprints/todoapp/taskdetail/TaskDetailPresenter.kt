@@ -16,8 +16,9 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.DataNotAvailableException
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import kotlinx.coroutines.experimental.runBlocking
 
 /**
  * Listens to user actions from the UI ([TaskDetailFragment]), retrieves the data and updates
@@ -44,28 +45,29 @@ class TaskDetailPresenter(
         }
 
         taskDetailView.setLoadingIndicator(true)
-        tasksRepository.getTask(taskId, object : TasksDataSource.GetTaskCallback {
-            override fun onTaskLoaded(task: Task) {
-                with(taskDetailView) {
-                    // The view may not be able to handle UI updates anymore
-                    if (!isActive) {
-                        return@onTaskLoaded
+        runBlocking {
+            try {
+                val task = tasksRepository.getTask(taskId)
+                if (task != null) {
+                    with(taskDetailView) {
+                        // The view may not be able to handle UI updates anymore
+                        if (!isActive) {
+                            return@runBlocking
+                        }
+                        setLoadingIndicator(false)
                     }
-                    setLoadingIndicator(false)
+                    showTask(task)
                 }
-                showTask(task)
-            }
-
-            override fun onDataNotAvailable() {
+            } catch (e: DataNotAvailableException) {
                 with(taskDetailView) {
                     // The view may not be able to handle UI updates anymore
                     if (!isActive) {
-                        return@onDataNotAvailable
+                        return@runBlocking
                     }
                     showMissingTask()
                 }
             }
-        })
+        }
     }
 
     override fun editTask() {

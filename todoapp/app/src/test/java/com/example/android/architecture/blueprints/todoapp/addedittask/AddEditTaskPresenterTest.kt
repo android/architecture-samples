@@ -17,17 +17,14 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import com.example.android.architecture.blueprints.todoapp.any
-import com.example.android.architecture.blueprints.todoapp.capture
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.eq
+import kotlinx.coroutines.experimental.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
@@ -41,12 +38,6 @@ class AddEditTaskPresenterTest {
     @Mock private lateinit var tasksRepository: TasksRepository
 
     @Mock private lateinit var addEditTaskView: AddEditTaskContract.View
-
-    /**
-     * [ArgumentCaptor] is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor private lateinit var getTaskCallbackCaptor: ArgumentCaptor<TasksDataSource.GetTaskCallback>
 
     private lateinit var addEditTaskPresenter: AddEditTaskPresenter
 
@@ -114,11 +105,13 @@ class AddEditTaskPresenterTest {
         }
 
         // Then the task repository is queried and the view updated
-        verify(tasksRepository).getTask(eq(testTask.id), capture(getTaskCallbackCaptor))
+        var task : Task? = null
+        runBlocking {
+            task = verify(tasksRepository).getTask(eq(testTask.id))
+        }
         assertThat(addEditTaskPresenter.isDataMissing, `is`(true))
 
-        // Simulate callback
-        getTaskCallbackCaptor.value.onTaskLoaded(testTask)
+        addEditTaskPresenter.onTaskLoaded(testTask)
 
         verify(addEditTaskView).setTitle(testTask.title)
         verify(addEditTaskView).setDescription(testTask.description)

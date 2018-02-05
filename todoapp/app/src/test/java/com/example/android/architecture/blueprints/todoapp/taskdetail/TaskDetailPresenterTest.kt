@@ -15,20 +15,15 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import com.example.android.architecture.blueprints.todoapp.capture
+import com.example.android.architecture.blueprints.todoapp.any
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.eq
+import kotlinx.coroutines.experimental.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.inOrder
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 /**
@@ -49,13 +44,6 @@ class TaskDetailPresenterTest {
     @Mock private lateinit var tasksRepository: TasksRepository
 
     @Mock private lateinit var taskDetailView: TaskDetailContract.View
-
-    /**
-     * [ArgumentCaptor] is a powerful Mockito API to capture argument values and use them to
-     * perform further actions or assertions on them.
-     */
-    @Captor private lateinit var getTaskCallbackCaptor:
-            ArgumentCaptor<TasksDataSource.GetTaskCallback>
 
     private lateinit var taskDetailPresenter: TaskDetailPresenter
 
@@ -78,46 +66,46 @@ class TaskDetailPresenterTest {
     }
 
     @Test fun getActiveTaskFromRepositoryAndLoadIntoView() {
-        // When tasks presenter is asked to open a task
-        taskDetailPresenter = TaskDetailPresenter(
-                ACTIVE_TASK.id, tasksRepository, taskDetailView).apply { start() }
+        runBlocking {
+            `when`(tasksRepository.getTask(any())).thenReturn(ACTIVE_TASK)
+            // When tasks presenter is asked to open a task
+            taskDetailPresenter = TaskDetailPresenter(
+                    ACTIVE_TASK.id, tasksRepository, taskDetailView).apply { start() }
 
-        // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(tasksRepository).getTask(eq(ACTIVE_TASK.id),
-                capture(getTaskCallbackCaptor))
-        val inOrder = inOrder(taskDetailView)
-        inOrder.verify(taskDetailView).setLoadingIndicator(true)
+            // Then task is loaded from model, callback is captured and progress indicator is shown
+            verify(tasksRepository).getTask(eq(ACTIVE_TASK.id))
+            val inOrder = inOrder(taskDetailView)
+            inOrder.verify(taskDetailView).setLoadingIndicator(true)
 
-        // When task is finally loaded
-        getTaskCallbackCaptor.value.onTaskLoaded(ACTIVE_TASK) // Trigger callback
 
-        // Then progress indicator is hidden and title, description and completion status are shown
-        // in UI
-        inOrder.verify(taskDetailView).setLoadingIndicator(false)
-        verify(taskDetailView).showTitle(TITLE_TEST)
-        verify(taskDetailView).showDescription(DESCRIPTION_TEST)
-        verify(taskDetailView).showCompletionStatus(false)
+            // Then progress indicator is hidden and title, description and completion status are shown
+            // in UI
+            inOrder.verify(taskDetailView).setLoadingIndicator(false)
+            verify(taskDetailView).showTitle(TITLE_TEST)
+            verify(taskDetailView).showDescription(DESCRIPTION_TEST)
+            verify(taskDetailView).showCompletionStatus(false)
+        }
     }
 
     @Test fun getCompletedTaskFromRepositoryAndLoadIntoView() {
-        taskDetailPresenter = TaskDetailPresenter(
-                COMPLETED_TASK.id, tasksRepository, taskDetailView).apply { start() }
+        runBlocking {
+            `when`(tasksRepository.getTask(any())).thenReturn(COMPLETED_TASK)
 
-        // Then task is loaded from model, callback is captured and progress indicator is shown
-        verify(tasksRepository).getTask(
-                eq(COMPLETED_TASK.id), capture(getTaskCallbackCaptor))
-        val inOrder = inOrder(taskDetailView)
-        inOrder.verify(taskDetailView).setLoadingIndicator(true)
+            taskDetailPresenter = TaskDetailPresenter(
+                    COMPLETED_TASK.id, tasksRepository, taskDetailView).apply { start() }
 
-        // When task is finally loaded
-        getTaskCallbackCaptor.value.onTaskLoaded(COMPLETED_TASK) // Trigger callback
+            // Then task is loaded from model, callback is captured and progress indicator is shown
+            verify(tasksRepository).getTask(eq(COMPLETED_TASK.id))
+            val inOrder = inOrder(taskDetailView)
+            inOrder.verify(taskDetailView).setLoadingIndicator(true)
 
-        // Then progress indicator is hidden and title, description and completion status are shown
-        // in UI
-        inOrder.verify(taskDetailView).setLoadingIndicator(false)
-        verify(taskDetailView).showTitle(TITLE_TEST)
-        verify(taskDetailView).showDescription(DESCRIPTION_TEST)
-        verify(taskDetailView).showCompletionStatus(true)
+            // Then progress indicator is hidden and title, description and completion status are shown
+            // in UI
+            inOrder.verify(taskDetailView).setLoadingIndicator(false)
+            verify(taskDetailView).showTitle(TITLE_TEST)
+            verify(taskDetailView).showDescription(DESCRIPTION_TEST)
+            verify(taskDetailView).showCompletionStatus(true)
+        }
     }
 
     @Test fun getUnknownTaskFromRepositoryAndLoadIntoView() {
