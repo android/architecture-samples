@@ -102,6 +102,19 @@ public class AddEditTaskPresenterTest {
     }
 
     @Test
+    public void saveExistingTaskWithEmptyNameToRepository_emptyTaskShowsErrorUi() {
+        // Get a reference to the class under test
+        mAddEditTaskPresenter = new AddEditTaskPresenter(
+                "1", mTasksRepository, mAddEditTaskView, true, mSchedulerProvider);
+
+        // When the presenter is asked to save an empty task
+        mAddEditTaskPresenter.saveTask("", "");
+
+        // Then an empty not error is shown in the UI
+        verify(mAddEditTaskView).showEmptyTaskError();
+    }
+
+    @Test
     public void saveExistingTaskToRepository_showsSuccessMessageUi() {
         // Get a reference to the class under test
         mAddEditTaskPresenter = new AddEditTaskPresenter(
