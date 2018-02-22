@@ -117,9 +117,9 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasks_repositoryCachesAfterFirstSubscription_whenTasksAvailableInRemoteStorage() {
-        // Given that the local data source has data available
+        // Given that the remote data source has data available
         setTasksAvailable(mTasksRemoteDataSource, TASKS);
-        // And the remote data source does not have any data available
+        // And the local data source does not have any data available
         setTasksNotAvailable(mTasksLocalDataSource);
 
         // When two subscriptions are set
