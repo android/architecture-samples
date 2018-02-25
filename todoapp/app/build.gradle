@@ -30,9 +30,9 @@ android {
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
     }
-    flavorDimensions "default"
 
     flavorDimensions "default"
+
 
     // If you need to add more flavors, consider using flavor dimensions.
     productFlavors {
