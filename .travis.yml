@@ -1,0 +1,21 @@
+language: android
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-26.0.2
+    - android-26
+    - extra-android-m2repository
+    - extra-google-m2repository
+jdk:
+  - oraclejdk8
+script:
+  - cd todoapp
+  - ./gradlew test
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
