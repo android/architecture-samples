@@ -39,7 +39,7 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
+public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
@@ -131,14 +131,12 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         return true;
     }
 
-    @Override
     public void onTaskDeleted() {
         setResult(DELETE_RESULT_OK);
         // If the task was deleted successfully, go back to the list.
         finish();
     }
 
-    @Override
     public void onStartEditTask() {
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
         Intent intent = new Intent(this, AddEditTaskActivity.class);
