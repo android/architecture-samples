@@ -33,7 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 /**
  * Displays an add or edit task screen.
  */
-public class AddEditTaskActivity extends AppCompatActivity implements AddEditTaskNavigator {
+public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 1;
 
@@ -43,12 +43,6 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    @Override
-    public void onTaskSaved() {
-        setResult(ADD_EDIT_RESULT_OK);
-        finish();
     }
 
     @Override
@@ -69,6 +63,11 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
                 addEditTaskFragment, R.id.contentFrame);
 
         subscribeToNavigationChanges();
+    }
+
+    public void onTaskSaved() {
+        setResult(ADD_EDIT_RESULT_OK);
+        finish();
     }
 
     private void subscribeToNavigationChanges() {
