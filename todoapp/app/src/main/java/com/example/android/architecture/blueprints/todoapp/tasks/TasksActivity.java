@@ -38,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 
-public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
+public class TasksActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
@@ -155,7 +155,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         mViewModel.handleActivityResult(requestCode, resultCode);
     }
 
-    @Override
     public void openTaskDetails(String taskId) {
         Intent intent = new Intent(this, TaskDetailActivity.class);
         intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
@@ -163,7 +162,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
 
     }
 
-    @Override
     public void addNewTask() {
         Intent intent = new Intent(this, AddEditTaskActivity.class);
         startActivityForResult(intent, AddEditTaskActivity.REQUEST_CODE);
