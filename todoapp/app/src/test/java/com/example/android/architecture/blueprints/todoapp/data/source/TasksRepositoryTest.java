@@ -25,9 +25,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import android.content.Context;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.cache.TasksCache;
 import com.google.common.collect.Lists;
 
 import org.junit.After;
@@ -63,6 +62,9 @@ public class TasksRepositoryTest {
     private TasksDataSource mTasksLocalDataSource;
 
     @Mock
+    private TasksCache mTasksCache;
+
+    @Mock
     private TasksDataSource.GetTaskCallback mGetTaskCallback;
 
     @Mock
@@ -90,7 +92,7 @@ public class TasksRepositoryTest {
 
         // Get a reference to the class under test
         mTasksRepository = TasksRepository.getInstance(
-                mTasksRemoteDataSource, mTasksLocalDataSource);
+                mTasksRemoteDataSource, mTasksLocalDataSource, mTasksCache);
     }
 
     @After
@@ -128,7 +130,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).saveTask(newTask);
         verify(mTasksLocalDataSource).saveTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
+        verify(mTasksCache).saveTask(newTask);
     }
 
     @Test
@@ -143,8 +145,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        verify(mTasksCache).saveTask(newTask);
     }
 
     @Test
@@ -159,8 +160,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(false));
+        verify(mTasksCache).saveTask(newTask);
     }
 
     @Test
@@ -175,8 +175,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        verify(mTasksCache).saveTask(newTask);
     }
 
     @Test
@@ -191,8 +190,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertThat(mTasksRepository.mCachedTasks.get(newTask.getId()).isActive(), is(true));
+        verify(mTasksCache).saveTask(newTask);
     }
 
     @Test
@@ -222,10 +220,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).clearCompletedTasks();
         verify(mTasksLocalDataSource).clearCompletedTasks();
-
-        assertThat(mTasksRepository.mCachedTasks.size(), is(1));
-        assertTrue(mTasksRepository.mCachedTasks.get(newTask2.getId()).isActive());
-        assertThat(mTasksRepository.mCachedTasks.get(newTask2.getId()).getTitle(), is(TASK_TITLE2));
+        verify(mTasksCache).clearCompletedTasks();
     }
 
     @Test
@@ -245,7 +240,7 @@ public class TasksRepositoryTest {
         verify(mTasksRemoteDataSource).deleteAllTasks();
         verify(mTasksLocalDataSource).deleteAllTasks();
 
-        assertThat(mTasksRepository.mCachedTasks.size(), is(0));
+        verify(mTasksCache).deleteAllTasks();
     }
 
     @Test
@@ -253,7 +248,7 @@ public class TasksRepositoryTest {
         // Given a task in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
         mTasksRepository.saveTask(newTask);
-        assertThat(mTasksRepository.mCachedTasks.containsKey(newTask.getId()), is(true));
+        verify(mTasksCache).saveTask(newTask);
 
         // When deleted
         mTasksRepository.deleteTask(newTask.getId());
@@ -261,9 +256,7 @@ public class TasksRepositoryTest {
         // Verify the data sources were called
         verify(mTasksRemoteDataSource).deleteTask(newTask.getId());
         verify(mTasksLocalDataSource).deleteTask(newTask.getId());
-
-        // Verify it's removed from repository
-        assertThat(mTasksRepository.mCachedTasks.containsKey(newTask.getId()), is(false));
+        verify(mTasksCache).deleteTask(newTask.getId());
     }
 
     @Test

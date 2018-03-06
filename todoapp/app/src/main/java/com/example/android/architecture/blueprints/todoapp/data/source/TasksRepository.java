@@ -22,12 +22,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.cache.TasksCache;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -44,22 +41,15 @@ public class TasksRepository implements TasksDataSource {
 
     private final TasksDataSource mTasksLocalDataSource;
 
-    /**
-     * This variable has package local visibility so it can be accessed from tests.
-     */
-    Map<String, Task> mCachedTasks;
-
-    /**
-     * Marks the cache as invalid, to force an update the next time data is requested. This variable
-     * has package local visibility so it can be accessed from tests.
-     */
-    boolean mCacheIsDirty = false;
+    private final TasksCache mTasksCache;
 
     // Prevent direct instantiation.
     private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource) {
+                            @NonNull TasksDataSource tasksLocalDataSource,
+                            @NonNull TasksCache tasksCache) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
+        mTasksCache = tasksCache;
     }
 
     /**
@@ -70,16 +60,17 @@ public class TasksRepository implements TasksDataSource {
      * @return the {@link TasksRepository} instance
      */
     public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
-                                              TasksDataSource tasksLocalDataSource) {
+                                              TasksDataSource tasksLocalDataSource,
+                                              TasksCache tasksCache) {
         if (INSTANCE == null) {
-            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
+            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource, tasksCache);
         }
         return INSTANCE;
     }
 
     /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource)} to create a new instance
-     * next time it's called.
+     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource, TasksCache)} to create a
+     * new instance next time it's called.
      */
     public static void destroyInstance() {
         INSTANCE = null;
@@ -97,12 +88,12 @@ public class TasksRepository implements TasksDataSource {
         checkNotNull(callback);
 
         // Respond immediately with cache if available and not dirty
-        if (mCachedTasks != null && !mCacheIsDirty) {
-            callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
+        if (!mTasksCache.isDirty()) {
+            callback.onTasksLoaded(mTasksCache.getTasks());
             return;
         }
 
-        if (mCacheIsDirty) {
+        if (mTasksCache.isDirty()) {
             // If the cache is dirty we need to fetch new data from the network.
             getTasksFromRemoteDataSource(callback);
         } else {
@@ -111,7 +102,7 @@ public class TasksRepository implements TasksDataSource {
                 @Override
                 public void onTasksLoaded(List<Task> tasks) {
                     refreshCache(tasks);
-                    callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
+                    callback.onTasksLoaded(mTasksCache.getTasks());
                 }
 
                 @Override
@@ -129,10 +120,7 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.saveTask(task);
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.put(task.getId(), task);
+        mTasksCache.saveTask(task);
     }
 
     @Override
@@ -144,10 +132,7 @@ public class TasksRepository implements TasksDataSource {
         Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.put(task.getId(), completedTask);
+        mTasksCache.saveTask(completedTask);
     }
 
     @Override
@@ -165,10 +150,7 @@ public class TasksRepository implements TasksDataSource {
         Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.put(task.getId(), activeTask);
+        mTasksCache.saveTask(activeTask);
     }
 
     @Override
@@ -183,16 +165,7 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource.clearCompletedTasks();
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        Iterator<Map.Entry<String, Task>> it = mCachedTasks.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Task> entry = it.next();
-            if (entry.getValue().isCompleted()) {
-                it.remove();
-            }
-        }
+        mTasksCache.clearCompletedTasks();
     }
 
     /**
@@ -222,10 +195,7 @@ public class TasksRepository implements TasksDataSource {
             @Override
             public void onTaskLoaded(Task task) {
                 // Do in memory cache update to keep the app UI up to date
-                if (mCachedTasks == null) {
-                    mCachedTasks = new LinkedHashMap<>();
-                }
-                mCachedTasks.put(task.getId(), task);
+                mTasksCache.saveTask(task);
                 callback.onTaskLoaded(task);
             }
 
@@ -235,10 +205,7 @@ public class TasksRepository implements TasksDataSource {
                     @Override
                     public void onTaskLoaded(Task task) {
                         // Do in memory cache update to keep the app UI up to date
-                        if (mCachedTasks == null) {
-                            mCachedTasks = new LinkedHashMap<>();
-                        }
-                        mCachedTasks.put(task.getId(), task);
+                        mTasksCache.saveTask(task);
                         callback.onTaskLoaded(task);
                     }
 
@@ -253,26 +220,21 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void refreshTasks() {
-        mCacheIsDirty = true;
+        mTasksCache.invalidate();
     }
 
     @Override
     public void deleteAllTasks() {
         mTasksRemoteDataSource.deleteAllTasks();
         mTasksLocalDataSource.deleteAllTasks();
-
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.clear();
+        mTasksCache.deleteAllTasks();
     }
 
     @Override
     public void deleteTask(@NonNull String taskId) {
         mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
         mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
-
-        mCachedTasks.remove(taskId);
+        mTasksCache.deleteTask(taskId);
     }
 
     private void getTasksFromRemoteDataSource(@NonNull final LoadTasksCallback callback) {
@@ -281,7 +243,7 @@ public class TasksRepository implements TasksDataSource {
             public void onTasksLoaded(List<Task> tasks) {
                 refreshCache(tasks);
                 refreshLocalDataSource(tasks);
-                callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
+                callback.onTasksLoaded(mTasksCache.getTasks());
             }
 
             @Override
@@ -292,14 +254,7 @@ public class TasksRepository implements TasksDataSource {
     }
 
     private void refreshCache(List<Task> tasks) {
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
-        }
-        mCachedTasks.clear();
-        for (Task task : tasks) {
-            mCachedTasks.put(task.getId(), task);
-        }
-        mCacheIsDirty = false;
+        mTasksCache.refresh(tasks);
     }
 
     private void refreshLocalDataSource(List<Task> tasks) {
@@ -312,10 +267,6 @@ public class TasksRepository implements TasksDataSource {
     @Nullable
     private Task getTaskWithId(@NonNull String id) {
         checkNotNull(id);
-        if (mCachedTasks == null || mCachedTasks.isEmpty()) {
-            return null;
-        } else {
-            return mCachedTasks.get(id);
-        }
+        return mTasksCache.getTask(id);
     }
 }
