@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.cache.TasksCache;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
@@ -39,7 +40,7 @@ public class Injection {
         checkNotNull(context);
         ToDoDatabase database = ToDoDatabase.getInstance(context);
         return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(new AppExecutors(),
-                        database.taskDao()));
+                TasksLocalDataSource.getInstance(new AppExecutors(), database.taskDao()),
+                TasksCache.getInstance());
     }
 }
