@@ -87,8 +87,8 @@ public class TasksRepository implements TasksDataSource {
     public void getTasks(@NonNull final LoadTasksCallback callback) {
         checkNotNull(callback);
 
-        // Respond immediately with cache if available and not dirty
-        if (!mTasksCache.isDirty()) {
+        // Respond immediately with cache if not empty and not dirty
+        if (!mTasksCache.isEmpty() && !mTasksCache.isDirty()) {
             callback.onTasksLoaded(mTasksCache.getTasks());
             return;
         }

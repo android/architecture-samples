@@ -30,12 +30,17 @@ public class TasksCache {
         return mDirty;
     }
 
+    public boolean isEmpty() {
+        if (mCache == null) mCache = new LinkedHashMap<>();
+        return mCache.isEmpty();
+    }
+
     public Task getTask(String taskId) {
         if (mCache == null) return null;
         return mCache.get(taskId);
     }
 
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         if (mCache == null) return new ArrayList<>();
         return new ArrayList<>(mCache.values());
     }

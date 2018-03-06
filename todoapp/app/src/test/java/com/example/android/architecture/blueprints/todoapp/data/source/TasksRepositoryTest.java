@@ -16,15 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.cache.TasksCache;
 import com.google.common.collect.Lists;
@@ -36,8 +27,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.verification.VerificationMode;
 
 import java.util.List;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -112,6 +111,9 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasks_requestsAllTasksFromLocalDataSource() {
+        when(mTasksCache.isDirty()).thenReturn(false);
+        when(mTasksCache.isEmpty()).thenReturn(true);
+
         // When tasks are requested from the tasks repository
         mTasksRepository.getTasks(mLoadTasksCallback);
 
@@ -145,13 +147,16 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        verify(mTasksCache).saveTask(newTask);
+        verify(mTasksCache, times(2)).saveTask(newTask);
     }
 
     @Test
     public void completeTaskId_completesTaskToServiceAPIUpdatesCache() {
         // Given a stub active task with title and description added in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description");
+
+        when(mTasksCache.getTask(newTask.getId())).thenReturn(newTask);
+
         mTasksRepository.saveTask(newTask);
 
         // When a task is completed using its id to the tasks repository
@@ -160,7 +165,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).completeTask(newTask);
         verify(mTasksLocalDataSource).completeTask(newTask);
-        verify(mTasksCache).saveTask(newTask);
+        verify(mTasksCache, times(2)).saveTask(newTask);
     }
 
     @Test
@@ -175,13 +180,16 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        verify(mTasksCache).saveTask(newTask);
+        verify(mTasksCache, times(2)).saveTask(newTask);
     }
 
     @Test
     public void activateTaskId_activatesTaskToServiceAPIUpdatesCache() {
         // Given a stub completed task with title and description in the repository
         Task newTask = new Task(TASK_TITLE, "Some Task Description", true);
+
+        when(mTasksCache.getTask(newTask.getId())).thenReturn(newTask);
+
         mTasksRepository.saveTask(newTask);
 
         // When a completed task is activated with its id to the tasks repository
@@ -190,7 +198,7 @@ public class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).activateTask(newTask);
         verify(mTasksLocalDataSource).activateTask(newTask);
-        verify(mTasksCache).saveTask(newTask);
+        verify(mTasksCache, times(2)).saveTask(newTask);
     }
 
     @Test
@@ -261,6 +269,10 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasksWithDirtyCache_tasksAreRetrievedFromRemote() {
+        when(mTasksCache.isDirty()).thenReturn(true);
+        when(mTasksCache.isEmpty()).thenReturn(true);
+        when(mTasksCache.getTasks()).thenReturn(TASKS);
+
         // When calling getTasks in the repository with dirty cache
         mTasksRepository.refreshTasks();
         mTasksRepository.getTasks(mLoadTasksCallback);
@@ -275,6 +287,10 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasksWithLocalDataSourceUnavailable_tasksAreRetrievedFromRemote() {
+        when(mTasksCache.isDirty()).thenReturn(false);
+        when(mTasksCache.isEmpty()).thenReturn(true);
+        when(mTasksCache.getTasks()).thenReturn(TASKS);
+
         // When calling getTasks in the repository
         mTasksRepository.getTasks(mLoadTasksCallback);
 
@@ -290,6 +306,9 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasksWithBothDataSourcesUnavailable_firesOnDataUnavailable() {
+        when(mTasksCache.isEmpty()).thenReturn(true);
+        when(mTasksCache.isDirty()).thenReturn(false);
+
         // When calling getTasks in the repository
         mTasksRepository.getTasks(mLoadTasksCallback);
 
@@ -323,6 +342,9 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTasks_refreshesLocalDataSource() {
+        when(mTasksCache.isDirty()).thenReturn(true);
+        when(mTasksCache.isEmpty()).thenReturn(false);
+
         // Mark cache as dirty to force a reload of data from remote data source.
         mTasksRepository.refreshTasks();
 
@@ -340,6 +362,9 @@ public class TasksRepositoryTest {
      * Convenience method that issues two calls to the tasks repository
      */
     private void twoTasksLoadCallsToRepository(TasksDataSource.LoadTasksCallback callback) {
+        when(mTasksCache.isEmpty()).thenReturn(true);
+        when(mTasksCache.isDirty()).thenReturn(false);
+
         // When tasks are requested from repository
         mTasksRepository.getTasks(callback); // First call to API
 
