@@ -6,7 +6,6 @@ Before starting work on new sample intended for submission, please open an issue
 
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/googlesamples/android-architecture/blob/master/code-of-conduct.md). By participating in this project you agree to abide by its terms.
 
-
 ## Code style and structure
 
 Please check out the [Code Style for Contributors](https://source.android.com/source/code-style.html) section in AOSP. Also, check out the rest of the samples and maintain as much consistency with them as possible.
