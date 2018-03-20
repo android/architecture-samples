@@ -10,7 +10,6 @@ Before exploring this sample, you should familiarize yourself with the following
 
 * The [project README](https://github.com/googlesamples/android-architecture/tree/master)
 * The [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp) sample
-* The [todo-databinding](https://github.com/googlesamples/android-architecture/tree/todo-databinding) sample
 * The [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture
 
 ## Designing the app
