@@ -1,6 +1,6 @@
 # todo-mvvm-databinding
 
-This version of the app is called todo-mvvm-databinding, and is based on the [todo-databinding](https://github.com/googlesamples/android-architecture/tree/todo-databinding/) sample, which uses the [Data Binding Library](http://developer.android.com/tools/data-binding/guide.html#data_objects) to display data and bind UI elements to actions.
+This version of the app is called todo-mvvm-databinding, and is based on the [todo-databinding](https://github.com/googlesamples/android-architecture/tree/deprecated-todo-databinding) sample, which uses the [Data Binding Library](http://developer.android.com/tools/data-binding/guide.html#data_objects) to display data and bind UI elements to actions.
 
 The sample demonstrates an alternative implementation of the todo-mvp sample using the [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) (MVVM) architecture. 
 
@@ -10,7 +10,7 @@ Before exploring this sample, you should familiarize yourself with the following
 
 * The [project README](https://github.com/googlesamples/android-architecture/tree/master)
 * The [todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp) sample
-* The [todo-databinding](https://github.com/googlesamples/android-architecture/tree/todo-databinding) sample
+* The [todo-databinding](https://github.com/googlesamples/android-architecture/tree/deprecated-todo-databinding) sample
 * The [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture
 
 ## Designing the app
