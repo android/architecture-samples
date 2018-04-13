@@ -5,7 +5,7 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsModule;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailPresenterModule;
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailModule;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksModule;
 
@@ -34,6 +34,6 @@ public abstract class ActivityBindingModule {
     abstract StatisticsActivity statisticsActivity();
 
     @ActivityScoped
-    @ContributesAndroidInjector(modules = TaskDetailPresenterModule.class)
+    @ContributesAndroidInjector(modules = TaskDetailModule.class)
     abstract TaskDetailActivity taskDetailActivity();
 }

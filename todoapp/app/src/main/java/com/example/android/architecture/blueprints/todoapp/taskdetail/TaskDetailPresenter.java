@@ -32,7 +32,7 @@ import javax.inject.Inject;
  * <p>
  * By marking the constructor with {@code @Inject}, Dagger injects the dependencies required to
  * create an instance of the TaskDetailPresenter (if it fails, it emits a compiler error). It uses
- * {@link TaskDetailPresenterModule} to do so.
+ * {@link TaskDetailModule} to do so.
  * <p>
  * Dagger generated code doesn't require public access to the constructor or class, and
  * therefore, to ensure the developer doesn't instantiate the class manually and bypasses Dagger,
