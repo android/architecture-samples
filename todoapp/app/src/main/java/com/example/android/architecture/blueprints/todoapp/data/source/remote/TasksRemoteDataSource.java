@@ -89,7 +89,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
         return Observable.from(tasks)
-                .doOnNext(this::saveTask)
+                .flatMapCompletable(this::saveTask)
                 .toCompletable();
     }
 

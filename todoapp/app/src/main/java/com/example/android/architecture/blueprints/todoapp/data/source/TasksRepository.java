@@ -169,7 +169,7 @@ public class TasksRepository implements TasksDataSource {
     public Completable refreshTasks() {
         return mTasksRemoteDataSource.getTasks()
                 .subscribeOn(mBaseSchedulerProvider.io())
-                .doOnNext(mTasksLocalDataSource::saveTasks)
+                .flatMapCompletable(tasks -> mTasksLocalDataSource.saveTasks(tasks))
                 .toCompletable();
     }
 
