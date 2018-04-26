@@ -9,6 +9,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 
+import java.util.concurrent.TimeUnit;
 import rx.Completable;
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -113,7 +114,8 @@ public class AddEditTaskViewModel {
             newTask = new Task(title, description);
             if (newTask.isEmpty()) {
                 showSnackbar(R.string.empty_task_message);
-                return Completable.complete();
+                //complete with delay, let snackbar take its time.
+                return Completable.complete().delay(600, TimeUnit.MILLISECONDS);
             }
         } else {
             newTask = new Task(title, description, mTaskId);
