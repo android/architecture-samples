@@ -1,13 +1,12 @@
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 14
-    targetSdkVersion = 26
-    compileSdkVersion = 26
-    buildToolsVersion = '26.0.2'
+    minSdkVersion = 19
+    targetSdkVersion = 28
+    compileSdkVersion = 'android-P'
 
     // App dependencies
-    supportLibraryVersion = '26.1.0'
+    supportLibraryVersion = '28.0.0-alpha1'
     guavaVersion = '22.0-android'
     junitVersion = '4.12'
     mockitoVersion = '2.8.47'
@@ -19,8 +18,8 @@ ext {
 }
 
 buildscript {
-    ext.kotlinVersion = '1.1.51'
-    ext.gradlePluginVersion = '3.0.0'
+    ext.kotlinVersion = '1.2.30'
+    ext.gradlePluginVersion = '3.1.2'
     repositories {
         jcenter()
         google()

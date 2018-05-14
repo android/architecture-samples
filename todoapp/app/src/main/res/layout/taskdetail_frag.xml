@@ -28,18 +28,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="@dimen/activity_horizontal_margin" />
+        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
     <TextView
         android:id="@+id/task_detail_title"
-        android:layout_toRightOf="@id/task_detail_complete"
+        android:layout_toEndOf="@id/task_detail_complete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
         android:id="@+id/task_detail_description"
-        android:layout_toRightOf="@id/task_detail_complete"
+        android:layout_toEndOf="@id/task_detail_complete"
         android:layout_below="@id/task_detail_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

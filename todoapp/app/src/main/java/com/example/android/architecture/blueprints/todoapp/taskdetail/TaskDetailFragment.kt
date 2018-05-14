@@ -67,8 +67,9 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
         }
 
         // Set up floating action button
-        activity.findViewById<FloatingActionButton>(R.id.fab_edit_task)
-                .setOnClickListener { presenter.editTask() }
+        activity?.findViewById<FloatingActionButton>(R.id.fab_edit_task)?.setOnClickListener {
+            presenter.editTask()
+        }
 
         return root
     }
@@ -125,7 +126,7 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
     }
 
     override fun showTaskDeleted() {
-        activity.finish()
+        activity?.finish()
     }
 
     override fun showTaskMarkedComplete() {
@@ -140,7 +141,7 @@ class TaskDetailFragment : Fragment(), TaskDetailContract.View {
         if (requestCode == REQUEST_EDIT_TASK) {
             // If the task was edited successfully, go back to the list.
             if (resultCode == Activity.RESULT_OK) {
-                activity.finish()
+                activity?.finish()
             }
         }
     }
