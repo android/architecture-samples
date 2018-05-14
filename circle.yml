@@ -4,6 +4,9 @@ machine:
   environment:
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
 
+checkout:
+  post:
+    - cp -r licences/. $ANDROID_HOME/licenses
 dependencies:
   pre:
     - sudo pip install -U crcmod
