@@ -6,7 +6,7 @@ machine:
 
 checkout:
   post:
-    - cp -r licences/. $ANDROID_HOME/licenses
+    - cp -r licenses/. $ANDROID_HOME/licenses
 dependencies:
   pre:
     - sudo pip install -U crcmod
