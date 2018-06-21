@@ -85,9 +85,5 @@ public interface TasksContract {
         TasksFilterType getFiltering();
 
         void setFiltering(TasksFilterType requestType);
-
-        void takeView(TasksContract.View view);
-
-        void dropView();
     }
 }
