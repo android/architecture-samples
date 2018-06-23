@@ -85,8 +85,8 @@ class TaskDetailViewModelTest {
         setupViewModelRepositoryCallback()
 
         // Then verify that the view was notified
-        assertEquals(taskDetailViewModel.task.get().title, task.title)
-        assertEquals(taskDetailViewModel.task.get().description, task.description)
+        assertEquals(taskDetailViewModel.task.get()?.title, task.title)
+        assertEquals(taskDetailViewModel.task.get()?.description, task.description)
     }
 
     @Test fun deleteTask() {

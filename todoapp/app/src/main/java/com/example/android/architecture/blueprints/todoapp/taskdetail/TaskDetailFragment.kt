@@ -45,14 +45,16 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
+        activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
             viewDataBinding.viewmodel?.editTask()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewDataBinding.viewmodel?.start(arguments.getString(ARGUMENT_TASK_ID))
+        arguments?.getString(ARGUMENT_TASK_ID)?.let {
+            viewDataBinding.viewmodel?.start(it)
+        }
     }
 
     override fun onCreateView(

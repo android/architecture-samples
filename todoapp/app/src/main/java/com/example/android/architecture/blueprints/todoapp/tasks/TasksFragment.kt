@@ -89,51 +89,55 @@ class TasksFragment : Fragment() {
     }
 
     private fun showFilteringPopUpMenu() {
-        PopupMenu(context, activity.findViewById<View>(R.id.menu_filter)).run {
-            menuInflater.inflate(R.menu.filter_tasks, menu)
+        context?.let { ctx ->
+            activity?.findViewById<View>(R.id.menu_filter)?.let { view ->
+                PopupMenu(ctx, view).apply {
+                    menuInflater.inflate(R.menu.filter_tasks, menu)
 
-            setOnMenuItemClickListener {
-                viewDataBinding.viewmodel?.run {
-                    currentFiltering =
-                            when (it.itemId) {
-                                R.id.active -> TasksFilterType.ACTIVE_TASKS
-                                R.id.completed -> TasksFilterType.COMPLETED_TASKS
-                                else -> TasksFilterType.ALL_TASKS
-                            }
-                    loadTasks(false)
-                }
-                true
+                    setOnMenuItemClickListener { menuItem ->
+                        viewDataBinding.viewmodel?.run {
+                            currentFiltering =
+                                    when (menuItem.itemId) {
+                                        R.id.active -> TasksFilterType.ACTIVE_TASKS
+                                        R.id.completed -> TasksFilterType.COMPLETED_TASKS
+                                        else -> TasksFilterType.ALL_TASKS
+                                    }
+                            loadTasks(false)
+                        }
+                        true
+                    }
+                }.show()
             }
-            show()
         }
     }
 
     private fun setupFab() {
-        activity.findViewById<FloatingActionButton>(R.id.fab_add_task).run {
-            setImageResource(R.drawable.ic_add)
-            setOnClickListener {
-                viewDataBinding.viewmodel?.addNewTask()
+        activity?.let {
+            with(it.findViewById<FloatingActionButton>(R.id.fab_add_task)) {
+                setImageResource(R.drawable.ic_add)
+                setOnClickListener {
+                    viewDataBinding.viewmodel?.addNewTask()
+                }
             }
         }
     }
 
     private fun setupListAdapter() {
-        val viewModel = viewDataBinding.viewmodel
-        if (viewModel != null) {
-            listAdapter = TasksAdapter(ArrayList(0), viewModel)
+        viewDataBinding.viewmodel?.let {
+            listAdapter = TasksAdapter(ArrayList(0), it)
             viewDataBinding.tasksList.adapter = listAdapter
-        } else {
-            Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
-        }
+        } ?: Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
     }
 
     private fun setupRefreshLayout() {
         viewDataBinding.refreshLayout.run {
-            setColorSchemeColors(
-                    ContextCompat.getColor(activity, R.color.colorPrimary),
-                    ContextCompat.getColor(activity, R.color.colorAccent),
-                    ContextCompat.getColor(activity, R.color.colorPrimaryDark)
-            )
+            activity?.let {
+                setColorSchemeColors(
+                        ContextCompat.getColor(it, R.color.colorPrimary),
+                        ContextCompat.getColor(it, R.color.colorAccent),
+                        ContextCompat.getColor(it, R.color.colorPrimaryDark)
+                )
+            }
             // Set the scrolling view in the custom SwipeRefreshLayout.
             scrollUpChild = viewDataBinding.tasksList
         }
