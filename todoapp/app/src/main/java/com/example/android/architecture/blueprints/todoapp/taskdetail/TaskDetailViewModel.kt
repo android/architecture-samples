@@ -59,26 +59,24 @@ class TaskDetailViewModel(
     }
 
     fun setCompleted(completed: Boolean) {
-        if (isDataLoading) {
-            return
-        }
-        val task = this.task.get().apply {
-            isCompleted = completed
-        }
-        if (completed) {
-            tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
-        } else {
-            tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+        if (!isDataLoading) {
+            task.get()?.let { task ->
+                task.isCompleted = completed
+
+                if (completed) {
+                    tasksRepository.completeTask(task)
+                    showSnackbarMessage(R.string.task_marked_complete)
+                } else {
+                    tasksRepository.activateTask(task)
+                    showSnackbarMessage(R.string.task_marked_active)
+                }
+            }
         }
     }
 
-    fun start(taskId: String?) {
-        taskId?.let {
-            isDataLoading = true
-            tasksRepository.getTask(it, this)
-        }
+    fun start(taskId: String) {
+        isDataLoading = true
+        tasksRepository.getTask(taskId, this)
     }
 
     fun setTask(task: Task) {
@@ -97,8 +95,8 @@ class TaskDetailViewModel(
     }
 
     fun onRefresh() {
-        if (task.get() != null) {
-            start(task.get().id)
+        task.get()?.id?.let {
+            start(it)
         }
     }
 

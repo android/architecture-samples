@@ -42,17 +42,9 @@ class TasksAdapter(
     override fun getItemId(position: Int) = position.toLong()
 
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup): View {
-        val binding: TaskItemBinding
-        if (view == null) {
-            // Inflate
-            val inflater = LayoutInflater.from(viewGroup.context)
-
-            // Create the binding
-            binding = TaskItemBinding.inflate(inflater, viewGroup, false)
-        } else {
-            // Recycling view
-            binding = DataBindingUtil.getBinding<TaskItemBinding>(view)
-        }
+        val binding = view?.let {
+            DataBindingUtil.getBinding<TaskItemBinding>(it)
+        } ?: TaskItemBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
 
         val userActionsListener = object : TaskItemUserActionsListener {
             override fun onCompleteChanged(task: Task, v: View) {

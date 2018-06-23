@@ -60,13 +60,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailNavigator {
 
     private fun subscribeToNavigationChanges(viewModel: TaskDetailViewModel) {
         // The activity observes the navigation commands in the ViewModel
-        val activity = this@TaskDetailActivity
-        viewModel.run {
-            editTaskCommand.observe(activity,
-                    Observer { activity.onStartEditTask() })
-            deleteTaskCommand.observe(activity,
-                    Observer { activity.onTaskDeleted() })
-        }
+        viewModel.editTaskCommand.observe(this, Observer { onStartEditTask() })
+        viewModel.deleteTaskCommand.observe(this, Observer { onTaskDeleted() })
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
