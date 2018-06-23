@@ -76,6 +76,7 @@ class TasksViewModel(
 
     fun start() {
         loadTasks(false)
+        updateFiltering()
     }
 
     fun loadTasks(forceUpdate: Boolean) {

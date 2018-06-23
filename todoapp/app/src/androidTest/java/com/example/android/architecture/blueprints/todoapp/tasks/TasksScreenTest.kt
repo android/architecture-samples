@@ -150,6 +150,9 @@ import org.junit.runner.RunWith
 
         // Verify task is displayed on screen
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
+
+        // Verify filter label is not empty string
+        onView(withId(R.id.filteringLabel)).check(matches(not(withText(""))))
     }
 
     @Test fun markTaskAsComplete() {
@@ -198,6 +201,8 @@ import org.junit.runner.RunWith
         viewAllTasks()
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.filteringLabel)).check(matches(not(withText(""))))
     }
 
     @Test fun showActiveTasks() {
@@ -209,6 +214,8 @@ import org.junit.runner.RunWith
         viewActiveTasks()
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.filteringLabel)).check(matches(not(withText(""))))
     }
 
     @Test fun showCompletedTasks() {
@@ -222,6 +229,8 @@ import org.junit.runner.RunWith
         viewCompletedTasks()
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.filteringLabel)).check(matches(not(withText(""))))
     }
 
     @Test fun clearCompletedTasks() {
