@@ -41,7 +41,7 @@ public abstract class AddEditTaskModule {
 
     @ActivityScoped
     @Binds
-    abstract AddEditTaskContract.Presenter taskPresenter(AddEditTaskPresenter presenter);
+    abstract AddEditTaskContract.Presenter addEditTaskPresenter(AddEditTaskPresenter presenter);
 
     //NOTE:  IF you want to have something be only in the Fragment scope but not activity mark a
     //@provides or @Binds method as @FragmentScoped.  Use case is when there are multiple fragments
