@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.1.4'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -26,12 +26,12 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     minSdkVersion = 15
-    targetSdkVersion = 27
-    compileSdkVersion = 27
+    targetSdkVersion = 28
+    compileSdkVersion = 28
     buildToolsVersion = '27.0.3'
 
     // App dependencies
-    supportLibraryVersion = '27.1.1'
+    supportLibraryVersion = '28.0.0-rc01'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
@@ -39,7 +39,7 @@ ext {
     hamcrestVersion = '1.3'
     runnerVersion = '0.5'
     rulesVersion = '0.5'
-    espressoVersion = '3.0.1'
+    espressoVersion = '2.2.2'
     rxjavaVersion = '1.1.8'
     rxandroidVersion = '1.2.1'
     sqlbriteVersion = '1.1.1'
