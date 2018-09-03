@@ -145,14 +145,14 @@ public final class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equal(mId, task.mId) &&
-               Objects.equal(mTitle, task.mTitle) &&
-               Objects.equal(mDescription, task.mDescription);
+        return Objects.equals(mId, task.mId) &&
+               Objects.equals(mTitle, task.mTitle) &&
+               Objects.equals(mDescription, task.mDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mId, mTitle, mDescription);
+        return Objects.hash(mId, mTitle, mDescription);
     }
 
     @Override
