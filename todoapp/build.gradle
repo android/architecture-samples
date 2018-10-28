@@ -3,7 +3,7 @@ ext {
     // Sdk and tools
     minSdkVersion = 19
     targetSdkVersion = 28
-    compileSdkVersion = 'android-P'
+    compileSdkVersion = 28
 
     // App dependencies
     supportLibraryVersion = '28.0.0-alpha1'
@@ -18,14 +18,14 @@ ext {
 }
 
 buildscript {
-    ext.kotlinVersion = '1.2.30'
+    ext.kotlinVersion = '1.2.71'
     ext.gradlePluginVersion = '3.1.2'
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "com.android.tools.build:gradle:3.2.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -35,8 +35,8 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 }
 
