@@ -104,5 +104,5 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
     androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 }
