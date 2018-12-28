@@ -3,8 +3,8 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-26.0.2
-    - android-26
+    - build-tools-28.0.3
+    - android-28
     - extra-android-m2repository
     - extra-google-m2repository
 jdk:
@@ -19,3 +19,6 @@ cache:
     - $HOME/.m2
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+before_install:
+  - yes | sdkmanager "platforms;android-26"
+
