@@ -1,6 +1,5 @@
 # Proguard rules that are applied to your test apk/code.
 -ignorewarnings
--addconfigurationdebugging
 -dontoptimize
 
 -keepattributes *Annotation*
