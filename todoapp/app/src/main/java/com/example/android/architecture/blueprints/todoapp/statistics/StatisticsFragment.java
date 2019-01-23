@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the statistics screen.

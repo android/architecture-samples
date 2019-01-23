@@ -47,7 +47,7 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.

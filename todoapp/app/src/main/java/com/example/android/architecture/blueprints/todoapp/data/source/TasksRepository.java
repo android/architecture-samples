@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

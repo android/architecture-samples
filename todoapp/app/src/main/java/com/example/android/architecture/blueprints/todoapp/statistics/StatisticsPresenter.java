@@ -25,7 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import java.util.List;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates

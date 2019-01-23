@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.test.espresso.IdlingResource;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An simple counter implementation of {@link IdlingResource} that determines idleness by

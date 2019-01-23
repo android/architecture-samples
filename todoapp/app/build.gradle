@@ -16,8 +16,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled true
-            // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
-            useProguard false
+            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -72,9 +71,7 @@ dependencies {
 
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
-    implementation ("com.google.guava:guava:$rootProject.guavaVersion") {
-        exclude module: "com.google.common.util.concurrent.ListenableFuture"
-    }
+    implementation "com.google.guava:guava:$rootProject.guavaVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
 

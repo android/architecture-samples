@@ -17,16 +17,17 @@
 package com.example.android.architecture.blueprints.todoapp;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase;
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import androidx.annotation.NonNull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of mock implementations for

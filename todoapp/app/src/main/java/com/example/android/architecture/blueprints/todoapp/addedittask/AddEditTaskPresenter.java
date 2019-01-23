@@ -22,7 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link AddEditTaskFragment}), retrieves the data and updates
