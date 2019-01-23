@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static androidx.core.util.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TasksFragment}), retrieves the data and updates the

@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -25,7 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static androidx.core.util.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates

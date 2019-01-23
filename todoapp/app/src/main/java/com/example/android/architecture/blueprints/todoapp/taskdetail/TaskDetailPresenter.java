@@ -16,15 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import static androidx.core.util.Preconditions.checkNotNull;
 
 /**
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and updates

@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -31,14 +31,19 @@ ext {
     compileSdkVersion = 28
 
     // App dependencies
-    supportLibraryVersion = '28.0.0'
-    guavaVersion = '18.0'
+    androidXVersion = '1.1.0-alpha01'
+    materialVersion = '1.1.0-alpha02'
+    cardVersion = '1.0.0'
+    recyclerViewVersion = '1.1.0-alpha01'
+    appCompatVersion = '1.1.0-alpha01'
+
+    guavaVersion = '27.0.1-android'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     powerMockito = '1.6.2'
     hamcrestVersion = '1.3'
     runnerVersion = '1.0.1'
     rulesVersion = '1.0.1'
-    espressoVersion = '3.0.2'
-    roomVersion = "1.1.1"
+    espressoVersion = '3.1.1'
+    roomVersion = "2.0.0"
 }

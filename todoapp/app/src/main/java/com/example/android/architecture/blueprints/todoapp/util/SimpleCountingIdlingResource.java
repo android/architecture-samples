@@ -16,11 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.test.espresso.IdlingResource;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import androidx.test.espresso.IdlingResource;
+
+import static androidx.core.util.Preconditions.checkNotNull;
 
 /**
  * An simple counter implementation of {@link IdlingResource} that determines idleness by
