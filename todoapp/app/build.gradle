@@ -64,12 +64,13 @@ android {
  */
 dependencies {
     // App"s dependencies, including test
-    implementation "androidx.appcompat:appcompat:$androidXVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.cardview:cardview:$cardVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.annotation:annotation:$androidXAnnotations"
 
-    implementation "androidx.legacy:legacy-support-v4:1.0.0"
+    implementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     implementation "com.google.guava:guava:$rootProject.guavaVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
@@ -81,16 +82,16 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
 
     // Android Testing Support Library"s runner and rules
-    androidTestImplementation "androidx.test:runner:1.1.1"
-    androidTestImplementation "androidx.test:rules:1.1.1"
+    androidTestImplementation "androidx.test:runner:$androidXTestVersion"
+    androidTestImplementation "androidx.test:rules:$androidXTestVersion"
 
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
 
     // Dependencies for Android unit tests
     androidTestImplementation "junit:junit:$rootProject.ext.junitVersion"
     androidTestImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
-    androidTestImplementation "com.google.dexmaker:dexmaker:1.2"
-    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:1.2"
+    androidTestImplementation "com.google.dexmaker:dexmaker:$dexMaker"
+    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:$dexMaker"
 
     // Espresso UI Testing
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -100,8 +101,8 @@ dependencies {
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
 
     // Resolve conflicts between main and test APK:
-    androidTestImplementation "androidx.annotation:annotation:1.0.1"
-    androidTestImplementation "androidx.legacy:legacy-support-v4:1.0.0"
+    androidTestImplementation "androidx.annotation:annotation:$androidXAnnotations"
+    androidTestImplementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
     androidTestImplementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     androidTestImplementation "androidx.appcompat:appcompat:$appCompatVersion"
     androidTestImplementation "com.google.android.material:material:$materialVersion"
