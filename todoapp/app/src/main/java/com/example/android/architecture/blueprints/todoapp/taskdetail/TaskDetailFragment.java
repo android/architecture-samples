@@ -37,7 +37,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.util.Preconditions;
 import androidx.fragment.app.Fragment;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -145,7 +144,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showCompletionStatus(final boolean complete) {
-        Preconditions.checkNotNull(mDetailCompleteStatus);
+        checkNotNull(mDetailCompleteStatus);
 
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
