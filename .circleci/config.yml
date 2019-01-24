@@ -28,6 +28,7 @@ jobs:
     - run:
         name: Build test and lint
         command: |
+          cd todoapp
           ./gradlew assembleMockDebug assembleProdDebug testMockDebug testProdDebug lintMockDebug lintProdDebug
     - run:
         name: Save test results
