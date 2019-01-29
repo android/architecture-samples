@@ -17,11 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.test.filters.LargeTest;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
@@ -36,10 +31,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
 
 /**
@@ -82,14 +83,6 @@ public class StatisticsScreenTest {
     }
 
     /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
-    }
-
-    /**
      * Prepare your test fixture for this test. In this case we register an IdlingResources with
      * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
      * idle state. This helps Espresso to synchronize your test actions, which makes tests
@@ -97,16 +90,24 @@ public class StatisticsScreenTest {
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
-    public void Tasks_ShowsNonEmptyMessage() throws Exception {
+    public void Tasks_ShowsNonEmptyMessage() {
         // Check that the active and completed tasks text is displayed
-        String expectedActiveTaskText = InstrumentationRegistry.getTargetContext()
+        String expectedActiveTaskText = ApplicationProvider.getApplicationContext()
                 .getString(R.string.statistics_active_tasks);
         onView(withText(containsString(expectedActiveTaskText))).check(matches(isDisplayed()));
-        String expectedCompletedTaskText = InstrumentationRegistry.getTargetContext()
+        String expectedCompletedTaskText = ApplicationProvider.getApplicationContext()
                 .getString(R.string.statistics_completed_tasks);
         onView(withText(containsString(expectedCompletedTaskText))).check(matches(isDisplayed()));
     }
