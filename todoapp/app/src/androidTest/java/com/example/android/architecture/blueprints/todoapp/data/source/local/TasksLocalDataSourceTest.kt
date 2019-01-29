@@ -15,9 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.filters.LargeTest
+import androidx.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import org.hamcrest.core.Is.`is`
@@ -33,7 +33,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import java.util.LinkedList
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.utils.SingleExecutors
 
 /**
