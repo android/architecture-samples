@@ -3,7 +3,7 @@ ext {
     // Sdk and tools
     minSdkVersion = 19
     targetSdkVersion = 28
-    compileSdkVersion = 'android-P'
+    compileSdkVersion = 28
 
     // App dependencies
     supportLibraryVersion = '28.0.0-alpha1'
@@ -18,8 +18,8 @@ ext {
 }
 
 buildscript {
-    ext.kotlinVersion = '1.2.30'
-    ext.gradlePluginVersion = '3.1.2'
+    ext.kotlinVersion = '1.3.20'
+    ext.gradlePluginVersion = '3.3.0'
     repositories {
         jcenter()
         google()
