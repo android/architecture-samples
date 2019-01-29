@@ -44,7 +44,7 @@ ext {
 
     guavaVersion = '27.0.1-android'
     junitVersion = '4.12'
-    mockitoVersion = '1.10.19'
+    mockitoVersion = '2.8.9'
     dexMaker = '1.2'
     hamcrestVersion = '1.3'
     runnerVersion = '1.0.1'
