@@ -16,7 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 /**
  * Main UI for the statistics screen.
  */
-class StatisticsFragment : Fragment(), StatisticsContract.View {
+class StatisticsFragment : androidx.fragment.app.Fragment(), StatisticsContract.View {
 
     private lateinit var statisticsTV: TextView
 

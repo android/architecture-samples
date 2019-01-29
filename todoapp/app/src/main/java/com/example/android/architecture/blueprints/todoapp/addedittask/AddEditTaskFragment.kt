@@ -18,9 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-class AddEditTaskFragment : Fragment(), AddEditTaskContract.View {
+class AddEditTaskFragment : androidx.fragment.app.Fragment(), AddEditTaskContract.View {
 
     override lateinit var presenter: AddEditTaskContract.Presenter
     override var isActive = false

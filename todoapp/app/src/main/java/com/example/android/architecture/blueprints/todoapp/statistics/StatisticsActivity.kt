@@ -16,11 +16,11 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.app.NavUtils
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.navigation.NavigationView
+import androidx.core.app.NavUtils
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 
 import com.example.android.architecture.blueprints.todoapp.Injection
@@ -33,7 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
  */
 class StatisticsActivity : AppCompatActivity() {
 
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: androidx.drawerlayout.widget.DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,7 @@ class StatisticsActivity : AppCompatActivity() {
         }
 
         // Set up the navigation drawer.
-        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
+        drawerLayout = (findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
         val navigationView = findViewById<NavigationView>(R.id.nav_view)

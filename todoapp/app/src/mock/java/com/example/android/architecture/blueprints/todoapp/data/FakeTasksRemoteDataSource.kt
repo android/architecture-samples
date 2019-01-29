@@ -15,7 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data
 
-import android.support.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.google.common.collect.Lists
 

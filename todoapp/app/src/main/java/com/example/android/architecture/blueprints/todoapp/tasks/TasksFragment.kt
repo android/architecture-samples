@@ -17,12 +17,12 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.PopupMenu
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.appcompat.widget.PopupMenu
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -45,7 +45,7 @@ import java.util.ArrayList
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : Fragment(), TasksContract.View {
+class TasksFragment : androidx.fragment.app.Fragment(), TasksContract.View {
 
     override lateinit var presenter: TasksContract.Presenter
 
@@ -162,7 +162,7 @@ class TasksFragment : Fragment(), TasksContract.View {
 
     override fun setLoadingIndicator(active: Boolean) {
         val root = view ?: return
-        with(root.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)) {
+        with(root.findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.refresh_layout)) {
             // Make sure setRefreshing() is called after the layout is done with everything else.
             post { isRefreshing = active }
         }

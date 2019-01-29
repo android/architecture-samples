@@ -16,8 +16,8 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.content.Context
-import android.support.v4.view.ViewCompat
-import android.support.v4.widget.SwipeRefreshLayout
+import androidx.core.view.ViewCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.AttributeSet
 import android.view.View
 
@@ -31,7 +31,7 @@ import android.view.View
  */
 class ScrollChildSwipeRefreshLayout @JvmOverloads constructor(context: Context,
         attrs: AttributeSet? = null)
-    : SwipeRefreshLayout(context, attrs) {
+    : androidx.swiperefreshlayout.widget.SwipeRefreshLayout(context, attrs) {
 
     var scrollUpChild: View? = null
 

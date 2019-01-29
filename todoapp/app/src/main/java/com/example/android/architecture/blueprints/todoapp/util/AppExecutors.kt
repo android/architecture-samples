@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.util
 
 import android.os.Handler
 import android.os.Looper
-import android.support.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting
 
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
