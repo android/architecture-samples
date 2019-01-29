@@ -71,21 +71,20 @@ dependencies {
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.annotation:annotation:$androidXAnnotations"
-    implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
-    implementation "com.google.guava:guava:$rootProject.guavaVersion"
+    implementation "com.google.guava:guava:$guavaVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
     // Dependencies for local unit tests
-    testImplementation "junit:junit:$rootProject.ext.junitVersion"
-    testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
-    testImplementation "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
 
     // Dependencies for Android unit tests
-    androidTestImplementation "junit:junit:$rootProject.ext.junitVersion"
-    androidTestImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
+    androidTestImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "com.google.dexmaker:dexmaker:$dexMaker"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:$dexMaker"
 
