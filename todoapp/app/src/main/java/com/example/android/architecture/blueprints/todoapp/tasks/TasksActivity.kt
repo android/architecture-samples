@@ -21,6 +21,7 @@ import android.view.MenuItem
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.test.espresso.IdlingResource
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
@@ -34,7 +35,7 @@ class TasksActivity : AppCompatActivity() {
 
     private val CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY"
 
-    private lateinit var drawerLayout: androidx.drawerlayout.widget.DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
     private lateinit var tasksPresenter: TasksPresenter
 
@@ -49,7 +50,7 @@ class TasksActivity : AppCompatActivity() {
         }
 
         // Set up the navigation drawer.
-        drawerLayout = (findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)).apply {
+        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
         setupDrawerContent(findViewById(R.id.nav_view))

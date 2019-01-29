@@ -17,17 +17,17 @@ package com.example.android.architecture.blueprints.todoapp.util
 
 
 import androidx.annotation.IdRes
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 
 /**
  * The `fragment` is added to the container view with id `frameId`. The operation is
  * performed by the `fragmentManager`.
  */
-fun AppCompatActivity.replaceFragmentInActivity(fragment: androidx.fragment.app.Fragment, @IdRes frameId: Int) {
+fun AppCompatActivity.replaceFragmentInActivity(fragment: Fragment, @IdRes frameId: Int) {
     supportFragmentManager.transact {
         replace(frameId, fragment)
     }
@@ -37,7 +37,7 @@ fun AppCompatActivity.replaceFragmentInActivity(fragment: androidx.fragment.app.
  * The `fragment` is added to the container view with tag. The operation is
  * performed by the `fragmentManager`.
  */
-fun AppCompatActivity.addFragmentToActivity(fragment: androidx.fragment.app.Fragment, tag: String) {
+fun AppCompatActivity.addFragmentToActivity(fragment: Fragment, tag: String) {
     supportFragmentManager.transact {
         add(fragment, tag)
     }
@@ -53,7 +53,7 @@ fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.()
 /**
  * Runs a FragmentTransaction, then calls commit().
  */
-private inline fun androidx.fragment.app.FragmentManager.transact(action: androidx.fragment.app.FragmentTransaction.() -> Unit) {
+private inline fun FragmentManager.transact(action: FragmentTransaction.() -> Unit) {
     beginTransaction().apply {
         action()
     }.commit()

@@ -37,7 +37,7 @@ import com.example.android.architecture.blueprints.todoapp.util.showSnackBar
 /**
  * Main UI for the task detail screen.
  */
-class TaskDetailFragment : androidx.fragment.app.Fragment(), TaskDetailContract.View {
+class TaskDetailFragment : Fragment(), TaskDetailContract.View {
 
     private lateinit var detailTitle: TextView
     private lateinit var detailDescription: TextView
