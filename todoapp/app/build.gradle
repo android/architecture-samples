@@ -85,8 +85,7 @@ dependencies {
     // Dependencies for Android unit tests
     androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation "com.google.dexmaker:dexmaker:$dexMaker"
-    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:$dexMaker"
+    androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
 
     // Android Testing Support Library - Instrumented testing
     androidTestImplementation "androidx.test:runner:$androidXTestVersion"
