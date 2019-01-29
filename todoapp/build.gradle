@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath "com.android.tools.build:gradle:3.3.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -30,6 +30,7 @@ ext {
     minSdkVersion = 14
     targetSdkVersion = 28
     compileSdkVersion = 28
+    kotlinVersion = '1.3.20'
 
     // App dependencies
     androidXVersion = '1.0.0'

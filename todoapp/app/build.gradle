@@ -76,7 +76,7 @@ dependencies {
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     implementation "com.google.guava:guava:$rootProject.guavaVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
