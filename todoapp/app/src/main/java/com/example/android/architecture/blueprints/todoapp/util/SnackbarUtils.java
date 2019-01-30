@@ -16,8 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.design.widget.Snackbar;
 import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Provides a method to show a Snackbar.

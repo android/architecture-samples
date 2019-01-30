@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

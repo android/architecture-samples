@@ -10,7 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -68,31 +68,31 @@ android {
  */
 dependencies {
     // App's dependencies, including test
-    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:design:$rootProject.supportLibraryVersion"
-    compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    compile "androidx.appcompat:appcompat:$rootProject.supportLibraryVersion"
+    compile "androidx.cardview:cardview:$rootProject.supportLibraryVersion"
+    compile "com.google.android.material:material:$rootProject.supportLibraryVersion"
+    compile "androidx.recyclerview:recyclerview:$rootProject.supportLibraryVersion"
+    compile "androidx.legacy:legacy-support-v4:$rootProject.supportLibraryVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
 
     // Architecture Components
-    compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
-    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
-    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
-    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
+    compile "androidx.room:room-runtime:$rootProject.roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
+    compile "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
 
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"
     testCompile "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
     testCompile "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
 
-    testCompile "android.arch.core:core-testing:$rootProject.archLifecycleVersion"
+    testCompile "androidx.arch.core:core-testing:$rootProject.archLifecycleVersion"
 
     // Android Testing Support Library's runner and rules
-    androidTestCompile "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestCompile "com.android.support.test:rules:$rootProject.ext.rulesVersion"
+    androidTestCompile "androidx.test:runner:$rootProject.ext.runnerVersion"
+    androidTestCompile "androidx.test:rules:$rootProject.ext.rulesVersion"
 
-    androidTestCompile "android.arch.persistence.room:testing:$rootProject.roomVersion"
+    androidTestCompile "androidx.room:room-testing:$rootProject.roomVersion"
 
     // Dependencies for Android unit tests
     androidTestCompile "junit:junit:$rootProject.ext.junitVersion"
@@ -101,18 +101,18 @@ dependencies {
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 
     // Espresso UI Testing
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
-    androidTestCompile "com.android.support.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
-    compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
+    androidTestCompile "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
+    androidTestCompile "androidx.test.espresso:espresso-contrib:$rootProject.espressoVersion"
+    androidTestCompile "androidx.test.espresso:espresso-intents:$rootProject.espressoVersion"
+    androidTestCompile "androidx.test.espresso.idling:idling-concurrent:$rootProject.espressoVersion"
+    compile "androidx.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
 
     // Resolve conflicts between main and test APK:
-    androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:support-compat:$rootProject.supportLibraryVersion"
-    androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
+    androidTestCompile "androidx.annotation:annotation:$rootProject.supportLibraryVersion"
+    androidTestCompile "androidx.legacy:legacy-support-v4:$rootProject.supportLibraryVersion"
+    androidTestCompile "androidx.recyclerview:recyclerview:$rootProject.supportLibraryVersion"
+    androidTestCompile "androidx.appcompat:appcompat:$rootProject.supportLibraryVersion"
+    androidTestCompile "androidx.core:core:$rootProject.supportLibraryVersion"
+    androidTestCompile "com.google.android.material:material:$rootProject.supportLibraryVersion"
     compile "com.google.code.findbugs:jsr305:2.0.1"
 }

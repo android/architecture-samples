@@ -16,9 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.annotation.NonNull;
-
-import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
+import androidx.annotation.NonNull;
 
 import java.util.concurrent.Executor;
 

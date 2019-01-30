@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.test.espresso.IdlingResource;
+import androidx.test.espresso.IdlingResource;
 
 /**
  * Contains a static reference to {@link IdlingResource}, only available in the 'mock' build type.

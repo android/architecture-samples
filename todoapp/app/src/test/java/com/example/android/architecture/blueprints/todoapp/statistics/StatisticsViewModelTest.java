@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 
 import android.app.Application;
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
