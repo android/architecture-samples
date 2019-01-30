@@ -16,10 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static org.hamcrest.Matchers.containsString;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
 import android.content.Intent;
 
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
@@ -36,12 +43,6 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the statistics screen.
@@ -74,8 +75,11 @@ public class StatisticsScreenTest {
     public void intentWithStubbedTaskId() {
         // Given some tasks
         TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", false));
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title2", "", true));
+        TasksRepository tasksRepository = Injection.provideTasksRepository(
+                ApplicationProvider.getApplicationContext());
+        tasksRepository.deleteAllTasks();
+        tasksRepository.saveTask(new Task("Title1", "", false));
+        tasksRepository.saveTask(new Task("Title2", "", true));
 
         // Lazily start the Activity from the ActivityTestRule
         Intent startIntent = new Intent();
@@ -104,11 +108,11 @@ public class StatisticsScreenTest {
     @Test
     public void Tasks_ShowsNonEmptyMessage() {
         // Check that the active and completed tasks text is displayed
-        String expectedActiveTaskText = ApplicationProvider.getApplicationContext()
-                .getString(R.string.statistics_active_tasks);
+        String expectedActiveTaskText = String.format(ApplicationProvider.getApplicationContext()
+                .getString(R.string.statistics_active_tasks), 1);
         onView(withText(containsString(expectedActiveTaskText))).check(matches(isDisplayed()));
-        String expectedCompletedTaskText = ApplicationProvider.getApplicationContext()
-                .getString(R.string.statistics_completed_tasks);
+        String expectedCompletedTaskText = String.format(ApplicationProvider.getApplicationContext()
+                .getString(R.string.statistics_completed_tasks), 1);
         onView(withText(containsString(expectedCompletedTaskText))).check(matches(isDisplayed()));
     }
 }

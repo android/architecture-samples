@@ -81,9 +81,9 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
     // Architecture Components
-    compile "androidx.room:room-runtime:$rootProject.roomVersion"
+    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
     annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
-    compile "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
 
     // Dependencies for local unit tests

@@ -16,31 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.ListView;
+import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.TestUtils;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
-
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.IdlingRegistry;
-import androidx.test.filters.LargeTest;
-import androidx.test.filters.SdkSuppress;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.IsNot.not;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
@@ -58,10 +38,32 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static com.example.android.architecture.blueprints.todoapp.TestUtils.getCurrentActivity;
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.IsNot.not;
+
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ListView;
+
+import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.TestUtils;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.filters.LargeTest;
+import androidx.test.filters.SdkSuppress;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -84,20 +86,14 @@ public class TasksScreenTest {
      */
     @Rule
     public ActivityTestRule<TasksActivity> mTasksActivityTestRule =
-            new ActivityTestRule<TasksActivity>(TasksActivity.class) {
+            new ActivityTestRule<>(TasksActivity.class);
 
-                /**
-                 * To avoid a long list of tasks and the need to scroll through the list to find a
-                 * task, we call {@link TasksDataSource#deleteAllTasks()} before each test.
-                 */
-                @Override
-                protected void beforeActivityLaunched() {
-                    super.beforeActivityLaunched();
-                    // Doing this in @Before generates a race condition.
-                    Injection.provideTasksRepository(ApplicationProvider.getApplicationContext())
-                            .deleteAllTasks();
-                }
-            };
+    @Before
+    public void resetState() {
+        ViewModelFactory.destroyInstance();
+        Injection.provideTasksRepository(ApplicationProvider.getApplicationContext())
+                .deleteAllTasks();
+    }
 
     /**
      * Prepare your test fixture for this test. In this case we register an IdlingResources with
