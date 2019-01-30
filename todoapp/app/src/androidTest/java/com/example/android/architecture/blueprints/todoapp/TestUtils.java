@@ -16,6 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import static androidx.test.InstrumentationRegistry.getInstrumentation;
+import static androidx.test.runner.lifecycle.Stage.RESUMED;
+
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -26,9 +29,6 @@ import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.Collection;
-
-import static androidx.test.InstrumentationRegistry.getInstrumentation;
-import static androidx.test.runner.lifecycle.Stage.RESUMED;
 
 /**
  * Useful test methods common to all activities

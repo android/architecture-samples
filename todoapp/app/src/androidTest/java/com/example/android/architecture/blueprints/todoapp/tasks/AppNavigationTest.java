@@ -16,11 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import androidx.test.espresso.NoActivityResumedException;
-import androidx.test.filters.LargeTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
-import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.Gravity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -28,6 +23,12 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.test.espresso.NoActivityResumedException;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;

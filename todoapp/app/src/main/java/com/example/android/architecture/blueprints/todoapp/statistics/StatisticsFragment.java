@@ -43,7 +43,7 @@ public class StatisticsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         mViewDataBinding = DataBindingUtil.inflate(
                 inflater, R.layout.statistics_frag, container, false);
         return mViewDataBinding.getRoot();

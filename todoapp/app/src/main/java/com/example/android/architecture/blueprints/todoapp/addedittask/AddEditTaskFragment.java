@@ -76,7 +76,7 @@ public class AddEditTaskFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.addtask_frag, container, false);
         if (mViewDataBinding == null) {
             mViewDataBinding = AddtaskFragBinding.bind(root);

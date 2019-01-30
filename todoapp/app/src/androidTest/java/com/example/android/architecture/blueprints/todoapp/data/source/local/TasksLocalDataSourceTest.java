@@ -16,21 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
-import androidx.room.Room;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.filters.LargeTest;
-import androidx.test.runner.AndroidJUnit4;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.SingleExecutors;
@@ -41,6 +26,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
+
+import androidx.room.Room;
+import androidx.test.filters.LargeTest;
+import androidx.test.runner.AndroidJUnit4;
+
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * Integration test for the {@link TasksDataSource}.
@@ -57,14 +57,13 @@ public class TasksLocalDataSourceTest {
 
     private TasksLocalDataSource mLocalDataSource;
 
-    private ToDoDatabase mDatabase;
+    // using an in-memory database for testing, since it doesn't survive killing the process
+    private ToDoDatabase mDatabase = Room.inMemoryDatabaseBuilder(getApplicationContext(),
+            ToDoDatabase.class)
+            .build();
 
     @Before
     public void setup() {
-        // using an in-memory database for testing, since it doesn't survive killing the process
-        mDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
-                ToDoDatabase.class)
-                .build();
         TasksDao tasksDao = mDatabase.taskDao();
 
         // Make sure that we're not keeping a reference to the wrong instance.

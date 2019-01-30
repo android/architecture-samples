@@ -18,15 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import androidx.annotation.Nullable;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.Espresso;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.espresso.matcher.BoundedMatcher;
-import androidx.test.filters.LargeTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -43,6 +34,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
@@ -81,7 +82,7 @@ public class AddEditTaskScreenTest {
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
 
     /**
@@ -89,7 +90,7 @@ public class AddEditTaskScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -143,8 +144,8 @@ public class AddEditTaskScreenTest {
      * @param taskId is null if used to add a new task, otherwise it edits the task.
      */
     private void launchNewTaskActivity(@Nullable String taskId) {
-        Intent intent = new Intent(InstrumentationRegistry.getInstrumentation()
-                .getTargetContext(), AddEditTaskActivity.class);
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                AddEditTaskActivity.class);
 
         intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
         mActivityTestRule.launchActivity(intent);

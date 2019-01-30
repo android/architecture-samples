@@ -16,11 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.filters.LargeTest;
-import androidx.test.filters.SdkSuppress;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
@@ -28,17 +23,25 @@ import android.widget.ListView;
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static androidx.test.InstrumentationRegistry.getTargetContext;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.filters.LargeTest;
+import androidx.test.filters.SdkSuppress;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -81,13 +84,38 @@ public class TasksScreenTest {
      */
     @Rule
     public ActivityTestRule<TasksActivity> mTasksActivityTestRule =
-            new ActivityTestRule<>(TasksActivity.class);
+            new ActivityTestRule<TasksActivity>(TasksActivity.class) {
 
+                /**
+                 * To avoid a long list of tasks and the need to scroll through the list to find a
+                 * task, we call {@link TasksDataSource#deleteAllTasks()} before each test.
+                 */
+                @Override
+                protected void beforeActivityLaunched() {
+                    super.beforeActivityLaunched();
+                    // Doing this in @Before generates a race condition.
+                    Injection.provideTasksRepository(ApplicationProvider.getApplicationContext())
+                            .deleteAllTasks();
+                }
+            };
+
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
+     */
     @Before
-    public void resetState() {
-        ViewModelFactory.destroyInstance();
-        Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-                .deleteAllTasks();
+    public void registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 
     /**
@@ -253,7 +281,7 @@ public class TasksScreenTest {
         clickCheckBoxForTask(TITLE2);
 
         // Click clear completed in menu
-        openActionBarOverflowOrOptionsMenu(getTargetContext());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
         onView(withText(R.string.menu_clear)).perform(click());
 
         //Verify that completed tasks are not shown

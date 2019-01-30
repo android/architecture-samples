@@ -68,7 +68,7 @@ public class TasksFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         mTasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
 
         mTasksViewModel = TasksActivity.obtainViewModel(getActivity());
