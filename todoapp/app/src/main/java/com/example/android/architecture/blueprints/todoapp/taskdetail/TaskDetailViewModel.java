@@ -17,19 +17,19 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.databinding.ObservableBoolean;
-import androidx.databinding.ObservableField;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent;
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 
 /**
@@ -38,19 +38,22 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
  */
 public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
-    public final ObservableField<Task> task = new ObservableField<>();
+    public final MutableLiveData<Task> task = new MutableLiveData<>();
 
-    public final ObservableBoolean completed = new ObservableBoolean();
+    public final MutableLiveData<Boolean> completed = new MutableLiveData<>();
 
-    private final SingleLiveEvent<Void> mEditTaskCommand = new SingleLiveEvent<>();
+    public final MutableLiveData<Boolean> isDataAvailable = new MutableLiveData<>();
 
-    private final SingleLiveEvent<Void> mDeleteTaskCommand = new SingleLiveEvent<>();
+    public final MutableLiveData<Boolean> isDataLoading = new MutableLiveData<>();
+
+    private final MutableLiveData<Event<Object>> mEditTaskCommand = new MutableLiveData<>();
+
+    private final MutableLiveData<Event<Object>> mDeleteTaskCommand = new MutableLiveData<>();
 
     private final TasksRepository mTasksRepository;
 
-    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
+    private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
-    private boolean mIsDataLoading;
 
     public TaskDetailViewModel(Application context, TasksRepository tasksRepository) {
         super(context);
@@ -58,33 +61,33 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
     }
 
     public void deleteTask() {
-        if (task.get() != null) {
-            mTasksRepository.deleteTask(task.get().getId());
-            mDeleteTaskCommand.call();
+        if (task.getValue() != null) {
+            mTasksRepository.deleteTask(task.getValue().getId());
+            mDeleteTaskCommand.setValue(new Event<>(new Object()));
         }
     }
 
     public void editTask() {
-        mEditTaskCommand.call();
+        mEditTaskCommand.setValue(new Event<>(new Object()));
     }
 
-    public SnackbarMessage getSnackbarMessage() {
+    public LiveData<Event<Integer>> getSnackbarMessage() {
         return mSnackbarText;
     }
 
-    public SingleLiveEvent<Void> getEditTaskCommand() {
+    public MutableLiveData<Event<Object>> getEditTaskCommand() {
         return mEditTaskCommand;
     }
 
-    public SingleLiveEvent<Void> getDeleteTaskCommand() {
+    public MutableLiveData<Event<Object>> getDeleteTaskCommand() {
         return mDeleteTaskCommand;
     }
 
     public void setCompleted(boolean completed) {
-        if (mIsDataLoading) {
+        if (isDataLoading.getValue()) {
             return;
         }
-        Task task = this.task.get();
+        Task task = this.task.getValue();
         if (completed) {
             mTasksRepository.completeTask(task);
             showSnackbarMessage(R.string.task_marked_complete);
@@ -96,50 +99,43 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     public void start(String taskId) {
         if (taskId != null) {
-            mIsDataLoading = true;
+            isDataLoading.setValue(true);
             mTasksRepository.getTask(taskId, this);
         }
     }
 
     public void setTask(Task task) {
-        this.task.set(task);
+        this.task.setValue(task);
         if (task != null) {
-            completed.set(task.isCompleted());
+            completed.setValue(task.isCompleted());
+            isDataAvailable.setValue(task != null);
         }
-    }
-
-    public boolean isDataAvailable() {
-        return task.get() != null;
-    }
-
-    public boolean isDataLoading() {
-        return mIsDataLoading;
     }
 
     @Override
     public void onTaskLoaded(Task task) {
         setTask(task);
-        mIsDataLoading = false;
+        isDataLoading.setValue(false);
     }
 
     @Override
     public void onDataNotAvailable() {
-        task.set(null);
-        mIsDataLoading = false;
+        task.setValue(null);
+        isDataLoading.setValue(false);
     }
 
     public void onRefresh() {
-        if (task.get() != null) {
-            start(task.get().getId());
+        if (task.getValue() != null) {
+            start(task.getValue().getId());
         }
     }
 
     @Nullable
     protected String getTaskId() {
-        return task.get().getId();
+        return task.getValue().getId();
     }
 
     private void showSnackbarMessage(@StringRes Integer message) {
-        mSnackbarText.setValue(message);
+        mSnackbarText.setValue(new Event<>(message));
     }
 }

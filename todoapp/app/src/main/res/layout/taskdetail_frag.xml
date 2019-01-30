@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:onRefreshListener="@{viewmodel::onRefresh}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        app:refreshing="@{viewmodel.isDataLoading}">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="@{viewmodel.dataAvailable ? View.GONE : View.VISIBLE}">
+                android:visibility="@{viewmodel.isDataAvailable ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="@{viewmodel.dataAvailable ? View.VISIBLE : View.GONE}">
+                android:visibility="@{viewmodel.isDataAvailable ? View.VISIBLE : View.GONE}">
 
                 <CheckBox
                     android:id="@+id/task_detail_complete"

@@ -30,6 +30,7 @@ import androidx.databinding.Bindable;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -41,13 +42,13 @@ import androidx.lifecycle.AndroidViewModel;
  */
 public class StatisticsViewModel extends AndroidViewModel {
 
-    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+    public final MutableLiveData<Boolean> dataLoading = new MutableLiveData<>();
 
-    public final ObservableBoolean error = new ObservableBoolean(false);
+    public final MutableLiveData<Boolean> error = new MutableLiveData<>();
 
-    public final ObservableField<String> numberOfActiveTasks = new ObservableField<>();
+    public final MutableLiveData<String> numberOfActiveTasks = new MutableLiveData<>();
 
-    public final ObservableField<String> numberOfCompletedTasks = new ObservableField<>();
+    public final MutableLiveData<String> numberOfCompletedTasks = new MutableLiveData<>();
 
     /**
      * Controls whether the stats are shown or a "No data" message.
@@ -73,18 +74,18 @@ public class StatisticsViewModel extends AndroidViewModel {
     }
 
     public void loadStatistics() {
-        dataLoading.set(true);
+        dataLoading.setValue(true);
 
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                error.set(false);
+                error.setValue(false);
                 computeStats(tasks);
             }
 
             @Override
             public void onDataNotAvailable() {
-                error.set(true);
+                error.setValue(true);
                 mNumberOfActiveTasks = 0;
                 mNumberOfCompletedTasks = 0;
                 updateDataBindingObservables();
@@ -113,12 +114,12 @@ public class StatisticsViewModel extends AndroidViewModel {
     }
 
     private void updateDataBindingObservables() {
-        numberOfCompletedTasks.set(
+        numberOfCompletedTasks.setValue(
                 mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks));
-        numberOfActiveTasks.set(
+        numberOfActiveTasks.setValue(
                 mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks));
         empty.set(mNumberOfActiveTasks + mNumberOfCompletedTasks == 0);
-        dataLoading.set(false);
+        dataLoading.setValue(false);
 
     }
 }

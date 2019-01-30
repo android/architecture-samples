@@ -16,19 +16,20 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Displays an add or edit task screen.
@@ -75,10 +76,12 @@ public class AddEditTaskActivity extends AppCompatActivity implements AddEditTas
         AddEditTaskViewModel viewModel = obtainViewModel(this);
 
         // The activity observes the navigation events in the ViewModel
-        viewModel.getTaskUpdatedEvent().observe(this, new Observer<Void>() {
+        viewModel.getTaskUpdatedEvent().observe(this, new Observer<Event<Object>>() {
             @Override
-            public void onChanged(@Nullable Void _) {
-                AddEditTaskActivity.this.onTaskSaved();
+            public void onChanged(Event<Object> taskIdEvent) {
+                if (taskIdEvent.getContentIfNotHandled() != null) {
+                    AddEditTaskActivity.this.onTaskSaved();
+                }
             }
         });
     }

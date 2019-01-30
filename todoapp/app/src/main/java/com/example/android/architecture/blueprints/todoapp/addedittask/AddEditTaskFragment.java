@@ -17,20 +17,21 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -85,6 +86,7 @@ public class AddEditTaskFragment extends Fragment {
         mViewModel = AddEditTaskActivity.obtainViewModel(getActivity());
 
         mViewDataBinding.setViewmodel(mViewModel);
+        mViewDataBinding.setLifecycleOwner(getActivity());
 
         setHasOptionsMenu(true);
         setRetainInstance(false);
@@ -93,10 +95,13 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
+        mViewModel.getSnackbarMessage().observe(this, new Observer<Event<Integer>>() {
             @Override
-            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
-                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
+            public void onChanged(Event<Integer> event) {
+                Integer msg = event.getContentIfNotHandled();
+                if (msg != null) {
+                    SnackbarUtils.showSnackbar(getView(), getString(msg));
+                }
             }
         });
     }

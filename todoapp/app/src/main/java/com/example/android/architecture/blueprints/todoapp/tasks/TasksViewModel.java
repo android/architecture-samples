@@ -17,19 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
 import android.content.Context;
-import androidx.databinding.BaseObservable;
-import androidx.databinding.Bindable;
-import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableBoolean;
-import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent;
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -38,6 +30,12 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 
 /**
@@ -49,34 +47,34 @@ import java.util.List;
  */
 public class TasksViewModel extends AndroidViewModel {
 
-    // These observable fields will update Views automatically
-    public final ObservableList<Task> items = new ObservableArrayList<>();
+    // These LiveDatas will update Views automatically
+    public final MutableLiveData<List<Task>> items = new MutableLiveData<>();
 
-    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+    public final MutableLiveData<Boolean> dataLoading = new MutableLiveData<>();
 
-    public final ObservableField<String> currentFilteringLabel = new ObservableField<>();
+    public final MutableLiveData<String> currentFilteringLabel = new MutableLiveData<>();
 
-    public final ObservableField<String> noTasksLabel = new ObservableField<>();
+    public final MutableLiveData<String> noTasksLabel = new MutableLiveData<>();
 
-    public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
+    public final MutableLiveData<Drawable> noTaskIconRes = new MutableLiveData<>();
 
-    public final ObservableBoolean empty = new ObservableBoolean(false);
+    public final MutableLiveData<Boolean> empty = new MutableLiveData<>();
 
-    public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
+    public final MutableLiveData<Boolean> tasksAddViewVisible = new MutableLiveData<>();
 
-    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
+    private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
     private final TasksRepository mTasksRepository;
 
-    private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
+    private final MutableLiveData<Boolean> mIsDataLoadingError = new MutableLiveData<>();
 
-    private final SingleLiveEvent<String> mOpenTaskEvent = new SingleLiveEvent<>();
+    private final MutableLiveData<Event<String>> mOpenTaskEvent = new MutableLiveData<>();
 
     private final Context mContext; // To avoid leaks, this must be an Application Context.
 
-    private final SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
+    private final MutableLiveData<Event<Object>> mNewTaskEvent = new MutableLiveData<>();
 
     public TasksViewModel(
             Application context,
@@ -110,32 +108,33 @@ public class TasksViewModel extends AndroidViewModel {
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         switch (requestType) {
             case ALL_TASKS:
-                currentFilteringLabel.set(mContext.getString(R.string.label_all));
-                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_all));
-                noTaskIconRes.set(mContext.getResources().getDrawable(
+                currentFilteringLabel.setValue(mContext.getString(R.string.label_all));
+                noTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_all));
+                noTaskIconRes.setValue(mContext.getResources().getDrawable(
                         R.drawable.ic_assignment_turned_in_24dp));
-                tasksAddViewVisible.set(true);
+                tasksAddViewVisible.setValue(true);
                 break;
             case ACTIVE_TASKS:
-                currentFilteringLabel.set(mContext.getString(R.string.label_active));
-                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_active));
-                noTaskIconRes.set(mContext.getResources().getDrawable(
+                currentFilteringLabel.setValue(mContext.getString(R.string.label_active));
+                noTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_active));
+                noTaskIconRes.setValue(mContext.getResources().getDrawable(
                         R.drawable.ic_check_circle_24dp));
-                tasksAddViewVisible.set(false);
+                tasksAddViewVisible.setValue(false);
                 break;
             case COMPLETED_TASKS:
-                currentFilteringLabel.set(mContext.getString(R.string.label_completed));
-                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_completed));
-                noTaskIconRes.set(mContext.getResources().getDrawable(
+                currentFilteringLabel.setValue(mContext.getString(R.string.label_completed));
+                noTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_completed));
+                noTaskIconRes.setValue(mContext.getResources().getDrawable(
                         R.drawable.ic_verified_user_24dp));
-                tasksAddViewVisible.set(false);
+                tasksAddViewVisible.setValue(false);
                 break;
         }
+
     }
 
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        mSnackbarText.setValue(R.string.completed_tasks_cleared);
+        mSnackbarText.setValue(new Event<>(R.string.completed_tasks_cleared));
         loadTasks(false, false);
     }
 
@@ -150,40 +149,48 @@ public class TasksViewModel extends AndroidViewModel {
         }
     }
 
-    SnackbarMessage getSnackbarMessage() {
+    LiveData<Event<Integer>> getSnackbarMessage() {
         return mSnackbarText;
     }
 
-    SingleLiveEvent<String> getOpenTaskEvent() {
+    LiveData<Event<String>> getOpenTaskEvent() {
         return mOpenTaskEvent;
     }
 
-    SingleLiveEvent<Void> getNewTaskEvent() {
+    LiveData<Event<Object>> getNewTaskEvent() {
         return mNewTaskEvent;
     }
 
     private void showSnackbarMessage(Integer message) {
-        mSnackbarText.setValue(message);
+        mSnackbarText.setValue(new Event<>(message));
     }
 
     /**
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        mNewTaskEvent.call();
+        mNewTaskEvent.setValue(new Event<>(new Object()));
+    }
+
+    /**
+     * Called by the {@link TasksAdapter}.
+     */
+    void openTask(String taskId) {
+        mOpenTaskEvent.setValue(new Event<>(taskId));
+
     }
 
     void handleActivityResult(int requestCode, int resultCode) {
         if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
             switch (resultCode) {
                 case TaskDetailActivity.EDIT_RESULT_OK:
-                    mSnackbarText.setValue(R.string.successfully_saved_task_message);
+                    mSnackbarText.setValue(new Event<>(R.string.successfully_saved_task_message));
                     break;
                 case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    mSnackbarText.setValue(R.string.successfully_added_task_message);
+                    mSnackbarText.setValue(new Event<>(R.string.successfully_added_task_message));
                     break;
                 case TaskDetailActivity.DELETE_RESULT_OK:
-                    mSnackbarText.setValue(R.string.successfully_deleted_task_message);
+                    mSnackbarText.setValue(new Event<>(R.string.successfully_deleted_task_message));
                     break;
             }
         }
@@ -195,7 +202,7 @@ public class TasksViewModel extends AndroidViewModel {
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            dataLoading.set(true);
+            dataLoading.setValue(true);
         }
         if (forceUpdate) {
 
@@ -229,18 +236,18 @@ public class TasksViewModel extends AndroidViewModel {
                     }
                 }
                 if (showLoadingUI) {
-                    dataLoading.set(false);
+                    dataLoading.setValue(false);
                 }
-                mIsDataLoadingError.set(false);
+                mIsDataLoadingError.setValue(false);
 
-                items.clear();
-                items.addAll(tasksToShow);
-                empty.set(items.isEmpty());
+                List<Task> itemsValue = new ArrayList<>(tasksToShow);
+                empty.setValue(itemsValue.isEmpty());
+                items.setValue(itemsValue);
             }
 
             @Override
             public void onDataNotAvailable() {
-                mIsDataLoadingError.set(true);
+                mIsDataLoadingError.setValue(true);
             }
         });
     }
