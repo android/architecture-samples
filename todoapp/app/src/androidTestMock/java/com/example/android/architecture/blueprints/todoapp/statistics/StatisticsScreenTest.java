@@ -23,13 +23,13 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import android.app.Application;
 import android.content.Intent;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import org.junit.After;
@@ -60,30 +60,31 @@ public class StatisticsScreenTest {
      */
     @Rule
     public ActivityTestRule<StatisticsActivity> mStatisticsActivityTestRule =
-            new ActivityTestRule<>(StatisticsActivity.class, true, false);
+            new ActivityTestRule<>(StatisticsActivity.class, false, false);
 
-    /**
-     * Setup your test fixture with a fake task id. The {@link TaskDetailActivity} is started with
-     * a particular task id, which is then loaded from the service API.
-     *
-     * <p>
-     * Note that this test runs hermetically and is fully isolated using a fake implementation of
-     * the service API. This is a great way to make your tests more reliable and faster at the same
-     * time, since they are isolated from any outside dependencies.
-     */
     @Before
-    public void intentWithStubbedTaskId() {
-        // Given some tasks
-        TasksRepository.destroyInstance();
-        TasksRepository tasksRepository = Injection.provideTasksRepository(
-                ApplicationProvider.getApplicationContext());
-        tasksRepository.deleteAllTasks();
-        tasksRepository.saveTask(new Task("Title1", "", false));
-        tasksRepository.saveTask(new Task("Title2", "", true));
+    public void prepareRepository() throws Throwable {
+        mStatisticsActivityTestRule.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TasksRepository repo = ViewModelFactory.getInstance(
+                        (Application) ApplicationProvider.getApplicationContext())
+                        .getTasksRepository();
 
-        // Lazily start the Activity from the ActivityTestRule
-        Intent startIntent = new Intent();
-        mStatisticsActivityTestRule.launchActivity(startIntent);
+                repo.deleteAllTasks();
+                repo.saveTask(
+                        new Task("St1", "", false)
+                );
+                repo.saveTask(
+                        new Task("St2", "", true)
+                );
+            }
+        });
+
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                StatisticsActivity.class);
+
+        mStatisticsActivityTestRule.launchActivity(intent);
     }
 
     /**

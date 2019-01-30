@@ -17,11 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
 import android.content.Context;
-import androidx.databinding.Bindable;
-import androidx.databinding.ObservableBoolean;
-import androidx.databinding.ObservableField;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -29,6 +25,11 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import java.util.List;
+
+import androidx.databinding.Bindable;
+import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
+import androidx.lifecycle.AndroidViewModel;
 
 /**
  * Exposes the data to be used in the statistics screen.

@@ -16,6 +16,15 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.example.android.architecture.blueprints.todoapp.R.id.toolbar;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.clearText;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.view.View;
@@ -44,14 +53,6 @@ import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.clearText;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static com.example.android.architecture.blueprints.todoapp.R.id.toolbar;
 
 /**
  * Tests for the add task screen.
@@ -124,11 +125,18 @@ public class AddEditTaskScreenTest {
     }
 
     @Test
-    public void toolbarTitle_editTask_persistsRotation() {
-        // Put a task in the repository and start the activity to edit it
-        TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", TASK_ID, false));
+    public void toolbarTitle_editTask_persistsRotation() throws Throwable {
+        mActivityTestRule.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TasksRepository.destroyInstance();
+                FakeTasksRemoteDataSource.getInstance().addTasks(
+                        new Task("AddTitle", "", TASK_ID, false)
+                );
+            }
+        });
         launchNewTaskActivity(TASK_ID);
+
 
         // Check that the toolbar shows the correct title
         onView(withId(toolbar)).check(matches(withToolbarTitle(R.string.edit_task)));
