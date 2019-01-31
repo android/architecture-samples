@@ -16,9 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
+import static com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.Observer;
 import android.content.res.Resources;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -40,15 +48,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.Observer;
 
 /**
  * Unit tests for the implementation of {@link TasksViewModel}
@@ -115,14 +116,14 @@ public class TasksViewModelTest {
 
 
         // Then progress indicator is shown
-        assertTrue(mTasksViewModel.dataLoading.get());
+        assertTrue(mTasksViewModel.mDataLoading.getValue());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.dataLoading.get());
+        assertFalse(mTasksViewModel.mDataLoading.getValue());
 
         // And data loaded
-        assertFalse(mTasksViewModel.items.isEmpty());
+        assertFalse(mTasksViewModel.items.getValue().isEmpty());
         assertTrue(mTasksViewModel.items.size() == 3);
     }
 
@@ -138,7 +139,7 @@ public class TasksViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.dataLoading.get());
+        assertFalse(mTasksViewModel.mDataLoading.getValue());
 
         // And data loaded
         assertFalse(mTasksViewModel.items.isEmpty());
@@ -157,7 +158,7 @@ public class TasksViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.dataLoading.get());
+        assertFalse(mTasksViewModel.mDataLoading.getValue());
 
         // And data loaded
         assertFalse(mTasksViewModel.items.isEmpty());
@@ -238,6 +239,6 @@ public class TasksViewModelTest {
         mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
 
         // Then the "Add task" action is visible
-        assertThat(mTasksViewModel.tasksAddViewVisible.get(), is(true));
+        assertThat(mTasksViewModel.tasksAddViewVisible.getValue(), is(true));
     }
 }

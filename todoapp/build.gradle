@@ -50,6 +50,7 @@ ext {
     espressoVersion = '3.1.1'
     roomVersion = '2.0.0'
     archLifecycleVersion = '2.0.0'
+    archTestingVersion = '1.1.1'
 }
 
 /*

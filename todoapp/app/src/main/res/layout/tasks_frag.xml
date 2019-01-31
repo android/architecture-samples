@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:onRefresh="@{viewmodel}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        app:refreshing="@{viewmodel.isDataLoading}">
 
         <RelativeLayout
             android:id="@+id/tasksContainer"

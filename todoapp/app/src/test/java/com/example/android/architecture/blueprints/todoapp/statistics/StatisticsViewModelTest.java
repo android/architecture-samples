@@ -87,7 +87,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then the results are empty
-        assertThat(mStatisticsViewModel.empty.get(), is(true));
+        assertThat(mStatisticsViewModel.getEmpty().get(), is(true));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then the results are empty
-        assertThat(mStatisticsViewModel.empty.get(), is(false));
+        assertThat(mStatisticsViewModel.getEmpty().get(), is(false));
     }
 
 
@@ -114,7 +114,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
-        assertEquals(mStatisticsViewModel.empty.get(), true);
-        assertEquals(mStatisticsViewModel.error.get(), true);
+        assertEquals(mStatisticsViewModel.getEmpty().get(), true);
+        assertEquals(mStatisticsViewModel.getError().get(), true);
     }
 }

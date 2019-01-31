@@ -38,21 +38,22 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
-    public final MutableLiveData<Task> task = new MutableLiveData<>();
+    private final MutableLiveData<Task> mTask = new MutableLiveData<>();
 
-    public final MutableLiveData<Boolean> completed = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mCompleted = new MutableLiveData<>();
 
-    public final MutableLiveData<Boolean> isDataAvailable = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mIsDataAvailable = new MutableLiveData<>();
 
-    public final MutableLiveData<Boolean> isDataLoading = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mDataLoading = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Object>> mEditTaskCommand = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Object>> mDeleteTaskCommand = new MutableLiveData<>();
 
+    private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
+
     private final TasksRepository mTasksRepository;
 
-    private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
 
     public TaskDetailViewModel(Application context, TasksRepository tasksRepository) {
@@ -61,8 +62,8 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
     }
 
     public void deleteTask() {
-        if (task.getValue() != null) {
-            mTasksRepository.deleteTask(task.getValue().getId());
+        if (mTask.getValue() != null) {
+            mTasksRepository.deleteTask(mTask.getValue().getId());
             mDeleteTaskCommand.setValue(new Event<>(new Object()));
         }
     }
@@ -83,11 +84,27 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
         return mDeleteTaskCommand;
     }
 
+    public LiveData<Task> getTask() {
+        return mTask;
+    }
+
+    public LiveData<Boolean> getCompleted() {
+        return mCompleted;
+    }
+
+    public LiveData<Boolean> getIsDataAvailable() {
+        return mIsDataAvailable;
+    }
+
+    public LiveData<Boolean> getDataLoading() {
+        return mDataLoading;
+    }
+
     public void setCompleted(boolean completed) {
-        if (isDataLoading.getValue()) {
+        if (mDataLoading.getValue()) {
             return;
         }
-        Task task = this.task.getValue();
+        Task task = this.mTask.getValue();
         if (completed) {
             mTasksRepository.completeTask(task);
             showSnackbarMessage(R.string.task_marked_complete);
@@ -99,40 +116,40 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     public void start(String taskId) {
         if (taskId != null) {
-            isDataLoading.setValue(true);
+            mDataLoading.setValue(true);
             mTasksRepository.getTask(taskId, this);
         }
     }
 
     public void setTask(Task task) {
-        this.task.setValue(task);
+        this.mTask.setValue(task);
         if (task != null) {
-            completed.setValue(task.isCompleted());
-            isDataAvailable.setValue(task != null);
+            mCompleted.setValue(task.isCompleted());
+            mIsDataAvailable.setValue(task != null);
         }
     }
 
     @Override
     public void onTaskLoaded(Task task) {
         setTask(task);
-        isDataLoading.setValue(false);
+        mDataLoading.setValue(false);
     }
 
     @Override
     public void onDataNotAvailable() {
-        task.setValue(null);
-        isDataLoading.setValue(false);
+        mTask.setValue(null);
+        mDataLoading.setValue(false);
     }
 
     public void onRefresh() {
-        if (task.getValue() != null) {
-            start(task.getValue().getId());
+        if (mTask.getValue() != null) {
+            start(mTask.getValue().getId());
         }
     }
 
     @Nullable
     protected String getTaskId() {
-        return task.getValue().getId();
+        return mTask.getValue().getId();
     }
 
     private void showSnackbarMessage(@StringRes Integer message) {

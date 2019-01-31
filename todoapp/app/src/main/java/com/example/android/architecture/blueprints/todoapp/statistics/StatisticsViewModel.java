@@ -30,6 +30,7 @@ import androidx.databinding.Bindable;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 /**
@@ -42,18 +43,15 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class StatisticsViewModel extends AndroidViewModel {
 
-    public final MutableLiveData<Boolean> dataLoading = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mDataLoading = new MutableLiveData<>();
 
-    public final MutableLiveData<Boolean> error = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mError = new MutableLiveData<>();
 
-    public final MutableLiveData<String> numberOfActiveTasks = new MutableLiveData<>();
+    private final MutableLiveData<String> mActiveTasks = new MutableLiveData<>();
 
-    public final MutableLiveData<String> numberOfCompletedTasks = new MutableLiveData<>();
+    private final MutableLiveData<String> mCompletedTasks = new MutableLiveData<>();
 
-    /**
-     * Controls whether the stats are shown or a "No data" message.
-     */
-    public final ObservableBoolean empty = new ObservableBoolean();
+    private final MutableLiveData mEmpty = new MutableLiveData();
 
     private int mNumberOfActiveTasks = 0;
 
@@ -74,23 +72,48 @@ public class StatisticsViewModel extends AndroidViewModel {
     }
 
     public void loadStatistics() {
-        dataLoading.setValue(true);
+        mDataLoading.setValue(true);
 
         mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
             @Override
             public void onTasksLoaded(List<Task> tasks) {
-                error.setValue(false);
+                mError.setValue(false);
                 computeStats(tasks);
             }
 
             @Override
             public void onDataNotAvailable() {
-                error.setValue(true);
+                mError.setValue(true);
                 mNumberOfActiveTasks = 0;
                 mNumberOfCompletedTasks = 0;
                 updateDataBindingObservables();
             }
         });
+    }
+
+    // LiveData getters
+
+    public LiveData<Boolean> getDataLoading() {
+        return mDataLoading;
+    }
+
+    public LiveData<Boolean> getError() {
+        return mError;
+    }
+
+    public LiveData<String> getNumberOfActiveTasks() {
+        return mActiveTasks;
+    }
+
+    public LiveData<String> getNumberOfCompletedTasks() {
+        return mCompletedTasks;
+    }
+
+    /**
+     * Controls whether the stats are shown or a "No data" message.
+     */
+    public LiveData<Boolean> getEmpty() {
+        return mEmpty;
     }
 
     /**
@@ -114,12 +137,12 @@ public class StatisticsViewModel extends AndroidViewModel {
     }
 
     private void updateDataBindingObservables() {
-        numberOfCompletedTasks.setValue(
+        mCompletedTasks.setValue(
                 mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks));
-        numberOfActiveTasks.setValue(
+        mActiveTasks.setValue(
                 mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks));
-        empty.set(mNumberOfActiveTasks + mNumberOfCompletedTasks == 0);
-        dataLoading.setValue(false);
+        mEmpty.setValue(mNumberOfActiveTasks + mNumberOfCompletedTasks == 0);
+        mDataLoading.setValue(false);
 
     }
 }

@@ -84,8 +84,8 @@ public class AddEditTaskViewModelTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the ViewModel is asked to save a task
-        mAddEditTaskViewModel.description.set("Some Task Description");
-        mAddEditTaskViewModel.title.set("New Task Title");
+        mAddEditTaskViewModel.getDescription().set("Some Task Description");
+        mAddEditTaskViewModel.getTitle().set("New Task Title");
         mAddEditTaskViewModel.saveTask();
 
         // Then a task is saved in the repository and the view updated
@@ -111,7 +111,7 @@ public class AddEditTaskViewModelTest {
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
 
         // Verify the fields were updated
-        assertThat(mAddEditTaskViewModel.title.get(), is(testTask.getTitle()));
-        assertThat(mAddEditTaskViewModel.description.get(), is(testTask.getDescription()));
+        assertThat(mAddEditTaskViewModel.getTitle().get(), is(testTask.getTitle()));
+        assertThat(mAddEditTaskViewModel.getDescription().get(), is(testTask.getDescription()));
     }
 }

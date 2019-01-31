@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:onRefreshListener="@{viewmodel::onRefresh}"
-        app:refreshing="@{viewmodel.isDataLoading}">
+        app:refreshing="@{viewmodel.dataLoading}">
 
         <LinearLayout
             android:layout_width="match_parent"

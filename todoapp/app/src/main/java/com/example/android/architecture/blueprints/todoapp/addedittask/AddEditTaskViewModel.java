@@ -25,7 +25,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 
 import androidx.annotation.Nullable;
-import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -41,11 +40,13 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
+    // Two-way databinding, exposing MutableLiveData
     public final MutableLiveData<String> title = new MutableLiveData<>();
 
+    // Two-way databinding, exposing MutableLiveData
     public final MutableLiveData<String> description = new MutableLiveData<>();
 
-    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+    private final MutableLiveData<Boolean> dataLoading = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
@@ -69,7 +70,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
     }
 
     public void start(String taskId) {
-        if (dataLoading.get()) {
+        if (dataLoading.getValue() != null && dataLoading.getValue()) {
             // Already loading, ignore.
             return;
         }
@@ -84,7 +85,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
             return;
         }
         mIsNewTask = false;
-        dataLoading.set(true);
+        dataLoading.setValue(true);
 
         mTasksRepository.getTask(taskId, this);
     }
@@ -94,7 +95,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
         title.setValue(task.getTitle());
         description.setValue(task.getDescription());
         mTaskCompleted = task.isCompleted();
-        dataLoading.set(false);
+        dataLoading.setValue(false);
         mIsDataLoaded = true;
 
         // Note that there's no need to notify that the values changed because we're using
@@ -103,7 +104,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
 
     @Override
     public void onDataNotAvailable() {
-        dataLoading.set(false);
+        dataLoading.setValue(false);
     }
 
     // Called when clicking on fab.
@@ -121,12 +122,16 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
         }
     }
 
-    LiveData<Event<Integer>> getSnackbarMessage() {
+    public LiveData<Event<Integer>> getSnackbarMessage() {
         return mSnackbarText;
     }
 
-    LiveData<Event<Object>> getTaskUpdatedEvent() {
+    public LiveData<Event<Object>> getTaskUpdatedEvent() {
         return mTaskUpdated;
+    }
+
+    public LiveData<Boolean> getDataLoading() {
+        return dataLoading;
     }
 
     private boolean isNewTask() {
