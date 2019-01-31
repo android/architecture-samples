@@ -102,7 +102,6 @@ public class TasksAdapter extends BaseAdapter {
         return binding.getRoot();
     }
 
-
     private void setList(List<Task> tasks) {
         mTasks = tasks;
         notifyDataSetChanged();

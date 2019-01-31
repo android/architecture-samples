@@ -27,9 +27,11 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 
 /**
@@ -39,8 +41,6 @@ import androidx.lifecycle.MutableLiveData;
 public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
     private final MutableLiveData<Task> mTask = new MutableLiveData<>();
-
-    private final MutableLiveData<Boolean> mCompleted = new MutableLiveData<>();
 
     private final MutableLiveData<Boolean> mIsDataAvailable = new MutableLiveData<>();
 
@@ -54,7 +54,15 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     private final TasksRepository mTasksRepository;
 
+    // This LiveData depends on another so we can use a transformation.
+    public final LiveData<Boolean> completed = Transformations.map(mTask,
+            new Function<Task, Boolean>() {
+                @Override
+                public Boolean apply(Task input) {
+                    return input.isCompleted();
 
+                }
+            });
 
     public TaskDetailViewModel(Application context, TasksRepository tasksRepository) {
         super(context);
@@ -88,10 +96,6 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
         return mTask;
     }
 
-    public LiveData<Boolean> getCompleted() {
-        return mCompleted;
-    }
-
     public LiveData<Boolean> getIsDataAvailable() {
         return mIsDataAvailable;
     }
@@ -123,9 +127,6 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     public void setTask(Task task) {
         this.mTask.setValue(task);
-        if (task != null) {
-            mCompleted.setValue(task.isCompleted());
-        }
         mIsDataAvailable.setValue(task != null);
     }
 

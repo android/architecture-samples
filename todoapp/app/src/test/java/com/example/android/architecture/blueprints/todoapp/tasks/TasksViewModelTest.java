@@ -115,7 +115,6 @@ public class TasksViewModelTest {
         // Callback is captured and invoked with stubbed tasks
         verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
 
-
         // Then progress indicator is shown
         assertTrue(mTasksViewModel.isDataLoading().getValue());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);

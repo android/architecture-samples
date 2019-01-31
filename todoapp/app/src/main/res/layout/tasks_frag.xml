@@ -74,7 +74,6 @@
                 android:orientation="vertical"
                 android:visibility="@{viewmodel.empty ? View.VISIBLE : View.GONE}">
 
-
                 <ImageView
                     android:id="@+id/noTasksIcon"
                     android:layout_width="48dp"

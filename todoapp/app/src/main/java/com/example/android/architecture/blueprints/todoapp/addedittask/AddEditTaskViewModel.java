@@ -97,9 +97,6 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
         mTaskCompleted = task.isCompleted();
         dataLoading.setValue(false);
         mIsDataLoaded = true;
-
-        // Note that there's no need to notify that the values changed because we're using
-        // ObservableFields.
     }
 
     @Override

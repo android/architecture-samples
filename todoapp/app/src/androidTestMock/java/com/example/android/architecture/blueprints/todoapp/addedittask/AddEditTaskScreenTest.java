@@ -137,7 +137,6 @@ public class AddEditTaskScreenTest {
         });
         launchNewTaskActivity(TASK_ID);
 
-
         // Check that the toolbar shows the correct title
         onView(withId(toolbar)).check(matches(withToolbarTitle(R.string.edit_task)));
 

@@ -25,7 +25,6 @@
             type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
     </data>
 
-
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"

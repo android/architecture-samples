@@ -31,11 +31,13 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.arch.core.util.Function;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 
 /**
@@ -57,8 +59,6 @@ public class TasksViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Drawable> mNoTaskIconRes = new MutableLiveData<>();
 
-    private final MutableLiveData<Boolean> mEmpty = new MutableLiveData<>();
-
     private final MutableLiveData<Boolean> mTasksAddViewVisible = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
@@ -75,6 +75,16 @@ public class TasksViewModel extends AndroidViewModel {
     private final MutableLiveData<Event<Object>> mNewTaskEvent = new MutableLiveData<>();
 
     private final Context mContext; // To avoid leaks, this must be an Application Context.
+
+    // This LiveData depends on another so we can use a transformation.
+    public final LiveData<Boolean> empty = Transformations.map(mItems,
+            new Function<List<Task>, Boolean>() {
+                @Override
+                public Boolean apply(List<Task> input) {
+                    return input.isEmpty();
+
+                }
+            });
 
     public TasksViewModel(
             Application context,
@@ -169,10 +179,6 @@ public class TasksViewModel extends AndroidViewModel {
 
     public LiveData<Drawable> getNoTaskIconRes() {
         return mNoTaskIconRes;
-    }
-
-    public LiveData<Boolean> getEmpty() {
-        return mEmpty;
     }
 
     public LiveData<Event<Integer>> getSnackbarMessage() {
@@ -272,7 +278,6 @@ public class TasksViewModel extends AndroidViewModel {
                 mIsDataLoadingError.setValue(false);
 
                 List<Task> itemsValue = new ArrayList<>(tasksToShow);
-                mEmpty.setValue(itemsValue.isEmpty());
                 mItems.setValue(itemsValue);
             }
 
