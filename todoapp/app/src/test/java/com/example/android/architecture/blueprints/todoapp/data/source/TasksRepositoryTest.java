@@ -105,7 +105,8 @@ public class TasksRepositoryTest {
         twoTasksLoadCallsToRepository(mLoadTasksCallback);
 
         // Then tasks were only requested once from Service API
-        verify(mTasksRemoteDataSource).getTasks(any(TasksDataSource.LoadTasksCallback.class));
+        verify(mTasksRemoteDataSource, times(1))
+                .getTasks(any(TasksDataSource.LoadTasksCallback.class));
     }
 
     @Test
