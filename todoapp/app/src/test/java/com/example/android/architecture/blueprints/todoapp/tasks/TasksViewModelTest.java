@@ -18,8 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import static com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,6 +30,8 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.res.Resources;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -49,7 +52,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.Observer;
 
 /**
  * Unit tests for the implementation of {@link TasksViewModel}
@@ -89,7 +91,6 @@ public class TasksViewModelTest {
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
 
         mTasksViewModel.getSnackbarMessage().removeObservers(TestUtils.TEST_OBSERVER);
-
     }
 
     private void setupContext() {
@@ -116,15 +117,15 @@ public class TasksViewModelTest {
 
 
         // Then progress indicator is shown
-        assertTrue(mTasksViewModel.mDataLoading.getValue());
+        assertTrue(mTasksViewModel.isDataLoading().getValue());
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.mDataLoading.getValue());
+        assertFalse(mTasksViewModel.isDataLoading().getValue());
 
         // And data loaded
-        assertFalse(mTasksViewModel.items.getValue().isEmpty());
-        assertTrue(mTasksViewModel.items.size() == 3);
+        assertFalse(mTasksViewModel.getItems().getValue().isEmpty());
+        assertTrue(mTasksViewModel.getItems().getValue().size() == 3);
     }
 
     @Test
@@ -139,11 +140,11 @@ public class TasksViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.mDataLoading.getValue());
+        assertFalse(mTasksViewModel.isDataLoading().getValue());
 
         // And data loaded
-        assertFalse(mTasksViewModel.items.isEmpty());
-        assertTrue(mTasksViewModel.items.size() == 1);
+        assertFalse(mTasksViewModel.getItems().getValue().isEmpty());
+        assertTrue(mTasksViewModel.getItems().getValue().size() == 1);
     }
 
     @Test
@@ -158,25 +159,22 @@ public class TasksViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then progress indicator is hidden
-        assertFalse(mTasksViewModel.mDataLoading.getValue());
+        assertFalse(mTasksViewModel.isDataLoading().getValue());
 
         // And data loaded
-        assertFalse(mTasksViewModel.items.isEmpty());
-        assertTrue(mTasksViewModel.items.size() == 2);
+        assertFalse(mTasksViewModel.getItems().getValue().isEmpty());
+        assertTrue(mTasksViewModel.getItems().getValue().size() == 2);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void clickOnFab_ShowsAddTaskUi() {
-
-        Observer<Void> observer = mock(Observer.class);
-
-        mTasksViewModel.getNewTaskEvent().observe(TestUtils.TEST_OBSERVER, observer);
-
+    public void clickOnFab_ShowsAddTaskUi() throws InterruptedException {
         // When adding a new task
         mTasksViewModel.addNewTask();
 
         // Then the event is triggered
-        verify(observer).onChanged(null);
+        Event<Object> value = LiveDataTestUtil.getValue(mTasksViewModel.getNewTaskEvent());
+        assertNotNull(value.getContentIfNotHandled());
     }
 
     @Test
@@ -190,55 +188,50 @@ public class TasksViewModelTest {
     }
 
     @Test
-    public void handleActivityResult_editOK() {
+    public void handleActivityResult_editOK() throws InterruptedException {
         // When TaskDetailActivity sends a EDIT_RESULT_OK
-        Observer<Integer> observer = mock(Observer.class);
-
-        mTasksViewModel.getSnackbarMessage().observe(TestUtils.TEST_OBSERVER, observer);
-
         mTasksViewModel.handleActivityResult(
                 AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.EDIT_RESULT_OK);
 
-        // Then the snackbar shows the correct message
-        verify(observer).onChanged(R.string.successfully_saved_task_message);
+        // Then the event is triggered
+        Event<Integer> value = LiveDataTestUtil.getValue(mTasksViewModel.getSnackbarMessage());
+        assertEquals((long) value.getContentIfNotHandled(), R.string.successfully_saved_task_message);
     }
 
     @Test
-    public void handleActivityResult_addEditOK() {
-        // When TaskDetailActivity sends a EDIT_RESULT_OK
-        Observer<Integer> observer = mock(Observer.class);
-
-        mTasksViewModel.getSnackbarMessage().observe(TestUtils.TEST_OBSERVER, observer);
-
-        // When AddEditTaskActivity sends a ADD_EDIT_RESULT_OK
+    public void handleActivityResult_addEditOK() throws InterruptedException {
+        // When TaskDetailActivity sends an EDIT_RESULT_OK
         mTasksViewModel.handleActivityResult(
                 AddEditTaskActivity.REQUEST_CODE, AddEditTaskActivity.ADD_EDIT_RESULT_OK);
 
         // Then the snackbar shows the correct message
-        verify(observer).onChanged(R.string.successfully_added_task_message);
+        Event<Integer> value = LiveDataTestUtil.getValue(mTasksViewModel.getSnackbarMessage());
+        assertEquals(
+                (long) value.getContentIfNotHandled(),
+                R.string.successfully_added_task_message
+        );
     }
 
     @Test
-    public void handleActivityResult_deleteOk() {
-        // When TaskDetailActivity sends a EDIT_RESULT_OK
-        Observer<Integer> observer = mock(Observer.class);
-
-        mTasksViewModel.getSnackbarMessage().observe(TestUtils.TEST_OBSERVER, observer);
-
-        // When AddEditTaskActivity sends a ADD_EDIT_RESULT_OK
+    public void handleActivityResult_deleteOk() throws InterruptedException {
+        // When TaskDetailActivity sends a DELETE_RESULT_OK
         mTasksViewModel.handleActivityResult(
                 AddEditTaskActivity.REQUEST_CODE, TaskDetailActivity.DELETE_RESULT_OK);
 
         // Then the snackbar shows the correct message
-        verify(observer).onChanged(R.string.successfully_deleted_task_message);
+        Event<Integer> value = LiveDataTestUtil.getValue(mTasksViewModel.getSnackbarMessage());
+        assertEquals(
+                (long) value.getContentIfNotHandled(),
+                R.string.successfully_deleted_task_message
+        );
     }
 
     @Test
-    public void getTasksAddViewVisible() {
+    public void getTasksAddViewVisible() throws InterruptedException {
         // When the filter type is ALL_TASKS
         mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
 
         // Then the "Add task" action is visible
-        assertThat(mTasksViewModel.tasksAddViewVisible.getValue(), is(true));
+        assertTrue(LiveDataTestUtil.getValue(mTasksViewModel.getTasksAddViewVisible()));
     }
 }

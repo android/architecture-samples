@@ -125,8 +125,8 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
         this.mTask.setValue(task);
         if (task != null) {
             mCompleted.setValue(task.isCompleted());
-            mIsDataAvailable.setValue(task != null);
         }
+        mIsDataAvailable.setValue(task != null);
     }
 
     @Override
@@ -139,6 +139,7 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
     public void onDataNotAvailable() {
         mTask.setValue(null);
         mDataLoading.setValue(false);
+        mIsDataAvailable.setValue(false);
     }
 
     public void onRefresh() {
