@@ -1,5 +1,6 @@
-// Looking for the SingleLiveEvent class? We deprecated it in favor of the Event
-// wrapper for LiveData.
+/* Looking for the SingleLiveEvent class? We are now using the Event class. Read more:
+https://medium.com/androiddevelopers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150
+ */
 
 ///*
 // *  Copyright 2017 Google Inc.
