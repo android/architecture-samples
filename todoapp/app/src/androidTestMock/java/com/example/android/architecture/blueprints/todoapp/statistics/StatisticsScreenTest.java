@@ -16,13 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import static org.hamcrest.Matchers.containsString;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import android.app.Application;
 import android.content.Intent;
 
@@ -43,6 +36,12 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the statistics screen.
@@ -72,12 +71,8 @@ public class StatisticsScreenTest {
                         .getTasksRepository();
 
                 repo.deleteAllTasks();
-                repo.saveTask(
-                        new Task("St1", "", false)
-                );
-                repo.saveTask(
-                        new Task("St2", "", true)
-                );
+                repo.saveTask(new Task("St1", "", false));
+                repo.saveTask(new Task("St2", "", true));
             }
         });
 
