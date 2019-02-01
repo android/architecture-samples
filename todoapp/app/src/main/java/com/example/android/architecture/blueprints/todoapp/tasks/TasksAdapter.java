@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,9 @@ import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemB
 
 import java.util.List;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LifecycleOwner;
+
 
 public class TasksAdapter extends BaseAdapter {
 
@@ -35,10 +37,13 @@ public class TasksAdapter extends BaseAdapter {
 
     private List<Task> mTasks;
 
+    private LifecycleOwner mLifecycleOwner;
+
     public TasksAdapter(List<Task> tasks,
-                        TasksViewModel tasksViewModel) {
+            TasksViewModel tasksViewModel, LifecycleOwner activity) {
         mTasksViewModel = tasksViewModel;
         setList(tasks);
+        mLifecycleOwner = activity;
 
     }
 
@@ -84,18 +89,18 @@ public class TasksAdapter extends BaseAdapter {
 
             @Override
             public void onTaskClicked(Task task) {
-                mTasksViewModel.getOpenTaskEvent().setValue(task.getId());
+                mTasksViewModel.openTask(task.getId());
             }
         };
 
         binding.setTask(mTasks.get(position));
+        binding.setLifecycleOwner(mLifecycleOwner);
 
         binding.setListener(userActionsListener);
 
         binding.executePendingBindings();
         return binding.getRoot();
     }
-
 
     private void setList(List<Task> tasks) {
         mTasks = tasks;

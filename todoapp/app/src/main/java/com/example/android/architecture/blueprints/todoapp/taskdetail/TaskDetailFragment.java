@@ -17,10 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,10 +25,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 
 /**
@@ -64,18 +65,19 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
+        mViewModel.getSnackbarMessage().observe(this, new Observer<Event<Integer>>() {
             @Override
-            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
-                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
-
+            public void onChanged(Event<Integer> event) {
+                Integer msg = event.getContentIfNotHandled();
+                if (msg != null) {
+                    SnackbarUtils.showSnackbar(getView(), getString(msg));
+                }
             }
         });
     }
 
     private void setupFab() {
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +96,7 @@ public class TaskDetailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
 
@@ -103,6 +105,7 @@ public class TaskDetailFragment extends Fragment {
         mViewModel = TaskDetailActivity.obtainViewModel(getActivity());
 
         viewDataBinding.setViewmodel(mViewModel);
+        viewDataBinding.setLifecycleOwner(getActivity());
 
         TaskDetailUserActionsListener actionsListener = getTaskDetailUserActionsListener();
 

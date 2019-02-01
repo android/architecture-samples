@@ -16,26 +16,27 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 
 public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
@@ -58,20 +59,24 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         mViewModel = obtainViewModel(this);
 
         // Subscribe to "open task" event
-        mViewModel.getOpenTaskEvent().observe(this, new Observer<String>() {
+        mViewModel.getOpenTaskEvent().observe(this, new Observer<Event<String>>() {
             @Override
-            public void onChanged(@Nullable String taskId) {
+            public void onChanged(Event<String> taskIdEvent) {
+                String taskId = taskIdEvent.getContentIfNotHandled();
                 if (taskId != null) {
                     openTaskDetails(taskId);
                 }
+
             }
         });
 
         // Subscribe to "new task" event
-        mViewModel.getNewTaskEvent().observe(this, new Observer<Void>() {
+        mViewModel.getNewTaskEvent().observe(this, new Observer<Event<Object>>() {
             @Override
-            public void onChanged(@Nullable Void _) {
-                addNewTask();
+            public void onChanged(Event<Object> taskIdEvent) {
+                if (taskIdEvent.getContentIfNotHandled() != null) {
+                    addNewTask();
+                }
             }
         });
     }

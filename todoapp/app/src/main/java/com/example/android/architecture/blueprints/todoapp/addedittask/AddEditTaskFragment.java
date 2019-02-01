@@ -17,20 +17,21 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -76,7 +77,7 @@ public class AddEditTaskFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.addtask_frag, container, false);
         if (mViewDataBinding == null) {
             mViewDataBinding = AddtaskFragBinding.bind(root);
@@ -85,6 +86,7 @@ public class AddEditTaskFragment extends Fragment {
         mViewModel = AddEditTaskActivity.obtainViewModel(getActivity());
 
         mViewDataBinding.setViewmodel(mViewModel);
+        mViewDataBinding.setLifecycleOwner(getActivity());
 
         setHasOptionsMenu(true);
         setRetainInstance(false);
@@ -93,10 +95,13 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void setupSnackbar() {
-        mViewModel.getSnackbarMessage().observe(this, new SnackbarMessage.SnackbarObserver() {
+        mViewModel.getSnackbarMessage().observe(this, new Observer<Event<Integer>>() {
             @Override
-            public void onNewMessage(@StringRes int snackbarMessageResourceId) {
-                SnackbarUtils.showSnackbar(getView(), getString(snackbarMessageResourceId));
+            public void onChanged(Event<Integer> event) {
+                Integer msg = event.getContentIfNotHandled();
+                if (msg != null) {
+                    SnackbarUtils.showSnackbar(getView(), getString(msg));
+                }
             }
         });
     }

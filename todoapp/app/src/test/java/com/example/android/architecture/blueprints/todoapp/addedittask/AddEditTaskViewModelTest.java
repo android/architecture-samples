@@ -17,8 +17,14 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import android.app.Application;
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -32,12 +38,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskViewModel}.
@@ -74,8 +75,8 @@ public class AddEditTaskViewModelTest {
     @Test
     public void saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the ViewModel is asked to save a task
-        mAddEditTaskViewModel.description.set("Some Task Description");
-        mAddEditTaskViewModel.title.set("New Task Title");
+        mAddEditTaskViewModel.description.setValue("Some Task Description");
+        mAddEditTaskViewModel.title.setValue("New Task Title");
         mAddEditTaskViewModel.saveTask();
 
         // Then a task is saved in the repository and the view updated
@@ -101,7 +102,7 @@ public class AddEditTaskViewModelTest {
         mGetTaskCallbackCaptor.getValue().onTaskLoaded(testTask);
 
         // Verify the fields were updated
-        assertThat(mAddEditTaskViewModel.title.get(), is(testTask.getTitle()));
-        assertThat(mAddEditTaskViewModel.description.get(), is(testTask.getDescription()));
+        assertThat(mAddEditTaskViewModel.title.getValue(), is(testTask.getTitle()));
+        assertThat(mAddEditTaskViewModel.description.getValue(), is(testTask.getDescription()));
     }
 }

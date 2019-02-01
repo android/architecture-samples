@@ -16,17 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
+import static com.example.android.architecture.blueprints.todoapp.R.id.toolbar;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.clearText;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.espresso.matcher.BoundedMatcher;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -44,13 +44,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.clearText;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static com.example.android.architecture.blueprints.todoapp.R.id.toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 /**
  * Tests for the add task screen.
@@ -81,7 +83,7 @@ public class AddEditTaskScreenTest {
      */
     @Before
     public void registerIdlingResource() {
-        Espresso.registerIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
 
     /**
@@ -89,7 +91,7 @@ public class AddEditTaskScreenTest {
      */
     @After
     public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -123,10 +125,16 @@ public class AddEditTaskScreenTest {
     }
 
     @Test
-    public void toolbarTitle_editTask_persistsRotation() {
-        // Put a task in the repository and start the activity to edit it
-        TasksRepository.destroyInstance();
-        FakeTasksRemoteDataSource.getInstance().addTasks(new Task("Title1", "", TASK_ID, false));
+    public void toolbarTitle_editTask_persistsRotation() throws Throwable {
+        mActivityTestRule.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TasksRepository.destroyInstance();
+                FakeTasksRemoteDataSource.getInstance().addTasks(
+                        new Task("AddTitle", "", TASK_ID, false)
+                );
+            }
+        });
         launchNewTaskActivity(TASK_ID);
 
         // Check that the toolbar shows the correct title
@@ -143,8 +151,8 @@ public class AddEditTaskScreenTest {
      * @param taskId is null if used to add a new task, otherwise it edits the task.
      */
     private void launchNewTaskActivity(@Nullable String taskId) {
-        Intent intent = new Intent(InstrumentationRegistry.getInstrumentation()
-                .getTargetContext(), AddEditTaskActivity.class);
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                AddEditTaskActivity.class);
 
         intent.putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
         mActivityTestRule.launchActivity(intent);

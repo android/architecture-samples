@@ -16,7 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import android.content.Context;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.google.common.collect.Lists;
@@ -30,15 +37,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -209,7 +207,6 @@ public class TasksRepositoryTest {
 
         // When a completed tasks are cleared to the tasks repository
         mTasksRepository.clearCompletedTasks();
-
 
         // Then the service API and persistent repository are called and the cache is updated
         verify(mTasksRemoteDataSource).clearCompletedTasks();

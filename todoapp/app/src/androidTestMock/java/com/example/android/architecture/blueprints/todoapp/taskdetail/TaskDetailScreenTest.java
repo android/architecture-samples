@@ -16,15 +16,18 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import static org.hamcrest.core.IsNot.not;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.IdlingRegistry;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
-import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
@@ -38,13 +41,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.core.IsNot.not;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
@@ -77,13 +77,31 @@ public class TaskDetailScreenTest {
      * <p>
      * Sometimes an {@link Activity} requires a custom start {@link Intent} to receive data
      * from the source Activity. ActivityTestRule has a feature which let's you lazily start the
-     * Activity under test, so you can control the Intent that is used to start the target
-     * Activity.
+     * Activity under test, so you can control the Intent that is used to start the target Activity.
      */
     @Rule
     public ActivityTestRule<TaskDetailActivity> mTaskDetailActivityTestRule =
             new ActivityTestRule<>(TaskDetailActivity.class, true /* Initial touch mode  */,
                     false /* Lazily launch activity */);
+
+    /**
+     * Prepare your test fixture for this test. In this case we register an IdlingResources with
+     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
+     * idle state. This helps Espresso to synchronize your test actions, which makes tests
+     * significantly more reliable.
+     */
+    @Before
+    public void registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
+    }
 
     private void loadActiveTask() {
         startActivityWithWithStubbedTask(ACTIVE_TASK);
@@ -104,25 +122,13 @@ public class TaskDetailScreenTest {
      */
     private void startActivityWithWithStubbedTask(Task task) {
         // Add a task stub to the fake service api layer.
-        TasksRepository tasksRepository = Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext());
-        tasksRepository.deleteAllTasks();
+        TasksRepository.destroyInstance();
         FakeTasksRemoteDataSource.getInstance().addTasks(task);
 
         // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         Intent startIntent = new Intent();
         startIntent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, task.getId());
         mTaskDetailActivityTestRule.launchActivity(startIntent);
-    }
-
-    /**
-     * Prepare your test fixture for this test. In this case we register an IdlingResources with
-     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
-     * idle state. This helps Espresso to synchronize your test actions, which makes tests
-     * significantly more reliable.
-     */
-    @Before
-    public void registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
@@ -162,11 +168,4 @@ public class TaskDetailScreenTest {
         onView(withId(R.id.menu_delete)).check(matches(isDisplayed()));
     }
 
-    /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    public void unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
-    }
 }

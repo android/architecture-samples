@@ -16,8 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -60,7 +60,7 @@ public class TasksRepository implements TasksDataSource {
 
     // Prevent direct instantiation.
     private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource) {
+            @NonNull TasksDataSource tasksLocalDataSource) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
     }
@@ -73,7 +73,7 @@ public class TasksRepository implements TasksDataSource {
      * @return the {@link TasksRepository} instance
      */
     public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
-                                              TasksDataSource tasksLocalDataSource) {
+            TasksDataSource tasksLocalDataSource) {
         if (INSTANCE == null) {
             synchronized (TasksRepository.class) {
                 if (INSTANCE == null) {

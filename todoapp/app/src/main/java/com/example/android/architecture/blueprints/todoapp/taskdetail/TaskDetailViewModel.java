@@ -17,19 +17,21 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.databinding.ObservableBoolean;
-import android.databinding.ObservableField;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent;
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.SnackbarMessage;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.arch.core.util.Function;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 
 /**
@@ -38,19 +40,29 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
  */
 public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
 
-    public final ObservableField<Task> task = new ObservableField<>();
+    private final MutableLiveData<Task> mTask = new MutableLiveData<>();
 
-    public final ObservableBoolean completed = new ObservableBoolean();
+    private final MutableLiveData<Boolean> mIsDataAvailable = new MutableLiveData<>();
 
-    private final SingleLiveEvent<Void> mEditTaskCommand = new SingleLiveEvent<>();
+    private final MutableLiveData<Boolean> mDataLoading = new MutableLiveData<>();
 
-    private final SingleLiveEvent<Void> mDeleteTaskCommand = new SingleLiveEvent<>();
+    private final MutableLiveData<Event<Object>> mEditTaskCommand = new MutableLiveData<>();
+
+    private final MutableLiveData<Event<Object>> mDeleteTaskCommand = new MutableLiveData<>();
+
+    private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
     private final TasksRepository mTasksRepository;
 
-    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
+    // This LiveData depends on another so we can use a transformation.
+    public final LiveData<Boolean> completed = Transformations.map(mTask,
+            new Function<Task, Boolean>() {
+                @Override
+                public Boolean apply(Task input) {
+                    return input.isCompleted();
 
-    private boolean mIsDataLoading;
+                }
+            });
 
     public TaskDetailViewModel(Application context, TasksRepository tasksRepository) {
         super(context);
@@ -58,33 +70,45 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
     }
 
     public void deleteTask() {
-        if (task.get() != null) {
-            mTasksRepository.deleteTask(task.get().getId());
-            mDeleteTaskCommand.call();
+        if (mTask.getValue() != null) {
+            mTasksRepository.deleteTask(mTask.getValue().getId());
+            mDeleteTaskCommand.setValue(new Event<>(new Object()));
         }
     }
 
     public void editTask() {
-        mEditTaskCommand.call();
+        mEditTaskCommand.setValue(new Event<>(new Object()));
     }
 
-    public SnackbarMessage getSnackbarMessage() {
+    public LiveData<Event<Integer>> getSnackbarMessage() {
         return mSnackbarText;
     }
 
-    public SingleLiveEvent<Void> getEditTaskCommand() {
+    public MutableLiveData<Event<Object>> getEditTaskCommand() {
         return mEditTaskCommand;
     }
 
-    public SingleLiveEvent<Void> getDeleteTaskCommand() {
+    public MutableLiveData<Event<Object>> getDeleteTaskCommand() {
         return mDeleteTaskCommand;
     }
 
+    public LiveData<Task> getTask() {
+        return mTask;
+    }
+
+    public LiveData<Boolean> getIsDataAvailable() {
+        return mIsDataAvailable;
+    }
+
+    public LiveData<Boolean> getDataLoading() {
+        return mDataLoading;
+    }
+
     public void setCompleted(boolean completed) {
-        if (mIsDataLoading) {
+        if (mDataLoading.getValue()) {
             return;
         }
-        Task task = this.task.get();
+        Task task = this.mTask.getValue();
         if (completed) {
             mTasksRepository.completeTask(task);
             showSnackbarMessage(R.string.task_marked_complete);
@@ -96,50 +120,41 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
 
     public void start(String taskId) {
         if (taskId != null) {
-            mIsDataLoading = true;
+            mDataLoading.setValue(true);
             mTasksRepository.getTask(taskId, this);
         }
     }
 
     public void setTask(Task task) {
-        this.task.set(task);
-        if (task != null) {
-            completed.set(task.isCompleted());
-        }
-    }
-
-    public boolean isDataAvailable() {
-        return task.get() != null;
-    }
-
-    public boolean isDataLoading() {
-        return mIsDataLoading;
+        this.mTask.setValue(task);
+        mIsDataAvailable.setValue(task != null);
     }
 
     @Override
     public void onTaskLoaded(Task task) {
         setTask(task);
-        mIsDataLoading = false;
+        mDataLoading.setValue(false);
     }
 
     @Override
     public void onDataNotAvailable() {
-        task.set(null);
-        mIsDataLoading = false;
+        mTask.setValue(null);
+        mDataLoading.setValue(false);
+        mIsDataAvailable.setValue(false);
     }
 
     public void onRefresh() {
-        if (task.get() != null) {
-            start(task.get().getId());
+        if (mTask.getValue() != null) {
+            start(mTask.getValue().getId());
         }
     }
 
     @Nullable
     protected String getTaskId() {
-        return task.get().getId();
+        return mTask.getValue().getId();
     }
 
     private void showSnackbarMessage(@StringRes Integer message) {
-        mSnackbarText.setValue(message);
+        mSnackbarText.setValue(new Event<>(message));
     }
 }

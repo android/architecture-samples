@@ -17,8 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import android.app.Application;
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -35,11 +40,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 /**
  * Unit tests for the implementation of {@link StatisticsViewModel}
@@ -87,7 +88,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then the results are empty
-        assertThat(mStatisticsViewModel.empty.get(), is(true));
+        assertThat(mStatisticsViewModel.getEmpty().getValue(), is(true));
     }
 
     @Test
@@ -100,7 +101,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
 
         // Then the results are empty
-        assertThat(mStatisticsViewModel.empty.get(), is(false));
+        assertThat(mStatisticsViewModel.getEmpty().getValue(), is(false));
     }
 
 
@@ -114,7 +115,7 @@ public class StatisticsViewModelTest {
         mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
-        assertEquals(mStatisticsViewModel.empty.get(), true);
-        assertEquals(mStatisticsViewModel.error.get(), true);
+        assertEquals(mStatisticsViewModel.getEmpty().getValue(), true);
+        assertEquals(mStatisticsViewModel.getError().getValue(), true);
     }
 }

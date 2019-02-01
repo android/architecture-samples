@@ -16,16 +16,17 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
+
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 
 /**
  * Main UI for the statistics screen.
@@ -43,7 +44,7 @@ public class StatisticsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         mViewDataBinding = DataBindingUtil.inflate(
                 inflater, R.layout.statistics_frag, container, false);
         return mViewDataBinding.getRoot();
@@ -54,6 +55,7 @@ public class StatisticsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mStatisticsViewModel = StatisticsActivity.obtainViewModel(getActivity());
         mViewDataBinding.setStats(mStatisticsViewModel);
+        mViewDataBinding.setLifecycleOwner(getActivity());
     }
 
     @Override

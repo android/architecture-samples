@@ -16,25 +16,26 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity.ADD_EDIT_RESULT_OK;
+import static com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment.REQUEST_EDIT_TASK;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
+import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
-import static com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity.ADD_EDIT_RESULT_OK;
-import static com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment.REQUEST_EDIT_TASK;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Displays task details screen.
@@ -90,7 +91,7 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
@@ -99,16 +100,20 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     private void subscribeToNavigationChanges(TaskDetailViewModel viewModel) {
         // The activity observes the navigation commands in the ViewModel
-        viewModel.getEditTaskCommand().observe(this, new Observer<Void>() {
+        viewModel.getEditTaskCommand().observe(this, new Observer<Event<Object>>() {
             @Override
-            public void onChanged(@Nullable Void _) {
-                TaskDetailActivity.this.onStartEditTask();
+            public void onChanged(Event<Object> taskEvent) {
+                if (taskEvent.getContentIfNotHandled() != null) {
+                    TaskDetailActivity.this.onStartEditTask();
+                }
             }
         });
-        viewModel.getDeleteTaskCommand().observe(this, new Observer<Void>() {
+        viewModel.getDeleteTaskCommand().observe(this, new Observer<Event<Object>>() {
             @Override
-            public void onChanged(@Nullable Void _) {
-                TaskDetailActivity.this.onTaskDeleted();
+            public void onChanged(Event<Object> taskEvent) {
+                if (taskEvent.getContentIfNotHandled() != null) {
+                    TaskDetailActivity.this.onTaskDeleted();
+                }
             }
         });
     }
