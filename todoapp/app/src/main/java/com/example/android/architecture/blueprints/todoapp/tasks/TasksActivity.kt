@@ -15,14 +15,14 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import android.view.MenuItem
+import androidx.lifecycle.Observer
+import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity
@@ -30,6 +30,7 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
 import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
+import com.google.android.material.navigation.NavigationView
 
 
 class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
@@ -52,29 +53,31 @@ class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
         setupViewFragment()
 
         viewModel = obtainViewModel().apply {
-            openTaskEvent.observe(this@TasksActivity, Observer<String> { taskId ->
-                if (taskId != null) {
-                    openTaskDetails(taskId)
+            openTaskEvent.observe(this@TasksActivity, Observer<Event<String>> { event ->
+                event.getContentIfNotHandled()?.let {
+                    openTaskDetails(it)
+
                 }
             })
             // Subscribe to "new task" event
-            newTaskEvent.observe(this@TasksActivity, Observer<Void> {
-                this@TasksActivity.addNewTask()
+            newTaskEvent.observe(this@TasksActivity, Observer<Event<Any>> { event ->
+                event.getContentIfNotHandled()?.let {
+                    this@TasksActivity.addNewTask()
+                }
             })
         }
     }
 
     private fun setupViewFragment() {
-        supportFragmentManager.findFragmentById(R.id.contentFrame) ?:
-                TasksFragment.newInstance().let {
-                    replaceFragmentInActivity(it, R.id.contentFrame)
-                }
+        supportFragmentManager.findFragmentById(R.id.contentFrame)
+            ?: replaceFragmentInActivity(TasksFragment.newInstance(), R.id.contentFrame)
     }
 
     private fun setupNavigationDrawer() {
-        drawerLayout = (findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)).apply {
-            setStatusBarBackground(R.color.colorPrimaryDark)
-        }
+        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout))
+            .apply {
+                setStatusBarBackground(R.color.colorPrimaryDark)
+            }
         setupDrawerContent(findViewById(R.id.nav_view))
     }
 

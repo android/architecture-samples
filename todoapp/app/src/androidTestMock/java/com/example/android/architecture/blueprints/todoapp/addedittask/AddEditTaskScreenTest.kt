@@ -17,7 +17,9 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.content.Intent
 import android.content.res.Resources
-import androidx.test.InstrumentationRegistry
+import android.view.View
+import androidx.appcompat.widget.Toolbar
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.clearText
@@ -30,8 +32,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import androidx.appcompat.widget.Toolbar
-import android.view.View
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -49,7 +49,9 @@ import org.junit.runner.RunWith
 /**
  * Tests for the add task screen.
  */
-@RunWith(AndroidJUnit4::class) @LargeTest class AddEditTaskScreenTest {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class AddEditTaskScreenTest {
 
     val TASK_ID = "1"
 
@@ -123,7 +125,7 @@ import org.junit.runner.RunWith
      * @param taskId is null if used to add a new task, otherwise it edits the task.
      */
     private fun launchNewTaskActivity(taskId: String?) {
-        val intent = Intent(InstrumentationRegistry.getInstrumentation().targetContext,
+        val intent = Intent(ApplicationProvider.getApplicationContext(),
                 AddEditTaskActivity::class.java)
                 .apply { putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId) }
         activityTestRule.launchActivity(intent)
@@ -134,7 +136,7 @@ import org.junit.runner.RunWith
      *
      * @param resourceId the ID of the string resource to match
      */
-    fun withToolbarTitle(resourceId: Int): Matcher<View> =
+    private fun withToolbarTitle(resourceId: Int): Matcher<View> =
             object : BoundedMatcher<View, Toolbar>(Toolbar::class.java) {
 
                 override fun describeTo(description: Description) {

@@ -15,13 +15,11 @@
  */
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.databinding.DataBindingUtil
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
 
@@ -45,6 +43,7 @@ class StatisticsFragment : androidx.fragment.app.Fragment() {
         super.onActivityCreated(savedInstanceState)
         statisticsViewModel = (activity as StatisticsActivity).obtainViewModel()
         viewDataBinding.stats = statisticsViewModel
+        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
     }
 
     override fun onResume() {

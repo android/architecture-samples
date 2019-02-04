@@ -16,16 +16,15 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -55,21 +54,22 @@ class AddEditTaskFragment : androidx.fragment.app.Fragment() {
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             viewmodel = (activity as AddEditTaskActivity).obtainViewModel()
         }
+        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
         setHasOptionsMenu(true)
         retainInstance = false
         return viewDataBinding.root
     }
 
     private fun setupFab() {
-        activity.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
-            setImageResource(R.drawable.ic_done)
-            setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
+        activity?.findViewById<FloatingActionButton>(R.id.fab_edit_task_done)?.let {
+            it.setImageResource(R.drawable.ic_done)
+            it.setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
         }
     }
 
     private fun setupActionBar() {
         (activity as AppCompatActivity).supportActionBar?.setTitle(
-                if (arguments != null && arguments.get(ARGUMENT_EDIT_TASK_ID) != null)
+                if (arguments != null && arguments?.get(ARGUMENT_EDIT_TASK_ID) != null)
                     R.string.edit_task
                 else
                     R.string.add_task
