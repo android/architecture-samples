@@ -13,23 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
+package com.example.android.architecture.blueprints.todoapp.util;
 
+import android.view.View;
 
-object TestUtils {
-    val TEST_OBSERVER: LifecycleOwner = object : LifecycleOwner {
+import com.google.android.material.snackbar.Snackbar;
 
-        private val registry = LifecycleRegistry(this).apply {
-            // Creates a LifecycleRegistry in RESUMED state.
-            handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            handleLifecycleEvent(Lifecycle.Event.ON_START)
-            handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+/**
+ * Provides a method to show a Snackbar.
+ */
+public class SnackbarUtils {
+
+    public static void showSnackbar(View v, String snackbarText) {
+        if (v == null || snackbarText == null) {
+            return;
         }
-
-        override fun getLifecycle() = registry
+        Snackbar.make(v, snackbarText, Snackbar.LENGTH_LONG).show();
     }
 }
