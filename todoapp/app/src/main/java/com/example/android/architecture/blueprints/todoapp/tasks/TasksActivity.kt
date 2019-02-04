@@ -15,13 +15,13 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.navigation.NavigationView
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
@@ -34,7 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 
 class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
 
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: androidx.drawerlayout.widget.DrawerLayout
 
     private lateinit var viewModel: TasksViewModel
 
@@ -72,7 +72,7 @@ class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
     }
 
     private fun setupNavigationDrawer() {
-        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
+        drawerLayout = (findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
         setupDrawerContent(findViewById(R.id.nav_view))

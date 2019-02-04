@@ -19,11 +19,11 @@ package com.example.android.architecture.blueprints.todoapp.util
  * Extension functions for View and subclasses of View.
  */
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
-import android.databinding.BindingAdapter
-import android.support.design.widget.Snackbar
-import android.support.v4.widget.SwipeRefreshLayout
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.databinding.BindingAdapter
+import com.google.android.material.snackbar.Snackbar
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.view.View
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent

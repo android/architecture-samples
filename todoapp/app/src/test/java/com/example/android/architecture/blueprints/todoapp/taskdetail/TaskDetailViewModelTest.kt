@@ -17,7 +17,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import android.content.Context
 import android.content.res.Resources
 import com.example.android.architecture.blueprints.todoapp.R

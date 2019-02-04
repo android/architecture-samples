@@ -16,8 +16,8 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -32,7 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 /**
  * Main UI for the task detail screen.
  */
-class TaskDetailFragment : Fragment() {
+class TaskDetailFragment : androidx.fragment.app.Fragment() {
 
     private lateinit var viewDataBinding: TaskdetailFragBinding
 

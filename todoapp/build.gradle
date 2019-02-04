@@ -2,28 +2,27 @@
 ext {
     // Sdk and tools
     minSdkVersion = 14
-    targetSdkVersion = 26
-    compileSdkVersion = 26
-    buildToolsVersion = '26.0.2'
+    targetSdkVersion = 28
+    compileSdkVersion = 28
 
     // App dependencies
-    supportLibraryVersion = '26.1.0'
+    supportLibraryVersion = '1.0.0-beta01'
     guavaVersion = '22.0-android'
     junitVersion = '4.12'
     mockitoVersion = '2.8.47'
     hamcrestVersion = '1.3'
-    runnerVersion = '1.0.1'
-    rulesVersion = '1.0.1'
-    espressoVersion = '3.0.1'
-    roomVersion = "1.0.0"
+    runnerVersion = '1.1.0-alpha4'
+    rulesVersion = '1.1.0-alpha4'
+    espressoVersion = '3.1.0-alpha4'
+    roomVersion = '2.0.0-beta01'
 
     // Architecture Components dependencies
-    archLifecycleVersion = "1.0.0"
+    archLifecycleVersion = '2.0.0-beta01'
 }
 
 buildscript {
     ext.kotlinVersion = '1.1.51'
-    ext.gradlePluginVersion = '3.0.0'
+    ext.gradlePluginVersion = '1.0.0-beta01'
     repositories {
         jcenter()
         google()
