@@ -87,18 +87,18 @@ class AddEditTaskViewModel(
     internal fun saveTask() {
         val currentTitle = title.value
         val currentDescription = title.value
+
+        if (currentTitle == null || currentDescription == null) {
+            _snackbarText.value =  Event(R.string.empty_task_message)
+            return
+        }
+        if (Task(currentTitle, currentDescription ?: "").isEmpty) {
+            _snackbarText.value =  Event(R.string.empty_task_message)
+            return
+        }
+
         val currentTaskId = taskId
-
-        if (currentTitle == null || currentDescription == null || currentTaskId == null) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
-            return
-        }
-        if (Task(currentTitle ?: "", currentDescription ?: "").isEmpty) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
-            return
-        }
-
-        if (isNewTask || taskId == null) {
+        if (isNewTask || currentTaskId == null) {
             createTask(Task(currentTitle, currentDescription))
         } else {
             val task = Task(currentTitle, currentDescription, currentTaskId)

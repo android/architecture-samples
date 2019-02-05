@@ -176,7 +176,7 @@ class TasksViewModel(
         _openTaskEvent.value = Event(taskId)
     }
 
-    internal fun handleActivityResult(requestCode: Int, resultCode: Int) {
+    fun handleActivityResult(requestCode: Int, resultCode: Int) {
         if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
             when (resultCode) {
                 EDIT_RESULT_OK -> _snackbarText.setValue(

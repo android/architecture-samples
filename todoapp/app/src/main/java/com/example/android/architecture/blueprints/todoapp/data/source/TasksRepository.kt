@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import java.util.ArrayList
 import java.util.LinkedHashMap
 
@@ -58,6 +59,8 @@ class TasksRepository(
             return
         }
 
+        EspressoIdlingResource.increment() // Set app as busy.
+
         if (cacheIsDirty) {
             // If the cache is dirty we need to fetch new data from the network.
             getTasksFromRemoteDataSource(callback)
@@ -66,6 +69,7 @@ class TasksRepository(
             tasksLocalDataSource.getTasks(object : TasksDataSource.LoadTasksCallback {
                 override fun onTasksLoaded(tasks: List<Task>) {
                     refreshCache(tasks)
+                    EspressoIdlingResource.decrement() // Set app as idle.
                     callback.onTasksLoaded(ArrayList(cachedTasks.values))
                 }
 
@@ -140,6 +144,8 @@ class TasksRepository(
             return
         }
 
+        EspressoIdlingResource.increment() // Set app as busy.
+
         // Load from server/persisted if needed.
 
         // Is the task in the local data source? If not, query the network.
@@ -147,6 +153,7 @@ class TasksRepository(
             override fun onTaskLoaded(task: Task) {
                 // Do in memory cache update to keep the app UI up to date
                 cacheAndPerform(task) {
+                    EspressoIdlingResource.decrement() // Set app as idle.
                     callback.onTaskLoaded(it)
                 }
             }
@@ -156,11 +163,13 @@ class TasksRepository(
                     override fun onTaskLoaded(task: Task) {
                         // Do in memory cache update to keep the app UI up to date
                         cacheAndPerform(task) {
+                            EspressoIdlingResource.decrement() // Set app as idle.
                             callback.onTaskLoaded(it)
                         }
                     }
 
                     override fun onDataNotAvailable() {
+                        EspressoIdlingResource.decrement() // Set app as idle.
                         callback.onDataNotAvailable()
                     }
                 })
@@ -189,10 +198,13 @@ class TasksRepository(
             override fun onTasksLoaded(tasks: List<Task>) {
                 refreshCache(tasks)
                 refreshLocalDataSource(tasks)
+
+                EspressoIdlingResource.decrement() // Set app as idle.
                 callback.onTasksLoaded(ArrayList(cachedTasks.values))
             }
 
             override fun onDataNotAvailable() {
+                EspressoIdlingResource.decrement() // Set app as idle.
                 callback.onDataNotAvailable()
             }
         })

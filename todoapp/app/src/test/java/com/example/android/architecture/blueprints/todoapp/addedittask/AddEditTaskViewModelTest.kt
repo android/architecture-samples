@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -64,13 +65,13 @@ class AddEditTaskViewModelTest {
     @Test fun saveNewTaskToRepository_showsSuccessMessageUi() {
         // When the ViewModel is asked to save a task
         with(addEditTaskViewModel) {
-            description.set("Some Task Description")
-            title.set("New Task Title")
+            description.value = "Some Task Description"
+            title.value = "New Task Title"
             saveTask()
         }
 
         // Then a task is saved in the repository and the view updated
-        verify<TasksRepository>(tasksRepository).saveTask(any<Task>())
+        verify(tasksRepository).saveTask(any())
     }
 
     @Test fun populateTask_callsRepoAndUpdatesView() {
@@ -90,7 +91,9 @@ class AddEditTaskViewModelTest {
         getTaskCallbackCaptor.value.onTaskLoaded(testTask)
 
         // Verify the fields were updated
-        assertThat(addEditTaskViewModel.title.get(), `is`(testTask.title))
-        assertThat(addEditTaskViewModel.description.get(), `is`(testTask.description))
+        assertThat(
+            LiveDataTestUtil.getValue(addEditTaskViewModel.title), `is`(testTask.title))
+        assertThat(
+            LiveDataTestUtil.getValue(addEditTaskViewModel.description), `is`(testTask.description))
     }
 }
