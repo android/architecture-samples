@@ -41,7 +41,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.Injection
-import com.example.android.architecture.blueprints.todoapp.R.id
+import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.currentActivity
@@ -63,7 +63,9 @@ import org.junit.runner.RunWith
 /**
  * Tests for the tasks screen, the main screen which contains a list of all tasks.
  */
-@RunWith(AndroidJUnit4::class) @LargeTest class TasksScreenTest {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class TasksScreenTest {
 
     private val TITLE1 = "TITLE1"
     private val TITLE2 = "TITLE2"
@@ -77,12 +79,13 @@ import org.junit.runner.RunWith
      * blocks of Junit tests.
      */
     @Rule @JvmField var tasksActivityTestRule =
-            ActivityTestRule<TasksActivity>(TasksActivity::class.java)
+        ActivityTestRule<TasksActivity>(TasksActivity::class.java)
 
-    @Before fun resetState() {
+    @Before
+    fun resetState() {
         ViewModelFactory.destroyInstance()
         Injection.provideTasksRepository(ApplicationProvider.getApplicationContext())
-                .deleteAllTasks()
+            .deleteAllTasks()
     }
 
     /**
@@ -105,7 +108,7 @@ import org.junit.runner.RunWith
     }
 
     private val toolbarNavigationContentDescription: String
-        get() = tasksActivityTestRule.activity.getToolbarNavigationContentDescription(id.toolbar)
+        get() = tasksActivityTestRule.activity.getToolbarNavigationContentDescription(R.id.toolbar)
 
     /**
      * A custom [Matcher] which matches an item in a [ListView] by its text.
@@ -121,8 +124,8 @@ import org.junit.runner.RunWith
         checkArgument(itemText.isNotEmpty(), "itemText cannot be null or empty")
         return object : TypeSafeMatcher<View>() {
             override fun matchesSafely(item: View) = allOf(
-                    isDescendantOfA(isAssignableFrom(ListView::class.java)),
-                    withText(itemText)
+                isDescendantOfA(isAssignableFrom(ListView::class.java)),
+                withText(itemText)
             ).matches(item)
 
             override fun describeTo(description: Description) {
@@ -131,15 +134,17 @@ import org.junit.runner.RunWith
         }
     }
 
-    @Test fun clickAddTaskButton_opensAddTaskUi() {
+    @Test
+    fun clickAddTaskButton_opensAddTaskUi() {
         // Click on the add task button
-        onView(withId(id.fab_add_task)).perform(click())
+        onView(withId(R.id.fab_add_task)).perform(click())
 
         // Check if the add task screen is displayed
-        onView(withId(id.add_task_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.add_task_title)).check(matches(isDisplayed()))
     }
 
-    @Test fun editTask() {
+    @Test
+    fun editTask() {
         // First add a task
         createTask(TITLE1, DESCRIPTION)
 
@@ -147,19 +152,21 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the edit task button
-        onView(withId(id.fab_edit_task)).perform(click())
+        onView(withId(R.id.fab_edit_task)).perform(click())
 
         val editTaskTitle = TITLE2
         val editTaskDescription = "New Description"
 
         // Edit task title and description
-        onView(withId(id.add_task_title))
-                .perform(replaceText(editTaskTitle), closeSoftKeyboard()) // Type new task title
-        onView(withId(id.add_task_description)).perform(replaceText(editTaskDescription),
-                closeSoftKeyboard()) // Type new task description and close the keyboard
+        onView(withId(R.id.add_task_title))
+            .perform(replaceText(editTaskTitle), closeSoftKeyboard()) // Type new task title
+        onView(withId(R.id.add_task_description)).perform(
+            replaceText(editTaskDescription),
+            closeSoftKeyboard()
+        ) // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(id.fab_edit_task_done)).perform(click())
+        onView(withId(R.id.fab_edit_task_done)).perform(click())
 
         // Verify task is displayed on screen in the task list.
         onView(withItemText(editTaskTitle)).check(matches(isDisplayed()))
@@ -168,14 +175,16 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE1)).check(doesNotExist())
     }
 
-    @Test fun addTaskToTasksList() {
+    @Test
+    fun addTaskToTasksList() {
         createTask(TITLE1, DESCRIPTION)
 
         // Verify task is displayed on screen
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
-    @Test fun markTaskAsComplete() {
+    @Test
+    fun markTaskAsComplete() {
         viewAllTasks()
 
         // Add active task
@@ -193,7 +202,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
-    @Test fun markTaskAsActive() {
+    @Test
+    fun markTaskAsActive() {
         viewAllTasks()
 
         // Add completed task
@@ -212,7 +222,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE1)).check(matches(not(isDisplayed())))
     }
 
-    @Test fun showAllTasks() {
+    @Test
+    fun showAllTasks() {
         // Add 2 active tasks
         createTask(TITLE1, DESCRIPTION)
         createTask(TITLE2, DESCRIPTION)
@@ -223,7 +234,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
     }
 
-    @Test fun showActiveTasks() {
+    @Test
+    fun showActiveTasks() {
         // Add 2 active tasks
         createTask(TITLE1, DESCRIPTION)
         createTask(TITLE2, DESCRIPTION)
@@ -234,7 +246,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
     }
 
-    @Test fun showCompletedTasks() {
+    @Test
+    fun showCompletedTasks() {
         // Add 2 completed tasks
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
@@ -247,7 +260,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
     }
 
-    @Test fun clearCompletedTasks() {
+    @Test
+    fun clearCompletedTasks() {
         viewAllTasks()
 
         // Add 2 complete tasks
@@ -265,7 +279,8 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE2)).check(matches(not(isDisplayed())))
     }
 
-    @Test fun createOneTask_deleteTask() {
+    @Test
+    fun createOneTask_deleteTask() {
         viewAllTasks()
 
         // Add active task
@@ -275,14 +290,15 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click delete task in menu
-        onView(withId(id.menu_delete)).perform(click())
+        onView(withId(R.id.menu_delete)).perform(click())
 
         // Verify it was deleted
         viewAllTasks()
         onView(withText(TITLE1)).check(matches(not(isDisplayed())))
     }
 
-    @Test fun createTwoTasks_deleteOneTask() {
+    @Test
+    fun createTwoTasks_deleteOneTask() {
         // Add 2 active tasks
         createTask(TITLE1, DESCRIPTION)
         createTask(TITLE2, DESCRIPTION)
@@ -291,7 +307,7 @@ import org.junit.runner.RunWith
         onView(withText(TITLE2)).perform(click())
 
         // Click delete task in menu
-        onView(withId(id.menu_delete)).perform(click())
+        onView(withId(R.id.menu_delete)).perform(click())
 
         // Verify only one task was deleted
         viewAllTasks()
@@ -299,7 +315,8 @@ import org.junit.runner.RunWith
         onView(withText(TITLE2)).check(doesNotExist())
     }
 
-    @Test fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
+    @Test
+    fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
         viewAllTasks()
 
         // Add 1 active task
@@ -309,17 +326,18 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
 
         // Check that the task is marked as completed
-        onView(allOf(withId(id.complete),
-                hasSibling(withText(TITLE1)))).check(matches(isChecked()))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
+            .check(matches(isChecked()))
     }
 
-    @Test fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
+    @Test
+    fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
         viewAllTasks()
 
         // Add 1 completed task
@@ -330,17 +348,18 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(id.complete),
-                hasSibling(withText(TITLE1)))).check(matches(not(isChecked())))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
+            .check(matches(not(isChecked())))
     }
 
-    @Test fun markTaskAsAcompleteAndActiveOnDetailScreen_taskIsActiveInList() {
+    @Test
+    fun markTaskAsAcompleteAndActiveOnDetailScreen_taskIsActiveInList() {
         viewAllTasks()
 
         // Add 1 active task
@@ -350,20 +369,21 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click again to restore it to original state
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(id.complete),
-                hasSibling(withText(TITLE1)))).check(matches(not(isChecked())))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
+            .check(matches(not(isChecked())))
     }
 
-    @Test fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
+    @Test
+    fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
         viewAllTasks()
 
         // Add 1 completed task
@@ -374,20 +394,21 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click again to restore it to original state
-        onView(withId(id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(id.complete),
-                hasSibling(withText(TITLE1)))).check(matches(isChecked()))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
+            .check(matches(isChecked()))
     }
 
-    @Test fun orientationChange_FilterActivePersists() {
+    @Test
+    fun orientationChange_FilterActivePersists() {
 
         // Add a completed task
         createTask(TITLE1, DESCRIPTION)
@@ -406,7 +427,8 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).check(doesNotExist())
     }
 
-    @Test fun orientationChange_FilterCompletedPersists() {
+    @Test
+    fun orientationChange_FilterCompletedPersists() {
 
         // Add a completed task
         createTask(TITLE1, DESCRIPTION)
@@ -427,7 +449,9 @@ import org.junit.runner.RunWith
     }
 
     // Blinking cursor after rotation breaks this in API 19
-    @Test @SdkSuppress(minSdkVersion = 21) fun orientationChange_DuringEdit_ChangePersists() {
+    @Test
+    @SdkSuppress(minSdkVersion = 21)
+    fun orientationChange_DuringEdit_ChangePersists() {
         // Add a completed task
         createTask(TITLE1, DESCRIPTION)
 
@@ -435,21 +459,23 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the edit task button
-        onView(withId(id.fab_edit_task)).perform(click())
+        onView(withId(R.id.fab_edit_task)).perform(click())
 
         // Change task title (but don't save)
-        onView(withId(id.add_task_title))
-                .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
+        onView(withId(R.id.add_task_title))
+            .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
 
         // Rotate the screen
         currentActivity.rotateOrientation()
 
         // Verify task title is restored
-        onView(withId(id.add_task_title)).check(matches(withText(TITLE2)))
+        onView(withId(R.id.add_task_title)).check(matches(withText(TITLE2)))
     }
 
     // Blinking cursor after rotation breaks this in API 19
-    @Test @SdkSuppress(minSdkVersion = 21) fun orientationChange_DuringEdit_NoDuplicate() {
+    @Test
+    @SdkSuppress(minSdkVersion = 21)
+    fun orientationChange_DuringEdit_NoDuplicate() {
         // Add a completed task
         createTask(TITLE1, DESCRIPTION)
 
@@ -457,19 +483,21 @@ import org.junit.runner.RunWith
         onView(withText(TITLE1)).perform(click())
 
         // Click on the edit task button
-        onView(withId(id.fab_edit_task)).perform(click())
+        onView(withId(R.id.fab_edit_task)).perform(click())
 
         // Rotate the screen
         currentActivity.rotateOrientation()
 
         // Edit task title and description
-        onView(withId(id.add_task_title))
-                .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
-        onView(withId(id.add_task_description)).perform(replaceText(DESCRIPTION),
-                closeSoftKeyboard()) // Type new task description and close the keyboard
+        onView(withId(R.id.add_task_title))
+            .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
+        onView(withId(R.id.add_task_description)).perform(
+            replaceText(DESCRIPTION),
+            closeSoftKeyboard()
+        ) // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(id.fab_edit_task_done)).perform(click())
+        onView(withId(R.id.fab_edit_task_done)).perform(click())
 
         // Verify task is displayed on screen in the task list.
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
@@ -478,63 +506,70 @@ import org.junit.runner.RunWith
         onView(withItemText(TITLE1)).check(doesNotExist())
     }
 
-    @Test fun noTasks_AllTasksFilter_AddTaskViewVisible() {
+    @Test
+    fun noTasks_AllTasksFilter_AddTaskViewVisible() {
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewAllTasks()
 
         // Add task View should be displayed
-        onView(withId(id.noTasksAdd)).check(matches(isDisplayed()))
+        onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()))
     }
 
-    @Test fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+    @Test
+    fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewCompletedTasks()
 
         // Add task View should be displayed
-        onView(withId(id.noTasksAdd)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
     }
 
-    @Test fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+    @Test
+    fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewActiveTasks()
 
         // Add task View should be displayed
-        onView(withId(id.noTasksAdd)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
     }
 
     private fun viewAllTasks() {
-        onView(withId(id.menu_filter)).perform(click())
+        onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(string.nav_all)).perform(click())
     }
 
     private fun viewActiveTasks() {
-        onView(withId(id.menu_filter)).perform(click())
+        onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(string.nav_active)).perform(click())
     }
 
     private fun viewCompletedTasks() {
-        onView(withId(id.menu_filter)).perform(click())
+        onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(string.nav_completed)).perform(click())
     }
 
     private fun createTask(title: String, description: String) {
         // Click on the add task button
-        onView(withId(id.fab_add_task)).perform(click())
+        onView(withId(R.id.fab_add_task)).perform(click())
 
         // Add task title and description
-        onView(withId(id.add_task_title)).perform(typeText(title),
-                closeSoftKeyboard()) // Type new task title
-        onView(withId(id.add_task_description)).perform(typeText(description),
-                closeSoftKeyboard()) // Type new task description and close the keyboard
+        onView(withId(R.id.add_task_title)).perform(
+            typeText(title),
+            closeSoftKeyboard()
+        ) // Type new task title
+        onView(withId(R.id.add_task_description)).perform(
+            typeText(description),
+            closeSoftKeyboard()
+        ) // Type new task description and close the keyboard
 
         // Save the task
-        onView(withId(id.fab_edit_task_done)).perform(click())
+        onView(withId(R.id.fab_edit_task_done)).perform(click())
     }
 
     private fun clickCheckBoxForTask(title: String) {
-        onView(allOf(withId(id.complete), hasSibling(withText(title)))).perform(click())
+        onView(allOf(withId(R.id.complete), hasSibling(withText(title)))).perform(click())
     }
 
     private fun getText(stringId: Int) =
-            tasksActivityTestRule.activity.resources.getString(stringId)
+        tasksActivityTestRule.activity.resources.getString(stringId)
 }

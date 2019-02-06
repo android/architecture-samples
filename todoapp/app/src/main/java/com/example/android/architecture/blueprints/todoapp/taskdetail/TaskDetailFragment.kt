@@ -23,6 +23,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.fragment.app.Fragment
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
@@ -31,7 +32,7 @@ import com.google.android.material.snackbar.Snackbar
 /**
  * Main UI for the task detail screen.
  */
-class TaskDetailFragment : androidx.fragment.app.Fragment() {
+class TaskDetailFragment : Fragment() {
 
     private lateinit var viewDataBinding: TaskdetailFragBinding
 

@@ -16,9 +16,9 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.AttributeSet
 import android.view.View
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 /**
  * Extends [SwipeRefreshLayout] to support non-direct descendant scrolling views.
@@ -31,7 +31,7 @@ import android.view.View
 class ScrollChildSwipeRefreshLayout @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null
-) : androidx.swiperefreshlayout.widget.SwipeRefreshLayout(context, attrs) {
+) : SwipeRefreshLayout(context, attrs) {
 
     var scrollUpChild: View? = null
 

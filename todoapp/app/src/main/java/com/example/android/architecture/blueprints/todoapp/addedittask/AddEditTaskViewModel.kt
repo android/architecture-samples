@@ -30,11 +30,18 @@ class AddEditTaskViewModel(
     // Two-way databinding, exposing MutableLiveData
     val description = MutableLiveData<String>()
 
-    private val dataLoading = MutableLiveData<Boolean>()
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() =_dataLoading
+
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
+        get() = _snackbarText
 
-    private val _taskUpdated = MutableLiveData<Event<Any>>()
+    private val _taskUpdated = MutableLiveData<Event<Unit>>()
+    val taskUpdatedEvent: LiveData<Event<Unit>>
+        get() = _taskUpdated
 
     private var taskId: String? = null
 
@@ -44,14 +51,8 @@ class AddEditTaskViewModel(
 
     private var taskCompleted = false
 
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
-
-    val taskUpdatedEvent: LiveData<Event<Any>>
-        get() = _taskUpdated
-
     fun start(taskId: String?) {
-        if (dataLoading.value != null && dataLoading.value!!) {
+        if (_dataLoading.value != null && _dataLoading.value!!) {
             // Already loading, ignore.
             return
         }
@@ -66,7 +67,7 @@ class AddEditTaskViewModel(
             return
         }
         isNewTask = false
-        dataLoading.value = true
+        _dataLoading.value = true
 
         tasksRepository.getTask(taskId, this)
     }
@@ -75,12 +76,12 @@ class AddEditTaskViewModel(
         title.value = task.title
         description.value = task.description
         taskCompleted = task.isCompleted
-        dataLoading.value = false
+        _dataLoading.value = false
         isDataLoaded = true
     }
 
     override fun onDataNotAvailable() {
-        dataLoading.value = false
+        _dataLoading.value = false
     }
 
     // Called when clicking on fab.
@@ -107,13 +108,9 @@ class AddEditTaskViewModel(
         }
     }
 
-    fun getDataLoading(): LiveData<Boolean> {
-        return dataLoading
-    }
-
     private fun createTask(newTask: Task) {
         tasksRepository.saveTask(newTask)
-        _taskUpdated.value = Event(Any())
+        _taskUpdated.value = Event(Unit)
     }
 
     private fun updateTask(task: Task) {
@@ -121,6 +118,6 @@ class AddEditTaskViewModel(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         tasksRepository.saveTask(task)
-        _taskUpdated.value = Event(Any())
+        _taskUpdated.value = Event(Unit)
     }
 }

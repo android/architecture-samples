@@ -15,6 +15,8 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.view.Gravity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -27,8 +29,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import androidx.drawerlayout.widget.DrawerLayout
-import android.view.Gravity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo
 import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
@@ -40,7 +40,9 @@ import org.junit.runner.RunWith
  * Tests for the [DrawerLayout] layout component in [TasksActivity] which manages
  * navigation within the app.
  */
-@RunWith(AndroidJUnit4::class) @LargeTest class AppNavigationTest {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class AppNavigationTest {
 
     /**
      * [ActivityTestRule] is a JUnit [@Rule][Rule] to launch your activity under test.
@@ -52,11 +54,12 @@ import org.junit.runner.RunWith
      */
     @get:Rule var activityTestRule = ActivityTestRule(TasksActivity::class.java)
 
-    @Test fun clickOnStatisticsNavigationItem_ShowsStatisticsScreen() {
+    @Test
+    fun clickOnStatisticsNavigationItem_ShowsStatisticsScreen() {
         // Open Drawer to click on navigation.
         onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-                .perform(open()) // Open Drawer
+            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+            .perform(open()) // Open Drawer
 
         // Start statistics screen.
         onView(withId(R.id.nav_view)).perform(navigateTo(R.id.statistics_navigation_menu_item))
@@ -65,40 +68,46 @@ import org.junit.runner.RunWith
         onView(withId(R.id.statistics)).check(matches(isDisplayed()))
     }
 
-    @Test fun clickOnListNavigationItem_ShowsListScreen() {
+    @Test
+    fun clickOnListNavigationItem_ShowsListScreen() {
         // Open Drawer to click on navigation.
         onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-                .perform(open()) // Open Drawer
+            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+            .perform(open()) // Open Drawer
 
         // Start statistics screen.
         onView(withId(R.id.nav_view))
-                .perform(navigateTo(R.id.statistics_navigation_menu_item))
+            .perform(navigateTo(R.id.statistics_navigation_menu_item))
 
         // Open Drawer to click on navigation.
         onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-                .perform(open()) // Open Drawer
+            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+            .perform(open()) // Open Drawer
 
         // Start tasks list screen.
         onView(withId(R.id.nav_view))
-                .perform(navigateTo(R.id.list_navigation_menu_item))
+            .perform(navigateTo(R.id.list_navigation_menu_item))
 
         // Check that Tasks Activity was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }
 
-    @Test fun clickOnAndroidHomeIcon_OpensNavigation() {
+    @Test
+    fun clickOnAndroidHomeIcon_OpensNavigation() {
         // Check that left drawer is closed at startup
         onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 
         // Open Drawer
-        onView(withContentDescription(activityTestRule.activity
-                .getToolbarNavigationContentDescription(R.id.toolbar))).perform(click())
+        onView(
+            withContentDescription(
+                activityTestRule.activity
+                    .getToolbarNavigationContentDescription(R.id.toolbar)
+            )
+        ).perform(click())
 
         // Check if drawer is open
         onView(withId(R.id.drawer_layout))
-                .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+            .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
     }
 }

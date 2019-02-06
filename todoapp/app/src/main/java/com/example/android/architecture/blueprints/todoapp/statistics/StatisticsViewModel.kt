@@ -42,12 +42,25 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
     AndroidViewModel(context) {
 
     private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
 
     private val _error = MutableLiveData<Boolean>()
+    val error: LiveData<Boolean>
+        get() = _error
+    /**
+     * Controls whether the stats are shown or a "No data" message.
+     */
+    val empty: LiveData<Boolean>
+        get() = _empty
 
     private val _numberOfActiveTasks = MutableLiveData<String>()
+    val numberOfActiveTasks: LiveData<String>
+        get() = _numberOfActiveTasks
 
     private val _numberOfCompletedTasks = MutableLiveData<String>()
+    val numberOfCompletedTasks: LiveData<String>
+        get() = _numberOfCompletedTasks
 
     private val _empty = MutableLiveData<Boolean>()
 
@@ -57,25 +70,6 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
 
     private val context: Context
 
-    // LiveData getters
-
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
-
-    val error: LiveData<Boolean>
-        get() = _error
-
-    val numberOfActiveTasks: LiveData<String>
-        get() = _numberOfActiveTasks
-
-    val numberOfCompletedTasks: LiveData<String>
-        get() = _numberOfCompletedTasks
-
-    /**
-     * Controls whether the stats are shown or a "No data" message.
-     */
-    val empty: LiveData<Boolean>
-        get() = _empty
 
     init {
         this.context = context
@@ -95,7 +89,7 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
             }
 
             override fun onDataNotAvailable() {
-                _error.setValue(true)
+                _error.value = true
                 activeTasks = 0
                 completedTasks = 0
                 updateDataBindingObservables()

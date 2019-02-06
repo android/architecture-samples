@@ -17,10 +17,9 @@ package com.example.android.architecture.blueprints.todoapp
 
 import android.annotation.SuppressLint
 import android.app.Application
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.annotation.VisibleForTesting
-
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel
@@ -45,7 +44,7 @@ class ViewModelFactory private constructor(
                     isAssignableFrom(StatisticsViewModel::class.java) ->
                         StatisticsViewModel(application, tasksRepository)
                     isAssignableFrom(TaskDetailViewModel::class.java) ->
-                        TaskDetailViewModel(application, tasksRepository)
+                        TaskDetailViewModel(tasksRepository)
                     isAssignableFrom(AddEditTaskViewModel::class.java) ->
                         AddEditTaskViewModel(application, tasksRepository)
                     isAssignableFrom(TasksViewModel::class.java) ->

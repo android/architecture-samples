@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
@@ -37,7 +38,7 @@ import java.util.ArrayList
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : androidx.fragment.app.Fragment() {
+class TasksFragment : Fragment() {
 
     private lateinit var viewDataBinding: TasksFragBinding
     private lateinit var listAdapter: TasksAdapter

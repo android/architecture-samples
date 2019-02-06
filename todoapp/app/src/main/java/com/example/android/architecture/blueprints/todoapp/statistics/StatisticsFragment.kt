@@ -20,13 +20,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
 
 /**
  * Main UI for the statistics screen.
  */
-class StatisticsFragment : androidx.fragment.app.Fragment() {
+class StatisticsFragment : Fragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 

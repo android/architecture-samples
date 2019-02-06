@@ -1,8 +1,26 @@
+/*
+ * Copyright 2017, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.app.Application
 import android.content.Context
 import android.graphics.drawable.Drawable
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,18 +50,32 @@ class TasksViewModel(
 ) : AndroidViewModel(context) {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
+    val items: LiveData<List<Task>>
+        get() = _items
 
     private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
 
     private val _currentFilteringLabel = MutableLiveData<String>()
+    val currentFilteringLabel: LiveData<String>
+        get() = _currentFilteringLabel
 
     private val _noTasksLabel = MutableLiveData<String>()
+    val noTasksLabel: LiveData<String>
+        get() = _noTasksLabel
 
     private val _noTaskIconRes = MutableLiveData<Drawable>()
+    val noTaskIconRes: LiveData<Drawable>
+        get() = _noTaskIconRes
 
     private val _tasksAddViewVisible = MutableLiveData<Boolean>()
+    val tasksAddViewVisible: LiveData<Boolean>
+        get() = _tasksAddViewVisible
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
+        get() = _snackbarText
 
     private var _currentFiltering = TasksFilterType.ALL_TASKS
 
@@ -51,49 +83,22 @@ class TasksViewModel(
     private val isDataLoadingError = MutableLiveData<Boolean>()
 
     private val _openTaskEvent = MutableLiveData<Event<String>>()
+    val openTaskEvent: LiveData<Event<String>>
+        get() = _openTaskEvent
 
-    private val _newTaskEvent = MutableLiveData<Event<Any>>()
+    private val _newTaskEvent = MutableLiveData<Event<Unit>>()
+    val newTaskEvent: LiveData<Event<Unit>>
+        get() = _newTaskEvent
 
     // To prevent leaks, this must be an Application Context.
     private val context: Context = context.applicationContext
 
     // This LiveData depends on another so we can use a transformation.
-    val empty = Transformations.map(_items) {
+    val empty: LiveData<Boolean> = Transformations.map(_items) {
         it.isEmpty()
     }
 
-    // LiveData getters
-
-    val tasksAddViewVisible: LiveData<Boolean>
-        get() = _tasksAddViewVisible
-
-    val isDataLoading: LiveData<Boolean>
-        get() = _dataLoading
-
-    val currentFilteringLabel: LiveData<String>
-        get() = _currentFilteringLabel
-
-    val noTasksLabel: LiveData<String>
-        get() = _noTasksLabel
-
-    val noTaskIconRes: LiveData<Drawable>
-        get() = _noTaskIconRes
-
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
-
-    val openTaskEvent: LiveData<Event<String>>
-        get() = _openTaskEvent
-
-    val newTaskEvent: LiveData<Event<Any>>
-        get() = _newTaskEvent
-
-    val items: LiveData<List<Task>>
-        get() = _items
-
     init {
-        // Force use of Application Context.
-
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
     }
@@ -119,30 +124,26 @@ class TasksViewModel(
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         when (requestType) {
             TasksFilterType.ALL_TASKS -> {
-                _currentFilteringLabel.value = context.getString(R.string.label_all)
-                _noTasksLabel.value = context.resources.getString(R.string.no_tasks_all)
-                _noTaskIconRes.value = context.resources.getDrawable(
-                    R.drawable.ic_assignment_turned_in_24dp
-                )
-                _tasksAddViewVisible.setValue(true)
+                setFilter(R.string.label_all, R.string.no_tasks_all,
+                    R.drawable.ic_assignment_turned_in_24dp, true)
             }
             TasksFilterType.ACTIVE_TASKS -> {
-                _currentFilteringLabel.value = context.getString(R.string.label_active)
-                _noTasksLabel.value = context.resources.getString(R.string.no_tasks_active)
-                _noTaskIconRes.value = context.resources.getDrawable(
-                    R.drawable.ic_check_circle_24dp
-                )
-                _tasksAddViewVisible.setValue(false)
+                setFilter(R.string.label_active, R.string.no_tasks_active,
+                    R.drawable.ic_check_circle_24dp, false)
             }
             TasksFilterType.COMPLETED_TASKS -> {
-                _currentFilteringLabel.value = context.getString(R.string.label_completed)
-                _noTasksLabel.value = context.resources.getString(R.string.no_tasks_completed)
-                _noTaskIconRes.value = context.resources.getDrawable(
-                    R.drawable.ic_verified_user_24dp
-                )
-                _tasksAddViewVisible.setValue(false)
+                setFilter(R.string.label_completed, R.string.no_tasks_completed,
+                    R.drawable.ic_verified_user_24dp, false)
             }
         }
+    }
+
+    private fun setFilter(@StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
+            @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean) {
+        _currentFilteringLabel.value = context.getString(filteringLabelString)
+        _noTasksLabel.value = context.getString(noTasksLabelString)
+        _noTaskIconRes.value = ContextCompat.getDrawable(context, noTaskIconDrawable)
+        _tasksAddViewVisible.value = tasksAddVisible
     }
 
     fun clearCompletedTasks() {
@@ -166,7 +167,7 @@ class TasksViewModel(
      * Called by the Data Binding library and the FAB's click listener.
      */
     fun addNewTask() {
-        _newTaskEvent.value = Event(Any())
+        _newTaskEvent.value = Event(Unit)
     }
 
     /**

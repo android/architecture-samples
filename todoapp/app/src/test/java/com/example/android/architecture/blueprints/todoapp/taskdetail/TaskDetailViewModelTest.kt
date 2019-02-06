@@ -72,7 +72,7 @@ class TaskDetailViewModelTest {
         task = Task(TITLE_TEST, DESCRIPTION_TEST)
 
         // Get a reference to the class under test
-        taskDetailViewModel = TaskDetailViewModel(context, tasksRepository)
+        taskDetailViewModel = TaskDetailViewModel(tasksRepository)
     }
 
     private fun setupContext() {

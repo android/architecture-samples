@@ -1,11 +1,25 @@
+/*
+ * Copyright 2017, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import android.app.Application
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -16,62 +30,60 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
  */
-open class TaskDetailViewModel(context: Application, private val tasksRepository: TasksRepository) :
-    AndroidViewModel(context), TasksDataSource.GetTaskCallback {
+class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
+    ViewModel(), TasksDataSource.GetTaskCallback {
 
     private val _task = MutableLiveData<Task>()
+    val task: LiveData<Task>
+        get() = _task
 
     private val _isDataAvailable = MutableLiveData<Boolean>()
+    val isDataAvailable: LiveData<Boolean>
+        get() = _isDataAvailable
 
     private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
 
-    val editTaskCommand = MutableLiveData<Event<Any>>()
+    private val _editTaskCommand = MutableLiveData<Event<Unit>>()
+    val editTaskCommand: LiveData<Event<Unit>>
+        get() = _editTaskCommand
 
-    val deleteTaskCommand = MutableLiveData<Event<Any>>()
+    private val _deleteTaskCommand = MutableLiveData<Event<Unit>>()
+    val deleteTaskCommand: LiveData<Event<Unit>>
+        get() = _deleteTaskCommand
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
+        get() = _snackbarText
 
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = Transformations.map(_task) {
             input -> input.isCompleted
     }
 
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
-
-    val task: LiveData<Task>
-        get() = _task
-
-    val isDataAvailable: LiveData<Boolean>
-        get() = _isDataAvailable
-
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
-
-    protected val taskId: String?
-        get() = _task.value!!.id
+    val taskId: String?
+        get() = _task.value?.id
 
     fun deleteTask() {
-        if (_task.value != null) {
-            tasksRepository.deleteTask(_task.value!!.id)
-            deleteTaskCommand.value = Event(Any())
+        taskId?.let {
+            tasksRepository.deleteTask(it)
+            _deleteTaskCommand.value = Event(Unit)
+
         }
     }
 
     fun editTask() {
-        editTaskCommand.value = Event(Any())
+        _editTaskCommand.value = Event(Unit)
     }
 
     fun setCompleted(completed: Boolean) {
-        if (_dataLoading.value!!) {
-            return
-        }
-        val task = this._task.value
+        val task = _task.value ?: return
         if (completed) {
-            tasksRepository.completeTask(task!!)
+            tasksRepository.completeTask(task)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task!!)
+            tasksRepository.activateTask(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -100,9 +112,7 @@ open class TaskDetailViewModel(context: Application, private val tasksRepository
     }
 
     fun onRefresh() {
-        if (_task.value != null) {
-            start(_task.value!!.id)
-        }
+        taskId?.let { start(it) }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {

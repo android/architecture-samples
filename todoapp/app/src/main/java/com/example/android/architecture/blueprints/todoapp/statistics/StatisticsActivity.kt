@@ -17,23 +17,23 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import android.view.MenuItem
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.replaceFragmentInActivity
 import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
+import com.google.android.material.navigation.NavigationView
 
 /**
  * Show statistics for tasks.
  */
 class StatisticsActivity : AppCompatActivity() {
 
-    private lateinit var drawerLayout: androidx.drawerlayout.widget.DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onOptionsItemSelected(item: MenuItem) =
             when (item.itemId) {
@@ -67,7 +67,7 @@ class StatisticsActivity : AppCompatActivity() {
                     }
 
     private fun setupNavigationDrawer() {
-        drawerLayout = (findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)).apply {
+        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
             setStatusBarBackground(R.color.colorPrimaryDark)
         }
         setupDrawerContent(findViewById(R.id.nav_view))

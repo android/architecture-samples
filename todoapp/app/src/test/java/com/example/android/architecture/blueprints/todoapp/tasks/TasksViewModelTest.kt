@@ -107,11 +107,11 @@ class TasksViewModelTest {
         verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
 
         // Then progress indicator is shown
-        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.isDataLoading))
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
         loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
         // Then progress indicator is hidden
-        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.isDataLoading))
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
         // And data loaded
         assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
@@ -130,7 +130,7 @@ class TasksViewModelTest {
         loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
         // Then progress indicator is hidden
-        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.isDataLoading))
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
         // And data loaded
         assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
@@ -149,7 +149,7 @@ class TasksViewModelTest {
         loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
         // Then progress indicator is hidden
-        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.isDataLoading))
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
         // And data loaded
         assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
@@ -234,5 +234,4 @@ class TasksViewModelTest {
         // Then the "Add task" action is visible
         assertTrue(LiveDataTestUtil.getValue(tasksViewModel.tasksAddViewVisible))
     }
-
 }

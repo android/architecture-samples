@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
@@ -29,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-class AddEditTaskFragment : androidx.fragment.app.Fragment() {
+class AddEditTaskFragment : Fragment() {
 
     private lateinit var viewDataBinding: AddtaskFragBinding
 

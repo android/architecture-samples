@@ -35,7 +35,7 @@ import com.google.android.material.navigation.NavigationView
 
 class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
 
-    private lateinit var drawerLayout: androidx.drawerlayout.widget.DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
     private lateinit var viewModel: TasksViewModel
 
@@ -60,7 +60,7 @@ class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
                 }
             })
             // Subscribe to "new task" event
-            newTaskEvent.observe(this@TasksActivity, Observer<Event<Any>> { event ->
+            newTaskEvent.observe(this@TasksActivity, Observer<Event<Unit>> { event ->
                 event.getContentIfNotHandled()?.let {
                     this@TasksActivity.addNewTask()
                 }
