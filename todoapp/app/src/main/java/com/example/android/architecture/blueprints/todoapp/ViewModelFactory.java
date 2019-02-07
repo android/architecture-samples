@@ -40,8 +40,6 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     @SuppressLint("StaticFieldLeak")
     private static volatile ViewModelFactory INSTANCE;
 
-    private final Application mApplication;
-
     private final TasksRepository mTasksRepository;
 
     public static ViewModelFactory getInstance(Application application) {
@@ -49,7 +47,7 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         if (INSTANCE == null) {
             synchronized (ViewModelFactory.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new ViewModelFactory(application,
+                    INSTANCE = new ViewModelFactory(
                             Injection.provideTasksRepository(application.getApplicationContext()));
                 }
             }
@@ -66,8 +64,7 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         INSTANCE = null;
     }
 
-    private ViewModelFactory(Application application, TasksRepository repository) {
-        mApplication = application;
+    private ViewModelFactory(TasksRepository repository) {
         mTasksRepository = repository;
     }
 
