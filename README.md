@@ -76,9 +76,7 @@ Each sample includes a dedicated `README.md` file where you can find related met
 * Whether you need to support multiple platforms
 * Your preference for the compactness of your codebase
 
-For more information on choosing and comparing samples, see the following pages:
-* [Samples at a glance](https://github.com/googlesamples/android-architecture/wiki/Samples-at-a-glance)
-* [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
+For more information on choosing and comparing samples, see the following page: [How to compare samples](https://github.com/googlesamples/android-architecture/wiki/How-to-compare-samples)
 
 ## Open a sample in Android Studio
 
@@ -94,7 +92,7 @@ git clone git@github.com:googlesamples/android-architecture.git
 
 Checkout the todo-mvp sample:
 ```
-git checkout todo-mvp
+git checkout todo-mvp 
 ```
 
 **Note:** To review a different sample, replace `todo-mvp` with the name of sample you want to check out.
@@ -103,38 +101,20 @@ Finally open the `todoapp/` directory in Android Studio.
 
 ## Contributors
 
-This project is **built by the community**, and curated by Google as well as other core maintainers.
+This project is **built by the community**, and curated by Google as well as other core [maintainers](https://github.com/googlesamples/android-architecture/wiki/Contributors).
 
-### External contributors
+# License
 
-[David González](http://github.com/malmstein) - Core developer (MVP Content Providers sample)
+Copyright 2019 Google Inc. All rights reserved.
 
-[Karumi](http://github.com/Karumi) - Developers (MVP Clean Architecture sample)
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-[Natalie Masse](http://github.com/freewheelnat) - Core developer
+    http://www.apache.org/licenses/LICENSE-2.0
 
-[Erik Hellman](https://github.com/ErikHellman) - Developer (MVP RxJava sample)
-
-[Saúl Molinero](https://github.com/saulmm) - Developer (MVP Dagger sample)
-
-[Mike Nakhimovich](https://github.com/digitalbuddha) - Developer (MVP Dagger sample)
-
-[Voicu Klein](https://github.com/kleinsenberg) - Developer (MVP RxJava sample)
-
-### Googlers
-
-[Jose Alcérreca](http://github.com/JoseAlcerreca) - Lead/Core developer
-
-[Mustafa Kurtuldu](https://github.com/mustafa-x) - UX/design
-
-[Stephan Linzner](http://github.com/slinzner) - Core developer
-
-[Florina Muntenescu](https://github.com/florina-muntenescu) - Core developer
-
-[Sharif Salah](https://github.com/sharifsalah) - Technical Writer
-
-[Doug Sigelbaum](https://github.com/DougSig) - Kotlin conversion
-
-[Ben Weiss](https://github.com/keyboardsurfer) - Kotlin conversion
-
-For more information on joining the project, see [how to become a contributor](https://github.com/googlesamples/android-architecture/blob/master/CONTRIBUTING.md) and the [contributor's guide](https://github.com/googlesamples/android-architecture/wiki/Contributions)
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
