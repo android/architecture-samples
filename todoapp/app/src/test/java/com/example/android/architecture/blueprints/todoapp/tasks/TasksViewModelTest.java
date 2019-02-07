@@ -16,17 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import static com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.app.Application;
 import android.content.res.Resources;
 
@@ -52,6 +41,16 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
+import static com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TasksViewModel}
@@ -84,7 +83,7 @@ public class TasksViewModelTest {
         setupContext();
 
         // Get a reference to the class under test
-        mTasksViewModel = new TasksViewModel(mContext, mTasksRepository);
+        mTasksViewModel = new TasksViewModel(mTasksRepository);
 
         // We initialise the tasks to 3, with one active and two completed
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
