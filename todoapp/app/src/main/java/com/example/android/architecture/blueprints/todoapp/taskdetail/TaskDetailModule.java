@@ -15,7 +15,7 @@ import static com.example.android.architecture.blueprints.todoapp.taskdetail.Tas
  * {@link TaskDetailPresenter}.
  */
 @Module
-public abstract class TaskDetailPresenterModule {
+public abstract class TaskDetailModule {
 
 
     @FragmentScoped
