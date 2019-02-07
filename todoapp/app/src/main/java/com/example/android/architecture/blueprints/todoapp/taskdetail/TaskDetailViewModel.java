@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.app.Application;
-
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -28,17 +26,17 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.arch.core.util.Function;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
 
 /**
  * Listens to user actions from the list item in ({@link TasksFragment}) and redirects them to the
  * Fragment's actions listener.
  */
-public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
+public class TaskDetailViewModel extends ViewModel implements TasksDataSource.GetTaskCallback {
 
     private final MutableLiveData<Task> mTask = new MutableLiveData<>();
 
@@ -64,8 +62,7 @@ public class TaskDetailViewModel extends AndroidViewModel implements TasksDataSo
                 }
             });
 
-    public TaskDetailViewModel(Application context, TasksRepository tasksRepository) {
-        super(context);
+    public TaskDetailViewModel(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
     }
 

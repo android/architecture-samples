@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.app.Application;
-
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -26,9 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 
 import androidx.annotation.Nullable;
 import androidx.databinding.ObservableField;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 /**
  * ViewModel for the Add/Edit screen.
@@ -38,7 +36,7 @@ import androidx.lifecycle.MutableLiveData;
  * {@link com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel} for
  * how to deal with more complex scenarios.
  */
-public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataSource.GetTaskCallback {
+public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.GetTaskCallback {
 
     // Two-way databinding, exposing MutableLiveData
     public final MutableLiveData<String> title = new MutableLiveData<>();
@@ -63,9 +61,7 @@ public class AddEditTaskViewModel extends AndroidViewModel implements TasksDataS
 
     private boolean mTaskCompleted = false;
 
-    public AddEditTaskViewModel(Application context,
-                                TasksRepository tasksRepository) {
-        super(context);
+    public AddEditTaskViewModel(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
     }
 
