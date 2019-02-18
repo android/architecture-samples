@@ -17,17 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.app.Application;
 import android.content.res.Resources;
 
@@ -48,6 +37,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the implementation of {@link TaskDetailViewModel}
@@ -72,12 +71,6 @@ public class TaskDetailViewModelTest {
     @Mock
     private Application mContext;
 
-    @Mock
-    private TasksDataSource.GetTaskCallback mRepositoryCallback;
-
-    @Mock
-    private TasksDataSource.GetTaskCallback mViewModelCallback;
-
     @Captor
     private ArgumentCaptor<TasksDataSource.GetTaskCallback> mGetTaskCallbackCaptor;
 
@@ -96,7 +89,7 @@ public class TaskDetailViewModelTest {
         mTask = new Task(TITLE_TEST, DESCRIPTION_TEST);
 
         // Get a reference to the class under test
-        mTaskDetailViewModel = new TaskDetailViewModel(mContext, mTasksRepository);
+        mTaskDetailViewModel = new TaskDetailViewModel(mTasksRepository);
     }
 
     private void setupContext() {
@@ -159,8 +152,6 @@ public class TaskDetailViewModelTest {
     @Test
     public void TaskDetailViewModel_repositoryError() throws InterruptedException {
         // Given an initialized ViewModel with an active task
-        mViewModelCallback = mock(TasksDataSource.GetTaskCallback.class);
-
         mTaskDetailViewModel.start(mTask.getId());
 
         // Use a captor to get a reference for the callback.
@@ -189,8 +180,6 @@ public class TaskDetailViewModelTest {
 
     private void setupViewModelRepositoryCallback() {
         // Given an initialized ViewModel with an active task
-        mViewModelCallback = mock(TasksDataSource.GetTaskCallback.class);
-
         mTaskDetailViewModel.start(mTask.getId());
 
         // Use a captor to get a reference for the callback.

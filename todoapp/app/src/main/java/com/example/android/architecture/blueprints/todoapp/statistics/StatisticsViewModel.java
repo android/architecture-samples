@@ -16,10 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.app.Application;
-import android.content.Context;
-
-import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -29,9 +25,9 @@ import java.util.List;
 import androidx.databinding.Bindable;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -41,15 +37,15 @@ import androidx.lifecycle.MutableLiveData;
  * whereas the {@link Bindable} getters allow us to add some logic to it. This is
  * preferable to having logic in the XML layout.
  */
-public class StatisticsViewModel extends AndroidViewModel {
+public class StatisticsViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> mDataLoading = new MutableLiveData<>();
 
     private final MutableLiveData<Boolean> mError = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mActiveTasks = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mActiveTasks = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mCompletedTasks = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mCompletedTasks = new MutableLiveData<>();
 
     private final MutableLiveData mEmpty = new MutableLiveData();
 
@@ -57,13 +53,9 @@ public class StatisticsViewModel extends AndroidViewModel {
 
     private int mNumberOfCompletedTasks = 0;
 
-    private final Context mContext;
-
     private final TasksRepository mTasksRepository;
 
-    public StatisticsViewModel(Application context, TasksRepository tasksRepository) {
-        super(context);
-        mContext = context;
+    public StatisticsViewModel(TasksRepository tasksRepository) {
         mTasksRepository = tasksRepository;
     }
 
@@ -101,11 +93,11 @@ public class StatisticsViewModel extends AndroidViewModel {
         return mError;
     }
 
-    public LiveData<String> getNumberOfActiveTasks() {
+    public MutableLiveData<Integer> getNumberOfActiveTasks() {
         return mActiveTasks;
     }
 
-    public LiveData<String> getNumberOfCompletedTasks() {
+    public MutableLiveData<Integer> getNumberOfCompletedTasks() {
         return mCompletedTasks;
     }
 
@@ -137,10 +129,8 @@ public class StatisticsViewModel extends AndroidViewModel {
     }
 
     private void updateDataBindingObservables() {
-        mCompletedTasks.setValue(
-                mContext.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks));
-        mActiveTasks.setValue(
-                mContext.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks));
+        mCompletedTasks.setValue(mNumberOfCompletedTasks);
+        mActiveTasks.setValue(mNumberOfActiveTasks);
         mEmpty.setValue(mNumberOfActiveTasks + mNumberOfCompletedTasks == 0);
         mDataLoading.setValue(false);
 

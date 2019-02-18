@@ -16,10 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.app.Application;
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -34,10 +30,10 @@ import java.util.List;
 import androidx.arch.core.util.Function;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
 
 /**
@@ -47,17 +43,17 @@ import androidx.lifecycle.Transformations;
  * property changes. This is done by assigning a {@link Bindable} annotation to the property's
  * getter method.
  */
-public class TasksViewModel extends AndroidViewModel {
+public class TasksViewModel extends ViewModel {
 
     private final MutableLiveData<List<Task>> mItems = new MutableLiveData<>();
 
     private final MutableLiveData<Boolean> mDataLoading = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mCurrentFilteringLabel = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mCurrentFilteringLabel = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mNoTasksLabel = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mNoTasksLabel = new MutableLiveData<>();
 
-    private final MutableLiveData<Drawable> mNoTaskIconRes = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mNoTaskIconRes = new MutableLiveData<>();
 
     private final MutableLiveData<Boolean> mTasksAddViewVisible = new MutableLiveData<>();
 
@@ -74,8 +70,6 @@ public class TasksViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Event<Object>> mNewTaskEvent = new MutableLiveData<>();
 
-    private final Context mContext; // To avoid leaks, this must be an Application Context.
-
     // This LiveData depends on another so we can use a transformation.
     public final LiveData<Boolean> empty = Transformations.map(mItems,
             new Function<List<Task>, Boolean>() {
@@ -86,11 +80,7 @@ public class TasksViewModel extends AndroidViewModel {
                 }
             });
 
-    public TasksViewModel(
-            Application context,
-            TasksRepository repository) {
-        super(context);
-        mContext = context.getApplicationContext(); // Force use of Application Context.
+    public TasksViewModel(TasksRepository repository) {
         mTasksRepository = repository;
 
         // Set initial state
@@ -118,24 +108,21 @@ public class TasksViewModel extends AndroidViewModel {
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         switch (requestType) {
             case ALL_TASKS:
-                mCurrentFilteringLabel.setValue(mContext.getString(R.string.label_all));
-                mNoTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_all));
-                mNoTaskIconRes.setValue(mContext.getResources().getDrawable(
-                        R.drawable.ic_assignment_turned_in_24dp));
+                mCurrentFilteringLabel.setValue(R.string.label_all);
+                mNoTasksLabel.setValue(R.string.no_tasks_all);
+                mNoTaskIconRes.setValue(R.drawable.ic_assignment_turned_in_24dp);
                 mTasksAddViewVisible.setValue(true);
                 break;
             case ACTIVE_TASKS:
-                mCurrentFilteringLabel.setValue(mContext.getString(R.string.label_active));
-                mNoTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_active));
-                mNoTaskIconRes.setValue(mContext.getResources().getDrawable(
-                        R.drawable.ic_check_circle_24dp));
+                mCurrentFilteringLabel.setValue(R.string.label_active);
+                mNoTasksLabel.setValue(R.string.no_tasks_active);
+                mNoTaskIconRes.setValue(R.drawable.ic_check_circle_24dp);
                 mTasksAddViewVisible.setValue(false);
                 break;
             case COMPLETED_TASKS:
-                mCurrentFilteringLabel.setValue(mContext.getString(R.string.label_completed));
-                mNoTasksLabel.setValue(mContext.getResources().getString(R.string.no_tasks_completed));
-                mNoTaskIconRes.setValue(mContext.getResources().getDrawable(
-                        R.drawable.ic_verified_user_24dp));
+                mCurrentFilteringLabel.setValue(R.string.label_completed);
+                mNoTasksLabel.setValue(R.string.no_tasks_completed);
+                mNoTaskIconRes.setValue(R.drawable.ic_verified_user_24dp);
                 mTasksAddViewVisible.setValue(false);
                 break;
         }
@@ -169,15 +156,15 @@ public class TasksViewModel extends AndroidViewModel {
         return mDataLoading;
     }
 
-    public LiveData<String> getCurrentFilteringLabel() {
+    public MutableLiveData<Integer> getCurrentFilteringLabel() {
         return mCurrentFilteringLabel;
     }
 
-    public LiveData<String> getNoTasksLabel() {
+    public MutableLiveData<Integer> getNoTasksLabel() {
         return mNoTasksLabel;
     }
 
-    public LiveData<Drawable> getNoTaskIconRes() {
+    public MutableLiveData<Integer> getNoTaskIconRes() {
         return mNoTaskIconRes;
     }
 

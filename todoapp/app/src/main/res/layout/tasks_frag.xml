@@ -20,6 +20,8 @@
 
         <import type="android.view.View" />
 
+        <import type="androidx.core.content.ContextCompat" />
+
         <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
@@ -57,7 +59,7 @@
                     android:layout_marginRight="@dimen/list_item_padding"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"
-                    android:text="@{viewmodel.currentFilteringLabel}" />
+                    android:text="@{context.getString(viewmodel.currentFilteringLabel)}" />
 
                 <ListView
                     android:id="@+id/tasks_list"
@@ -79,14 +81,14 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
-                    android:src="@{viewmodel.noTaskIconRes}" />
+                    android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}" />
 
                 <TextView
                     android:id="@+id/noTasksMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{viewmodel.noTasksLabel}"
+                    android:text="@{context.getString(viewmodel.noTasksLabel)}"
                     android:layout_marginBottom="@dimen/list_item_padding"/>
 
                 <TextView

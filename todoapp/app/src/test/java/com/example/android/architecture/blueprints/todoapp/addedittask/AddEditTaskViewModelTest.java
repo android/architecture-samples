@@ -17,15 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-import android.app.Application;
-
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -39,6 +30,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the implementation of {@link AddEditTaskViewModel}.
@@ -68,8 +65,7 @@ public class AddEditTaskViewModelTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Application.class), mTasksRepository);
+        mAddEditTaskViewModel = new AddEditTaskViewModel(mTasksRepository);
     }
 
     @Test
@@ -88,8 +84,7 @@ public class AddEditTaskViewModelTest {
         Task testTask = new Task("TITLE", "DESCRIPTION", "1");
 
         // Get a reference to the class under test
-        mAddEditTaskViewModel = new AddEditTaskViewModel(
-                mock(Application.class), mTasksRepository);
+        mAddEditTaskViewModel = new AddEditTaskViewModel(mTasksRepository);
 
 
         // When the ViewModel is asked to populate an existing task
