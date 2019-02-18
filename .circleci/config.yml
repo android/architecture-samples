@@ -72,6 +72,7 @@ jobs:
           sudo gcloud firebase test android run \
             --app todoapp/app/build/outputs/apk/mock/debug/app-mock-debug.apk \
             --test todoapp/app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk \
+            --device-ids=walleye
             --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-blueprints \
             --results-dir=${BUILD_DIR}
     - run:
