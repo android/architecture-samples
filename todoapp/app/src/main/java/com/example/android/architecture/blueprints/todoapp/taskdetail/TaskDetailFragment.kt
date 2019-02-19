@@ -16,8 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -25,9 +23,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.fragment.app.Fragment
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Main UI for the task detail screen.
@@ -45,14 +45,14 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
+        activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
             viewDataBinding.viewmodel?.editTask()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewDataBinding.viewmodel?.start(arguments.getString(ARGUMENT_TASK_ID))
+        viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_TASK_ID))
     }
 
     override fun onCreateView(
@@ -69,17 +69,18 @@ class TaskDetailFragment : Fragment() {
                 }
             }
         }
+        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
         setHasOptionsMenu(true)
         return view
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.menu_delete -> {
                 viewDataBinding.viewmodel?.deleteTask()
-                return true
+                true
             }
-            else -> return false
+            else -> false
         }
     }
 

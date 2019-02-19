@@ -22,12 +22,12 @@ package com.example.android.architecture.blueprints.todoapp
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.support.annotation.IdRes
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitor
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
-import android.support.test.runner.lifecycle.Stage
-import android.support.v7.widget.Toolbar
+import androidx.annotation.IdRes
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitor
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
+import androidx.test.runner.lifecycle.Stage
+import androidx.appcompat.widget.Toolbar
 
 private fun Activity.rotateToLandscape() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE

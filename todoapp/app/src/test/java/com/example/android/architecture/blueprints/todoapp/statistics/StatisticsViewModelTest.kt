@@ -17,7 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -80,7 +81,7 @@ class StatisticsViewModelTest {
         loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
         // Then the results are empty
-        assertThat(statisticsViewModel.empty.get(), `is`(true))
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty), `is`(true))
     }
 
     @Test fun loadNonEmptyTasksFromRepository_NonEmptyResults() {
@@ -92,7 +93,7 @@ class StatisticsViewModelTest {
         loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
         // Then the results are empty
-        assertThat(statisticsViewModel.empty.get(), `is`(false))
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty), `is`(false))
     }
 
 
@@ -105,7 +106,7 @@ class StatisticsViewModelTest {
         loadTasksCallbackCaptor.value.onDataNotAvailable()
 
         // Then an error message is shown
-        assertEquals(statisticsViewModel.empty.get(), true)
-        assertEquals(statisticsViewModel.error.get(), true)
+        assertEquals(LiveDataTestUtil.getValue(statisticsViewModel.empty), true)
+        assertEquals(LiveDataTestUtil.getValue(statisticsViewModel.error), true)
     }
 }

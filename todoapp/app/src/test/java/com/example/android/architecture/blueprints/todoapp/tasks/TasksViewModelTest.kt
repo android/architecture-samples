@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright 2016, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.res.Resources
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string.successfully_deleted_task_message
-import com.example.android.architecture.blueprints.todoapp.TestUtils
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback
@@ -32,11 +32,10 @@ import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.any
 import com.example.android.architecture.blueprints.todoapp.util.capture
-import com.example.android.architecture.blueprints.todoapp.util.mock
 import com.google.common.collect.Lists
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -53,6 +52,7 @@ import org.mockito.MockitoAnnotations
  * Unit tests for the implementation of [TasksViewModel]
  */
 class TasksViewModelTest {
+
     // Executes each task synchronously using Architecture Components.
     @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
     @Mock private lateinit var tasksRepository: TasksRepository
@@ -61,7 +61,8 @@ class TasksViewModelTest {
     private lateinit var tasksViewModel: TasksViewModel
     private lateinit var tasks: List<Task>
 
-    @Before fun setupTasksViewModel() {
+    @Before
+    fun setupTasksViewModel() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this)
@@ -81,8 +82,6 @@ class TasksViewModelTest {
         }
         tasks = Lists.newArrayList(task1, task2, task3)
 
-        tasksViewModel.snackbarMessage.removeObservers(TestUtils.TEST_OBSERVER)
-
     }
 
     private fun setupContext() {
@@ -97,147 +96,142 @@ class TasksViewModelTest {
         `when`(context.resources).thenReturn(mock(Resources::class.java))
     }
 
-    @Test fun loadAllTasksFromRepository_dataLoaded() {
-        with(tasksViewModel) {
-            // Given an initialized TasksViewModel with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.ALL_TASKS
-            loadTasks(true)
+    @Test
+    fun loadAllTasksFromRepository_dataLoaded() {
+        // Given an initialized TasksViewModel with initialized tasks
+        // When loading of Tasks is requested
+        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+        tasksViewModel.loadTasks(true)
 
-            // Callback is captured and invoked with stubbed tasks
-            verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+        // Callback is captured and invoked with stubbed tasks
+        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
 
+        // Then progress indicator is shown
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
+        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
-            // Then progress indicator is shown
-            assertTrue(dataLoading.get())
-            loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
+        // Then progress indicator is hidden
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
-            // Then progress indicator is hidden
-            assertFalse(dataLoading.get())
-
-            // And data loaded
-            assertFalse(items.isEmpty())
-            assertTrue(items.size == 3)
-        }
+        // And data loaded
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.items).size == 3)
     }
 
-    @Test fun loadActiveTasksFromRepositoryAndLoadIntoView() {
-        with(tasksViewModel) {
-            // Given an initialized TasksViewModel with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.ACTIVE_TASKS
-            loadTasks(true)
+    @Test
+    fun loadActiveTasksFromRepositoryAndLoadIntoView() {
+        // Given an initialized TasksViewModel with initialized tasks
+        // When loading of Tasks is requested
+        tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
+        tasksViewModel.loadTasks(true)
 
-            // Callback is captured and invoked with stubbed tasks
-            verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-            loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
+        // Callback is captured and invoked with stubbed tasks
+        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
-            // Then progress indicator is hidden
-            assertFalse(dataLoading.get())
+        // Then progress indicator is hidden
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
-            // And data loaded
-            assertFalse(items.isEmpty())
-            assertTrue(items.size == 1)
-        }
+        // And data loaded
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.items).size == 1)
     }
 
-    @Test fun loadCompletedTasksFromRepositoryAndLoadIntoView() {
-        with(tasksViewModel) {
-            // Given an initialized TasksViewModel with initialized tasks
-            // When loading of Tasks is requested
-            currentFiltering = TasksFilterType.COMPLETED_TASKS
-            loadTasks(true)
+    @Test
+    fun loadCompletedTasksFromRepositoryAndLoadIntoView() {
+        // Given an initialized TasksViewModel with initialized tasks
+        // When loading of Tasks is requested
+        tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
+        tasksViewModel.loadTasks(true)
 
-            // Callback is captured and invoked with stubbed tasks
-            verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
-            loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
+        // Callback is captured and invoked with stubbed tasks
+        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 
-            // Then progress indicator is hidden
-            assertFalse(dataLoading.get())
+        // Then progress indicator is hidden
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
 
-            // And data loaded
-            assertFalse(items.isEmpty())
-            assertTrue(items.size == 2)
-        }
+        // And data loaded
+        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.items).size == 2)
     }
 
-    @Test fun clickOnFab_ShowsAddTaskUi() {
-
-        val observer = mock<Observer<Void>>()
-
-        with(tasksViewModel) {
-            newTaskEvent.observe(TestUtils.TEST_OBSERVER, observer)
-
-            // When adding a new task
-            addNewTask()
-        }
+    @Test
+    @Throws(InterruptedException::class)
+    fun clickOnFab_ShowsAddTaskUi() {
+        // When adding a new task
+        tasksViewModel.addNewTask()
 
         // Then the event is triggered
-        verify<Observer<Void>>(observer).onChanged(null)
+        val value = LiveDataTestUtil.getValue(tasksViewModel.newTaskEvent)
+        assertNotNull(value.getContentIfNotHandled())
     }
 
-    @Test fun clearCompletedTasks_ClearsTasks() {
+    @Test
+    fun clearCompletedTasks_ClearsTasks() {
         // When completed tasks are cleared
         tasksViewModel.clearCompletedTasks()
 
         // Then repository is called and the view is notified
-        verify<TasksRepository>(tasksRepository).clearCompletedTasks()
-        verify<TasksRepository>(tasksRepository).getTasks(any<LoadTasksCallback>())
+        verify(tasksRepository).clearCompletedTasks()
+        verify(tasksRepository).getTasks(any())
     }
 
-    @Test fun handleActivityResult_editOK() {
+    @Test
+    @Throws(InterruptedException::class)
+    fun handleActivityResult_editOK() {
         // When TaskDetailActivity sends a EDIT_RESULT_OK
-        val observer = mock<Observer<Int>>()
+        tasksViewModel.handleActivityResult(
+            AddEditTaskActivity.REQUEST_CODE, EDIT_RESULT_OK
+        )
 
-        with(tasksViewModel) {
-            snackbarMessage.observe(TestUtils.TEST_OBSERVER, observer)
+        // Then the event is triggered
+        val value = LiveDataTestUtil.getValue(tasksViewModel.snackbarMessage)
+        assertEquals(
+            value.getContentIfNotHandled(),
+            R.string.successfully_saved_task_message
+        )
+    }
 
-            handleActivityResult(AddEditTaskActivity.REQUEST_CODE, EDIT_RESULT_OK)
-        }
+    @Test
+    @Throws(InterruptedException::class)
+    fun handleActivityResult_addEditOK() {
+        // When TaskDetailActivity sends an EDIT_RESULT_OK
+        tasksViewModel.handleActivityResult(
+            AddEditTaskActivity.REQUEST_CODE, ADD_EDIT_RESULT_OK
+        )
 
         // Then the snackbar shows the correct message
-        verify<Observer<Int>>(observer).onChanged(R.string.successfully_saved_task_message)
+        val value = LiveDataTestUtil.getValue(tasksViewModel.snackbarMessage)
+        assertEquals(
+            value.getContentIfNotHandled(),
+            R.string.successfully_added_task_message
+        )
     }
 
-    @Test fun handleActivityResult_addEditOK() {
-        // When TaskDetailActivity sends a EDIT_RESULT_OK
-        val observer = mock<Observer<Int>>()
-
-        with(tasksViewModel) {
-            snackbarMessage.observe(TestUtils.TEST_OBSERVER, observer)
-
-            // When AddEditTaskActivity sends a ADD_EDIT_RESULT_OK
-            handleActivityResult(
-                    AddEditTaskActivity.REQUEST_CODE, ADD_EDIT_RESULT_OK)
-        }
+    @Test
+    @Throws(InterruptedException::class)
+    fun handleActivityResult_deleteOk() {
+        // When TaskDetailActivity sends a DELETE_RESULT_OK
+        tasksViewModel.handleActivityResult(
+            AddEditTaskActivity.REQUEST_CODE, DELETE_RESULT_OK
+        )
 
         // Then the snackbar shows the correct message
-        verify<Observer<Int>>(observer).onChanged(R.string.successfully_added_task_message)
+        val value = LiveDataTestUtil.getValue(tasksViewModel.snackbarMessage)
+        assertEquals(
+            value.getContentIfNotHandled(),
+            R.string.successfully_deleted_task_message
+        )
     }
 
-    @Test fun handleActivityResult_deleteOk() {
-        // When TaskDetailActivity sends a EDIT_RESULT_OK
-        val observer = mock<Observer<Int>>()
+    @Test
+    @Throws(InterruptedException::class)
+    fun getTasksAddViewVisible() {
+        // When the filter type is ALL_TASKS
+        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
 
-        with(tasksViewModel) {
-            snackbarMessage.observe(TestUtils.TEST_OBSERVER, observer)
-
-            // When AddEditTaskActivity sends a ADD_EDIT_RESULT_OK
-            handleActivityResult(
-                    AddEditTaskActivity.REQUEST_CODE, DELETE_RESULT_OK)
-        }
-
-        // Then the snackbar shows the correct message
-        verify<Observer<Int>>(observer).onChanged(R.string.successfully_deleted_task_message)
-    }
-
-    @Test fun getTasksAddViewVisible() {
-        with(tasksViewModel) {
-            // When the filter type is ALL_TASKS
-            currentFiltering = TasksFilterType.ALL_TASKS
-
-            // Then the "Add task" action is visible
-            assertThat(tasksAddViewVisible.get(), `is`(true))
-        }
+        // Then the "Add task" action is visible
+        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.tasksAddViewVisible))
     }
 }

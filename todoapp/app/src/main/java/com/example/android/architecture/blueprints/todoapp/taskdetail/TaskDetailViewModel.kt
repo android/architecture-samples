@@ -15,56 +15,70 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.databinding.ObservableBoolean
-import android.databinding.ObservableField
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment
-
 
 /**
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
  */
-class TaskDetailViewModel(
-        context: Application,
-        private val tasksRepository: TasksRepository
-) : AndroidViewModel(context), TasksDataSource.GetTaskCallback {
+class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
+    ViewModel(), TasksDataSource.GetTaskCallback {
 
-    val task = ObservableField<Task>()
-    val completed = ObservableBoolean()
-    val editTaskCommand = SingleLiveEvent<Void>()
-    val deleteTaskCommand = SingleLiveEvent<Void>()
-    val snackbarMessage = SingleLiveEvent<Int>()
-    var isDataLoading = false
-        private set
-    val isDataAvailable
-        get() = task.get() != null
+    private val _task = MutableLiveData<Task>()
+    val task: LiveData<Task>
+        get() = _task
+
+    private val _isDataAvailable = MutableLiveData<Boolean>()
+    val isDataAvailable: LiveData<Boolean>
+        get() = _isDataAvailable
+
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
+
+    private val _editTaskCommand = MutableLiveData<Event<Unit>>()
+    val editTaskCommand: LiveData<Event<Unit>>
+        get() = _editTaskCommand
+
+    private val _deleteTaskCommand = MutableLiveData<Event<Unit>>()
+    val deleteTaskCommand: LiveData<Event<Unit>>
+        get() = _deleteTaskCommand
+
+    private val _snackbarText = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
+        get() = _snackbarText
+
+    // This LiveData depends on another so we can use a transformation.
+    val completed: LiveData<Boolean> = Transformations.map(_task) {
+            input -> input.isCompleted
+    }
+
+    val taskId: String?
+        get() = _task.value?.id
 
     fun deleteTask() {
-        task.get()?.let {
-            tasksRepository.deleteTask(it.id)
-            deleteTaskCommand.call()
+        taskId?.let {
+            tasksRepository.deleteTask(it)
+            _deleteTaskCommand.value = Event(Unit)
+
         }
     }
 
     fun editTask() {
-        editTaskCommand.call()
+        _editTaskCommand.value = Event(Unit)
     }
 
     fun setCompleted(completed: Boolean) {
-        if (isDataLoading) {
-            return
-        }
-        val task = this.task.get().apply {
-            isCompleted = completed
-        }
+        val task = _task.value ?: return
         if (completed) {
             tasksRepository.completeTask(task)
             showSnackbarMessage(R.string.task_marked_complete)
@@ -75,34 +89,33 @@ class TaskDetailViewModel(
     }
 
     fun start(taskId: String?) {
-        taskId?.let {
-            isDataLoading = true
-            tasksRepository.getTask(it, this)
+        if (taskId != null) {
+            _dataLoading.value = true
+            tasksRepository.getTask(taskId, this)
         }
     }
 
-    fun setTask(task: Task) {
-        this.task.set(task)
-        completed.set(task.isCompleted)
+    private fun setTask(task: Task?) {
+        this._task.value = task
+        _isDataAvailable.value = task != null
     }
 
     override fun onTaskLoaded(task: Task) {
         setTask(task)
-        isDataLoading = false
+        _dataLoading.value = false
     }
 
     override fun onDataNotAvailable() {
-        task.set(null)
-        isDataLoading = false
+        _task.value = null
+        _dataLoading.value = false
+        _isDataAvailable.value = false
     }
 
     fun onRefresh() {
-        if (task.get() != null) {
-            start(task.get().id)
-        }
+        taskId?.let { start(it) }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {
-        snackbarMessage.value = message
+        _snackbarText.value = Event(message)
     }
 }

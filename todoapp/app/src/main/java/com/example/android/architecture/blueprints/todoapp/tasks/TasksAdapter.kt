@@ -15,16 +15,14 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.databinding.DataBindingUtil
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
-
+import androidx.databinding.DataBindingUtil
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding
-
 
 class TasksAdapter(
         private var tasks: List<Task>,
@@ -43,15 +41,15 @@ class TasksAdapter(
 
     override fun getView(position: Int, view: View?, viewGroup: ViewGroup): View {
         val binding: TaskItemBinding
-        if (view == null) {
+        binding = if (view == null) {
             // Inflate
             val inflater = LayoutInflater.from(viewGroup.context)
 
             // Create the binding
-            binding = TaskItemBinding.inflate(inflater, viewGroup, false)
+            TaskItemBinding.inflate(inflater, viewGroup, false)
         } else {
             // Recycling view
-            binding = DataBindingUtil.getBinding<TaskItemBinding>(view)
+            DataBindingUtil.getBinding(view) ?: throw IllegalStateException()
         }
 
         val userActionsListener = object : TaskItemUserActionsListener {
@@ -61,7 +59,7 @@ class TasksAdapter(
             }
 
             override fun onTaskClicked(task: Task) {
-                tasksViewModel.openTaskEvent.value = task.id
+                tasksViewModel.openTask(task.id)
             }
         }
 

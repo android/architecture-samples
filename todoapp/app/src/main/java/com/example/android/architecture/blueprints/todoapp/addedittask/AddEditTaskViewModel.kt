@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.databinding.ObservableBoolean
-import android.databinding.ObservableField
-import android.support.annotation.StringRes
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -31,78 +31,102 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  *
  *
  * This ViewModel only exposes [ObservableField]s, so it doesn't need to extend
- * [android.databinding.BaseObservable] and updates are notified automatically. See
+ * [androidx.databinding.BaseObservable] and updates are notified automatically. See
  * [com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel] for
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
-        context: Application,
-        private val tasksRepository: TasksRepository
+    context: Application,
+    private val tasksRepository: TasksRepository
 ) : AndroidViewModel(context), TasksDataSource.GetTaskCallback {
 
-    val title = ObservableField<String>()
-    val description = ObservableField<String>()
-    val dataLoading = ObservableBoolean(false)
-    internal val snackbarMessage = SingleLiveEvent<Int>()
-    internal val taskUpdatedEvent = SingleLiveEvent<Void>()
+    // Two-way databinding, exposing MutableLiveData
+    val title = MutableLiveData<String>()
+
+    // Two-way databinding, exposing MutableLiveData
+    val description = MutableLiveData<String>()
+
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() =_dataLoading
+
+
+    private val _snackbarText = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
+        get() = _snackbarText
+
+    private val _taskUpdated = MutableLiveData<Event<Unit>>()
+    val taskUpdatedEvent: LiveData<Event<Unit>>
+        get() = _taskUpdated
+
     private var taskId: String? = null
-    private val isNewTask
-        get() = taskId == null
+
+    private var isNewTask: Boolean = false
+
     private var isDataLoaded = false
+
     private var taskCompleted = false
 
     fun start(taskId: String?) {
-        if (dataLoading.get()) {
+        _dataLoading.value?.let { isLoading ->
             // Already loading, ignore.
-            return
+            if (isLoading) return
         }
         this.taskId = taskId
-        if (isNewTask || isDataLoaded) {
-            // No need to populate, it's a new task or it already has data
+        if (taskId == null) {
+            // No need to populate, it's a new task
+            isNewTask = true
             return
         }
-        dataLoading.set(true)
-        taskId?.let {
-            tasksRepository.getTask(it, this)
+        if (isDataLoaded) {
+            // No need to populate, already have data.
+            return
         }
+        isNewTask = false
+        _dataLoading.value = true
+
+        tasksRepository.getTask(taskId, this)
     }
 
     override fun onTaskLoaded(task: Task) {
-        title.set(task.title)
-        description.set(task.description)
+        title.value = task.title
+        description.value = task.description
         taskCompleted = task.isCompleted
-        dataLoading.set(false)
+        _dataLoading.value = false
         isDataLoaded = true
-
-        // Note that there's no need to notify that the values changed because we're using
-        // ObservableFields.
     }
 
     override fun onDataNotAvailable() {
-        dataLoading.set(false)
+        _dataLoading.value = false
     }
 
     // Called when clicking on fab.
-    fun saveTask() {
-        val task = Task(title.get(), description.get())
-        if (task.isEmpty) {
-            showSnackbarMessage(R.string.empty_task_message)
+    internal fun saveTask() {
+        val currentTitle = title.value
+        val currentDescription = title.value
+
+        if (currentTitle == null || currentDescription == null) {
+            _snackbarText.value =  Event(R.string.empty_task_message)
             return
         }
-        if (isNewTask) {
-            createTask(task)
+        if (Task(currentTitle, currentDescription ?: "").isEmpty) {
+            _snackbarText.value =  Event(R.string.empty_task_message)
+            return
+        }
+
+        val currentTaskId = taskId
+        if (isNewTask || currentTaskId == null) {
+            createTask(Task(currentTitle, currentDescription))
         } else {
-            taskId?.let {
-                updateTask(Task(title.get(), description.get(), it)
-                        .apply { isCompleted = taskCompleted })
-            }
+            val task = Task(currentTitle, currentDescription, currentTaskId)
+                .apply { isCompleted = taskCompleted }
+            updateTask(task)
         }
     }
 
-
     private fun createTask(newTask: Task) {
         tasksRepository.saveTask(newTask)
-        taskUpdatedEvent.call()
+        _taskUpdated.value = Event(Unit)
     }
 
     private fun updateTask(task: Task) {
@@ -110,10 +134,6 @@ class AddEditTaskViewModel(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         tasksRepository.saveTask(task)
-        taskUpdatedEvent.call()
-    }
-
-    private fun showSnackbarMessage(@StringRes message: Int) {
-        snackbarMessage.value = message
+        _taskUpdated.value = Event(Unit)
     }
 }

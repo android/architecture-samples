@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.tasks
-
-import androidx.databinding.BindingAdapter
-import android.widget.ListView
-
-import com.example.android.architecture.blueprints.todoapp.data.Task
+package com.example.android.architecture.blueprints.todoapp
 
 /**
- * Contains [BindingAdapter]s for the [Task] list.
+ * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */
-object TasksListBindings {
+open class Event<out T>(private val content: T) {
 
-    @BindingAdapter("app:items")
-    @JvmStatic fun setItems(listView: ListView, items: List<Task>) {
-        with(listView.adapter as TasksAdapter) {
-            replaceData(items)
+    var hasBeenHandled = false
+        private set // Allow external read but not write
+
+    /**
+     * Returns the content and prevents its use again.
+     */
+    fun getContentIfNotHandled(): T? {
+        return if (hasBeenHandled) {
+            null
+        } else {
+            hasBeenHandled = true
+            content
         }
     }
+
+    /**
+     * Returns the content, even if it's already been handled.
+     */
+    fun peekContent(): T = content
 }

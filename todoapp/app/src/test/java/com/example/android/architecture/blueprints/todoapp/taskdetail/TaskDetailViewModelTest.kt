@@ -17,9 +17,10 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.content.Context
 import android.content.res.Resources
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -71,7 +72,7 @@ class TaskDetailViewModelTest {
         task = Task(TITLE_TEST, DESCRIPTION_TEST)
 
         // Get a reference to the class under test
-        taskDetailViewModel = TaskDetailViewModel(context, tasksRepository)
+        taskDetailViewModel = TaskDetailViewModel(tasksRepository)
     }
 
     private fun setupContext() {
@@ -85,8 +86,10 @@ class TaskDetailViewModelTest {
         setupViewModelRepositoryCallback()
 
         // Then verify that the view was notified
-        assertEquals(taskDetailViewModel.task.get().title, task.title)
-        assertEquals(taskDetailViewModel.task.get().description, task.description)
+        assertEquals(
+            LiveDataTestUtil.getValue(taskDetailViewModel.task).title, task.title)
+        assertEquals(
+            LiveDataTestUtil.getValue(taskDetailViewModel.task).description, task.description)
     }
 
     @Test fun deleteTask() {
@@ -107,8 +110,8 @@ class TaskDetailViewModelTest {
 
         // Then a request is sent to the task repository and the UI is updated
         verify<TasksRepository>(tasksRepository).completeTask(task)
-        assertThat<Int>(taskDetailViewModel.snackbarMessage.value,
-                `is`(R.string.task_marked_complete))
+        assertEquals(LiveDataTestUtil.getValue(taskDetailViewModel.snackbarMessage).peekContent(),
+                R.string.task_marked_complete)
     }
 
     @Test fun activateTask() {
@@ -119,8 +122,8 @@ class TaskDetailViewModelTest {
 
         // Then a request is sent to the task repository and the UI is updated
         verify<TasksRepository>(tasksRepository).activateTask(task)
-        assertThat<Int>(taskDetailViewModel.snackbarMessage.value,
-                `is`(R.string.task_marked_active))
+        assertEquals(LiveDataTestUtil.getValue(taskDetailViewModel.snackbarMessage).peekContent(),
+                R.string.task_marked_active)
     }
 
     @Test fun TaskDetailViewModel_repositoryError() {
@@ -130,13 +133,14 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.start(task.id)
 
         // Use a captor to get a reference for the callback.
-        verify<TasksRepository>(tasksRepository).getTask(eq(task.id), capture(getTaskCallbackCaptor))
+        verify<TasksRepository>(tasksRepository).getTask(eq(task.id),
+            capture(getTaskCallbackCaptor))
 
         // When the repository returns an error
         getTaskCallbackCaptor.value.onDataNotAvailable() // Trigger callback error
 
         // Then verify that data is not available
-        assertFalse(taskDetailViewModel.isDataAvailable)
+        assertFalse(LiveDataTestUtil.getValue(taskDetailViewModel.isDataAvailable))
     }
 
     private fun setupViewModelRepositoryCallback() {
@@ -153,9 +157,9 @@ class TaskDetailViewModelTest {
 
     @Test fun updateSnackbar_nullValue() {
         // Before setting the Snackbar text, get its current value
-        val snackbarText = taskDetailViewModel.snackbarMessage
+        val snackbarText = LiveDataTestUtil.getValue(taskDetailViewModel.snackbarMessage)
 
         // Check that the value is null
-        assertThat<Int>("Snackbar text does not match", snackbarText.value, `is`(nullValue()))
+        assertThat("Snackbar text does not match", snackbarText, `is`(nullValue()))
     }
 }

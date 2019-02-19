@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) 2017 The Android Open Source Project
+  ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,50 +24,50 @@
             type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
     </data>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/loading"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:visibility="@{stats.dataLoading ? View.VISIBLE : View.GONE}" />
-
     <LinearLayout
-        android:id="@+id/statistics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="@{stats.dataLoading ? View.GONE : View.VISIBLE}">
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/statistics_no_tasks"
+            android:layout_height="match_parent"
+            android:text="@string/loading"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{stats.dataLoading ? View.VISIBLE : View.GONE}" />
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/statistics"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{stats.numberOfActiveTasksString}"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="@{stats.dataLoading ? View.GONE : View.VISIBLE}">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{stats.numberOfCompletedTasksString}"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/statistics_no_tasks"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{stats.numberOfActiveTasks}"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{stats.numberOfCompletedTasks}"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
 </layout>

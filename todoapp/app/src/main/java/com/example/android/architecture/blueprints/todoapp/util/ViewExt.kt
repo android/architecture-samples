@@ -19,15 +19,16 @@ package com.example.android.architecture.blueprints.todoapp.util
  * Extension functions for View and subclasses of View.
  */
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
-import android.databinding.BindingAdapter
-import android.support.design.widget.Snackbar
-import android.support.v4.widget.SwipeRefreshLayout
 import android.view.View
+import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Transforms static java function Snackbar.make() to an extension function on View.
@@ -39,10 +40,16 @@ fun View.showSnackbar(snackbarText: String, timeLength: Int) {
 /**
  * Triggers a snackbar message when the value contained by snackbarTaskMessageLiveEvent is modified.
  */
-fun View.setupSnackbar(lifecycleOwner: LifecycleOwner,
-        snackbarMessageLiveEvent: SingleLiveEvent<Int>, timeLength: Int) {
-    snackbarMessageLiveEvent.observe(lifecycleOwner, Observer {
-        it?.let { showSnackbar(context.getString(it), timeLength) }
+fun View.setupSnackbar(
+    lifecycleOwner: LifecycleOwner,
+    snackbarEvent: LiveData<Event<Int>>,
+    timeLength: Int
+) {
+
+    snackbarEvent.observe(lifecycleOwner, Observer { event ->
+        event.getContentIfNotHandled()?.let {
+            showSnackbar(context.getString(it), timeLength)
+        }
     })
 }
 

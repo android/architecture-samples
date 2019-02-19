@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright 2016, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.databinding.Bindable
-import android.databinding.ObservableBoolean
-import android.databinding.ObservableField
+import android.content.Context
+import androidx.databinding.Bindable
+import androidx.databinding.ObservableBoolean
+import androidx.databinding.ObservableField
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -34,38 +38,60 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * whereas the [Bindable] getters allow us to add some logic to it. This is
  * preferable to having logic in the XML layout.
  */
-class StatisticsViewModel(
-        private val context: Application,
-        private val tasksRepository: TasksRepository
-) : AndroidViewModel(context) {
+class StatisticsViewModel(context: Application, private val tasksRepository: TasksRepository) :
+    AndroidViewModel(context) {
 
-    val dataLoading = ObservableBoolean(false)
-    val error = ObservableBoolean(false)
-    val numberOfActiveTasksString = ObservableField<String>()
-    val numberOfCompletedTasksString = ObservableField<String>()
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
+
+    private val _error = MutableLiveData<Boolean>()
+    val error: LiveData<Boolean>
+        get() = _error
     /**
      * Controls whether the stats are shown or a "No data" message.
      */
-    val empty = ObservableBoolean()
-    private var numberOfActiveTasks = 0
-    private var numberOfCompletedTasks = 0
+    val empty: LiveData<Boolean>
+        get() = _empty
+
+    private val _numberOfActiveTasks = MutableLiveData<String>()
+    val numberOfActiveTasks: LiveData<String>
+        get() = _numberOfActiveTasks
+
+    private val _numberOfCompletedTasks = MutableLiveData<String>()
+    val numberOfCompletedTasks: LiveData<String>
+        get() = _numberOfCompletedTasks
+
+    private val _empty = MutableLiveData<Boolean>()
+
+    private var activeTasks = 0
+
+    private var completedTasks = 0
+
+    private val context: Context
+
+
+    init {
+        this.context = context
+    }
 
     fun start() {
         loadStatistics()
     }
 
     fun loadStatistics() {
-        dataLoading.set(true)
+        _dataLoading.value = true
+
         tasksRepository.getTasks(object : TasksDataSource.LoadTasksCallback {
             override fun onTasksLoaded(tasks: List<Task>) {
-                error.set(false)
+                _error.value = false
                 computeStats(tasks)
             }
 
             override fun onDataNotAvailable() {
-                error.set(true)
-                numberOfActiveTasks = 0
-                numberOfCompletedTasks = 0
+                _error.value = true
+                activeTasks = 0
+                completedTasks = 0
                 updateDataBindingObservables()
             }
         })
@@ -75,17 +101,30 @@ class StatisticsViewModel(
      * Called when new data is ready.
      */
     private fun computeStats(tasks: List<Task>) {
-        numberOfCompletedTasks = tasks.count { it.isCompleted }
-        numberOfActiveTasks = tasks.size - numberOfCompletedTasks
+        var completed = 0
+        var active = 0
+
+        for (task in tasks) {
+            if (task.isCompleted) {
+                completed += 1
+            } else {
+                active += 1
+            }
+        }
+        activeTasks = active
+        completedTasks = completed
+
         updateDataBindingObservables()
     }
 
     private fun updateDataBindingObservables() {
-        numberOfCompletedTasksString.set(
-                context.getString(R.string.statistics_completed_tasks, numberOfCompletedTasks))
-        numberOfActiveTasksString.set(
-                context.getString(R.string.statistics_active_tasks, numberOfActiveTasks))
-        empty.set(numberOfActiveTasks + numberOfCompletedTasks == 0)
-        dataLoading.set(false)
+        _numberOfCompletedTasks.value =
+            context.getString(R.string.statistics_completed_tasks, completedTasks)
+
+        _numberOfActiveTasks.value =
+            context.getString(R.string.statistics_active_tasks, activeTasks)
+
+        _empty.value = activeTasks + completedTasks == 0
+        _dataLoading.value = false
     }
 }
