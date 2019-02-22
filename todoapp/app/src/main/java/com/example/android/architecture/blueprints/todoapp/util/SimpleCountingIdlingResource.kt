@@ -15,7 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.util
 
-import android.support.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
