@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 
-import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -33,7 +32,6 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 
@@ -56,7 +54,7 @@ class StatisticsViewModelTest {
         MockitoAnnotations.initMocks(this)
 
         // Get a reference to the class under test
-        statisticsViewModel = StatisticsViewModel(mock(Application::class.java), tasksRepository)
+        statisticsViewModel = StatisticsViewModel(tasksRepository)
 
         // We initialise the tasks to 3, with one active and two completed
         val task1 = Task("Title1", "Description1")

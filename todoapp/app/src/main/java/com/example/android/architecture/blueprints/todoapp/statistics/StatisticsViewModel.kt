@@ -16,15 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import android.app.Application
-import android.content.Context
-import androidx.databinding.Bindable
-import androidx.databinding.ObservableBoolean
-import androidx.databinding.ObservableField
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.android.architecture.blueprints.todoapp.R
+import androidx.lifecycle.ViewModel
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -38,8 +32,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * whereas the [Bindable] getters allow us to add some logic to it. This is
  * preferable to having logic in the XML layout.
  */
-class StatisticsViewModel(context: Application, private val tasksRepository: TasksRepository) :
-    AndroidViewModel(context) {
+class StatisticsViewModel(
+    private val tasksRepository: TasksRepository
+) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean>
@@ -54,12 +49,12 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
     val empty: LiveData<Boolean>
         get() = _empty
 
-    private val _numberOfActiveTasks = MutableLiveData<String>()
-    val numberOfActiveTasks: LiveData<String>
+    private val _numberOfActiveTasks = MutableLiveData<Int>()
+    val numberOfActiveTasks: LiveData<Int>
         get() = _numberOfActiveTasks
 
-    private val _numberOfCompletedTasks = MutableLiveData<String>()
-    val numberOfCompletedTasks: LiveData<String>
+    private val _numberOfCompletedTasks = MutableLiveData<Int>()
+    val numberOfCompletedTasks: LiveData<Int>
         get() = _numberOfCompletedTasks
 
     private val _empty = MutableLiveData<Boolean>()
@@ -67,13 +62,6 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
     private var activeTasks = 0
 
     private var completedTasks = 0
-
-    private val context: Context
-
-
-    init {
-        this.context = context
-    }
 
     fun start() {
         loadStatistics()
@@ -118,11 +106,9 @@ class StatisticsViewModel(context: Application, private val tasksRepository: Tas
     }
 
     private fun updateDataBindingObservables() {
-        _numberOfCompletedTasks.value =
-            context.getString(R.string.statistics_completed_tasks, completedTasks)
+        _numberOfCompletedTasks.value = completedTasks
 
-        _numberOfActiveTasks.value =
-            context.getString(R.string.statistics_active_tasks, activeTasks)
+        _numberOfActiveTasks.value = activeTasks
 
         _empty.value = activeTasks + completedTasks == 0
         _dataLoading.value = false

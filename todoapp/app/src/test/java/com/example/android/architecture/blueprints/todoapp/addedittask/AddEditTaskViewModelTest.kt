@@ -59,7 +59,7 @@ class AddEditTaskViewModelTest {
         MockitoAnnotations.initMocks(this)
 
         // Get a reference to the class under test
-        addEditTaskViewModel = AddEditTaskViewModel(mock<Application>(), tasksRepository)
+        addEditTaskViewModel = AddEditTaskViewModel(tasksRepository)
     }
 
     @Test fun saveNewTaskToRepository_showsSuccessMessageUi() {
@@ -78,7 +78,7 @@ class AddEditTaskViewModelTest {
         val testTask = Task("TITLE", "DESCRIPTION", "1")
 
         // Get a reference to the class under test
-        addEditTaskViewModel = AddEditTaskViewModel(mock<Application>(), tasksRepository).apply {
+        addEditTaskViewModel = AddEditTaskViewModel(tasksRepository).apply {
             // When the ViewModel is asked to populate an existing task
             start(testTask.id)
         }

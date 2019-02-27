@@ -70,7 +70,7 @@ class TasksViewModelTest {
         setupContext()
 
         // Get a reference to the class under test
-        tasksViewModel = TasksViewModel(context, tasksRepository)
+        tasksViewModel = TasksViewModel(tasksRepository)
 
         // We initialise the tasks to 3, with one active and two completed
         val task1 = Task("Title1", "Description1")
