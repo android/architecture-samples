@@ -34,7 +34,19 @@ import com.google.android.material.snackbar.Snackbar
  * Transforms static java function Snackbar.make() to an extension function on View.
  */
 fun View.showSnackbar(snackbarText: String, timeLength: Int) {
-    Snackbar.make(this, snackbarText, timeLength).show()
+    Snackbar.make(this, snackbarText, timeLength).run {
+        addCallback(object: Snackbar.Callback() {
+            override fun onShown(sb: Snackbar?) {
+                EspressoIdlingResource.increment()
+
+            }
+
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                EspressoIdlingResource.decrement()
+            }
+        })
+        show()
+    }
 }
 
 /**
