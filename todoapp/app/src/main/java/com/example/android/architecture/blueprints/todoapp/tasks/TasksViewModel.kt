@@ -15,16 +15,12 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.app.Application
-import android.content.Context
-import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
@@ -45,9 +41,8 @@ import java.util.ArrayList
  * getter method.
  */
 class TasksViewModel(
-    context: Application,
     private val tasksRepository: TasksRepository
-) : AndroidViewModel(context) {
+) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>>
@@ -57,16 +52,16 @@ class TasksViewModel(
     val dataLoading: LiveData<Boolean>
         get() = _dataLoading
 
-    private val _currentFilteringLabel = MutableLiveData<String>()
-    val currentFilteringLabel: LiveData<String>
+    private val _currentFilteringLabel = MutableLiveData<Int>()
+    val currentFilteringLabel: LiveData<Int>
         get() = _currentFilteringLabel
 
-    private val _noTasksLabel = MutableLiveData<String>()
-    val noTasksLabel: LiveData<String>
+    private val _noTasksLabel = MutableLiveData<Int>()
+    val noTasksLabel: LiveData<Int>
         get() = _noTasksLabel
 
-    private val _noTaskIconRes = MutableLiveData<Drawable>()
-    val noTaskIconRes: LiveData<Drawable>
+    private val _noTaskIconRes = MutableLiveData<Int>()
+    val noTaskIconRes: LiveData<Int>
         get() = _noTaskIconRes
 
     private val _tasksAddViewVisible = MutableLiveData<Boolean>()
@@ -89,9 +84,6 @@ class TasksViewModel(
     private val _newTaskEvent = MutableLiveData<Event<Unit>>()
     val newTaskEvent: LiveData<Event<Unit>>
         get() = _newTaskEvent
-
-    // To prevent leaks, this must be an Application Context.
-    private val context: Context = context.applicationContext
 
     // This LiveData depends on another so we can use a transformation.
     val empty: LiveData<Boolean> = Transformations.map(_items) {
@@ -140,9 +132,9 @@ class TasksViewModel(
 
     private fun setFilter(@StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
             @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean) {
-        _currentFilteringLabel.value = context.getString(filteringLabelString)
-        _noTasksLabel.value = context.getString(noTasksLabelString)
-        _noTaskIconRes.value = ContextCompat.getDrawable(context, noTaskIconDrawable)
+        _currentFilteringLabel.value = filteringLabelString
+        _noTasksLabel.value = noTasksLabelString
+        _noTaskIconRes.value = noTaskIconDrawable
         _tasksAddViewVisible.value = tasksAddVisible
     }
 

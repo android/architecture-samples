@@ -16,10 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -36,9 +35,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
-    context: Application,
     private val tasksRepository: TasksRepository
-) : AndroidViewModel(context), TasksDataSource.GetTaskCallback {
+) : ViewModel(), TasksDataSource.GetTaskCallback {
 
     // Two-way databinding, exposing MutableLiveData
     val title = MutableLiveData<String>()

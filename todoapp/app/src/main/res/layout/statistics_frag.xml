@@ -57,14 +57,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{stats.numberOfActiveTasks}"
+                android:text="@{@string/statistics_active_tasks(stats.numberOfActiveTasks)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{stats.numberOfCompletedTasks}"
+                android:text="@{@string/statistics_completed_tasks(stats.numberOfCompletedTasks)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
 

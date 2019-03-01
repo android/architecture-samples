@@ -34,7 +34,6 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  * actually necessary in this case, as the product ID can be passed in a public method.
  */
 class ViewModelFactory private constructor(
-        private val application: Application,
         private val tasksRepository: TasksRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -42,13 +41,13 @@ class ViewModelFactory private constructor(
             with(modelClass) {
                 when {
                     isAssignableFrom(StatisticsViewModel::class.java) ->
-                        StatisticsViewModel(application, tasksRepository)
+                        StatisticsViewModel(tasksRepository)
                     isAssignableFrom(TaskDetailViewModel::class.java) ->
                         TaskDetailViewModel(tasksRepository)
                     isAssignableFrom(AddEditTaskViewModel::class.java) ->
-                        AddEditTaskViewModel(application, tasksRepository)
+                        AddEditTaskViewModel(tasksRepository)
                     isAssignableFrom(TasksViewModel::class.java) ->
-                        TasksViewModel(application, tasksRepository)
+                        TasksViewModel(tasksRepository)
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
@@ -61,7 +60,7 @@ class ViewModelFactory private constructor(
 
         fun getInstance(application: Application) =
                 INSTANCE ?: synchronized(ViewModelFactory::class.java) {
-                    INSTANCE ?: ViewModelFactory(application,
+                    INSTANCE ?: ViewModelFactory(
                             Injection.provideTasksRepository(application.applicationContext))
                             .also { INSTANCE = it }
                 }
