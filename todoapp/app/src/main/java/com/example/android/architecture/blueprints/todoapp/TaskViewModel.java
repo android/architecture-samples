@@ -116,10 +116,12 @@ public abstract class TaskViewModel extends BaseObservable
     // This could be an observable, but we save a call to Task.getTitleForList() if not needed.
     @Bindable
     public String getTitleForList() {
-        if (mTaskObservable.get() == null) {
+        Task task = mTaskObservable.get();
+
+        if (task == null)
             return "No data";
-        }
-        return mTaskObservable.get().getTitleForList();
+
+        return task.getTitleForList();
     }
 
     @Override
