@@ -51,6 +51,7 @@ class AddEditTaskViewModelTest {
      */
     @Captor private lateinit var getTaskCallbackCaptor:
             ArgumentCaptor<TasksDataSource.GetTaskCallback>
+    @Captor private lateinit var saveTaskTaskCaptor: ArgumentCaptor<Task>
     private lateinit var addEditTaskViewModel: AddEditTaskViewModel
 
     @Before fun setupAddEditTaskViewModel() {
@@ -71,7 +72,9 @@ class AddEditTaskViewModelTest {
         }
 
         // Then a task is saved in the repository and the view updated
-        verify(tasksRepository).saveTask(any())
+        verify(tasksRepository).saveTask(capture(saveTaskTaskCaptor))
+        assertThat(saveTaskTaskCaptor.value.title, `is`("New Task Title"))
+        assertThat(saveTaskTaskCaptor.value.description, `is`("Some Task Description"))
     }
 
     @Test fun populateTask_callsRepoAndUpdatesView() {
