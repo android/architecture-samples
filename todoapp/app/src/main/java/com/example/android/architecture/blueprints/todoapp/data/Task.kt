@@ -30,8 +30,8 @@ import java.util.UUID
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
-        @ColumnInfo(name = "title") var title: String = "",
-        @ColumnInfo(name = "description") var description: String = "",
+        @ColumnInfo(name = "title") var title: String? = null,
+        @ColumnInfo(name = "description") var description: String? = null,
         @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 
@@ -41,12 +41,11 @@ data class Task @JvmOverloads constructor(
     @ColumnInfo(name = "completed") var isCompleted = false
 
     val titleForList: String
-        get() = if (title.isNotEmpty()) title else description
-
+        get() = if(title.isNullOrBlank()) description ?: "" else title!!
 
     val isActive
         get() = !isCompleted
 
     val isEmpty
-        get() = title.isEmpty() && description.isEmpty()
+        get() = title.isNullOrBlank() && description.isNullOrBlank()
 }
