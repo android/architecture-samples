@@ -118,8 +118,9 @@ public abstract class TaskViewModel extends BaseObservable
     public String getTitleForList() {
         Task task = mTaskObservable.get();
 
-        if (task == null)
+        if (task == null) {
             return "No data";
+        }
 
         return task.getTitleForList();
     }
