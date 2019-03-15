@@ -67,6 +67,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mListAdapter = new NotesAdapter(new ArrayList<Note>(0), mItemListener);
+        mActionsListener = new NotesPresenter(Injection.provideNotesRepository(), this);
     }
 
     @Override
@@ -80,9 +81,6 @@ public class NotesFragment extends Fragment implements NotesContract.View {
         super.onActivityCreated(savedInstanceState);
 
         setRetainInstance(true);
-
-        mActionsListener = new NotesPresenter(Injection.provideNotesRepository(), this);
-
     }
 
     @Override
@@ -126,7 +124,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
-       swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 mActionsListener.loadNotes(true);
@@ -170,7 +168,7 @@ public class NotesFragment extends Fragment implements NotesContract.View {
 
     @Override
     public void showAddNote() {
-        Intent intent = new Intent(getContext(),AddNoteActivity.class);
+        Intent intent = new Intent(getContext(), AddNoteActivity.class);
         startActivityForResult(intent, REQUEST_ADD_NOTE);
     }
 

@@ -25,10 +25,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -112,7 +112,8 @@ public class NotesScreenTest {
         onView(withId(R.id.fab_add_notes)).perform(click());
 
         // Add note title and description
-        onView(withId(R.id.add_note_title)).perform(typeText(newNoteTitle)); // Type new note title
+        // Type new note title
+        onView(withId(R.id.add_note_title)).perform(typeText(newNoteTitle), closeSoftKeyboard());
         onView(withId(R.id.add_note_description)).perform(typeText(newNoteDescription),
                 closeSoftKeyboard()); // Type new note description and close the keyboard
 
