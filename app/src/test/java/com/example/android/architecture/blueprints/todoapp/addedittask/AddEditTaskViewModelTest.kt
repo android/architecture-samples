@@ -21,7 +21,7 @@
 //import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 //import com.example.android.architecture.blueprints.todoapp.data.Task
 //import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-//import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+//import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 //import com.example.android.architecture.blueprints.todoapp.util.any
 //import com.example.android.architecture.blueprints.todoapp.util.capture
 //import com.example.android.architecture.blueprints.todoapp.util.eq
@@ -44,7 +44,7 @@
 //
 //    // Executes each task synchronously using Architecture Components.
 //    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
-//    @Mock private lateinit var tasksRepository: TasksRepository
+//    @Mock private lateinit var tasksRepository: DefaultTasksRepository
 //    /**
 //     * [ArgumentCaptor] is a powerful Mockito API to capture argument values and use them to
 //     * perform further actions or assertions on them.

@@ -24,7 +24,7 @@
 //import com.example.android.architecture.blueprints.todoapp.R
 //import com.example.android.architecture.blueprints.todoapp.data.Task
 //import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-//import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+//import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 //import com.example.android.architecture.blueprints.todoapp.util.capture
 //import com.example.android.architecture.blueprints.todoapp.util.eq
 //import org.hamcrest.CoreMatchers.nullValue
@@ -50,7 +50,7 @@
 //
 //    // Executes each task synchronously using Architecture Components.
 //    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
-//    @Mock private lateinit var tasksRepository: TasksRepository
+//    @Mock private lateinit var tasksRepository: DefaultTasksRepository
 //    @Mock private lateinit var context: Application
 //    private lateinit var taskDetailViewModel: TaskDetailViewModel
 //    private lateinit var task: Task
@@ -96,7 +96,7 @@
 //        taskDetailViewModel.deleteTask()
 //
 //        // Then the repository is notified
-//        verify<TasksRepository>(tasksRepository).deleteTask(task.id)
+//        verify<DefaultTasksRepository>(tasksRepository).deleteTask(task.id)
 //    }
 //
 //    @Test fun completeTask() {
@@ -106,7 +106,7 @@
 //        taskDetailViewModel.setCompleted(true)
 //
 //        // Then a request is sent to the task repository and the UI is updated
-//        verify<TasksRepository>(tasksRepository).completeTask(task)
+//        verify<DefaultTasksRepository>(tasksRepository).completeTask(task)
 //        assertEquals(LiveDataTestUtil.getValue(taskDetailViewModel.snackbarMessage).peekContent(),
 //                R.string.task_marked_complete)
 //    }
@@ -118,7 +118,7 @@
 //        taskDetailViewModel.setCompleted(false)
 //
 //        // Then a request is sent to the task repository and the UI is updated
-//        verify<TasksRepository>(tasksRepository).activateTask(task)
+//        verify<DefaultTasksRepository>(tasksRepository).activateTask(task)
 //        assertEquals(LiveDataTestUtil.getValue(taskDetailViewModel.snackbarMessage).peekContent(),
 //                R.string.task_marked_active)
 //    }
@@ -128,7 +128,7 @@
 //        taskDetailViewModel.start(task.id)
 //
 //        // Use a captor to get a reference for the callback.
-//        verify<TasksRepository>(tasksRepository).getTask(eq(task.id),
+//        verify<DefaultTasksRepository>(tasksRepository).getTask(eq(task.id),
 //            capture(getTaskCallbackCaptor))
 //
 //        // When the repository returns an error
@@ -145,7 +145,7 @@
 //        taskDetailViewModel.start(task.id)
 //
 //        // Use a captor to get a reference for the callback.
-//        verify<TasksRepository>(tasksRepository).getTask(eq(task.id), capture(getTaskCallbackCaptor))
+//        verify<DefaultTasksRepository>(tasksRepository).getTask(eq(task.id), capture(getTaskCallbackCaptor))
 //
 //        getTaskCallbackCaptor.value.onTaskLoaded(task) // Trigger callback
 //    }

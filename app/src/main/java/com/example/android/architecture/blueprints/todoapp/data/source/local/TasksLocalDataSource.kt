@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,42 +53,37 @@ class TasksLocalDataSource private constructor(
         }
     }
 
-    override fun saveTask(task: Task) {
+    override suspend fun saveTask(task: Task) {
         appExecutors.diskIO.execute { tasksDao.insertTask(task) }
     }
 
-    override fun completeTask(task: Task) {
+    override suspend fun completeTask(task: Task) {
         appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, true) }
     }
 
-    override fun completeTask(taskId: String) {
-        // Not required for the local data source because the {@link TasksRepository} handles
+    override suspend fun completeTask(taskId: String) {
+        // Not required for the local data source because the {@link DefaultTasksRepository} handles
         // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
-    override fun activateTask(task: Task) {
+    override suspend fun activateTask(task: Task) {
         appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, false) }
     }
 
-    override fun activateTask(taskId: String) {
-        // Not required for the local data source because the {@link TasksRepository} handles
+    override suspend fun activateTask(taskId: String) {
+        // Not required for the local data source because the {@link DefaultTasksRepository} handles
         // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
-    override fun clearCompletedTasks() {
+    override suspend fun clearCompletedTasks() {
         appExecutors.diskIO.execute { tasksDao.deleteCompletedTasks() }
     }
 
-    override fun refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
-    }
-
-    override fun deleteAllTasks() {
+    override suspend fun deleteAllTasks() {
         appExecutors.diskIO.execute { tasksDao.deleteTasks() }
     }
 
-    override fun deleteTask(taskId: String) {
+    override suspend fun deleteTask(taskId: String) {
         appExecutors.diskIO.execute { tasksDao.deleteTaskById(taskId) }
     }
 

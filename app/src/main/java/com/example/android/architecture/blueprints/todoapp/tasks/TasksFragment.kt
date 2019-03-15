@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -33,6 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.databinding.TasksFrag
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import timber.log.Timber
 import java.util.ArrayList
 
 /**
@@ -126,7 +126,7 @@ class TasksFragment : Fragment() {
             listAdapter = TasksAdapter(ArrayList(0), viewModel)
             viewDataBinding.tasksList.adapter = listAdapter
         } else {
-            Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
+            Timber.w("ViewModel not initialized when attempting to set up adapter.")
         }
     }
 

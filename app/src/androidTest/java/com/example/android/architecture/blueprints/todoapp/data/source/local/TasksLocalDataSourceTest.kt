@@ -17,7 +17,7 @@
 //
 //import androidx.test.InstrumentationRegistry
 //import androidx.test.filters.LargeTest
-//import androidx.test.runner.AndroidJUnit4
+//import androidx.test.ext.junit.runners.AndroidJUnit4
 //import com.example.android.architecture.blueprints.todoapp.data.Task
 //import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 //import com.example.android.architecture.blueprints.todoapp.util.any

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,21 +32,19 @@ interface TasksDataSource {
 
     suspend fun getTask(taskId: String): Result<Task>
 
-    fun saveTask(task: Task)
+    suspend fun saveTask(task: Task)
 
-    fun completeTask(task: Task)
+    suspend fun completeTask(task: Task)
 
-    fun completeTask(taskId: String)
+    suspend fun completeTask(taskId: String)
 
-    fun activateTask(task: Task)
+    suspend fun activateTask(task: Task)
 
-    fun activateTask(taskId: String)
+    suspend fun activateTask(taskId: String)
 
-    fun clearCompletedTasks()
+    suspend fun clearCompletedTasks()
 
-    fun refreshTasks()
+    suspend fun deleteAllTasks()
 
-    fun deleteAllTasks()
-
-    fun deleteTask(taskId: String)
+    suspend fun deleteTask(taskId: String)
 }

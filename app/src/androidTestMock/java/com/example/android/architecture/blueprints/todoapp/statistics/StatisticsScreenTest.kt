@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,24 @@
  */
 package com.example.android.architecture.blueprints.todoapp.statistics
 
+import android.app.Application
+import android.content.Context
 import android.content.Intent
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.containsString
 import org.junit.After
 import org.junit.Before
@@ -41,12 +43,12 @@ import org.junit.runner.RunWith
 /**
  * Tests for the statistics screen.
  */
-@RunWith(AndroidJUnit4::class) @LargeTest class StatisticsScreenTest {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class StatisticsScreenTest {
 
     /**
-     * [ActivityTestRule] is a JUnit [@Rule][Rule] to launch your activity under test.
-
-     *
+     * [ActivityTestRule] is a JUnit [@Rule][Rule] to launch your activity under test.     *
      *
      * Rules are interceptors which are executed for each test method and are important building
      * blocks of Junit tests.
@@ -64,17 +66,21 @@ import org.junit.runner.RunWith
      * the service API. This is a great way to make your tests more reliable and faster at the same
      * time, since they are isolated from any outside dependencies.
      */
-    @Before fun intentWithStubbedTaskId() {
-        ViewModelFactory.destroyInstance()
-        // Given some tasks
-        val tasksRepository =
-                Injection.provideTasksRepository(InstrumentationRegistry.getTargetContext())
-        val task1 = Task("Title1").apply { isCompleted = false }
-        val task2 = Task("Title2").apply { isCompleted = true }
-        tasksRepository.run {
-            deleteAllTasks()
-            saveTask(task1)
-            saveTask(task2)
+    @Before
+    fun intentWithStubbedTaskId() {
+        statisticsActivityTestRule.runOnUiThread {
+            // Given some tasks
+            val tasksRepository = Injection.provideTasksRepository(getApplicationContext())
+            val task1 = Task("Title1").apply { isCompleted = false }
+            val task2 = Task("Title2").apply { isCompleted = true }
+
+            tasksRepository.run {
+                runBlocking {
+                    deleteAllTasks()
+                    saveTask(task1)
+                    saveTask(task2)
+                }
+            }
         }
         // Lazily start the Activity from the ActivityTestRule
         statisticsActivityTestRule.launchActivity(Intent())
@@ -86,24 +92,29 @@ import org.junit.runner.RunWith
      * idle state. This helps Espresso to synchronize your test actions, which makes tests
      * significantly more reliable.
      */
-    @Before fun registerIdlingResource() {
+    @Before
+    fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
     }
 
-    @Test fun Tasks_ShowsNonEmptyMessage() {
+    @Test
+    fun tasks_ShowsNonEmptyMessage() {
+
         // Check that the active and completed tasks text is displayed
-        val expectedActiveTaskText = InstrumentationRegistry.getTargetContext()
-                .getString(R.string.statistics_active_tasks, 1)
+        val context = getApplicationContext<Context>()
+        val expectedActiveTaskText = context
+            .getString(R.string.statistics_active_tasks, 1)
         onView(withText(containsString(expectedActiveTaskText))).check(matches(isDisplayed()))
-        val expectedCompletedTaskText = InstrumentationRegistry.getTargetContext()
-                .getString(R.string.statistics_completed_tasks, 1)
+        val expectedCompletedTaskText = context
+            .getString(R.string.statistics_completed_tasks, 1)
         onView(withText(containsString(expectedCompletedTaskText))).check(matches(isDisplayed()))
     }
 
     /**
      * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
      */
-    @After fun unregisterIdlingResource() {
+    @After
+    fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 }

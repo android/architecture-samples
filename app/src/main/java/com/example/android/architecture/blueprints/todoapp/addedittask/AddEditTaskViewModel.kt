@@ -133,15 +133,19 @@ class AddEditTaskViewModel(
     }
 
     private fun createTask(newTask: Task) {
-        tasksRepository.saveTask(newTask)
-        _taskUpdated.value = Event(Unit)
+        viewModelScope.launch {
+            tasksRepository.saveTask(newTask)
+            _taskUpdated.value = Event(Unit)
+        }
     }
 
     private fun updateTask(task: Task) {
         if (isNewTask) {
             throw RuntimeException("updateTask() was called but task is new.")
         }
-        tasksRepository.saveTask(task)
-        _taskUpdated.value = Event(Unit)
+        viewModelScope.launch {
+            tasksRepository.saveTask(task)
+            _taskUpdated.value = Event(Unit)
+        }
     }
 }

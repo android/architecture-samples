@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
-
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
+import kotlinx.coroutines.Dispatchers
 
 /**
  * Enables injection of mock implementations for
@@ -31,9 +31,12 @@ import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
  */
 object Injection {
 
-    fun provideTasksRepository(context: Context): TasksRepository {
+    fun provideTasksRepository(context: Context): DefaultTasksRepository {
         val database = ToDoDatabase.getInstance(context)
-        return TasksRepository.getInstance(FakeTasksRemoteDataSource,
-                TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()))
+        return DefaultTasksRepository.getInstance(
+            FakeTasksRemoteDataSource,
+            TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
+            Dispatchers.Unconfined
+        )
     }
 }

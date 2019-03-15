@@ -23,11 +23,11 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import androidx.annotation.IdRes
-import androidx.test.InstrumentationRegistry
+import androidx.appcompat.widget.Toolbar
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitor
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
-import androidx.appcompat.widget.Toolbar
 
 private fun Activity.rotateToLandscape() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE

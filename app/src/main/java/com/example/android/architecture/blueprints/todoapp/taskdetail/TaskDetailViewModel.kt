@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,9 @@ import kotlinx.coroutines.launch
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
  */
-class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
-    ViewModel() {
+class TaskDetailViewModel(
+    private val tasksRepository: TasksRepository
+) : ViewModel() {
 
     private val _task = MutableLiveData<Task>()
     val task: LiveData<Task>
@@ -70,9 +71,10 @@ class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
 
     fun deleteTask() {
         taskId?.let {
-            tasksRepository.deleteTask(it)
-            _deleteTaskCommand.value = Event(Unit)
-
+            viewModelScope.launch {
+                tasksRepository.deleteTask(it)
+                _deleteTaskCommand.value = Event(Unit)
+            }
         }
     }
 
@@ -82,12 +84,14 @@ class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
 
     fun setCompleted(completed: Boolean) {
         val task = _task.value ?: return
-        if (completed) {
-            tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
-        } else {
-            tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+        viewModelScope.launch {
+            if (completed) {
+                tasksRepository.completeTask(task)
+                showSnackbarMessage(R.string.task_marked_complete)
+            } else {
+                tasksRepository.activateTask(task)
+                showSnackbarMessage(R.string.task_marked_active)
+            }
         }
     }
 
@@ -95,7 +99,7 @@ class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
         if (taskId != null) {
             _dataLoading.value = true
             viewModelScope.launch {
-                tasksRepository.getTask(taskId).let { result ->
+                tasksRepository.getTask(taskId, false).let { result ->
                     if (result is Success) {
                         onTaskLoaded(result.data)
                     } else {
@@ -111,12 +115,12 @@ class TaskDetailViewModel(private val tasksRepository: TasksRepository) :
         _isDataAvailable.value = task != null
     }
 
-    fun onTaskLoaded(task: Task) {
+    private fun onTaskLoaded(task: Task) {
         setTask(task)
         _dataLoading.value = false
     }
 
-    fun onDataNotAvailable(result: Result<Task>) {
+    private fun onDataNotAvailable(result: Result<Task>) {
         _task.value = null
         _dataLoading.value = false
         _isDataAvailable.value = false

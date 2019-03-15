@@ -17,8 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import androidx.room.Room
-import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -29,21 +29,26 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class) class TasksDaoTest {
+@RunWith(AndroidJUnit4::class)
+class TasksDaoTest {
 
     private lateinit var database: ToDoDatabase
 
-    @Before fun initDb() {
+    @Before
+    fun initDb() {
         // using an in-memory database because the information stored here disappears when the
         // process is killed
-        database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
-                ToDoDatabase::class.java).build()
+        database = Room.inMemoryDatabaseBuilder(
+            getApplicationContext(),
+            ToDoDatabase::class.java
+        ).build()
     }
 
-    @After fun closeDb() = database.close()
+    @After
+    fun closeDb() = database.close()
 
-
-    @Test fun insertTaskAndGetById() {
+    @Test
+    fun insertTaskAndGetById() {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -54,7 +59,8 @@ import org.junit.runner.RunWith
         assertTask(loaded, DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
     }
 
-    @Test fun insertTaskReplacesOnConflict() {
+    @Test
+    fun insertTaskReplacesOnConflict() {
         // Given that a task is inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -71,7 +77,8 @@ import org.junit.runner.RunWith
         assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
     }
 
-    @Test fun insertTaskAndGetTasks() = runBlocking {
+    @Test
+    fun insertTaskAndGetTasks() = runBlocking {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -84,7 +91,8 @@ import org.junit.runner.RunWith
         assertTask(tasks[0], DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
     }
 
-    @Test fun updateTaskAndGetById() {
+    @Test
+    fun updateTaskAndGetById() {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -101,7 +109,8 @@ import org.junit.runner.RunWith
         assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
     }
 
-    @Test fun updateCompletedAndGetById() {
+    @Test
+    fun updateCompletedAndGetById() {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -115,7 +124,8 @@ import org.junit.runner.RunWith
         assertTask(loaded, DEFAULT_TASK.id, DEFAULT_TASK.title, DEFAULT_TASK.description, false)
     }
 
-    @Test fun deleteTaskByIdAndGettingTasks() = runBlocking  {
+    @Test
+    fun deleteTaskByIdAndGettingTasks() = runBlocking {
         // Given a task inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -129,7 +139,8 @@ import org.junit.runner.RunWith
         assertThat(tasks.size, `is`(0))
     }
 
-    @Test fun deleteTasksAndGettingTasks() = runBlocking  {
+    @Test
+    fun deleteTasksAndGettingTasks() = runBlocking {
         // Given a task inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -143,7 +154,8 @@ import org.junit.runner.RunWith
         assertThat(tasks.size, `is`(0))
     }
 
-    @Test fun deleteCompletedTasksAndGettingTasks() = runBlocking  {
+    @Test
+    fun deleteCompletedTasksAndGettingTasks() = runBlocking {
         // Given a completed task inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -158,11 +170,11 @@ import org.junit.runner.RunWith
     }
 
     private fun assertTask(
-            task: Task?,
-            id: String,
-            title: String,
-            description: String,
-            completed: Boolean
+        task: Task?,
+        id: String,
+        title: String,
+        description: String,
+        completed: Boolean
     ) {
         assertThat<Task>(task as Task, notNullValue())
         assertThat(task.id, `is`(id))

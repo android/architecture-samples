@@ -26,7 +26,7 @@
 //import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 //import com.example.android.architecture.blueprints.todoapp.data.Task
 //import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource.LoadTasksCallback
-//import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+//import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 //import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 //import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 //import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
@@ -55,7 +55,7 @@
 //
 //    // Executes each task synchronously using Architecture Components.
 //    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
-//    @Mock private lateinit var tasksRepository: TasksRepository
+//    @Mock private lateinit var tasksRepository: DefaultTasksRepository
 //    @Mock private lateinit var context: Application
 //    @Captor private lateinit var loadTasksCallbackCaptor: ArgumentCaptor<LoadTasksCallback>
 //    private lateinit var tasksViewModel: TasksViewModel
@@ -104,7 +104,7 @@
 //        tasksViewModel.loadTasks(true)
 //
 //        // Callback is captured and invoked with stubbed tasks
-//        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+//        verify<DefaultTasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
 //
 //        // Then progress indicator is shown
 //        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
@@ -126,7 +126,7 @@
 //        tasksViewModel.loadTasks(true)
 //
 //        // Callback is captured and invoked with stubbed tasks
-//        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+//        verify<DefaultTasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
 //        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 //
 //        // Then progress indicator is hidden
@@ -145,7 +145,7 @@
 //        tasksViewModel.loadTasks(true)
 //
 //        // Callback is captured and invoked with stubbed tasks
-//        verify<TasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
+//        verify<DefaultTasksRepository>(tasksRepository).getTasks(capture(loadTasksCallbackCaptor))
 //        loadTasksCallbackCaptor.value.onTasksLoaded(tasks)
 //
 //        // Then progress indicator is hidden

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,18 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.FakeFailingTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
-import com.example.android.architecture.blueprints.todoapp.data.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
+import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Executors
 
 /**
  * Unit tests for the implementation of [StatisticsViewModel]
@@ -45,6 +42,11 @@ class StatisticsViewModelTest {
 
     private lateinit var statisticsViewModel: StatisticsViewModel
     private val tasksRepository = FakeRepository
+
+    // Set the main coroutines dispatcher for unit testing.
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule()
 
     @Before
     fun setupStatisticsViewModel() {
@@ -59,16 +61,6 @@ class StatisticsViewModelTest {
         tasksRepository.addTasks(task1, task2, task3)
 
         statisticsViewModel = StatisticsViewModel(tasksRepository)
-    }
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(Executors.newSingleThreadExecutor().asCoroutineDispatcher())
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -94,7 +86,11 @@ class StatisticsViewModelTest {
 
     @Test
     fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() = runBlocking {
-        val errorViewModel = StatisticsViewModel(FakeFailingTasksRemoteDataSource)
+        val errorViewModel = StatisticsViewModel(
+            DefaultTasksRepository(
+                FakeFailingTasksRemoteDataSource,
+                FakeFailingTasksRemoteDataSource)
+        )
 
         // When statistics are loaded
         errorViewModel.loadStatistics()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 import android.app.Activity
 import android.content.Intent
 import android.view.View
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -35,6 +35,7 @@ import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteD
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
@@ -87,8 +88,10 @@ class TaskDetailScreenTest {
      */
     private fun startActivityWithWithStubbedTask(task: Task) {
         // Add a task stub to the fake service api layer.
-        Injection.provideTasksRepository(ApplicationProvider.getApplicationContext()).apply {
-            deleteAllTasks()
+        Injection.provideTasksRepository(getApplicationContext()).apply {
+            runBlocking {
+                deleteAllTasks()
+            }
         }
         FakeTasksRemoteDataSource.addTasks(task)
 
@@ -152,9 +155,9 @@ class TaskDetailScreenTest {
 
     companion object {
 
-        private val TASK_TITLE = "ATSL"
+        private val TASK_TITLE = "Title"
 
-        private val TASK_DESCRIPTION = "Rocks"
+        private val TASK_DESCRIPTION = "Desc"
 
         /**
          * [Task] stub that is added to the fake service API layer.

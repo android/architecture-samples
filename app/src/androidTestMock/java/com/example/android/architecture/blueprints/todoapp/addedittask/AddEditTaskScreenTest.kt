@@ -19,7 +19,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.clearText
@@ -29,13 +29,13 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import org.hamcrest.Description
@@ -105,7 +105,7 @@ class AddEditTaskScreenTest {
 
     @Test fun toolbarTitle_editTask_persistsRotation() {
         // Put a task in the repository and start the activity to edit it
-        TasksRepository.destroyInstance()
+        DefaultTasksRepository.destroyInstance()
         FakeTasksRemoteDataSource.addTasks(
                 Task("Title1", "", TASK_ID).apply { isCompleted = false }
         )
@@ -125,9 +125,8 @@ class AddEditTaskScreenTest {
      * @param taskId is null if used to add a new task, otherwise it edits the task.
      */
     private fun launchNewTaskActivity(taskId: String?) {
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-                AddEditTaskActivity::class.java)
-                .apply { putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId) }
+        val intent = Intent(getApplicationContext(), AddEditTaskActivity::class.java)
+            .apply { putExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId) }
         activityTestRule.launchActivity(intent)
     }
 

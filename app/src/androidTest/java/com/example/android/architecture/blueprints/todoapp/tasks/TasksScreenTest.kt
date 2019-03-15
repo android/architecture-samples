@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.view.View
 import android.widget.ListView
-import androidx.test.InstrumentationRegistry.getTargetContext
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.annotation.UiThreadTest
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.IdlingRegistry
@@ -36,19 +36,19 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.currentActivity
 import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.google.common.base.Preconditions.checkArgument
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
@@ -81,10 +81,13 @@ class TasksScreenTest {
     @Rule @JvmField var tasksActivityTestRule =
         ActivityTestRule<TasksActivity>(TasksActivity::class.java)
 
+    /**
+     * The tasks repository needs to be instantiated on the main thread.
+     */
+    @UiThreadTest
     @Before
-    fun resetState() {
-        ViewModelFactory.destroyInstance()
-        Injection.provideTasksRepository(ApplicationProvider.getApplicationContext())
+    fun resetState() = runBlocking {
+        Injection.provideTasksRepository(getApplicationContext())
             .deleteAllTasks()
     }
 
@@ -271,7 +274,7 @@ class TasksScreenTest {
         clickCheckBoxForTask(TITLE2)
 
         // Click clear completed in menu
-        openActionBarOverflowOrOptionsMenu(getTargetContext())
+        openActionBarOverflowOrOptionsMenu(getApplicationContext())
         onView(withText(string.menu_clear)).perform(click())
 
         //Verify that completed tasks are not shown

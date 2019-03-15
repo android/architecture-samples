@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.Main
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -38,7 +35,7 @@ import kotlinx.coroutines.withContext
  * preferable to having logic in the XML layout.
  */
 class StatisticsViewModel(
-    private val tasksRepository: TasksDataSource
+    private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
@@ -75,20 +72,16 @@ class StatisticsViewModel(
     fun loadStatistics() {
         _dataLoading.value = true
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             tasksRepository.getTasks().let { result ->
                 if (result is Success) {
-                    withContext(Main) {
-                        _error.value = false
-                        computeStats(result.data)
-                    }
+                    _error.value = false
+                    computeStats(result.data)
                 } else {
-                    withContext(Main) {
-                        _error.value = true
-                        activeTasks = 0
-                        completedTasks = 0
-                        updateDataBindingObservables()
-                    }
+                    _error.value = true
+                    activeTasks = 0
+                    completedTasks = 0
+                    updateDataBindingObservables()
                 }
             }
         }

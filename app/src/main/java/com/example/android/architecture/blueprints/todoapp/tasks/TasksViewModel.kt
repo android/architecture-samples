@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,10 +102,6 @@ class TasksViewModel(
         loadTasks(false)
     }
 
-    fun loadTasks(forceUpdate: Boolean) {
-        loadTasks(forceUpdate, true)
-    }
-
     /**
      * Sets the current task filtering type.
      *
@@ -142,19 +138,23 @@ class TasksViewModel(
     }
 
     fun clearCompletedTasks() {
-        tasksRepository.clearCompletedTasks()
-        _snackbarText.value = Event(R.string.completed_tasks_cleared)
-        loadTasks(false, false)
+        viewModelScope.launch {
+            tasksRepository.clearCompletedTasks()
+            _snackbarText.value = Event(R.string.completed_tasks_cleared)
+            loadTasks(false)
+        }
     }
 
     fun completeTask(task: Task, completed: Boolean) {
         // Notify repository
-        if (completed) {
-            tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
-        } else {
-            tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+        viewModelScope.launch {
+            if (completed) {
+                tasksRepository.completeTask(task)
+                showSnackbarMessage(R.string.task_marked_complete)
+            } else {
+                tasksRepository.activateTask(task)
+                showSnackbarMessage(R.string.task_marked_active)
+            }
         }
     }
 
@@ -196,48 +196,36 @@ class TasksViewModel(
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    private fun loadTasks(forceUpdate: Boolean, showLoadingUI: Boolean) {
-        if (showLoadingUI) {
-            _dataLoading.setValue(true)
-        }
-        if (forceUpdate) {
-            viewModelScope.launch {
-                tasksRepository.refreshTasks()
-            }
-        }
+    fun loadTasks(forceUpdate: Boolean) = viewModelScope.launch {
 
-        viewModelScope.launch {
-            val tasksResult = tasksRepository.getTasks()
+        _dataLoading.value = true
+        val tasksResult = tasksRepository.getTasks(forceUpdate)
 
-            if (tasksResult is Success) {
-                val tasks = tasksResult.data
+        if (tasksResult is Success) {
+            val tasks = tasksResult.data
 
-                val tasksToShow = ArrayList<Task>()
-                // We filter the tasks based on the requestType
-                for (task in tasks) {
-                    when (_currentFiltering) {
-                        TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                        TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
-                        }
-                        TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
-                        }
+            val tasksToShow = ArrayList<Task>()
+            // We filter the tasks based on the requestType
+            for (task in tasks) {
+                when (_currentFiltering) {
+                    TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
+                    TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
+                        tasksToShow.add(task)
+                    }
+                    TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
+                        tasksToShow.add(task)
                     }
                 }
-                // Update UI elements
-                if (showLoadingUI) {
-                    _dataLoading.value = false
-                }
-                isDataLoadingError.value = false
-
-                val itemsValue = ArrayList(tasksToShow)
-                _items.value = itemsValue
-            } else {
-                _dataLoading.value = false
-                isDataLoadingError.value = false
-                _items.value = emptyList()
             }
+            _dataLoading.value = false
+            isDataLoadingError.value = false
+
+            val itemsValue = ArrayList(tasksToShow)
+            _items.value = itemsValue
+        } else {
+            _dataLoading.value = false
+            isDataLoadingError.value = false
+            _items.value = emptyList()
         }
     }
 }

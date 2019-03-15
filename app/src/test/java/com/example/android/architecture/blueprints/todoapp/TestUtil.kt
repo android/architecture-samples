@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.util
 
-import androidx.test.espresso.IdlingResource
+package com.example.android.architecture.blueprints.todoapp
 
-/**
- * Contains a static reference to [IdlingResource], only available in the 'mock' build type.
- */
-object EspressoIdlingResource {
+import org.junit.Assert
+import org.junit.Assert.fail
 
-    private const val RESOURCE = "GLOBAL"
+fun assertNonNullTrue(b: Boolean?) = Assert.assertTrue(b == true)
 
-    @JvmField val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
+fun assertNonNullFalse(b: Boolean?) = Assert.assertTrue(b == false)
 
-    fun increment() {
-        countingIdlingResource.increment()
-    }
-
-    fun decrement() {
-        countingIdlingResource.decrement()
-    }
+fun assertNonNullEquals(one: Any?, two: Any?) {
+    if (one == null && two == null) return fail("Both sides are null")
+    return Assert.assertEquals(one, two)
 }
