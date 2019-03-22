@@ -20,30 +20,13 @@ package com.example.android.architecture.blueprints.todoapp
  */
 
 import android.app.Activity
-import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitor
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
-
-private fun Activity.rotateToLandscape() {
-    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-}
-
-private fun Activity.rotateToPortrait() {
-    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-}
-
-fun Activity.rotateOrientation() {
-    when (resources.configuration.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> rotateToPortrait()
-        Configuration.ORIENTATION_PORTRAIT -> rotateToLandscape()
-        else -> rotateToLandscape()
-    }
-}
 
 /**
  * Returns the content description for the navigation button view in the toolbar.
@@ -60,15 +43,15 @@ fun Activity.getToolbarNavigationContentDescription(@IdRes toolbarId: Int) =
  * See [ActivityLifecycleMonitor].
  */
 // The array is just to wrap the Activity and be able to access it from the Runnable.
-val currentActivity: Activity
+val currentActivity: AppCompatActivity
     get() {
         // The array is just to wrap the Activity and be able to access it from the Runnable.
-        val resumedActivity = arrayOfNulls<Activity>(1)
+        val resumedActivity = arrayOfNulls<AppCompatActivity>(1)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             val resumedActivities = ActivityLifecycleMonitorRegistry.getInstance()
                     .getActivitiesInStage(Stage.RESUMED)
             if (resumedActivities.iterator().hasNext()) {
-                resumedActivity[0] = resumedActivities.iterator().next() as Activity
+                resumedActivity[0] = resumedActivities.iterator().next() as AppCompatActivity
             } else {
                 throw IllegalStateException("No Activity in stage RESUMED")
             }

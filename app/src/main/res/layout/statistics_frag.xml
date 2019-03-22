@@ -55,15 +55,21 @@
                 android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}" />
 
             <TextView
+                android:id="@+id/stats_active_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="1dp"
                 android:text="@{@string/statistics_active_tasks(stats.numberOfActiveTasks)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
 
+            <!-- android:paddingTop specified to temporarily work around -->
+            <!-- https://github.com/robolectric/robolectric/issues/4588 -->
             <TextView
+                android:id="@+id/stats_completed_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="1dp"
                 android:text="@{@string/statistics_completed_tasks(stats.numberOfCompletedTasks)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />

@@ -45,7 +45,7 @@ import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.currentActivity
 import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
-import com.example.android.architecture.blueprints.todoapp.rotateOrientation
+import com.example.android.architecture.blueprints.todoapp.util.rotateOrientation
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.google.common.base.Preconditions.checkArgument
 import kotlinx.coroutines.runBlocking

@@ -20,6 +20,8 @@ package com.example.android.architecture.blueprints.todoapp.util
  */
 
 import android.app.Activity
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import androidx.annotation.IdRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -75,4 +77,20 @@ private inline fun FragmentManager.transact(action: FragmentTransaction.() -> Un
     beginTransaction().apply {
         action()
     }.commit()
+}
+
+private fun AppCompatActivity.rotateToLandscape() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+}
+
+private fun AppCompatActivity.rotateToPortrait() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+}
+
+fun AppCompatActivity.rotateOrientation() {
+    when (resources.configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> rotateToPortrait()
+        Configuration.ORIENTATION_PORTRAIT -> rotateToLandscape()
+        else -> rotateToLandscape()
+    }
 }

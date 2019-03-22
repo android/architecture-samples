@@ -72,6 +72,8 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:visibility="@{viewmodel.isDataAvailable ? View.VISIBLE : View.GONE}">
 
+                <!-- android:paddingTop specified to temporarily work around -->
+                <!-- https://github.com/robolectric/robolectric/issues/4588 -->
                 <CheckBox
                     android:id="@+id/task_detail_complete"
                     android:layout_width="wrap_content"
@@ -79,6 +81,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:onClick="@{(view) -> listener.onCompleteChanged(view)}"
+                    android:paddingTop="1dp"
                     android:checked="@{viewmodel.completed}" />
 
                 <TextView
@@ -86,6 +89,7 @@
                     android:layout_toRightOf="@id/task_detail_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="1dp"
                     android:text="@{viewmodel.task.title}"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -95,6 +99,7 @@
                     android:layout_below="@id/task_detail_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="1dp"
                     android:text="@{viewmodel.task.description}"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
