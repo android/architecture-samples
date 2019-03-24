@@ -1,41 +1,76 @@
-version: 2
-config_android:
-  docker:
-  - image: circleci/android:api-28-alpha
-  working_directory: ~/project
-  environment:
-    JAVA_TOOL_OPTIONS: -Xmx1024m
-    GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
-    TERM: dumb
-setup_ftl:
-- run:
-    name: Authorize gcloud and set config defaults
-    command: |
-      echo $GCLOUD_SERVICE_KEY | base64 -di > ${HOME}/gcloud-service-key.json
-      sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-      sudo gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-jobs:
-  build_and_setup:
+version: 2.1
+
+executors:
+  android-arch-executor:
     docker:
-    - image: circleci/android:api-28-alpha
+      - image: circleci/android:api-28-alpha
     working_directory: ~/project
     environment:
-    - JAVA_TOOL_OPTIONS: -Xmx1024m
-    - GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
-    - TERM: dumb
+      JAVA_TOOL_OPTIONS: -Xmx1024m
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
+      TERM: dumb
+
+commands:
+  build_test_lint:
+    description: "Build, run tests & lint"
+    steps:
+      - run:
+          name: Build test and lint
+          command: |
+            cd todoapp
+            ./gradlew assembleMockDebug assembleProdDebug assembleMockDebugAndroidTest testMockDebug testProdDebug lintMockDebug lintProdDebug
+
+  save_test_results:
+    description: "Save test results"
+    steps:
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/junit/
+            find . -type f -regex "./todoapp/.*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+  setup_ftl:
+    description: "Authorize gcloud and set config defaults"
+    steps:
+      - run:
+          name: Authorize gcloud and set config defaults
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 -di > ${HOME}/gcloud-service-key.json
+            sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            sudo gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+
+  test_with_ftl:
+    description: "Test with Firebase Test Lab"
+    steps:
+      - run:
+          name: Test with Firebase Test Lab
+          command: |
+            BUILD_DIR=build_${CIRCLE_BUILD_NUM}
+            sudo gcloud firebase test android run \
+              --app todoapp/app/build/outputs/apk/mock/debug/app-mock-debug.apk \
+              --test todoapp/app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk \
+              --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-blueprints \
+              --results-dir=${BUILD_DIR}
+
+  download_ftl_results:
+    description: "Download Firebase Test Lab results"
+    steps:
+      - run:
+          name: Download Firebase Test Lab results
+          command: |
+            BUILD_DIR=build_${CIRCLE_BUILD_NUM}
+            sudo pip install -U crcmod
+            mkdir firebase_test_results
+            sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-blueprints/${BUILD_DIR} | tail -1` firebase_test_results/ | true
+
+jobs:
+  build_and_setup:
+    executor: android-arch-executor
     steps:
     - checkout
-    - run:
-        name: Build test and lint
-        command: |
-          cd todoapp
-          ./gradlew assembleMockDebug assembleProdDebug assembleMockDebugAndroidTest testMockDebug testProdDebug lintMockDebug lintProdDebug
-    - run:
-        name: Save test results
-        command: |
-          mkdir -p ~/junit/
-          find . -type f -regex "./todoapp/.*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
-        when: always
+    - build_test_lint
+    - save_test_results
     - store_test_results:
         path: ~/junit
     - store_artifacts:
@@ -48,41 +83,18 @@ jobs:
         root: .
         paths:
         - ./todoapp/app/build
+
   run_ftl:
-    docker:
-    - image: circleci/android:api-28-alpha
-    working_directory: ~/project
-    environment:
-    - JAVA_TOOL_OPTIONS: -Xmx1024m
-    - GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
-    - TERM: dumb
+    executor: android-arch-executor
     steps:
     - attach_workspace:
         at: .
-    - run:
-        name: Authorize gcloud and set config defaults
-        command: |
-          echo $GCLOUD_SERVICE_KEY | base64 -di > ${HOME}/gcloud-service-key.json
-          sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-          sudo gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-    - run:
-        name: Test with Firebase Test Lab
-        command: |
-          BUILD_DIR=build_${CIRCLE_BUILD_NUM}
-          sudo gcloud firebase test android run \
-            --app todoapp/app/build/outputs/apk/mock/debug/app-mock-debug.apk \
-            --test todoapp/app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk \
-            --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-blueprints \
-            --results-dir=${BUILD_DIR}
-    - run:
-        name: Download results
-        command: |
-          BUILD_DIR=build_${CIRCLE_BUILD_NUM}
-          sudo pip install -U crcmod
-          mkdir firebase_test_results
-          sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-blueprints/${BUILD_DIR} | tail -1` firebase_test_results/ | true
+    - setup_ftl
+    - test_with_ftl
+    - download_ftl_results
     - store_artifacts:
         path: firebase_test_results
+
 workflows:
   version: 2
   build_and_test:
