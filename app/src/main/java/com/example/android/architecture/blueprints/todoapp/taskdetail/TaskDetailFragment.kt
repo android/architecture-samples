@@ -24,8 +24,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
+import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 
@@ -33,8 +37,9 @@ import com.google.android.material.snackbar.Snackbar
  * Main UI for the task detail screen.
  */
 class TaskDetailFragment : Fragment() {
-
     private lateinit var viewDataBinding: TaskdetailFragBinding
+
+    private lateinit var viewModel: TaskDetailViewModel
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -42,6 +47,22 @@ class TaskDetailFragment : Fragment() {
         viewDataBinding.viewmodel?.let {
             view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
         }
+
+        setupNavigation()
+    }
+
+    private fun setupNavigation() {
+        viewModel.deleteTaskCommand.observe(this, EventObserver {
+            val action = TaskDetailFragmentDirections
+                .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
+            findNavController().navigate(action)
+        })
+        viewModel.editTaskCommand.observe(this, EventObserver {
+            val taskId = TaskDetailFragmentArgs.fromBundle(arguments!!).TASKID
+            val action = TaskDetailFragmentDirections
+                .actionTaskDetailFragmentToAddEditTaskFragment(taskId)
+            findNavController().navigate(action)
+        })
     }
 
     private fun setupFab() {
@@ -52,7 +73,10 @@ class TaskDetailFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_TASK_ID))
+        val taskId = arguments?.let {
+            TaskDetailFragmentArgs.fromBundle(it).TASKID
+        }
+        viewDataBinding.viewmodel?.start(taskId)
     }
 
     override fun onCreateView(
@@ -61,8 +85,9 @@ class TaskDetailFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
+        viewModel = obtainViewModel(TaskDetailViewModel::class.java)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {
-            viewmodel = (activity as TaskDetailActivity).obtainViewModel()
+            viewmodel = viewModel
             listener = object : TaskDetailUserActionsListener {
                 override fun onCompleteChanged(v: View) {
                     viewmodel?.setCompleted((v as CheckBox).isChecked)
@@ -86,17 +111,5 @@ class TaskDetailFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
-    }
-
-    companion object {
-
-        const val ARGUMENT_TASK_ID = "TASK_ID"
-        const val REQUEST_EDIT_TASK = 1
-
-        fun newInstance(taskId: String) = TaskDetailFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARGUMENT_TASK_ID, taskId)
-            }
-        }
     }
 }

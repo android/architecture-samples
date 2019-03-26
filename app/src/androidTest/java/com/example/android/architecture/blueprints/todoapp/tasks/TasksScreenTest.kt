@@ -17,10 +17,10 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.view.View
 import android.widget.ListView
-import androidx.appcompat.widget.Toolbar
 import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.IdlingRegistry
@@ -35,7 +35,6 @@ import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -101,14 +100,6 @@ class TasksScreenTest {
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-    }
-
-    private fun ActivityScenario<TasksActivity>.getToolbarNavigationContentDescription() : String {
-        var description = ""
-        onActivity {
-            description = it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
-        }
-        return description
     }
 
     /**
@@ -316,7 +307,7 @@ class TasksScreenTest {
 
         // Verify it was deleted
         viewAllTasks()
-        onView(withText(TITLE1)).check(matches(not(isDisplayed())))
+        onView(withText(TITLE1)).check(doesNotExist())
     }
 
     @Test
@@ -351,8 +342,8 @@ class TasksScreenTest {
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Click on the navigation up button to go back to the list
-        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
+        // Press back button to go back to the list
+        Espresso.pressBack();
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -374,8 +365,8 @@ class TasksScreenTest {
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Click on the navigation up button to go back to the list
-        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
+        // Press back button to go back to the list
+        Espresso.pressBack();
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -398,9 +389,8 @@ class TasksScreenTest {
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Click on the navigation up button to go back to the list
-        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription()))
-            .perform(click())
+        // Press back button to go back to the list
+        Espresso.pressBack();
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -425,7 +415,8 @@ class TasksScreenTest {
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
+        // Press back button to go back to the list
+        Espresso.pressBack();
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))

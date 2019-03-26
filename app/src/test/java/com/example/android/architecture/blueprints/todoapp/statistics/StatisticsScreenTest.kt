@@ -16,7 +16,8 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.content.Context
-import androidx.test.core.app.ActivityScenario
+import android.os.Bundle
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -41,11 +42,8 @@ class StatisticsScreenTest {
     @Before
     fun setup() {
         // Given some tasks
-        val tasksRepository =
-            ServiceLocator.provideTasksRepository(getApplicationContext())
-        tasksRepository.run {
+        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
             runBlocking {
-                deleteAllTasks()
                 saveTask(Task("Title1").apply { isCompleted = false })
                 saveTask(Task("Title2").apply { isCompleted = true })
             }
@@ -54,12 +52,12 @@ class StatisticsScreenTest {
 
     @Test
     fun tasks_showsNonEmptyMessage() {
-        val activityScenario = ActivityScenario.launch(StatisticsActivity::class.java)
+        val scenario = launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.Theme_AppCompat)
         val expectedActiveTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_active_tasks, 1)
         val expectedCompletedTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_completed_tasks, 1)
-        activityScenario.onActivity {
+        scenario.onFragment {
             // check that both info boxes are displayed and contain the correct info
             onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
             onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))

@@ -38,26 +38,6 @@ const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 
-/**
- * The `fragment` is added to the container view with id `frameId`. The operation is
- * performed by the `fragmentManager`.
- */
-fun AppCompatActivity.replaceFragmentInActivity(fragment: Fragment, frameId: Int) {
-    supportFragmentManager.transact {
-        replace(frameId, fragment)
-    }
-}
-
-/**
- * The `fragment` is added to the container view with tag. The operation is
- * performed by the `fragmentManager`.
- */
-fun AppCompatActivity.addFragmentToActivity(fragment: Fragment, tag: String) {
-    supportFragmentManager.transact {
-        add(fragment, tag)
-    }
-}
-
 fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.() -> Unit) {
     setSupportActionBar(findViewById(toolbarId))
     supportActionBar?.run {
@@ -65,18 +45,9 @@ fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.()
     }
 }
 
-fun <T : ViewModel> AppCompatActivity.obtainViewModel(viewModelClass: Class<T>): T {
-    val repository = (application as TodoApplication).taskRepository
+fun <T : ViewModel> Fragment.obtainViewModel(viewModelClass: Class<T>): T {
+    val repository = (requireContext().applicationContext as TodoApplication).taskRepository
     return ViewModelProviders.of(this, ViewModelFactory(repository)).get(viewModelClass)
-}
-
-/**
- * Runs a FragmentTransaction, then calls commit().
- */
-private inline fun FragmentManager.transact(action: FragmentTransaction.() -> Unit) {
-    beginTransaction().apply {
-        action()
-    }.commit()
 }
 
 private fun AppCompatActivity.rotateToLandscape() {

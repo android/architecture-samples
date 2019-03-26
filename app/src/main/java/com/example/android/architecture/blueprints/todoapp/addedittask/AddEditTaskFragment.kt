@@ -21,10 +21,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
+import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -34,52 +37,60 @@ class AddEditTaskFragment : Fragment() {
 
     private lateinit var viewDataBinding: AddtaskFragBinding
 
+    private lateinit var viewModel: AddEditTaskViewModel
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val root = inflater.inflate(R.layout.addtask_frag, container, false)
+        viewModel = obtainViewModel(AddEditTaskViewModel::class.java)
+        viewDataBinding = AddtaskFragBinding.bind(root).apply {
+            this.viewmodel = viewModel
+        }
+        // Set the lifecycle owner to the lifecycle of the view
+        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        return viewDataBinding.root
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupFab()
+        setupSnackbar()
+        setupActionBar()
+        setupNavigation()
+        loadData()
+    }
+
+    private fun setupSnackbar() {
         viewDataBinding.viewmodel?.let {
             view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
         }
-        setupActionBar()
-        loadData()
+    }
+
+    private fun setupNavigation() {
+        viewModel.taskUpdatedEvent.observe(this, EventObserver {
+            val action = AddEditTaskFragmentDirections
+                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
+            findNavController().navigate(action)
+        })
     }
 
     private fun loadData() {
         // Add or edit an existing task?
-        viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_EDIT_TASK_ID))
+        viewDataBinding.viewmodel?.start(getTaskId())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.addtask_frag, container, false)
-        viewDataBinding = AddtaskFragBinding.bind(root).apply {
-            viewmodel = (activity as AddEditTaskActivity).obtainViewModel()
-        }
-        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
-        setHasOptionsMenu(true)
-        retainInstance = false
-        return viewDataBinding.root
-    }
-
-    private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.fab_edit_task_done)?.let {
-            it.setImageResource(R.drawable.ic_done)
-            it.setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
-        }
-    }
 
     private fun setupActionBar() {
-        (activity as AppCompatActivity).supportActionBar?.setTitle(
-                if (arguments != null && arguments?.get(ARGUMENT_EDIT_TASK_ID) != null)
-                    R.string.edit_task
-                else
-                    R.string.add_task
+        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(
+            if (getTaskId() != null)
+                R.string.edit_task
+            else
+                R.string.add_task
         )
     }
 
-    companion object {
-        const val ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID"
-
-        fun newInstance() = AddEditTaskFragment()
+    private fun getTaskId(): String? {
+        return arguments?.let {
+            AddEditTaskFragmentArgs.fromBundle(it).TASKID
+        }
     }
 }

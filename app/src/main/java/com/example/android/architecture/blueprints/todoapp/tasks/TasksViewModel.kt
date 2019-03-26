@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -87,10 +86,6 @@ class TasksViewModel(
     init {
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
-    }
-
-    fun start() {
-        loadTasks(false)
     }
 
     /**
@@ -163,20 +158,19 @@ class TasksViewModel(
         _openTaskEvent.value = Event(taskId)
     }
 
-    fun handleActivityResult(requestCode: Int, resultCode: Int) {
-        if (AddEditTaskActivity.REQUEST_CODE == requestCode) {
-            when (resultCode) {
-                EDIT_RESULT_OK -> _snackbarText.setValue(
-                    Event(R.string.successfully_saved_task_message)
-                )
-                ADD_EDIT_RESULT_OK -> _snackbarText.setValue(
-                    Event(R.string.successfully_added_task_message)
-                )
-                DELETE_RESULT_OK -> _snackbarText.setValue(
-                    Event(R.string.successfully_deleted_task_message)
-                )
-            }
+    fun showEditResultMessage(result: Int) {
+        when (result) {
+            EDIT_RESULT_OK -> _snackbarText.setValue(
+                Event(R.string.successfully_saved_task_message)
+            )
+            ADD_EDIT_RESULT_OK -> _snackbarText.setValue(
+                Event(R.string.successfully_added_task_message)
+            )
+            DELETE_RESULT_OK -> _snackbarText.setValue(
+                Event(R.string.successfully_deleted_task_message)
+            )
         }
+
     }
 
     private fun showSnackbarMessage(message: Int) {

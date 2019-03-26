@@ -49,7 +49,6 @@ class AddEditTaskViewModel(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> =_dataLoading
 
-
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
@@ -106,7 +105,7 @@ class AddEditTaskViewModel(
     }
 
     // Called when clicking on fab.
-    internal fun saveTask() {
+    fun saveTask() {
         val currentTitle = title.value
         val currentDescription = description.value
 

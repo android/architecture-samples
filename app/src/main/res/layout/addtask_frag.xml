@@ -15,7 +15,7 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -26,47 +26,64 @@
             type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel"/>
     </data>
 
-    <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
-        android:id="@+id/refresh_layout"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:enabled="@{viewmodel.dataLoading}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        android:layout_height="match_parent">
 
-        <ScrollView
+        <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:enabled="@{viewmodel.dataLoading}"
+            app:refreshing="@{viewmodel.dataLoading}">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
+                android:layout_height="match_parent">
 
-                <EditText
-                    android:id="@+id/add_task_title"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/title_hint"
-                    android:maxLines="1"
-                    android:imeOptions="flagNoExtractUi"
-                    android:text="@={viewmodel.title}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
 
-                <EditText
-                    android:id="@+id/add_task_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="350dp"
-                    android:imeOptions="flagNoExtractUi"
-                    android:gravity="top"
-                    android:hint="@string/description_hint"
-                    android:text="@={viewmodel.description}"/>
+                    <EditText
+                        android:id="@+id/add_task_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/title_hint"
+                        android:imeOptions="flagNoExtractUi"
+                        android:maxLines="1"
+                        android:text="@={viewmodel.title}"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
-            </LinearLayout>
-        </ScrollView>
-    </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
+                    <EditText
+                        android:id="@+id/add_task_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp"
+                        android:gravity="top"
+                        android:hint="@string/description_hint"
+                        android:imeOptions="flagNoExtractUi"
+                        android:text="@={viewmodel.description}"/>
+
+                </LinearLayout>
+            </ScrollView>
+        </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_edit_task_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_done"
+            android:onClick="@{() -> viewmodel.saveTask()}"
+            app:fabSize="normal"
+            app:layout_anchor="@id/refresh_layout"
+            app:layout_anchorGravity="bottom|right|end"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
