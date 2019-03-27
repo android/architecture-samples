@@ -40,9 +40,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.rule.ActivityTestRule
-import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.currentActivity
 import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
@@ -82,13 +82,12 @@ class TasksScreenTest {
         ActivityTestRule<TasksActivity>(TasksActivity::class.java)
 
     /**
-     * The tasks repository needs to be instantiated on the main thread.
+     * Make sure the tasks repository has no tasks on initialization.
      */
     @UiThreadTest
     @Before
     fun resetState() = runBlocking {
-        Injection.provideTasksRepository(getApplicationContext())
-            .deleteAllTasks()
+        (getApplicationContext() as TodoApplication).taskRepository.deleteAllTasks()
     }
 
     /**

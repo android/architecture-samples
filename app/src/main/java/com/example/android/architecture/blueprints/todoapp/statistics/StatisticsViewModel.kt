@@ -39,27 +39,22 @@ class StatisticsViewModel(
 ) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _error = MutableLiveData<Boolean>()
-    val error: LiveData<Boolean>
-        get() = _error
+    val error: LiveData<Boolean> = _error
+
     /**
      * Controls whether the stats are shown or a "No data" message.
      */
-    val empty: LiveData<Boolean>
-        get() = _empty
+    private val _empty = MutableLiveData<Boolean>()
+    val empty: LiveData<Boolean> = _empty
 
     private val _numberOfActiveTasks = MutableLiveData<Int>()
-    val numberOfActiveTasks: LiveData<Int>
-        get() = _numberOfActiveTasks
+    val numberOfActiveTasks: LiveData<Int> = _numberOfActiveTasks
 
     private val _numberOfCompletedTasks = MutableLiveData<Int>()
-    val numberOfCompletedTasks: LiveData<Int>
-        get() = _numberOfCompletedTasks
-
-    private val _empty = MutableLiveData<Boolean>()
+    val numberOfCompletedTasks: LiveData<Int> = _numberOfCompletedTasks
 
     private var activeTasks = 0
 

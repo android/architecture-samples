@@ -38,28 +38,22 @@ class TaskDetailViewModel(
 ) : ViewModel() {
 
     private val _task = MutableLiveData<Task>()
-    val task: LiveData<Task>
-        get() = _task
+    val task: LiveData<Task> = _task
 
     private val _isDataAvailable = MutableLiveData<Boolean>()
-    val isDataAvailable: LiveData<Boolean>
-        get() = _isDataAvailable
+    val isDataAvailable: LiveData<Boolean> = _isDataAvailable
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _editTaskCommand = MutableLiveData<Event<Unit>>()
-    val editTaskCommand: LiveData<Event<Unit>>
-        get() = _editTaskCommand
+    val editTaskCommand: LiveData<Event<Unit>> = _editTaskCommand
 
     private val _deleteTaskCommand = MutableLiveData<Event<Unit>>()
-    val deleteTaskCommand: LiveData<Event<Unit>>
-        get() = _deleteTaskCommand
+    val deleteTaskCommand: LiveData<Event<Unit>> = _deleteTaskCommand
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
+    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = Transformations.map(_task) { input: Task? ->

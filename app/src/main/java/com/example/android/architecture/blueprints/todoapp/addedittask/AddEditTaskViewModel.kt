@@ -47,17 +47,14 @@ class AddEditTaskViewModel(
     val description = MutableLiveData<String>()
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() =_dataLoading
+    val dataLoading: LiveData<Boolean> =_dataLoading
 
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
+    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
     private val _taskUpdated = MutableLiveData<Event<Unit>>()
-    val taskUpdatedEvent: LiveData<Event<Unit>>
-        get() = _taskUpdated
+    val taskUpdatedEvent: LiveData<Event<Unit>> = _taskUpdated
 
     private var taskId: String? = null
 

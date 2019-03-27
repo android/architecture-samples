@@ -17,9 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
@@ -28,17 +27,33 @@ import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
 import kotlinx.coroutines.Dispatchers
 
 /**
- * Enables injection of production implementations for
- * [TasksDataSource] at compile time.
+ * A Service Locator for the [TasksRepository]. This is the prod version, with a
+ * the "real" [TasksRemoteDataSource].
  */
-object Injection {
+object ServiceLocator {
+
+    @Volatile private var tasksRepository: TasksRepository? = null
 
     fun provideTasksRepository(context: Context): TasksRepository {
+        return tasksRepository ?: synchronized(this) {
+            tasksRepository ?: createTasksRepository(context)
+        }
+    }
+
+    private fun createTasksRepository(context: Context): TasksRepository {
         val database = ToDoDatabase.getInstance(context)
         return DefaultTasksRepository.getInstance(
             TasksRemoteDataSource,
             TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
             Dispatchers.IO
         )
+    }
+
+    /**
+     * Enables replacing the [TasksRepository] from tests. Not used at the moment.
+     */
+    @VisibleForTesting
+    fun setTestTasksRepository(newRepository: TasksRepository) {
+        tasksRepository = newRepository
     }
 }

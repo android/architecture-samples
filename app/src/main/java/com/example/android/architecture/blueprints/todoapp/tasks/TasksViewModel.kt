@@ -48,32 +48,25 @@ class TasksViewModel(
 ) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
-    val items: LiveData<List<Task>>
-        get() = _items
+    val items: LiveData<List<Task>> = _items
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
-    val currentFilteringLabel: LiveData<Int>
-        get() = _currentFilteringLabel
+    val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel
 
     private val _noTasksLabel = MutableLiveData<Int>()
-    val noTasksLabel: LiveData<Int>
-        get() = _noTasksLabel
+    val noTasksLabel: LiveData<Int> = _noTasksLabel
 
     private val _noTaskIconRes = MutableLiveData<Int>()
-    val noTaskIconRes: LiveData<Int>
-        get() = _noTaskIconRes
+    val noTaskIconRes: LiveData<Int> = _noTaskIconRes
 
     private val _tasksAddViewVisible = MutableLiveData<Boolean>()
-    val tasksAddViewVisible: LiveData<Boolean>
-        get() = _tasksAddViewVisible
+    val tasksAddViewVisible: LiveData<Boolean> = _tasksAddViewVisible
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>>
-        get() = _snackbarText
+    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
     private var _currentFiltering = TasksFilterType.ALL_TASKS
 
@@ -81,12 +74,10 @@ class TasksViewModel(
     private val isDataLoadingError = MutableLiveData<Boolean>()
 
     private val _openTaskEvent = MutableLiveData<Event<String>>()
-    val openTaskEvent: LiveData<Event<String>>
-        get() = _openTaskEvent
+    val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
 
     private val _newTaskEvent = MutableLiveData<Event<Unit>>()
-    val newTaskEvent: LiveData<Event<Unit>>
-        get() = _newTaskEvent
+    val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
 
     // This LiveData depends on another so we can use a transformation.
     val empty: LiveData<Boolean> = Transformations.map(_items) {

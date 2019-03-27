@@ -28,7 +28,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import com.example.android.architecture.blueprints.todoapp.Injection
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 
 
@@ -64,7 +64,7 @@ fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.()
 }
 
 fun <T : ViewModel> AppCompatActivity.obtainViewModel(viewModelClass: Class<T>): T {
-    val repository = Injection.provideTasksRepository(application)
+    val repository = (application as TodoApplication).taskRepository
     return ViewModelProviders.of(this, ViewModelFactory(repository)).get(viewModelClass)
 }
 

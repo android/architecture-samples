@@ -16,27 +16,44 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
 import kotlinx.coroutines.Dispatchers
 
 /**
- * Enables injection of mock implementations for
- * [TasksDataSource] at compile time. This is useful for testing, since it allows us to use
- * a fake instance of the class to isolate the dependencies and run a test hermetically.
+ * A Service Locator for the [TasksRepository]. This is the mock version, with a
+ * [FakeTasksRemoteDataSource].
  */
-object Injection {
 
-    fun provideTasksRepository(context: Context): DefaultTasksRepository {
+object ServiceLocator {
+
+    @Volatile private var tasksRepository: TasksRepository? = null
+
+    fun provideTasksRepository(context: Context): TasksRepository {
+        return tasksRepository ?: synchronized(this) {
+            tasksRepository ?: createTasksRepository(context)
+        }
+    }
+
+    private fun createTasksRepository(context: Context): TasksRepository {
         val database = ToDoDatabase.getInstance(context)
         return DefaultTasksRepository.getInstance(
             FakeTasksRemoteDataSource,
             TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
             Dispatchers.Unconfined
         )
+    }
+
+    /**
+     * Enables replacing the [TasksRepository] from tests. Not used at the moment.
+     */
+    @VisibleForTesting
+    fun setTestTasksRepository(newRepository: TasksRepository) {
+        tasksRepository = newRepository
     }
 }

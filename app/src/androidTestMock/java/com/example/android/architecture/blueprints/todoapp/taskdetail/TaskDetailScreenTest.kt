@@ -29,8 +29,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import com.example.android.architecture.blueprints.todoapp.Injection
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.rotateOrientation
@@ -65,8 +65,11 @@ class TaskDetailScreenTest {
      * Activity under test, so you can control the Intent that is used to start the target
      * Activity.
      */
-    @get:Rule var taskDetailActivityTestRule = ActivityTestRule(TaskDetailActivity::class.java,
-            /* Initial touch mode  */ true, /* Lazily launch activity */ false)
+    @get:Rule var taskDetailActivityTestRule = ActivityTestRule(
+        TaskDetailActivity::class.java,
+        /* Initial touch mode  */ true,
+        /* Lazily launch activity */ false
+    )
 
     private fun loadActiveTask() {
         startActivityWithWithStubbedTask(ACTIVE_TASK)
@@ -88,7 +91,7 @@ class TaskDetailScreenTest {
      */
     private fun startActivityWithWithStubbedTask(task: Task) {
         // Add a task stub to the fake service api layer.
-        Injection.provideTasksRepository(getApplicationContext()).apply {
+        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
             runBlocking {
                 deleteAllTasks()
             }
@@ -108,11 +111,13 @@ class TaskDetailScreenTest {
      * idle state. This helps Espresso to synchronize your test actions, which makes tests
      * significantly more reliable.
      */
-    @Before fun registerIdlingResource() {
+    @Before
+    fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
     }
 
-    @Test fun activeTaskDetails_DisplayedInUi() {
+    @Test
+    fun activeTaskDetails_DisplayedInUi() {
         loadActiveTask()
 
         // Check that the task title and description are displayed
@@ -121,7 +126,8 @@ class TaskDetailScreenTest {
         onView(withId(R.id.task_detail_complete)).check(matches(not<View>(isChecked())))
     }
 
-    @Test fun completedTaskDetails_DisplayedInUi() {
+    @Test
+    fun completedTaskDetails_DisplayedInUi() {
         loadCompletedTask()
 
         // Check that the task title and description are displayed
@@ -130,7 +136,8 @@ class TaskDetailScreenTest {
         onView(withId(R.id.task_detail_complete)).check(matches(isChecked()))
     }
 
-    @Test fun orientationChange_menuAndTaskPersist() {
+    @Test
+    fun orientationChange_menuAndTaskPersist() {
         loadActiveTask()
 
         // Check delete menu item is displayed and is unique
@@ -149,7 +156,8 @@ class TaskDetailScreenTest {
     /**
      * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
      */
-    @After fun unregisterIdlingResource() {
+    @After
+    fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 

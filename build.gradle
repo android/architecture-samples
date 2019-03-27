@@ -40,7 +40,7 @@ ext {
     androidXAnnotations = '1.0.1'
     androidXLegacySupport = '1.0.0'
     appCompatVersion = '1.0.2'
-    archLifecycleVersion = '2.1.0-alpha02'
+    archLifecycleVersion = '2.1.0-alpha03'
     archTestingVersion = '2.0.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.1.0'
@@ -52,9 +52,9 @@ ext {
     materialVersion = '1.0.0'
     mockitoVersion = '2.8.9'
     recyclerViewVersion = '1.0.0'
-    roomVersion = '2.1.0-alpha04'
+    roomVersion = '2.1.0-alpha06'
     rulesVersion = '1.0.1'
-    timberVersion = '4.7.0'
+    timberVersion = '4.7.1'
 }
 
 /*
