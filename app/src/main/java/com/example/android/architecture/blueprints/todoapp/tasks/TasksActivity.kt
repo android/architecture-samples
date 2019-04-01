@@ -66,6 +66,7 @@ class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
                 }
             })
         }
+        viewModel.loadTasks(true)
     }
 
     private fun setupViewFragment() {

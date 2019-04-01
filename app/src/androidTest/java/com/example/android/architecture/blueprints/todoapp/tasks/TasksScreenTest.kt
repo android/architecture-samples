@@ -17,7 +17,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.view.View
 import android.widget.ListView
+import androidx.appcompat.widget.Toolbar
 import androidx.test.annotation.UiThreadTest
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
@@ -39,13 +41,14 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.rule.ActivityTestRule
+
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.currentActivity
-import com.example.android.architecture.blueprints.todoapp.getToolbarNavigationContentDescription
 import com.example.android.architecture.blueprints.todoapp.util.rotateOrientation
+import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.google.common.base.Preconditions.checkArgument
 import kotlinx.coroutines.runBlocking
@@ -56,7 +59,6 @@ import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -69,20 +71,12 @@ class TasksScreenTest {
 
     private val TITLE1 = "TITLE1"
     private val TITLE2 = "TITLE2"
+    private val TITLE3 = "TITLE3"
     private val DESCRIPTION = "DESCR"
 
     /**
-     * [ActivityTestRule] is a JUnit [@Rule][Rule] to launch your activity under test.
-     *
-     *
-     * Rules are interceptors which are executed for each test method and are important building
-     * blocks of Junit tests.
-     */
-    @Rule @JvmField var tasksActivityTestRule =
-        ActivityTestRule<TasksActivity>(TasksActivity::class.java)
-
-    /**
      * Make sure the tasks repository has no tasks on initialization.
+     * The tasks repository needs to be instantiated on the main thread.
      */
     @UiThreadTest
     @Before
@@ -109,8 +103,13 @@ class TasksScreenTest {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 
-    private val toolbarNavigationContentDescription: String
-        get() = tasksActivityTestRule.activity.getToolbarNavigationContentDescription(R.id.toolbar)
+    private fun ActivityScenario<TasksActivity>.getToolbarNavigationContentDescription() : String {
+        var description = ""
+        onActivity {
+            description = it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
+        }
+        return description
+    }
 
     /**
      * A custom [Matcher] which matches an item in a [ListView] by its text.
@@ -138,6 +137,8 @@ class TasksScreenTest {
 
     @Test
     fun clickAddTaskButton_opensAddTaskUi() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
         // Click on the add task button
         onView(withId(R.id.fab_add_task)).perform(click())
 
@@ -147,8 +148,8 @@ class TasksScreenTest {
 
     @Test
     fun editTask() {
-        // First add a task
-        createTask(TITLE1, DESCRIPTION)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText(TITLE1)).perform(click())
@@ -179,18 +180,18 @@ class TasksScreenTest {
 
     @Test
     fun addTaskToTasksList() {
-        createTask(TITLE1, DESCRIPTION)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Verify task is displayed on screen
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun markTaskAsComplete() {
-        viewAllTasks()
-
-        // Add active task
-        createTask(TITLE1, DESCRIPTION)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Mark the task as complete
         clickCheckBoxForTask(TITLE1)
@@ -204,13 +205,13 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun markTaskAsActive() {
-        viewAllTasks()
-
-        // Add completed task
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Mark the task as active
         clickCheckBoxForTask(TITLE1)
@@ -224,65 +225,84 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(matches(not(isDisplayed())))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun showAllTasks() {
-        // Add 2 active tasks
-        createTask(TITLE1, DESCRIPTION)
-        createTask(TITLE2, DESCRIPTION)
+        // Add one active task and one completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
-        //Verify that all our tasks are shown
+        // Verify that both of our tasks are shown
         viewAllTasks()
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun showActiveTasks() {
-        // Add 2 active tasks
-        createTask(TITLE1, DESCRIPTION)
-        createTask(TITLE2, DESCRIPTION)
+        // Add 2 active tasks and one completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION))
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE3, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
-        //Verify that all our tasks are shown
+        // Verify that the active tasks (but not the completed task) are shown
         viewActiveTasks()
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
+        onView(withItemText(TITLE3)).check(doesNotExist())
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun showCompletedTasks() {
-        // Add 2 completed tasks
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
-        createTask(TITLE2, DESCRIPTION)
-        clickCheckBoxForTask(TITLE2)
+        // Add one active task and 2 completed tasks
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE3, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
-        // Verify that all our tasks are shown
+        // Verify that the completed tasks (but not the active task) are shown
         viewCompletedTasks()
-        onView(withItemText(TITLE1)).check(matches(isDisplayed()))
+        onView(withItemText(TITLE1)).check(doesNotExist())
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
+        onView(withItemText(TITLE3)).check(matches(isDisplayed()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun clearCompletedTasks() {
+        // Add one active task and one completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
         viewAllTasks()
-
-        // Add 2 complete tasks
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
-        createTask(TITLE2, DESCRIPTION)
-        clickCheckBoxForTask(TITLE2)
-
         // Click clear completed in menu
         openActionBarOverflowOrOptionsMenu(getApplicationContext())
         onView(withText(string.menu_clear)).perform(click())
 
-        //Verify that completed tasks are not shown
-        onView(withItemText(TITLE1)).check(matches(not(isDisplayed())))
-        onView(withItemText(TITLE2)).check(matches(not(isDisplayed())))
+        viewAllTasks()
+        // Verify that only the active task is shown
+        onView(withItemText(TITLE1)).check(matches(isDisplayed()))
+        onView(withItemText(TITLE2)).check(doesNotExist())
     }
 
     @Test
     fun createOneTask_deleteTask() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
         // Add active task
@@ -301,6 +321,7 @@ class TasksScreenTest {
 
     @Test
     fun createTwoTasks_deleteOneTask() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         // Add 2 active tasks
         createTask(TITLE1, DESCRIPTION)
         createTask(TITLE2, DESCRIPTION)
@@ -319,10 +340,10 @@ class TasksScreenTest {
 
     @Test
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
-        viewAllTasks()
-
         // Add 1 active task
-        createTask(TITLE1, DESCRIPTION)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        viewAllTasks()
 
         // Click on the task on the list
         onView(withText(TITLE1)).perform(click())
@@ -331,7 +352,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
+        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -340,11 +361,12 @@ class TasksScreenTest {
 
     @Test
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
-        viewAllTasks()
-
         // Add 1 completed task
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        viewAllTasks()
 
         // Click on the task on the list
         onView(withText(TITLE1)).perform(click())
@@ -353,7 +375,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
+        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -361,11 +383,11 @@ class TasksScreenTest {
     }
 
     @Test
-    fun markTaskAsAcompleteAndActiveOnDetailScreen_taskIsActiveInList() {
-        viewAllTasks()
-
+    fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 active task
-        createTask(TITLE1, DESCRIPTION)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        viewAllTasks()
 
         // Click on the task on the list
         onView(withText(TITLE1)).perform(click())
@@ -377,7 +399,8 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
+        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription()))
+            .perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -386,11 +409,12 @@ class TasksScreenTest {
 
     @Test
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
-        viewAllTasks()
-
         // Add 1 completed task
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        viewAllTasks()
 
         // Click on the task on the list
         onView(withText(TITLE1)).perform(click())
@@ -401,20 +425,21 @@ class TasksScreenTest {
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Click on the navigation up button to go back to the list
-        onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
+        onView(withContentDescription(activityScenario.getToolbarNavigationContentDescription())).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
             .check(matches(isChecked()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun orientationChange_FilterActivePersists() {
-
-        // Add a completed task
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
+        // Add 1 completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // when switching to active tasks
         viewActiveTasks()
@@ -423,18 +448,22 @@ class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(not(isDisplayed())))
 
         // when rotating the screen
-        tasksActivityTestRule.activity.rotateOrientation()
+        activityScenario.onActivity {
+            it.rotateOrientation()
+        }
 
         // then nothing changes
         onView(withText(TITLE1)).check(doesNotExist())
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun orientationChange_FilterCompletedPersists() {
-
-        // Add a completed task
-        createTask(TITLE1, DESCRIPTION)
-        clickCheckBoxForTask(TITLE1)
+        // Add 1 completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // when switching to completed tasks
         viewCompletedTasks()
@@ -443,7 +472,9 @@ class TasksScreenTest {
         onView(withText(TITLE1)).check(matches(isDisplayed()))
 
         // when rotating the screen
-        tasksActivityTestRule.activity.rotateOrientation()
+        activityScenario.onActivity {
+            it.rotateOrientation()
+        }
 
         // then nothing changes
         onView(withText(TITLE1)).check(matches(isDisplayed()))
@@ -454,8 +485,12 @@ class TasksScreenTest {
     @Test
     @SdkSuppress(minSdkVersion = 21)
     fun orientationChange_DuringEdit_ChangePersists() {
-        // Add a completed task
-        createTask(TITLE1, DESCRIPTION)
+        // Add 1 completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        viewAllTasks()
 
         // Open the task in details view
         onView(withText(TITLE1)).perform(click())
@@ -478,8 +513,11 @@ class TasksScreenTest {
     @Test
     @SdkSuppress(minSdkVersion = 21)
     fun orientationChange_DuringEdit_NoDuplicate() {
-        // Add a completed task
-        createTask(TITLE1, DESCRIPTION)
+        // Add 1 completed task
+        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
+            isCompleted = true
+        })
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Open the task in details view
         onView(withText(TITLE1)).perform(click())
@@ -487,8 +525,10 @@ class TasksScreenTest {
         // Click on the edit task button
         onView(withId(R.id.fab_edit_task)).perform(click())
 
-        // Rotate the screen
-        currentActivity.rotateOrientation()
+        // when rotating the screen
+        activityScenario.onActivity {
+            it.rotateOrientation()
+        }
 
         // Edit task title and description
         onView(withId(R.id.add_task_title))
@@ -508,8 +548,10 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(doesNotExist())
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewAllTasks()
 
@@ -517,21 +559,25 @@ class TasksScreenTest {
         onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewCompletedTasks()
 
-        // Add task View should be displayed
+        // Add task View should be not be displayed
         onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
     }
 
+    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         // Given an empty list of tasks, make sure "All tasks" filter is on
         viewActiveTasks()
 
-        // Add task View should be displayed
+        // Add task View should be not be displayed
         onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
     }
 
@@ -571,7 +617,4 @@ class TasksScreenTest {
     private fun clickCheckBoxForTask(title: String) {
         onView(allOf(withId(R.id.complete), hasSibling(withText(title)))).perform(click())
     }
-
-    private fun getText(stringId: Int) =
-        tasksActivityTestRule.activity.resources.getString(stringId)
 }

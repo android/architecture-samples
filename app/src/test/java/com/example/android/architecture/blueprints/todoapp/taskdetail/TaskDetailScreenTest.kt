@@ -58,7 +58,6 @@ class TaskDetailScreenTest {
     fun activeTaskDetails_DisplayedInUi() {
         FakeTasksRemoteDataSource.addTasks(ACTIVE_TASK)
 
-        // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         val startIntent = Intent(getApplicationContext(),
             TaskDetailActivity::class.java).apply {
             putExtra(TaskDetailActivity.EXTRA_TASK_ID, ACTIVE_TASK.id)
@@ -82,7 +81,6 @@ class TaskDetailScreenTest {
     fun completedTaskDetails_DisplayedInUi() {
         FakeTasksRemoteDataSource.addTasks(COMPLETED_TASK)
 
-        // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         val startIntent = Intent(getApplicationContext(),
             TaskDetailActivity::class.java).apply {
             putExtra(TaskDetailActivity.EXTRA_TASK_ID, COMPLETED_TASK.id)
@@ -106,7 +104,6 @@ class TaskDetailScreenTest {
     fun orientationChange_menuAndTaskPersist() {
         FakeTasksRemoteDataSource.addTasks(ACTIVE_TASK)
 
-        // Lazily start the Activity from the ActivityTestRule this time to inject the start Intent
         val startIntent = Intent(getApplicationContext(),
             TaskDetailActivity::class.java).apply {
             putExtra(TaskDetailActivity.EXTRA_TASK_ID, ACTIVE_TASK.id)
