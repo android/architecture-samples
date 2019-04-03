@@ -48,7 +48,7 @@ class AddEditTaskActivity : AppCompatActivity(), AddEditTaskNavigator {
             setDisplayShowHomeEnabled(true)
         }
 
-        replaceFragmentInActivity(obtainViewFragment(), R.id.contentFrame)
+        setupViewFragment()
 
         subscribeToNavigationChanges()
     }
@@ -60,13 +60,17 @@ class AddEditTaskActivity : AppCompatActivity(), AddEditTaskNavigator {
         })
     }
 
-    private fun obtainViewFragment() = supportFragmentManager.findFragmentById(R.id.contentFrame) ?:
+    private fun setupViewFragment() {
+        supportFragmentManager.findFragmentById(R.id.contentFrame) ?: replaceFragmentInActivity(
             AddEditTaskFragment.newInstance().apply {
                 arguments = Bundle().apply {
                     putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
                             intent.getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID))
                 }
-            }
+            },
+            R.id.contentFrame
+        )
+    }
 
     fun obtainViewModel(): AddEditTaskViewModel = obtainViewModel(AddEditTaskViewModel::class.java)
 
