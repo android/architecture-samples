@@ -47,16 +47,19 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailNavigator {
             setDisplayShowHomeEnabled(true)
         }
 
-        replaceFragmentInActivity(findOrCreateViewFragment(), R.id.contentFrame)
+        setupViewFragment()
 
         taskViewModel = obtainViewModel()
 
         subscribeToNavigationChanges(taskViewModel)
     }
 
-    private fun findOrCreateViewFragment() =
-            supportFragmentManager.findFragmentById(R.id.contentFrame) ?:
-                    TaskDetailFragment.newInstance(intent.getStringExtra(EXTRA_TASK_ID))
+    private fun setupViewFragment() {
+        supportFragmentManager.findFragmentById(R.id.contentFrame) ?: replaceFragmentInActivity(
+            TaskDetailFragment.newInstance(intent.getStringExtra(EXTRA_TASK_ID)),
+            R.id.contentFrame
+        )
+    }
 
     private fun subscribeToNavigationChanges(viewModel: TaskDetailViewModel) {
         // The activity observes the navigation commands in the ViewModel

@@ -57,14 +57,15 @@ class StatisticsActivity : AppCompatActivity() {
 
         setupNavigationDrawer()
 
-        findOrCreateViewFragment()
+        setupViewFragment()
     }
 
-    private fun findOrCreateViewFragment() =
-            supportFragmentManager.findFragmentById(R.id.contentFrame) ?:
-                    StatisticsFragment.newInstance().also {
-                        replaceFragmentInActivity(it, R.id.contentFrame)
-                    }
+    private fun setupViewFragment() {
+        supportFragmentManager.findFragmentById(R.id.contentFrame) ?: replaceFragmentInActivity(
+            StatisticsFragment.newInstance(),
+            R.id.contentFrame
+        )
+    }
 
     private fun setupNavigationDrawer() {
         drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout)).apply {
