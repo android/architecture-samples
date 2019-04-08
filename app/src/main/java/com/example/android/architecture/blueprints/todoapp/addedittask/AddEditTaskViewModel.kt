@@ -105,7 +105,7 @@ class AddEditTaskViewModel(
     }
 
     // Called when clicking on fab.
-    fun saveTask() {
+    internal fun saveTask() {
         val currentTitle = title.value
         val currentDescription = description.value
 

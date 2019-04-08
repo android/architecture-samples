@@ -70,6 +70,8 @@ class AppNavigationTest {
         onView(withId(R.id.statistics)).check(matches(isDisplayed()))
     }
 
+    // TODO: StatisticsActivity no longer exists so rethink this test
+    //  https://github.com/googlecodelabs/android-testing/issues/122
 //    @Test
 //    fun clickOnListNavigationItem_ShowsListScreen() {
 //        // start up Statistics screen
@@ -109,6 +111,8 @@ class AppNavigationTest {
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
     }
 
+    // TODO: StatisticsActivity no longer exists so rethink this test
+    //  https://github.com/googlecodelabs/android-testing/issues/122
 //    @Test
 //    fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
 //        // start up Tasks screen
