@@ -20,8 +20,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.BaseViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
@@ -33,6 +32,8 @@ import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import kotlinx.coroutines.launch
 import java.util.ArrayList
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Exposes the data to be used in the task list screen.
@@ -43,8 +44,9 @@ import java.util.ArrayList
  * getter method.
  */
 class TasksViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+    private val tasksRepository: TasksRepository,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext
+) : BaseViewModel(coroutineContext) {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>> = _items
@@ -131,16 +133,13 @@ class TasksViewModel(
         }
     }
 
-    fun completeTask(task: Task, completed: Boolean) {
-        // Notify repository
-        viewModelScope.launch {
-            if (completed) {
-                tasksRepository.completeTask(task)
-                showSnackbarMessage(R.string.task_marked_complete)
-            } else {
-                tasksRepository.activateTask(task)
-                showSnackbarMessage(R.string.task_marked_active)
-            }
+    fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
+        if (completed) {
+            tasksRepository.completeTask(task)
+            showSnackbarMessage(R.string.task_marked_complete)
+        } else {
+            tasksRepository.activateTask(task)
+            showSnackbarMessage(R.string.task_marked_active)
         }
     }
 
@@ -181,36 +180,38 @@ class TasksViewModel(
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    fun loadTasks(forceUpdate: Boolean) = viewModelScope.launch {
+    fun loadTasks(forceUpdate: Boolean) {
 
         _dataLoading.value = true
-        val tasksResult = tasksRepository.getTasks(forceUpdate)
 
-        if (tasksResult is Success) {
-            val tasks = tasksResult.data
+        viewModelScope.launch {
+            val tasksResult = tasksRepository.getTasks(forceUpdate)
 
-            val tasksToShow = ArrayList<Task>()
-            // We filter the tasks based on the requestType
-            for (task in tasks) {
-                when (_currentFiltering) {
-                    TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                    TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                        tasksToShow.add(task)
-                    }
-                    TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                        tasksToShow.add(task)
+            if (tasksResult is Success) {
+                val tasks = tasksResult.data
+
+                val tasksToShow = ArrayList<Task>()
+                // We filter the tasks based on the requestType
+                for (task in tasks) {
+                    when (_currentFiltering) {
+                        TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
+                        TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
+                            tasksToShow.add(task)
+                        }
+                        TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
+                            tasksToShow.add(task)
+                        }
                     }
                 }
+                isDataLoadingError.value = false
+                _items.value = ArrayList(tasksToShow)
+            } else {
+                isDataLoadingError.value = false
+                _items.value = emptyList()
+                _snackbarText.value = Event(R.string.loading_tasks_error)
             }
-            _dataLoading.value = false
-            isDataLoadingError.value = false
 
-            val itemsValue = ArrayList(tasksToShow)
-            _items.value = itemsValue
-        } else {
             _dataLoading.value = false
-            isDataLoadingError.value = false
-            _items.value = emptyList()
         }
     }
 }

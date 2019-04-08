@@ -19,8 +19,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.BaseViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
@@ -28,14 +27,17 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
  */
 class TaskDetailViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+    private val tasksRepository: TasksRepository,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext
+) : BaseViewModel(coroutineContext) {
 
     private val _task = MutableLiveData<Task>()
     val task: LiveData<Task> = _task
@@ -63,12 +65,10 @@ class TaskDetailViewModel(
     val taskId: String?
         get() = _task.value?.id
 
-    fun deleteTask() {
+    fun deleteTask() = viewModelScope.launch {
         taskId?.let {
-            viewModelScope.launch {
-                tasksRepository.deleteTask(it)
-                _deleteTaskCommand.value = Event(Unit)
-            }
+            tasksRepository.deleteTask(it)
+            _deleteTaskCommand.value = Event(Unit)
         }
     }
 
@@ -76,33 +76,31 @@ class TaskDetailViewModel(
         _editTaskCommand.value = Event(Unit)
     }
 
-    fun setCompleted(completed: Boolean) {
-        val task = _task.value ?: return
-        viewModelScope.launch {
-            if (completed) {
-                tasksRepository.completeTask(task)
-                showSnackbarMessage(R.string.task_marked_complete)
-            } else {
-                tasksRepository.activateTask(task)
-                showSnackbarMessage(R.string.task_marked_active)
-            }
+    fun setCompleted(completed: Boolean) = viewModelScope.launch {
+        val task = _task.value ?: return@launch
+        if (completed) {
+            tasksRepository.completeTask(task)
+            showSnackbarMessage(R.string.task_marked_complete)
+        } else {
+            tasksRepository.activateTask(task)
+            showSnackbarMessage(R.string.task_marked_active)
         }
     }
 
-    fun start(taskId: String?) {
+
+    fun start(taskId: String?) = viewModelScope.launch {
         if (taskId != null) {
             _dataLoading.value = true
-            viewModelScope.launch {
-                tasksRepository.getTask(taskId, false).let { result ->
-                    if (result is Success) {
-                        onTaskLoaded(result.data)
-                    } else {
-                        onDataNotAvailable(result)
-                    }
+            tasksRepository.getTask(taskId, false).let { result ->
+                if (result is Success) {
+                    onTaskLoaded(result.data)
+                } else {
+                    onDataNotAvailable(result)
                 }
             }
         }
     }
+
 
     private fun setTask(task: Task?) {
         this._task.value = task

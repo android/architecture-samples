@@ -18,14 +18,15 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.BaseViewModel
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * ViewModel for the Add/Edit screen.
@@ -37,8 +38,9 @@ import kotlinx.coroutines.launch
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+    private val tasksRepository: TasksRepository,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext
+) : BaseViewModel(coroutineContext) {
 
     // Two-way databinding, exposing MutableLiveData
     val title = MutableLiveData<String>()
@@ -105,7 +107,7 @@ class AddEditTaskViewModel(
     }
 
     // Called when clicking on fab.
-    internal fun saveTask() {
+    fun saveTask() {
         val currentTitle = title.value
         val currentDescription = description.value
 
@@ -113,7 +115,7 @@ class AddEditTaskViewModel(
             _snackbarText.value =  Event(R.string.empty_task_message)
             return
         }
-        if (Task(currentTitle, currentDescription ?: "").isEmpty) {
+        if (Task(currentTitle, currentDescription).isEmpty) {
             _snackbarText.value =  Event(R.string.empty_task_message)
             return
         }
@@ -128,11 +130,9 @@ class AddEditTaskViewModel(
         }
     }
 
-    private fun createTask(newTask: Task) {
-        viewModelScope.launch {
-            tasksRepository.saveTask(newTask)
-            _taskUpdated.value = Event(Unit)
-        }
+    private fun createTask(newTask: Task) = viewModelScope.launch {
+        tasksRepository.saveTask(newTask)
+        _taskUpdated.value = Event(Unit)
     }
 
     private fun updateTask(task: Task) {

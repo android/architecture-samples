@@ -26,62 +26,76 @@ import java.util.LinkedHashMap
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
  */
-object FakeRepository : TasksRepository {
+class FakeRepository : TasksRepository {
 
-    private var TASKS_SERVICE_DATA: LinkedHashMap<String, Task> = LinkedHashMap()
+    var tasksServiceData: LinkedHashMap<String, Task> = LinkedHashMap()
+
+    private var shouldReturnError = false
+
+    fun setReturnError(value: Boolean) {
+        shouldReturnError = value
+    }
 
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-        TASKS_SERVICE_DATA[taskId]?.let {
+        if (shouldReturnError) {
+            return Error(Exception("Test exception"))
+        }
+        tasksServiceData[taskId]?.let {
             return Success(it)
         }
         return Error(Exception("Could not find task"))
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
-        return Success(Lists.newArrayList(TASKS_SERVICE_DATA.values))
+        if (shouldReturnError) {
+            return Error(Exception("Test exception"))
+        }
+        return Success(Lists.newArrayList(tasksServiceData.values))
     }
 
     override suspend fun saveTask(task: Task) {
-        TASKS_SERVICE_DATA.put(task.id, task)
+        tasksServiceData[task.id] = task
     }
 
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, task.id)
-        completedTask.isCompleted = true
-        TASKS_SERVICE_DATA.put(task.id, completedTask)
+        val completedTask = Task(task.title, task.description, task.id).apply {
+            isCompleted = true
+        }
+        tasksServiceData[task.id] = completedTask
     }
 
     override suspend fun completeTask(taskId: String) {
         // Not required for the remote data source.
+        throw NotImplementedError()
     }
 
     override suspend fun activateTask(task: Task) {
         val activeTask = Task(task.title, task.description, task.id)
-        TASKS_SERVICE_DATA.put(task.id, activeTask)
+        tasksServiceData[task.id] = activeTask
     }
 
     override suspend fun activateTask(taskId: String) {
-        // Not required for the remote data source.
+        throw NotImplementedError()
     }
 
     override suspend fun clearCompletedTasks() {
-        TASKS_SERVICE_DATA = TASKS_SERVICE_DATA.filterValues {
+        tasksServiceData = tasksServiceData.filterValues {
             !it.isCompleted
         } as LinkedHashMap<String, Task>
     }
 
     override suspend fun deleteTask(taskId: String) {
-        TASKS_SERVICE_DATA.remove(taskId)
+        tasksServiceData.remove(taskId)
     }
 
     override suspend fun deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear()
+        tasksServiceData.clear()
     }
 
     @VisibleForTesting
     fun addTasks(vararg tasks: Task) {
         for (task in tasks) {
-            TASKS_SERVICE_DATA.put(task.id, task)
+            tasksServiceData[task.id] = task
         }
     }
 }

@@ -48,5 +48,5 @@ data class Task @JvmOverloads constructor(
         get() = !isCompleted
 
     val isEmpty
-        get() = title.isEmpty() && description.isEmpty()
+        get() = title.isEmpty() || description.isEmpty()
 }
