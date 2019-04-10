@@ -68,8 +68,7 @@
         <argument
             android:name="TASK_ID"
             app:argType="string"
-            app:nullable="true"
-            android:defaultValue="null"/>
+            app:nullable="true"/>
         <action
             android:id="@+id/action_addEditTaskFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"

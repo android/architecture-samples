@@ -29,7 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -39,8 +39,18 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class StatisticsScreenTest {
 
-    @Before
-    fun setup() {
+    @After
+    fun cleanupDb() {
+        // Given some tasks
+        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
+            runBlocking {
+                deleteAllTasks()
+            }
+        }
+    }
+
+    @Test
+    fun tasks_showsNonEmptyMessage() {
         // Given some tasks
         ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
             runBlocking {
@@ -48,10 +58,7 @@ class StatisticsScreenTest {
                 saveTask(Task("Title2").apply { isCompleted = true })
             }
         }
-    }
 
-    @Test
-    fun tasks_showsNonEmptyMessage() {
         val scenario = launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.Theme_AppCompat)
         val expectedActiveTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_active_tasks, 1)

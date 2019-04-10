@@ -1,7 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -11,34 +10,24 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
-import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
+import org.robolectric.annotation.TextLayoutMode
 
 /**
  * Tests for the main tasks screen that do not involve having to navigate to another screen
+ *
  */
 @RunWith(AndroidJUnit4::class)
-@Ignore("blocked on robolectric issue #4810")
+@LooperMode(LooperMode.Mode.PAUSED)
+@TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
+@Ignore("blocked on robolectric/4862")
 class TasksSingleScreenTest {
-
-    @Before
-    fun clearTaskRepository() {
-        // Add a task stub to the fake service api layer.
-        ServiceLocator.provideTasksRepository(ApplicationProvider.getApplicationContext()).apply {
-            runBlocking {
-                deleteAllTasks()
-            }
-        }
-    }
 
     @Test
     fun displayActiveTask() {

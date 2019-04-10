@@ -24,28 +24,29 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.LooperMode
+import org.robolectric.annotation.TextLayoutMode
 
 /**
  * Tests for the add task screen.
  */
 @RunWith(AndroidJUnit4::class)
+@LooperMode(LooperMode.Mode.PAUSED)
+@TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 class AddEditTaskScreenTest {
 
     @Test
-    @Ignore("hangs in robolectric, see issue #4724")
     fun emptyTask_isNotSaved() {
         // GIVEN - On the "Add Task" screen.
-        val bundle = AddEditTaskFragmentArgs().toBundle()
+        val bundle = AddEditTaskFragmentArgs(null).toBundle()
         launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
 
         // WHEN - Enter invalid title and description combination and click save
         onView(withId(R.id.add_task_title)).perform(clearText())
         onView(withId(R.id.add_task_description)).perform(clearText())
-        // This line hangs due to https://github.com/robolectric/robolectric/issues/4724
-        onView(withId(R.id.fab_edit_task_done)).perform(click())
+        onView(withId(R.id.fab_save_task)).perform(click())
 
         // THEN - Entered Task is still displayed (a correct task would close it).
         onView(withId(R.id.add_task_title)).check(matches(isDisplayed()))
