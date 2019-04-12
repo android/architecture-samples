@@ -18,13 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.android.architecture.blueprints.todoapp.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -36,9 +35,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  * preferable to having logic in the XML layout.
  */
 class StatisticsViewModel(
-    private val tasksRepository: TasksRepository,
-    coroutineContext: CoroutineContext = EmptyCoroutineContext
-) : BaseViewModel(coroutineContext) {
+    private val tasksRepository: TasksRepository
+) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading

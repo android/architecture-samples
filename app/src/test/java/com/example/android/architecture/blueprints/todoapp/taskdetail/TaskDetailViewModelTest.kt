@@ -48,16 +48,16 @@ class TaskDetailViewModelTest {
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
 
+    // A CoroutineContext that can be controlled from tests
+    private val testContext = TestCoroutineContext()
+
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule()
+    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule(testContext)
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
-
-    // A CoroutineContext that can be controlled from tests
-    private val testContext = TestCoroutineContext()
 
     val task = Task("Title1", "Description1")
 
@@ -66,7 +66,7 @@ class TaskDetailViewModelTest {
         tasksRepository = FakeRepository()
         tasksRepository.addTasks(task)
 
-        taskDetailViewModel = TaskDetailViewModel(tasksRepository, testContext)
+        taskDetailViewModel = TaskDetailViewModel(tasksRepository)
     }
 
     @Test
