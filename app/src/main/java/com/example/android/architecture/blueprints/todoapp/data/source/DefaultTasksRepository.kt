@@ -239,9 +239,7 @@ class DefaultTasksRepository(
     private fun getTaskWithId(id: String) = cachedTasks?.get(id)
 
     private fun cacheTask(task: Task): Task {
-        val cachedTask = Task(task.title, task.description, task.id).apply {
-            isCompleted = task.isCompleted
-        }
+        val cachedTask = Task(task.title, task.description, task.isCompleted, task.id)
         // Create if it doesn't exist.
         if (cachedTasks == null) {
             cachedTasks = ConcurrentHashMap()

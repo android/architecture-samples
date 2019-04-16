@@ -1,6 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.app.Service
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -10,9 +12,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,9 +35,16 @@ import org.robolectric.annotation.TextLayoutMode
 @Ignore("blocked on robolectric/4862")
 class TasksSingleScreenTest {
 
+    private lateinit var repository: TasksRepository
+
+    @Before
+    fun setup() {
+        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+    }
+
     @Test
     fun displayActiveTask() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION1))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION1))
 
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
@@ -46,9 +59,7 @@ class TasksSingleScreenTest {
 
     @Test
     fun displayCompletedTask() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION1).apply {
-          isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION1, true))
 
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
@@ -63,7 +74,7 @@ class TasksSingleScreenTest {
 
     @Test
     fun deleteOneTest() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION1))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION1))
 
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
@@ -80,8 +91,9 @@ class TasksSingleScreenTest {
 
     @Test
     fun deleteOneOfTwoTests() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION1))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION2))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION1))
+        repository.saveTaskBlocking(Task(TITLE2, DESCRIPTION2))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Open it in details view
@@ -116,10 +128,8 @@ class TasksSingleScreenTest {
 
         const val TITLE1 = "TITLE1"
         const val TITLE2 = "TITLE2"
-        const val TITLE3 = "TITLE3"
 
         const val DESCRIPTION1 = "DESCRIPTION1"
         const val DESCRIPTION2 = "DESCRIPTION2"
-        const val DESCRIPTION3 = "DESCRIPTION3"
     }
 }

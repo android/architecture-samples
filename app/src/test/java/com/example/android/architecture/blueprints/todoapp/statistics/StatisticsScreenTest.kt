@@ -54,8 +54,8 @@ class StatisticsScreenTest {
         // Given some tasks
         ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
             runBlocking {
-                saveTask(Task("Title1").apply { isCompleted = false })
-                saveTask(Task("Title2").apply { isCompleted = true })
+                saveTask(Task("Title1", "Description1", false))
+                saveTask(Task("Title2", "Description2", true))
             }
         }
 

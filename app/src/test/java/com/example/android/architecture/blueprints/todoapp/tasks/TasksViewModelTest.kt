@@ -67,12 +67,8 @@ class TasksViewModelTest {
         // We initialise the tasks to 3, with one active and two completed
         tasksRepository = FakeRepository()
         val task1 = Task("Title1", "Description1")
-        val task2 = Task("Title2", "Description2").apply {
-            isCompleted = true
-        }
-        val task3 = Task("Title3", "Description3").apply {
-            isCompleted = true
-        }
+        val task2 = Task("Title2", "Description2", true)
+        val task3 = Task("Title3", "Description3", true)
         tasksRepository.addTasks(task1, task2, task3)
 
         tasksViewModel = TasksViewModel(tasksRepository)
@@ -261,7 +257,7 @@ class TasksViewModelTest {
     @Test
     fun activateTask_dataAndSnackbarUpdated() {
         // With a repository that has a completed task
-        val task = Task("Title", "Description").apply { isCompleted = true }
+        val task = Task("Title", "Description", true)
         tasksRepository.addTasks(task)
 
         // Activate task

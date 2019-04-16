@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -47,13 +46,5 @@ object ServiceLocator {
             TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
             Dispatchers.Unconfined
         )
-    }
-
-    /**
-     * Enables replacing the [TasksRepository] from tests. Not used at the moment.
-     */
-    @VisibleForTesting
-    fun setTestTasksRepository(newRepository: TasksRepository) {
-        tasksRepository = newRepository
     }
 }

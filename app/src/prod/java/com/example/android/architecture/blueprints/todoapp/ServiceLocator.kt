@@ -48,12 +48,4 @@ object ServiceLocator {
             Dispatchers.IO
         )
     }
-
-    /**
-     * Enables replacing the [TasksRepository] from tests. Not used at the moment.
-     */
-    @VisibleForTesting
-    fun setTestTasksRepository(newRepository: TasksRepository) {
-        tasksRepository = newRepository
-    }
 }

@@ -122,8 +122,7 @@ class AddEditTaskViewModel(
         if (isNewTask || currentTaskId == null) {
             createTask(Task(currentTitle, currentDescription))
         } else {
-            val task = Task(currentTitle, currentDescription, currentTaskId)
-                .apply { isCompleted = taskCompleted }
+            val task = Task(currentTitle, currentDescription, taskCompleted, currentTaskId)
             updateTask(task)
         }
     }

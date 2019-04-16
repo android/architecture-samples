@@ -65,9 +65,7 @@ class TasksDaoTest {
         database.taskDao().insertTask(DEFAULT_TASK)
 
         // When a task with the same id is inserted
-        val newTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = NEW_IS_COMPLETED
-        }
+        val newTask = Task(NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED, DEFAULT_ID)
         database.taskDao().insertTask(newTask)
 
         // When getting the task by id from the database
@@ -97,9 +95,7 @@ class TasksDaoTest {
         database.taskDao().insertTask(DEFAULT_TASK)
 
         // When the task is updated
-        val updatedTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = NEW_IS_COMPLETED
-        }
+        val updatedTask = Task(NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED, DEFAULT_ID)
         database.taskDao().updateTask(updatedTask)
 
         // When getting the task by id from the database
@@ -189,9 +185,8 @@ class TasksDaoTest {
         private val DEFAULT_DESCRIPTION = "description"
         private val DEFAULT_ID = "id"
         private val DEFAULT_IS_COMPLETED = true
-        private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = DEFAULT_IS_COMPLETED
-        }
+        private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED,
+          DEFAULT_ID)
 
         private val NEW_TITLE = "title2"
         private val NEW_DESCRIPTION = "description2"

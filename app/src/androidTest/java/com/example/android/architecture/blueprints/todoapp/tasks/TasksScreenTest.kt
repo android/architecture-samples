@@ -40,15 +40,15 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
+import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.currentActivity
-import com.example.android.architecture.blueprints.todoapp.util.rotateOrientation
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.rotateOrientation
+import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.common.base.Preconditions.checkArgument
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
@@ -73,14 +73,19 @@ class TasksScreenTest {
     private val TITLE3 = "TITLE3"
     private val DESCRIPTION = "DESCR"
 
+    private lateinit var repository: TasksRepository
+
     /**
      * Make sure the tasks repository has no tasks on initialization.
      * The tasks repository needs to be instantiated on the main thread.
      */
     @UiThreadTest
     @Before
-    fun resetState() = runBlocking {
-        (getApplicationContext() as TodoApplication).taskRepository.deleteAllTasks()
+    fun resetState() {
+        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        runBlocking {
+            repository.deleteAllTasks()
+        }
     }
 
     /**
@@ -139,7 +144,8 @@ class TasksScreenTest {
 
     @Test
     fun editTask() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
@@ -171,17 +177,19 @@ class TasksScreenTest {
 
     @Test
     fun addTaskToTasksList() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Verify task is displayed on screen
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun markTaskAsComplete() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Mark the task as complete
@@ -196,12 +204,11 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun markTaskAsActive() {
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Mark the task as active
@@ -216,14 +223,13 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(matches(not(isDisplayed())))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun showAllTasks() {
         // Add one active task and one completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE2, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Verify that both of our tasks are shown
@@ -232,15 +238,14 @@ class TasksScreenTest {
         onView(withItemText(TITLE2)).check(matches(isDisplayed()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun showActiveTasks() {
         // Add 2 active tasks and one completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE3, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE2, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE3, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Verify that the active tasks (but not the completed task) are shown
@@ -250,17 +255,14 @@ class TasksScreenTest {
         onView(withItemText(TITLE3)).check(doesNotExist())
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun showCompletedTasks() {
         // Add one active task and 2 completed tasks
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
-            isCompleted = true
-        })
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE3, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE2, DESCRIPTION, true))
+        repository.saveTaskBlocking(Task(TITLE3, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Verify that the completed tasks (but not the active task) are shown
@@ -270,14 +272,13 @@ class TasksScreenTest {
         onView(withItemText(TITLE3)).check(matches(isDisplayed()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun clearCompletedTasks() {
         // Add one active task and one completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE2, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE2, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         viewAllTasks()
@@ -332,7 +333,8 @@ class TasksScreenTest {
     @Test
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 active task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
@@ -353,9 +355,8 @@ class TasksScreenTest {
     @Test
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
@@ -376,7 +377,8 @@ class TasksScreenTest {
     @Test
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 active task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION))
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
@@ -400,9 +402,8 @@ class TasksScreenTest {
     @Test
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
@@ -423,13 +424,12 @@ class TasksScreenTest {
             .check(matches(isChecked()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun orientationChange_FilterActivePersists() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // when switching to active tasks
@@ -447,13 +447,12 @@ class TasksScreenTest {
         onView(withText(TITLE1)).check(doesNotExist())
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun orientationChange_FilterCompletedPersists() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // when switching to completed tasks
@@ -477,9 +476,8 @@ class TasksScreenTest {
     @SdkSuppress(minSdkVersion = 21)
     fun orientationChange_DuringEdit_ChangePersists() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         viewAllTasks()
 
@@ -505,9 +503,8 @@ class TasksScreenTest {
     @SdkSuppress(minSdkVersion = 21)
     fun orientationChange_DuringEdit_NoDuplicate() {
         // Add 1 completed task
-        FakeTasksRemoteDataSource.addTasks(Task(TITLE1, DESCRIPTION).apply {
-            isCompleted = true
-        })
+        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
+
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
         // Open the task in details view
@@ -539,7 +536,7 @@ class TasksScreenTest {
         onView(withItemText(TITLE1)).check(doesNotExist())
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
@@ -550,7 +547,7 @@ class TasksScreenTest {
         onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
@@ -561,7 +558,7 @@ class TasksScreenTest {
         onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
     }
 
-    // TODO Move this to TasksSingleScreenTest once #4810 is fixed
+    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)

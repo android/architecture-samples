@@ -15,7 +15,6 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data
 
-import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -45,8 +44,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, task.id)
-        completedTask.isCompleted = true
+        val completedTask = Task(task.title, task.description, true, task.id)
         TASKS_SERVICE_DATA.put(task.id, completedTask)
     }
 
@@ -55,7 +53,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, task.id)
+        val activeTask = Task(task.title, task.description, false, task.id)
         TASKS_SERVICE_DATA.put(task.id, activeTask)
     }
 
@@ -75,12 +73,5 @@ object FakeTasksRemoteDataSource : TasksDataSource {
 
     override suspend fun deleteAllTasks() {
         TASKS_SERVICE_DATA.clear()
-    }
-
-    @VisibleForTesting
-    fun addTasks(vararg tasks: Task) {
-        for (task in tasks) {
-            TASKS_SERVICE_DATA.put(task.id, task)
-        }
     }
 }

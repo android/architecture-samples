@@ -26,11 +26,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -40,23 +42,23 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TaskDetailScreenTest {
 
+    private lateinit var repository: TasksRepository
+
+    @Before
+    fun initRepository() {
+        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+    }
+
     @After
-    fun cleanupDb() {
-        // Given some tasks
-        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
-            runBlocking {
-                deleteAllTasks()
-            }
-        }
+    fun cleanupDb() = runBlocking {
+        repository.deleteAllTasks()
     }
 
     @Test
     fun activeTaskDetails_DisplayedInUi() {
         // GIVEN - Add active (incomplete) task to the DB
-        val activeTask = Task("Active Task", "AndroidX Rocks").apply {
-            isCompleted = false
-        }
-        FakeTasksRemoteDataSource.addTasks(activeTask)
+        val activeTask = Task("Active Task", "AndroidX Rocks", false)
+        repository.saveTaskBlocking(activeTask)
 
         // WHEN - Details fragment launched to display task
         val bundle = TaskDetailFragmentArgs(activeTask.id).toBundle();
@@ -78,10 +80,8 @@ class TaskDetailScreenTest {
     @Test
     fun completedTaskDetails_DisplayedInUi() {
         // GIVEN - Add completed task to the DB
-        val completedTask = Task("Completed Task", "AndroidX Rocks").apply {
-            isCompleted = true
-        }
-        FakeTasksRemoteDataSource.addTasks(completedTask)
+        val completedTask = Task("Completed Task", "AndroidX Rocks", true)
+        repository.saveTaskBlocking(completedTask)
 
         // WHEN - Details fragment launched to display task
         val bundle = TaskDetailFragmentArgs(completedTask.id).toBundle();
