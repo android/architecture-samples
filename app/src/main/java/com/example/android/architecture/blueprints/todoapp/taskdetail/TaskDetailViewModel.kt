@@ -19,7 +19,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.android.architecture.blueprints.todoapp.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
@@ -27,17 +28,14 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
  * Fragment's actions listener.
  */
 class TaskDetailViewModel(
-    private val tasksRepository: TasksRepository,
-    coroutineContext: CoroutineContext = EmptyCoroutineContext
-) : BaseViewModel(coroutineContext) {
+    private val tasksRepository: TasksRepository
+) : ViewModel() {
 
     private val _task = MutableLiveData<Task>()
     val task: LiveData<Task> = _task

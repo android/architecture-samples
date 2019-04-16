@@ -50,17 +50,17 @@ class StatisticsViewModelTest {
     // Use a fake repository to be injected into the viewmodel
     private val tasksRepository = FakeRepository()
 
-    // Set the main coroutines dispatcher for unit testing.
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule()
-
     // A CoroutineContext that can be controlled from tests
     private val testContext = TestCoroutineContext()
 
+    // Set the main coroutines dispatcher for unit testing.
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule(testContext)
+
     @Before
     fun setupStatisticsViewModel() {
-        statisticsViewModel = StatisticsViewModel(tasksRepository, testContext)
+        statisticsViewModel = StatisticsViewModel(tasksRepository)
     }
 
     @Test

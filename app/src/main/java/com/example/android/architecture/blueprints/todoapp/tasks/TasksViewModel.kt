@@ -20,7 +20,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.android.architecture.blueprints.todoapp.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
@@ -32,8 +33,6 @@ import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import kotlinx.coroutines.launch
 import java.util.ArrayList
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Exposes the data to be used in the task list screen.
@@ -44,9 +43,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  * getter method.
  */
 class TasksViewModel(
-    private val tasksRepository: TasksRepository,
-    coroutineContext: CoroutineContext = EmptyCoroutineContext
-) : BaseViewModel(coroutineContext) {
+    private val tasksRepository: TasksRepository
+) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>> = _items
