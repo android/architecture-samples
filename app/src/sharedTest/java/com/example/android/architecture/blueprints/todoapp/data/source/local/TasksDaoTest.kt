@@ -41,7 +41,7 @@ class TasksDaoTest {
         database = Room.inMemoryDatabaseBuilder(
             getApplicationContext(),
             ToDoDatabase::class.java
-        ).build()
+        ).allowMainThreadQueries().build()
     }
 
     @After
