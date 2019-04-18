@@ -38,13 +38,6 @@ const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 
-fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.() -> Unit) {
-    setSupportActionBar(findViewById(toolbarId))
-    supportActionBar?.run {
-        action()
-    }
-}
-
 fun <T : ViewModel> Fragment.obtainViewModel(viewModelClass: Class<T>): T {
     val repository = (requireContext().applicationContext as TodoApplication).taskRepository
     return ViewModelProviders.of(this, ViewModelFactory(repository)).get(viewModelClass)

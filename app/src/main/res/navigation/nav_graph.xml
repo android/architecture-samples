@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/taskDetailFragment"
         android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment"
-        android:label="TaskDetailFragment" >
+        android:label="TO-DO Details">
         <action
             android:id="@+id/action_taskDetailFragment_to_addEditTaskFragment"
             app:destination="@id/addEditTaskFragment" />
@@ -37,7 +37,7 @@
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragment"
-        android:label="StatisticsFragment" >
+        android:label="@string/app_name">
         <action
             android:id="@+id/action_statisticsFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
@@ -46,7 +46,7 @@
     <fragment
         android:id="@+id/tasksFragment"
         android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment"
-        android:label="TasksFragment" >
+        android:label="@string/app_name">
         <action
             android:id="@+id/action_tasksFragment_to_statisticsFragment"
             app:destination="@id/statisticsFragment" />
@@ -64,11 +64,15 @@
     <fragment
         android:id="@+id/addEditTaskFragment"
         android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment"
-        android:label="AddEditTaskFragment" >
+        android:label="{title}" >
         <argument
             android:name="TASK_ID"
             app:argType="string"
             app:nullable="true"/>
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="false"/>
         <action
             android:id="@+id/action_addEditTaskFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"

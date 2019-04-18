@@ -16,68 +16,46 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.NavOptions
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.setupActionBar
 import com.google.android.material.navigation.NavigationView
-
 
 class TasksActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tasks_act)
-
-        setupActionBar(R.id.toolbar) {
-            setHomeAsUpIndicator(R.drawable.ic_menu)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
         setupNavigationDrawer()
+        setSupportActionBar(findViewById(R.id.toolbar))
+
+        val navController : NavController = findNavController(R.id.nav_host_fragment)
+        appBarConfiguration =
+            AppBarConfiguration.Builder(R.id.tasksFragment, R.id.statisticsFragment)
+                .setDrawerLayout(drawerLayout)
+                .build()
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        findViewById<NavigationView>(R.id.nav_view)
+          .setupWithNavController(navController)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
 
     private fun setupNavigationDrawer() {
         drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout))
             .apply {
                 setStatusBarBackground(R.color.colorPrimaryDark)
             }
-        setupDrawerContent(findViewById(R.id.nav_view))
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) =
-        when (item.itemId) {
-            android.R.id.home -> {
-                // Open the navigation drawer when the home icon is selected from the toolbar.
-                drawerLayout.openDrawer(GravityCompat.START)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
-    private fun setupDrawerContent(navigationView: NavigationView) {
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.list_navigation_menu_item -> {
-                    val navOpts = NavOptions.Builder().setPopUpTo(R.id.tasksFragment, true).build()
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.tasksFragment, null, navOpts)
-                }
-                R.id.statistics_navigation_menu_item -> {
-                    val navOpts = NavOptions.Builder().setPopUpTo(R.id.statisticsFragment, true).build()
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.statisticsFragment, null, navOpts)
-                }
-            }
-            // Close the navigation drawer when an item is selected.
-            menuItem.isChecked = true
-            drawerLayout.closeDrawers()
-            true
-        }
     }
 }

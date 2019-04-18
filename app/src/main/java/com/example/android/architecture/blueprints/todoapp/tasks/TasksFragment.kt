@@ -139,7 +139,9 @@ class TasksFragment : Fragment() {
     }
 
     private fun navigateToAddNewTask() {
-        val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(null)
+        val action = TasksFragmentDirections
+            .actionTasksFragmentToAddEditTaskFragment(null,
+                resources.getString(R.string.add_task))
         findNavController().navigate(action)
     }
 
