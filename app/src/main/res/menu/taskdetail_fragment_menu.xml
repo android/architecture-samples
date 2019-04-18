@@ -18,6 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_delete"
+        android:icon="@drawable/trash_icon"
         android:title="@string/menu_delete_task"
-        app:showAsAction="always|withText" />
+        app:showAsAction="always" />
 </menu>
