@@ -60,6 +60,7 @@
                         android:imeOptions="flagNoExtractUi"
                         android:maxLines="1"
                         android:text="@={viewmodel.title}"
+                        android:textStyle="bold"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
                     <EditText
