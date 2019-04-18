@@ -60,7 +60,8 @@ class TaskDetailFragment : Fragment() {
         viewModel.editTaskCommand.observe(this, EventObserver {
             val taskId = TaskDetailFragmentArgs.fromBundle(arguments!!).TASKID
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToAddEditTaskFragment(taskId)
+                .actionTaskDetailFragmentToAddEditTaskFragment(taskId,
+                    resources.getString(R.string.edit_task))
             findNavController().navigate(action)
         })
     }

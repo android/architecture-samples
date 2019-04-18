@@ -15,7 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
+import android.content.Context
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
@@ -40,7 +42,8 @@ class AddEditTaskScreenTest {
     @Test
     fun emptyTask_isNotSaved() {
         // GIVEN - On the "Add Task" screen.
-        val bundle = AddEditTaskFragmentArgs(null).toBundle()
+        val bundle = AddEditTaskFragmentArgs(null,
+            getApplicationContext<Context>().getString(R.string.add_task)).toBundle()
         launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
 
         // WHEN - Enter invalid title and description combination and click save

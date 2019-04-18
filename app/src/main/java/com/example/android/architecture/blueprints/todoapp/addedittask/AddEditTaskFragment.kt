@@ -54,7 +54,6 @@ class AddEditTaskFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
-        setupActionBar()
         setupNavigation()
         loadData()
     }
@@ -76,16 +75,6 @@ class AddEditTaskFragment : Fragment() {
     private fun loadData() {
         // Add or edit an existing task?
         viewDataBinding.viewmodel?.start(getTaskId())
-    }
-
-
-    private fun setupActionBar() {
-        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(
-            if (getTaskId() != null)
-                R.string.edit_task
-            else
-                R.string.add_task
-        )
     }
 
     private fun getTaskId(): String? {
