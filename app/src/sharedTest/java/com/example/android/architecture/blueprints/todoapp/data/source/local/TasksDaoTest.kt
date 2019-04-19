@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -30,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 class TasksDaoTest {
 
     private lateinit var database: ToDoDatabase
@@ -49,14 +51,19 @@ class TasksDaoTest {
 
     @Test
     fun insertTaskAndGetById() {
-        // When inserting a task
-        database.taskDao().insertTask(DEFAULT_TASK)
+        // GIVEN - insert a task
+        val task = Task("title", "description", true, "id")
+        database.taskDao().insertTask(task)
 
-        // When getting the task by id from the database
+        // WHEN - Get the task by id from the database
         val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
 
-        // The loaded data contains the expected values
-        assertTask(loaded, DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
+        // THEN - The loaded data contains the expected values
+        assertThat<Task>(loaded as Task, notNullValue())
+        assertThat(loaded.id, `is`(task.id))
+        assertThat(loaded.title, `is`(task.title))
+        assertThat(loaded.description, `is`(task.description))
+        assertThat(loaded.isCompleted, `is`(task.isCompleted))
     }
 
     @Test
@@ -77,16 +84,20 @@ class TasksDaoTest {
 
     @Test
     fun insertTaskAndGetTasks() = runBlocking {
-        // When inserting a task
-        database.taskDao().insertTask(DEFAULT_TASK)
+        // GIVEN - insert a task
+        val task = Task("title", "description", true, "id")
+        database.taskDao().insertTask(task)
 
-        // When getting the tasks from the database
+        // WHEN - Get tasks from the database
         val tasks = database.taskDao().getTasks()
 
-        // There is only 1 task in the database
+        // THEN - There is only 1 task in the database, and contains the expected values
         assertThat(tasks.size, `is`(1))
-        // The loaded data contains the expected values
-        assertTask(tasks[0], DEFAULT_ID, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED)
+        assertThat<Task>(tasks[0] as Task, notNullValue())
+        assertThat(tasks[0].id, `is`(task.id))
+        assertThat(tasks[0].title, `is`(task.title))
+        assertThat(tasks[0].description, `is`(task.description))
+        assertThat(tasks[0].isCompleted, `is`(task.isCompleted))
     }
 
     @Test

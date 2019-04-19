@@ -37,7 +37,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
-import com.example.android.architecture.blueprints.todoapp.custom.action.NavigationViewActions.navigateTo
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.junit.Test
@@ -71,7 +70,7 @@ class AppNavigationTest {
             .perform(open()) // Open Drawer
 
         // Start statistics screen.
-        onView(withId(R.id.nav_view)).perform(navigateTo(R.id.statisticsFragment))
+        onView(withText(R.string.statistics_title)).perform(click())
 
         // Check that statistics Activity was opened.
         onView(withId(R.id.statistics)).check(matches(isDisplayed()))
@@ -90,8 +89,7 @@ class AppNavigationTest {
             .perform(open()) // Open Drawer
 
         // Start tasks list screen.
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.tasksFragment))
+        onView(withText(R.string.list_title)).perform(click())
 
         // Check that Tasks Activity was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))

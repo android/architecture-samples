@@ -26,3 +26,7 @@ import kotlinx.coroutines.runBlocking
 fun TasksRepository.saveTaskBlocking(task: Task) = runBlocking {
     this@saveTaskBlocking.saveTask(task)
 }
+
+fun TasksRepository.getTasksBlocking(forceUpdate: Boolean) = runBlocking {
+    this@getTasksBlocking.getTasks(forceUpdate)
+}

@@ -20,9 +20,9 @@ import android.widget.ListView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -132,14 +132,20 @@ class TasksScreenTest {
     }
 
     @Test
-    fun clickAddTaskButton_opensAddTaskUi() {
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+    fun createTask() {
+        // GIVEN - Start on home screen
+        ActivityScenario.launch(TasksActivity::class.java)
 
-        // Click on the add task button
+        // WHEN - Click on the "+" button, add details, and save
         onView(withId(R.id.fab_add_task)).perform(click())
+        onView(withId(R.id.add_task_title))
+          .perform(typeText("title"))
+        onView(withId(R.id.add_task_description))
+          .perform(typeText("description"))
+        onView(withId(R.id.fab_save_task)).perform(click())
 
-        // Check if the add task screen is displayed
-        onView(withId(R.id.add_task_title)).check(matches(isDisplayed()))
+        // THEN - Verify task is displayed on screen
+        onView(withItemText("title")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -173,16 +179,6 @@ class TasksScreenTest {
 
         // Verify previous task is not displayed
         onView(withItemText(TITLE1)).check(doesNotExist())
-    }
-
-    @Test
-    fun addTaskToTasksList() {
-        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-
-        // Verify task is displayed on screen
-        onView(withItemText(TITLE1)).check(matches(isDisplayed()))
     }
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
@@ -345,7 +341,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Press back button to go back to the list
-        Espresso.pressBack();
+        pressBack()
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -367,7 +363,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Press back button to go back to the list
-        Espresso.pressBack();
+        pressBack()
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -392,7 +388,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Press back button to go back to the list
-        Espresso.pressBack();
+        pressBack()
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
@@ -417,7 +413,7 @@ class TasksScreenTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Press back button to go back to the list
-        Espresso.pressBack();
+        pressBack()
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(TITLE1))))
