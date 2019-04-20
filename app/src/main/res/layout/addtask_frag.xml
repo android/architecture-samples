@@ -54,6 +54,7 @@
 
                     <EditText
                         android:id="@+id/add_task_title"
+                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/title_hint"
@@ -65,6 +66,7 @@
 
                     <EditText
                         android:id="@+id/add_task_description"
+                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="350dp"
                         android:gravity="top"
