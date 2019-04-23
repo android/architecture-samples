@@ -24,7 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -55,14 +54,20 @@ class DefaultTasksRepositoryTest {
         tasksRemoteDataSource = FakeDataSource(remoteTasks.toMutableList())
         tasksLocalDataSource = FakeDataSource(localTasks.toMutableList())
         // Get a reference to the class under test
-        tasksRepository = DefaultTasksRepository.getInstance(
+        tasksRepository = DefaultTasksRepository(
             tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Unconfined
         )
     }
 
-    @After
-    fun destroyRepository() {
-        DefaultTasksRepository.destroyInstance()
+    @ExperimentalCoroutinesApi
+    @Test
+    fun getTasks_emptyRepositoryAndUninitializedCache() = runBlocking {
+        val emptySource = FakeDataSource()
+        val tasksRepository = DefaultTasksRepository(
+            emptySource, emptySource, Dispatchers.Unconfined
+        )
+
+        assertTrue(tasksRepository.getTasks() is Success)
     }
 
     @Test
@@ -84,7 +89,7 @@ class DefaultTasksRepositoryTest {
         val tasks = tasksRepository.getTasks()
 
         // Then tasks are loaded from the remote data source
-        assertEquals((tasks as? Success)?.data, remoteTasks)
+        assertEquals(remoteTasks, (tasks as? Success)?.data)
     }
 
     @Test
@@ -120,7 +125,7 @@ class DefaultTasksRepositoryTest {
         val refreshedTasks = tasksRepository.getTasks(true)
 
         // Tasks must be the recently updated in REMOTE
-        assertEquals((refreshedTasks as Success).data, newTasks)
+        assertEquals(newTasks, (refreshedTasks as Success).data)
     }
 
     @Test
@@ -141,7 +146,7 @@ class DefaultTasksRepositoryTest {
         tasksRemoteDataSource.tasks = null
 
         // The repository fetches from the local source
-        assertEquals((tasksRepository.getTasks() as Success).data, localTasks)
+        assertEquals(localTasks, (tasksRepository.getTasks() as Success).data)
     }
 
     @Test
@@ -161,9 +166,9 @@ class DefaultTasksRepositoryTest {
         // First load will fetch from remote
         val newTasks = (tasksRepository.getTasks() as Success).data
 
-        assertEquals(newTasks, remoteTasks)
-        assertEquals(newTasks, tasksLocalDataSource.tasks)
-        assertNotEquals(initialLocal, tasksLocalDataSource.tasks)
+        assertEquals(remoteTasks, newTasks)
+        assertEquals(tasksLocalDataSource.tasks, newTasks)
+        assertNotEquals(tasksLocalDataSource.tasks, initialLocal)
     }
 
     @Test
@@ -260,7 +265,6 @@ class DefaultTasksRepositoryTest {
         assertNonNullTrue(tasks?.size == 1)
         assertNonNullTrue(tasks?.contains(task2))
         assertNonNullFalse(tasks?.contains(completedTask))
-
     }
 
     @Test

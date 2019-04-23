@@ -63,6 +63,13 @@ class DefaultTasksRepository(
             cachedTasks?.values?.let { tasks ->
                 return@withContext Result.Success(tasks.sortedBy { it.id })
             }
+
+            (newTasks as? Success)?.let {
+                if (it.data.isEmpty()) {
+                    return@withContext Result.Success(it.data)
+                }
+            }
+
             return@withContext Result.Error(Exception("Illegal state"))
         }
 
