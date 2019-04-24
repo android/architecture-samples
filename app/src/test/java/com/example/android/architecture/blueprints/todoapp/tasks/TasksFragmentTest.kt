@@ -2,15 +2,18 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -22,6 +25,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matcher
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
@@ -73,7 +78,6 @@ class TasksFragmentTest {
     }
 
     @Test
-    @MediumTest
     fun displayTask_whenRepositoryHasData() {
         // GIVEN - One task already in the repository
         val repository = ServiceLocator.provideTasksRepository(getApplicationContext())
@@ -157,5 +161,152 @@ class TasksFragmentTest {
         onView(withText("TITLE1")).check(doesNotExist())
         // but not the other one
         onView(withText("TITLE2")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun markTaskAsComplete() {
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Mark the task as complete
+        onView(checkboxWithText("TITLE1")).perform(click())
+
+        // Verify task is shown as complete
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_active)).perform(click())
+        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_completed)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun markTaskAsActive() {
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Mark the task as active
+        onView(checkboxWithText("TITLE1")).perform(click())
+
+        // Verify task is shown as active
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_active)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_completed)).perform(click())
+        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun showAllTasks() {
+        // Add one active task and one completed task
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
+        repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Verify that both of our tasks are shown
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withText("TITLE2")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun showActiveTasks() {
+        // Add 2 active tasks and one completed task
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
+        repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
+        repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Verify that the active tasks (but not the completed task) are shown
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_active)).perform(click())
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withText("TITLE2")).check(matches(isDisplayed()))
+        onView(withText("TITLE3")).check(doesNotExist())
+    }
+
+    @Test
+    fun showCompletedTasks() {
+        // Add one active task and 2 completed tasks
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
+        repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
+        repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Verify that the completed tasks (but not the active task) are shown
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_completed)).perform(click())
+        onView(withText("TITLE1")).check(doesNotExist())
+        onView(withText("TITLE2")).check(matches(isDisplayed()))
+        onView(withText("TITLE3")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clearCompletedTasks() {
+        // Add one active task and one completed task
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
+        repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
+
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        // Click clear completed in menu
+        openActionBarOverflowOrOptionsMenu(getApplicationContext())
+        onView(withText(R.string.menu_clear)).perform(click())
+
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+        // Verify that only the active task is shown
+        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        onView(withText("TITLE2")).check(doesNotExist())
+    }
+
+    @Test
+    fun noTasks_AllTasksFilter_AddTaskViewVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+
+        // Verify the "You have no TO-DOs!" text is shown
+        onView(withText("You have no TO-DOs!")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_completed)).perform(click())
+
+        // Verify the "You have no completed TO-DOs!" text is shown
+        onView(withText("You have no completed TO-DOs!")).check(matches((isDisplayed())))
+    }
+
+    @Test
+    fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_active)).perform(click())
+
+        // Verify the "You have no active TO-DOs!" text is shown
+        onView(withText("You have no active TO-DOs!")).check(matches((isDisplayed())))
+    }
+
+    private fun checkboxWithText(text: String) : Matcher<View> {
+        return allOf(withId(R.id.complete), hasSibling(withText(text)))
     }
 }
