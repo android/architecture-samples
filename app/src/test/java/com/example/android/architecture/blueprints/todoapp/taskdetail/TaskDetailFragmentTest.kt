@@ -24,6 +24,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -37,10 +38,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the tasks screen, the main screen which contains a list of all tasks.
+ * Integration test for the Task Details screen.
  */
+@MediumTest
 @RunWith(AndroidJUnit4::class)
-class TaskDetailScreenTest {
+class TaskDetailFragmentTest {
 
     private lateinit var repository: TasksRepository
 
@@ -65,16 +67,14 @@ class TaskDetailScreenTest {
         val scenario = launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.Theme_AppCompat)
 
         // THEN - Task details are displayed on the screen
-        scenario.onFragment {
-            // make sure that the title/description are both shown and correct
-            onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_title)).check(matches(withText("Active Task")))
-            onView(withId(R.id.task_detail_description)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_description)).check(matches(withText("AndroidX Rocks")))
-            // and make sure the "active" checkbox is shown unchecked
-            onView(withId(R.id.task_detail_complete)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_complete)).check(matches(not(isChecked())))
-        }
+        // make sure that the title/description are both shown and correct
+        onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_title)).check(matches(withText("Active Task")))
+        onView(withId(R.id.task_detail_description)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_description)).check(matches(withText("AndroidX Rocks")))
+        // and make sure the "active" checkbox is shown unchecked
+        onView(withId(R.id.task_detail_complete)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_complete)).check(matches(not(isChecked())))
     }
 
     @Test
@@ -88,15 +88,13 @@ class TaskDetailScreenTest {
         val scenario = launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.Theme_AppCompat)
 
         // THEN - Task details are displayed on the screen
-        scenario.onFragment {
-            // make sure that the title/description are both shown and correct
-            onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_title)).check(matches(withText("Completed Task")))
-            onView(withId(R.id.task_detail_description)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_description)).check(matches(withText("AndroidX Rocks")))
-            // and make sure the "active" checkbox is shown unchecked
-            onView(withId(R.id.task_detail_complete)).check(matches(isDisplayed()))
-            onView(withId(R.id.task_detail_complete)).check(matches(isChecked()))
-        }
+        // make sure that the title/description are both shown and correct
+        onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_title)).check(matches(withText("Completed Task")))
+        onView(withId(R.id.task_detail_description)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_description)).check(matches(withText("AndroidX Rocks")))
+        // and make sure the "active" checkbox is shown unchecked
+        onView(withId(R.id.task_detail_complete)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_complete)).check(matches(isChecked()))
     }
 }

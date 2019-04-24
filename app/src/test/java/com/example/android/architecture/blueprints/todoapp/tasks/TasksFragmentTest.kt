@@ -42,14 +42,13 @@ import org.robolectric.annotation.LooperMode
 import org.robolectric.annotation.TextLayoutMode
 
 /**
- * Tests for the main tasks screen that do not involve having to navigate to another screen
- *
+ * Integration test for the Task List screen.
  */
 @RunWith(AndroidJUnit4::class)
-@SmallTest
+@MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
-class TasksSingleScreenTest {
+class TasksFragmentTest {
 
     private lateinit var repository: TasksRepository
 

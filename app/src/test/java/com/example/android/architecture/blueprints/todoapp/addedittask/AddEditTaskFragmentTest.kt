@@ -49,13 +49,13 @@ import org.robolectric.annotation.LooperMode
 import org.robolectric.annotation.TextLayoutMode
 
 /**
- * Tests for the add task screen.
+ * Integration test for the Add Task screen.
  */
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
-class AddEditTaskScreenTest {
+class AddEditTaskFragmentTest {
 
     @Before
     @After

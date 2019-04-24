@@ -25,19 +25,22 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the statistics screen.
+ * Integration test for the statistics screen.
  */
+@MediumTest
 @RunWith(AndroidJUnit4::class)
-class StatisticsScreenTest {
+class StatisticsFragmentTest {
 
     @After
     fun cleanupDb() {
@@ -53,23 +56,19 @@ class StatisticsScreenTest {
     fun tasks_showsNonEmptyMessage() {
         // Given some tasks
         ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
-            runBlocking {
-                saveTask(Task("Title1", "Description1", false))
-                saveTask(Task("Title2", "Description2", true))
-            }
+            saveTaskBlocking(Task("Title1", "Description1", false))
+            saveTaskBlocking(Task("Title2", "Description2", true))
         }
 
-        val scenario = launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.Theme_AppCompat)
+        launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.AppTheme)
         val expectedActiveTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_active_tasks, 1)
         val expectedCompletedTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_completed_tasks, 1)
-        scenario.onFragment {
-            // check that both info boxes are displayed and contain the correct info
-            onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
-            onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))
-            onView(withId(R.id.stats_completed_text)).check(matches(isDisplayed()))
-            onView(withId(R.id.stats_completed_text)).check(matches(withText(expectedCompletedTaskText)))
-        }
+        // check that both info boxes are displayed and contain the correct info
+        onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
+        onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))
+        onView(withId(R.id.stats_completed_text)).check(matches(isDisplayed()))
+        onView(withId(R.id.stats_completed_text)).check(matches(withText(expectedCompletedTaskText)))
     }
 }

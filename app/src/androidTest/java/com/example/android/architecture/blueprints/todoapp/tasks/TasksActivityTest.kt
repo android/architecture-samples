@@ -59,11 +59,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the tasks screen, the main screen which contains a list of all tasks.
+ * Large End-to-End test for the tasks module.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class TasksScreenTest {
+class TasksActivityTest {
 
     private val TITLE1 = "TITLE1"
     private val TITLE2 = "TITLE2"
