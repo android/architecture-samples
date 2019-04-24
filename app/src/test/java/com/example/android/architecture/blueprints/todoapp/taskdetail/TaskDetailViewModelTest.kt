@@ -22,16 +22,10 @@ import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDis
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import junit.framework.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineContext
-import org.hamcrest.core.Is.`is`
-import org.hamcrest.core.IsNull.nullValue
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -77,18 +71,15 @@ class TaskDetailViewModelTest {
         testContext.triggerActions()
 
         // Then verify that the view was notified
-        assertEquals(
-            LiveDataTestUtil.getValue(taskDetailViewModel.task).title, task.title
-        )
-        assertEquals(
-            LiveDataTestUtil.getValue(taskDetailViewModel.task).description, task.description
-        )
+        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).title).isEqualTo(task.title)
+        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).description)
+            .isEqualTo(task.description)
     }
 
     @Test
     fun deleteTask() {
 
-        assertTrue(tasksRepository.tasksServiceData.containsValue(task))
+        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 
         // Execute pending coroutines actions
@@ -100,7 +91,7 @@ class TaskDetailViewModelTest {
         // Execute pending coroutines actions
         testContext.triggerActions()
 
-        assertFalse(tasksRepository.tasksServiceData.containsValue(task))
+        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
     }
 
     @Test
@@ -111,7 +102,7 @@ class TaskDetailViewModelTest {
         // Execute pending coroutines actions
         testContext.triggerActions()
 
-        assertTrue(tasksRepository.tasksServiceData[task.id]?.isCompleted == false)
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
 
         // When the ViewModel is asked to complete the task
         taskDetailViewModel.setCompleted(true)
@@ -119,7 +110,7 @@ class TaskDetailViewModelTest {
         // Execute pending coroutines actions
         testContext.triggerActions()
 
-        assertTrue(tasksRepository.tasksServiceData[task.id]?.isCompleted == true)
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
         assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_complete)
     }
 
@@ -132,7 +123,7 @@ class TaskDetailViewModelTest {
         // Execute pending coroutines actions
         testContext.triggerActions()
 
-        assertTrue(tasksRepository.tasksServiceData[task.id]?.isCompleted == true)
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
 
         // When the ViewModel is asked to complete the task
         taskDetailViewModel.setCompleted(false)
@@ -140,7 +131,7 @@ class TaskDetailViewModelTest {
         // Execute pending coroutines actions
         testContext.triggerActions()
 
-        assertTrue(tasksRepository.tasksServiceData[task.id]?.isCompleted == false)
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
         assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_active)
 
     }
@@ -157,7 +148,7 @@ class TaskDetailViewModelTest {
         testContext.triggerActions()
 
         // Then verify that data is not available
-        assertFalse(LiveDataTestUtil.getValue(taskDetailViewModel.isDataAvailable))
+        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.isDataAvailable)).isFalse()
     }
 
     @Test
@@ -166,7 +157,7 @@ class TaskDetailViewModelTest {
         val snackbarText = taskDetailViewModel.snackbarMessage.value
 
         // Check that the value is null
-        assertThat("Snackbar text does not match", snackbarText, `is`(nullValue()))
+        assertThat(snackbarText).isNull()
     }
 
     @Test
@@ -176,6 +167,6 @@ class TaskDetailViewModelTest {
 
         // Then the event is triggered
         val value = LiveDataTestUtil.getValue(taskDetailViewModel.editTaskCommand)
-        assertNotNull(value.getContentIfNotHandled())
+        assertThat(value.getContentIfNotHandled()).isNotNull()
     }
 }

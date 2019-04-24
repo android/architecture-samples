@@ -22,14 +22,10 @@ import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDis
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineContext
-import org.hamcrest.Matchers.`is`
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -85,8 +81,8 @@ class AddEditTaskViewModelTest {
         val newTask = tasksRepository.tasksServiceData.values.first()
 
         // Then a task is saved in the repository and the view updated
-        assertThat(newTask.title, `is`(newTitle))
-        assertThat(newTask.description, `is`(newDescription))
+        assertThat(newTask.title).isEqualTo(newTitle)
+        assertThat(newTask.description).isEqualTo(newDescription)
     }
 
     @Test
@@ -95,13 +91,13 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
-        assertTrue(getValue(addEditTaskViewModel.dataLoading))
+        assertThat(getValue(addEditTaskViewModel.dataLoading)).isTrue()
 
         // Execute pending coroutines actions
         testContext.triggerActions()
 
         // Then progress indicator is hidden
-        assertFalse(getValue(addEditTaskViewModel.dataLoading))
+        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
     }
 
     @Test
@@ -116,9 +112,9 @@ class AddEditTaskViewModelTest {
         testContext.triggerActions()
 
         // Verify a task is loaded
-        assertEquals(getValue(addEditTaskViewModel.title), task.title)
-        assertEquals(getValue(addEditTaskViewModel.description), task.description)
-        assertEquals(getValue(addEditTaskViewModel.dataLoading), false)
+        assertThat(getValue(addEditTaskViewModel.title)).isEqualTo(task.title)
+        assertThat(getValue(addEditTaskViewModel.description)).isEqualTo(task.description)
+        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
     }
 
     @ObsoleteCoroutinesApi

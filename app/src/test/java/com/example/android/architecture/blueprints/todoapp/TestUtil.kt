@@ -17,18 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import androidx.lifecycle.LiveData
-import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
-
-fun assertNonNullTrue(b: Boolean?) = Assert.assertTrue(b == true)
-
-fun assertNonNullFalse(b: Boolean?) = Assert.assertTrue(b == false)
-
-fun assertNonNullEquals(one: Any?, two: Any?) {
-    if (one == null && two == null) return fail("Both sides are null")
-    return assertEquals(one, two)
-}
 
 fun assertLiveDataEventTriggered(
     liveData: LiveData<Event<String>>,

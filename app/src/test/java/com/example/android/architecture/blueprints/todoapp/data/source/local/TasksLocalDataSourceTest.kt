@@ -24,13 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.succeeded
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.core.Is.`is`
 import org.junit.After
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,11 +69,11 @@ class TasksLocalDataSourceTest {
         val result = localDataSource.getTask(newTask.id)
 
         // THEN - Same task is returned
-        assertTrue(result.succeeded)
+        assertThat(result.succeeded).isTrue()
         result as Result.Success;
-        assertThat(result.data.title, `is`("title"))
-        assertThat(result.data.description, `is`("description"))
-        assertThat(result.data.isCompleted, `is`(true))
+        assertThat(result.data.title).isEqualTo("title")
+        assertThat(result.data.description).isEqualTo("description")
+        assertThat(result.data.isCompleted).isTrue()
     }
 
     @Test
@@ -91,10 +87,10 @@ class TasksLocalDataSourceTest {
         val result = localDataSource.getTask(newTask.id)
 
         // Then the task can be retrieved from the persistent repository and is complete
-        assertTrue(result.succeeded)
+        assertThat(result.succeeded).isTrue()
         result as Result.Success;
-        assertThat(result.data.title, `is`(newTask.title))
-        assertThat(result.data.isCompleted, `is`(true))
+        assertThat(result.data.title).isEqualTo(newTask.title)
+        assertThat(result.data.isCompleted).isTrue()
     }
 
     @Test
@@ -109,11 +105,11 @@ class TasksLocalDataSourceTest {
         // Then the task can be retrieved from the persistent repository and is active
         val result = localDataSource.getTask(newTask.id)
 
-        assertTrue(result.succeeded)
+        assertThat(result.succeeded).isTrue()
         result as Result.Success;
 
-        assertThat(result.data.title, `is`("Some title"))
-        assertThat(result.data.isCompleted, `is`(false))
+        assertThat(result.data.title).isEqualTo("Some title")
+        assertThat(result.data.isCompleted).isFalse()
     }
 
     @Test
@@ -132,15 +128,15 @@ class TasksLocalDataSourceTest {
         localDataSource.clearCompletedTasks()
 
         // Then the completed tasks cannot be retrieved and the active one can
-        assertFalse(localDataSource.getTask(newTask1.id).succeeded)
-        assertFalse(localDataSource.getTask(newTask2.id).succeeded)
+        assertThat(localDataSource.getTask(newTask1.id).succeeded).isFalse()
+        assertThat(localDataSource.getTask(newTask2.id).succeeded).isFalse()
 
         val result3 = localDataSource.getTask(newTask3.id)
 
-        assertTrue(result3.succeeded)
+        assertThat(result3.succeeded).isTrue()
         result3 as Result.Success;
 
-        assertThat(result3.data, `is`(newTask3))
+        assertThat(result3.data).isEqualTo(newTask3)
     }
 
     @Test
@@ -155,7 +151,7 @@ class TasksLocalDataSourceTest {
 
         // Then the retrieved tasks is an empty list
         val result = localDataSource.getTasks() as Result.Success
-        assertThat(result.data.size, `is`(0))
+        assertThat(result.data).isEmpty()
 
     }
 
@@ -170,8 +166,7 @@ class TasksLocalDataSourceTest {
         // Then the tasks can be retrieved from the persistent repository
         val results = localDataSource.getTasks() as Result.Success<List<Task>>
         val tasks = results.data
-        assertNotNull(tasks)
-        assertTrue(tasks.size == 2)
+        assertThat(tasks).hasSize(2)
     }
 
     companion object {

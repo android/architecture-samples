@@ -127,6 +127,7 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation "com.google.truth:truth:$truthVersion"
 
     // Dependencies for Android unit tests
     androidTestImplementation "junit:junit:$junitVersion"

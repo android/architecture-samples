@@ -59,6 +59,7 @@ ext {
     roomVersion = '2.1.0-alpha06'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
+    truthVersion = '0.44'
 }
 
 /*
