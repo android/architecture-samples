@@ -536,33 +536,30 @@ class TasksScreenTest {
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewAllTasks()
 
-        // Add task View should be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()))
+        // Verify the "You have no TO-DOs!" text is shown
+        onView(withText("You have no TO-DOs!")).check(matches(isDisplayed()))
     }
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewCompletedTasks()
 
-        // Add task View should be not be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
+        // Verify the "You have no completed TO-DOs!" text is shown
+        onView(withText("You have no completed TO-DOs!")).check(matches((isDisplayed())))
     }
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewActiveTasks()
 
-        // Add task View should be not be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
+        // Verify the "You have no active TO-DOs!" text is shown
+        onView(withText("You have no active TO-DOs!")).check(matches((isDisplayed())))
     }
 
     private fun viewAllTasks() {
