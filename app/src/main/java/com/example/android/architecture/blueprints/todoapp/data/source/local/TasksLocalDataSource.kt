@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 /**
  * Concrete implementation of a data source as a db.
  */
-class TasksLocalDataSource private constructor(
+class TasksLocalDataSource internal constructor(
         private val appExecutors: AppExecutors,
         private val tasksDao: TasksDao
 ) : TasksDataSource {
@@ -42,14 +42,15 @@ class TasksLocalDataSource private constructor(
     }
 
     override suspend fun getTask(taskId: String): Result<Task> = withContext(Dispatchers.IO) {
-        //TODO
-        return@withContext try {
-            tasksDao.getTaskById(taskId)?.let {
-                Success(it)
+        try {
+            val task = tasksDao.getTaskById(taskId)
+            if (task != null) {
+                return@withContext Success(task)
+            } else {
+                return@withContext Error(Exception("Task not found!"))
             }
-            Error(Exception("Task not found!"))
-        } catch(e: Exception) {
-            Error(e)
+        } catch (e: Exception) {
+            return@withContext Error(e)
         }
     }
 
