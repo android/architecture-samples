@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">TO-DO-MVVM-Lifecycles</string>
+    <string name="app_name">TO-DO Notes</string>
     <string name="add_task">New TO-DO</string>
     <string name="edit_task">Edit TO-DO</string>
     <string name="task_marked_complete">Task marked complete</string>
@@ -53,7 +53,6 @@
     <string name="no_tasks_all">You have no TO-DOs!</string>
     <string name="no_tasks_active">You have no active TO-DOs!</string>
     <string name="no_tasks_completed">You have no completed TO-DOs!</string>
-    <string name="no_tasks_add">Add a TO-DO item +</string>
     <string name="refresh">Refresh</string>
     <string name="successfully_deleted_task_message">Task was deleted</string>
     <string name="successfully_added_task_message">TO-DO added</string>

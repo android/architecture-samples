@@ -39,15 +39,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
-import com.example.android.architecture.blueprints.todoapp.currentActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
-import com.example.android.architecture.blueprints.todoapp.util.rotateOrientation
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.common.base.Preconditions.checkArgument
 import kotlinx.coroutines.runBlocking
@@ -422,147 +419,32 @@ class TasksScreenTest {
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
-    fun orientationChange_FilterActivePersists() {
-        // Add 1 completed task
-        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-
-        // when switching to active tasks
-        viewActiveTasks()
-
-        // then no tasks should appear
-        onView(withText(TITLE1)).check(matches(not(isDisplayed())))
-
-        // when rotating the screen
-        activityScenario.onActivity {
-            it.rotateOrientation()
-        }
-
-        // then nothing changes
-        onView(withText(TITLE1)).check(doesNotExist())
-    }
-
-    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
-    @Test
-    fun orientationChange_FilterCompletedPersists() {
-        // Add 1 completed task
-        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-
-        // when switching to completed tasks
-        viewCompletedTasks()
-
-        // the completed task should be displayed
-        onView(withText(TITLE1)).check(matches(isDisplayed()))
-
-        // when rotating the screen
-        activityScenario.onActivity {
-            it.rotateOrientation()
-        }
-
-        // then nothing changes
-        onView(withText(TITLE1)).check(matches(isDisplayed()))
-        onView(withText(string.label_completed)).check(matches(isDisplayed()))
-    }
-
-    // Blinking cursor after rotation breaks this in API 19
-    @Test
-    @SdkSuppress(minSdkVersion = 21)
-    fun orientationChange_DuringEdit_ChangePersists() {
-        // Add 1 completed task
-        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        viewAllTasks()
-
-        // Open the task in details view
-        onView(withText(TITLE1)).perform(click())
-
-        // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click())
-
-        // Change task title (but don't save)
-        onView(withId(R.id.add_task_title))
-            .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
-
-        // Rotate the screen
-        currentActivity.rotateOrientation()
-
-        // Verify task title is restored
-        onView(withId(R.id.add_task_title)).check(matches(withText(TITLE2)))
-    }
-
-    // Blinking cursor after rotation breaks this in API 19
-    @Test
-    @SdkSuppress(minSdkVersion = 21)
-    fun orientationChange_DuringEdit_NoDuplicate() {
-        // Add 1 completed task
-        repository.saveTaskBlocking(Task(TITLE1, DESCRIPTION, true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-
-        // Open the task in details view
-        onView(withText(TITLE1)).perform(click())
-
-        // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click())
-
-        // when rotating the screen
-        activityScenario.onActivity {
-            it.rotateOrientation()
-        }
-
-        // Edit task title and description
-        onView(withId(R.id.add_task_title))
-            .perform(replaceText(TITLE2), closeSoftKeyboard()) // Type new task title
-        onView(withId(R.id.add_task_description)).perform(
-            replaceText(DESCRIPTION),
-            closeSoftKeyboard()
-        ) // Type new task description and close the keyboard
-
-        // Save the task
-        onView(withId(R.id.fab_save_task)).perform(click())
-
-        // Verify task is displayed on screen in the task list.
-        onView(withItemText(TITLE2)).check(matches(isDisplayed()))
-
-        // Verify previous task is not displayed
-        onView(withItemText(TITLE1)).check(doesNotExist())
-    }
-
-    // TODO Move this to TasksSingleScreenTest once #4862 is fixed
-    @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewAllTasks()
 
-        // Add task View should be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(isDisplayed()))
+        // Verify the "You have no TO-DOs!" text is shown
+        onView(withText("You have no TO-DOs!")).check(matches(isDisplayed()))
     }
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewCompletedTasks()
 
-        // Add task View should be not be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
+        // Verify the "You have no completed TO-DOs!" text is shown
+        onView(withText("You have no completed TO-DOs!")).check(matches((isDisplayed())))
     }
 
     // TODO Move this to TasksSingleScreenTest once #4862 is fixed
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        // Given an empty list of tasks, make sure "All tasks" filter is on
         viewActiveTasks()
 
-        // Add task View should be not be displayed
-        onView(withId(R.id.noTasksAdd)).check(matches(not(isDisplayed())))
+        // Verify the "You have no active TO-DOs!" text is shown
+        onView(withText("You have no active TO-DOs!")).check(matches((isDisplayed())))
     }
 
     private fun viewAllTasks() {

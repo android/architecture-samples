@@ -97,18 +97,6 @@
                         android:layout_gravity="center"
                         android:layout_marginBottom="@dimen/list_item_padding"
                         android:text="@{context.getString(viewmodel.noTasksLabel)}"/>
-
-                    <TextView
-                        android:id="@+id/noTasksAdd"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/touch_feedback"
-                        android:gravity="center"
-                        android:onClick="@{() -> viewmodel.addNewTask()}"
-                        android:text="@string/no_tasks_add"
-                        android:visibility="@{viewmodel.tasksAddViewVisible ? View.VISIBLE : View.GONE}"/>
-
                 </LinearLayout>
             </RelativeLayout>
 

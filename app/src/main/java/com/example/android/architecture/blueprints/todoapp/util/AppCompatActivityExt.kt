@@ -20,14 +20,7 @@ package com.example.android.architecture.blueprints.todoapp.util
  */
 
 import android.app.Activity
-import android.content.pm.ActivityInfo
-import android.content.res.Configuration
-import androidx.annotation.IdRes
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import com.example.android.architecture.blueprints.todoapp.TodoApplication
@@ -41,20 +34,4 @@ const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 fun <T : ViewModel> Fragment.obtainViewModel(viewModelClass: Class<T>): T {
     val repository = (requireContext().applicationContext as TodoApplication).taskRepository
     return ViewModelProviders.of(this, ViewModelFactory(repository)).get(viewModelClass)
-}
-
-private fun AppCompatActivity.rotateToLandscape() {
-    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-}
-
-private fun AppCompatActivity.rotateToPortrait() {
-    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-}
-
-fun AppCompatActivity.rotateOrientation() {
-    when (resources.configuration.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> rotateToPortrait()
-        Configuration.ORIENTATION_PORTRAIT -> rotateToLandscape()
-        else -> rotateToLandscape()
-    }
 }
