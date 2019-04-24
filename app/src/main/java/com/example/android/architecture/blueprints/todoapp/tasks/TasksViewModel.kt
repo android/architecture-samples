@@ -102,7 +102,7 @@ class TasksViewModel(
         when (requestType) {
             TasksFilterType.ALL_TASKS -> {
                 setFilter(R.string.label_all, R.string.no_tasks_all,
-                    R.drawable.ic_assignment_turned_in_24dp, true)
+                    R.drawable.logo_no_fill, true)
             }
             TasksFilterType.ACTIVE_TASKS -> {
                 setFilter(R.string.label_active, R.string.no_tasks_active,
