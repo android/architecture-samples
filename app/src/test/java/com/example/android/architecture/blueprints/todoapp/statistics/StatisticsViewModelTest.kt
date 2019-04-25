@@ -22,6 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDis
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -102,11 +103,16 @@ class StatisticsViewModelTest {
         val errorViewModel = StatisticsViewModel(
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,
-                FakeFailingTasksRemoteDataSource)
+                FakeFailingTasksRemoteDataSource,
+                Dispatchers.Main  // Main is set in ViewModelScopeMainDispatcherRule
+            )
         )
 
         // When statistics are loaded
         errorViewModel.loadStatistics()
+
+        // Execute pending coroutines actions
+        testContext.triggerActions()
 
         // Then an error message is shown
         assertEquals(LiveDataTestUtil.getValue(errorViewModel.empty), true)
