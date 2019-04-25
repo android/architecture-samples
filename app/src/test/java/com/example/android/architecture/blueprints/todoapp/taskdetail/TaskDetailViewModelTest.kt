@@ -78,7 +78,6 @@ class TaskDetailViewModelTest {
 
     @Test
     fun deleteTask() {
-
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 
@@ -96,7 +95,6 @@ class TaskDetailViewModelTest {
 
     @Test
     fun completeTask() {
-
         taskDetailViewModel.start(task.id)
 
         // Execute pending coroutines actions

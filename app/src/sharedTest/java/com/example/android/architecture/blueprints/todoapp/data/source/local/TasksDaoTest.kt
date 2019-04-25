@@ -21,8 +21,10 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,11 +59,11 @@ class TasksDaoTest {
         val loaded = database.taskDao().getTaskById(task.id)
 
         // THEN - The loaded data contains the expected values
-        assertThat(loaded as Task).isNotNull()
-        assertThat(loaded.id).isEqualTo(task.id)
-        assertThat(loaded.title).isEqualTo(task.title)
-        assertThat(loaded.description).isEqualTo(task.description)
-        assertThat(loaded.isCompleted).isEqualTo(task.isCompleted)
+        assertThat<Task>(loaded as Task, notNullValue())
+        assertThat(loaded.id, `is`(task.id))
+        assertThat(loaded.title, `is`(task.title))
+        assertThat(loaded.description, `is`(task.description))
+        assertThat(loaded.isCompleted, `is`(task.isCompleted))
     }
 
     @Test
@@ -76,10 +78,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(task.id)
-        assertThat(loaded?.id).isEqualTo(task.id)
-        assertThat(loaded?.title).isEqualTo("title2")
-        assertThat(loaded?.description).isEqualTo("description2")
-        assertThat(loaded?.isCompleted).isTrue()
+        assertThat(loaded?.id, `is`(task.id))
+        assertThat(loaded?.title, `is`("title2"))
+        assertThat(loaded?.description, `is`("description2"))
+        assertThat(loaded?.isCompleted, `is`(true))
     }
 
     @Test
@@ -92,11 +94,11 @@ class TasksDaoTest {
         val tasks = database.taskDao().getTasks()
 
         // THEN - There is only 1 task in the database, and contains the expected values
-        assertThat(tasks).hasSize(1)
-        assertThat(tasks[0].id).isEqualTo(task.id)
-        assertThat(tasks[0].title).isEqualTo(task.title)
-        assertThat(tasks[0].description).isEqualTo(task.description)
-        assertThat(tasks[0].isCompleted).isEqualTo(task.isCompleted)
+        assertThat(tasks.size, `is`(1))
+        assertThat(tasks[0].id, `is`(task.id))
+        assertThat(tasks[0].title, `is`(task.title))
+        assertThat(tasks[0].description, `is`(task.description))
+        assertThat(tasks[0].isCompleted, `is`(task.isCompleted))
     }
 
     @Test
@@ -111,10 +113,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(originalTask.id)
-        assertThat(loaded?.id).isEqualTo(originalTask.id)
-        assertThat(loaded?.title).isEqualTo("new title")
-        assertThat(loaded?.description).isEqualTo("new description")
-        assertThat(loaded?.isCompleted).isEqualTo(true)
+        assertThat(loaded?.id, `is`(originalTask.id))
+        assertThat(loaded?.title, `is`("new title"))
+        assertThat(loaded?.description, `is`("new description"))
+        assertThat(loaded?.isCompleted, `is`(true))
     }
 
     @Test
@@ -128,10 +130,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(task.id)
-        assertThat(loaded?.id).isEqualTo(task.id)
-        assertThat(loaded?.title).isEqualTo(task.title)
-        assertThat(loaded?.description).isEqualTo(task.description)
-        assertThat(loaded?.isCompleted).isFalse()
+        assertThat(loaded?.id, `is`(task.id))
+        assertThat(loaded?.title, `is`(task.title))
+        assertThat(loaded?.description, `is`(task.description))
+        assertThat(loaded?.isCompleted, `is`(false))
     }
 
     @Test
@@ -145,7 +147,7 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks).isEmpty()
+        assertThat(tasks.isEmpty(), `is`(true))
     }
 
     @Test
@@ -158,7 +160,7 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks).isEmpty()
+        assertThat(tasks.isEmpty(), `is`(true))
     }
 
     @Test
@@ -171,6 +173,6 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks).isEmpty()
+        assertThat(tasks.isEmpty(), `is`(true))
     }
 }

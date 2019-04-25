@@ -40,10 +40,9 @@ import org.junit.runner.RunWith
 /**
  * Integration test for the statistics screen.
  */
-@MediumTest
 @RunWith(AndroidJUnit4::class)
+@MediumTest
 class StatisticsFragmentTest {
-
     private lateinit var repository: TasksRepository
 
     @Before

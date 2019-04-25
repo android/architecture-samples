@@ -112,7 +112,6 @@ class StatisticsViewModelTest {
         testContext.triggerActions()
 
         // Then an error message is shown
-        // TODO - Error is not being populated.
         assertThat(LiveDataTestUtil.getValue(errorViewModel.empty)).isTrue()
         assertThat(LiveDataTestUtil.getValue(errorViewModel.error)).isTrue()
     }

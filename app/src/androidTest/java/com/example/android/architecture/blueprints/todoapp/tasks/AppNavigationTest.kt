@@ -22,7 +22,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
@@ -78,7 +77,7 @@ class AppNavigationTest {
 
         // Start statistics screen.
         onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.statisticsFragment));
+            .perform(navigateTo(R.id.statisticsFragment))
 
         // Check that statistics screen was opened.
         onView(withId(R.id.statistics)).check(matches(isDisplayed()))
@@ -89,7 +88,7 @@ class AppNavigationTest {
 
         // Start statistics screen.
         onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.tasksFragment));
+            .perform(navigateTo(R.id.tasksFragment))
 
         // Check that Tasks Activity was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))

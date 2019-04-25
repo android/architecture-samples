@@ -83,7 +83,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("title", "description"))
 
         // WHEN - On startup
-        launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // THEN - Verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))

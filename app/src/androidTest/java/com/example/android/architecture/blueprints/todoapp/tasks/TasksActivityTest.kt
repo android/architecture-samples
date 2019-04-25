@@ -104,32 +104,29 @@ class TasksActivityTest {
     @Test
     fun editTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        ActivityScenario.launch(TasksActivity::class.java)
 
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-
-        // Click on the task on the list
+        // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
+        onView(withId(R.id.task_detail_title)).check(matches(withText("TITLE1")))
+        onView(withId(R.id.task_detail_description)).check(matches(withText("DESCRIPTION")))
+        onView(withId(R.id.task_detail_complete)).check(matches(not(isChecked())))
 
-        // Click on the edit task button
+        // Click on the edit button, edit, and save
         onView(withId(R.id.fab_edit_task)).perform(click())
-
-        // Edit task title and description
         onView(withId(R.id.add_task_title)).perform(replaceText("NEW TITLE"))
         onView(withId(R.id.add_task_description)).perform(replaceText("NEW DESCRIPTION"))
-
-        // Save the task
         onView(withId(R.id.fab_save_task)).perform(click())
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
-
         // Verify previous task is not displayed
         onView(withText("TITLE1")).check(doesNotExist())
     }
 
     @Test
     fun createOneTask_deleteTask() {
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Add active task
         onView(withId(R.id.fab_add_task)).perform(click())
@@ -139,7 +136,6 @@ class TasksActivityTest {
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
-
         // Click delete task in menu
         onView(withId(R.id.menu_delete)).perform(click())
 
@@ -151,7 +147,7 @@ class TasksActivityTest {
 
     @Test
     fun createTwoTasks_deleteOneTask() {
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Add 2 active tasks
         onView(withId(R.id.fab_add_task)).perform(click())
@@ -166,7 +162,6 @@ class TasksActivityTest {
 
         // Open the second task in details view
         onView(withText("TITLE2")).perform(click())
-
         // Click delete task in menu
         onView(withId(R.id.menu_delete)).perform(click())
 
@@ -181,12 +176,10 @@ class TasksActivityTest {
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 active task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText("TITLE1")).perform(click())
-
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
@@ -202,12 +195,10 @@ class TasksActivityTest {
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 completed task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION", true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText("TITLE1")).perform(click())
-
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
@@ -223,15 +214,12 @@ class TasksActivityTest {
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 active task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText("TITLE1")).perform(click())
-
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
-
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
@@ -247,15 +235,12 @@ class TasksActivityTest {
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 completed task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION", true))
-
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText("TITLE1")).perform(click())
-
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
-
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 

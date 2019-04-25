@@ -67,7 +67,7 @@ class TasksLocalDataSourceTest {
 
         // THEN - Same task is returned
         assertThat(result.succeeded).isTrue()
-        result as Result.Success;
+        result as Result.Success
         assertThat(result.data.title).isEqualTo("title")
         assertThat(result.data.description).isEqualTo("description")
         assertThat(result.data.isCompleted).isTrue()
@@ -85,14 +85,13 @@ class TasksLocalDataSourceTest {
 
         // Then the task can be retrieved from the persistent repository and is complete
         assertThat(result.succeeded).isTrue()
-        result as Result.Success;
+        result as Result.Success
         assertThat(result.data.title).isEqualTo(newTask.title)
         assertThat(result.data.isCompleted).isTrue()
     }
 
     @Test
     fun activateTask_retrievedTaskIsActive() = runBlocking {
-
         // Given a new completed task in the persistent repository
         val newTask = Task("Some title", "Some description", true)
         localDataSource.saveTask(newTask)
@@ -103,7 +102,7 @@ class TasksLocalDataSourceTest {
         val result = localDataSource.getTask(newTask.id)
 
         assertThat(result.succeeded).isTrue()
-        result as Result.Success;
+        result as Result.Success
 
         assertThat(result.data.title).isEqualTo("Some title")
         assertThat(result.data.isCompleted).isFalse()
@@ -111,7 +110,6 @@ class TasksLocalDataSourceTest {
 
     @Test
     fun clearCompletedTask_taskNotRetrievable() = runBlocking {
-
         // Given 2 new completed tasks and 1 active task in the persistent repository
         val newTask1 = Task("title")
         val newTask2 = Task("title2")
@@ -131,7 +129,7 @@ class TasksLocalDataSourceTest {
         val result3 = localDataSource.getTask(newTask3.id)
 
         assertThat(result3.succeeded).isTrue()
-        result3 as Result.Success;
+        result3 as Result.Success
 
         assertThat(result3.data).isEqualTo(newTask3)
     }

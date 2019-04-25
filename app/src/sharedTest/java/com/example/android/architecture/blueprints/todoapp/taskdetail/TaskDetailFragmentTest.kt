@@ -63,8 +63,8 @@ class TaskDetailFragmentTest {
         repository.saveTaskBlocking(activeTask)
 
         // WHEN - Details fragment launched to display task
-        val bundle = TaskDetailFragmentArgs(activeTask.id).toBundle();
-        val scenario = launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.Theme_AppCompat)
+        val bundle = TaskDetailFragmentArgs(activeTask.id).toBundle()
+        launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.AppTheme)
 
         // THEN - Task details are displayed on the screen
         // make sure that the title/description are both shown and correct
@@ -84,8 +84,8 @@ class TaskDetailFragmentTest {
         repository.saveTaskBlocking(completedTask)
 
         // WHEN - Details fragment launched to display task
-        val bundle = TaskDetailFragmentArgs(completedTask.id).toBundle();
-        val scenario = launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.Theme_AppCompat)
+        val bundle = TaskDetailFragmentArgs(completedTask.id).toBundle()
+        launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.AppTheme)
 
         // THEN - Task details are displayed on the screen
         // make sure that the title/description are both shown and correct

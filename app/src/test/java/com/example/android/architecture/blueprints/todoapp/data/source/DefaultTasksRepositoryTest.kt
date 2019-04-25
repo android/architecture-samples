@@ -107,7 +107,6 @@ class DefaultTasksRepositoryTest {
 
     @Test
     fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = runBlocking {
-
         // First call returns from REMOTE
         val tasks = tasksRepository.getTasks()
 

@@ -15,7 +15,6 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-
 import android.view.View
 
 import com.example.android.architecture.blueprints.todoapp.data.Task

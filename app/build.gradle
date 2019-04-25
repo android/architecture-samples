@@ -153,7 +153,6 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$espressoVersion"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
-    androidTestImplementation "com.google.truth:truth:$truthVersion"
 
     // Resolve conflicts between main and test APK:
     androidTestImplementation "androidx.annotation:annotation:$androidXAnnotations"
