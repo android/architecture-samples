@@ -25,7 +25,6 @@ import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -36,9 +35,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -106,11 +104,9 @@ class AddEditTaskFragmentTest {
         // 1) That the repository saved the task
         // 2) Verify that we navigated back to the tasks screen.
         val tasks = (repository.getTasksBlocking(true) as Result.Success).data
-        assertThat(tasks.size, `is`(1))
-        // The loaded data contains the expected values
-        assertThat(tasks[0], notNullValue())
-        assertThat(tasks[0].title, `is`("title"))
-        assertThat(tasks[0].description, `is`("description"))
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].title).isEqualTo("title")
+        assertThat(tasks[0].description).isEqualTo("description")
 
         verify(navController).navigate(
             AddEditTaskFragmentDirections

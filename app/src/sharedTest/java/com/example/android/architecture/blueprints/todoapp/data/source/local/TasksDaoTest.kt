@@ -21,10 +21,8 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -52,155 +50,127 @@ class TasksDaoTest {
     @Test
     fun insertTaskAndGetById() = runBlocking {
         // GIVEN - insert a task
-        val task = Task("title", "description", true, "id")
+        val task = Task("title", "description")
         database.taskDao().insertTask(task)
 
         // WHEN - Get the task by id from the database
-        val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
+        val loaded = database.taskDao().getTaskById(task.id)
 
         // THEN - The loaded data contains the expected values
-        assertThat<Task>(loaded as Task, notNullValue())
-        assertThat(loaded.id, `is`(task.id))
-        assertThat(loaded.title, `is`(task.title))
-        assertThat(loaded.description, `is`(task.description))
-        assertThat(loaded.isCompleted, `is`(task.isCompleted))
+        assertThat(loaded as Task).isNotNull()
+        assertThat(loaded.id).isEqualTo(task.id)
+        assertThat(loaded.title).isEqualTo(task.title)
+        assertThat(loaded.description).isEqualTo(task.description)
+        assertThat(loaded.isCompleted).isEqualTo(task.isCompleted)
     }
 
     @Test
     fun insertTaskReplacesOnConflict() = runBlocking {
         // Given that a task is inserted
-        database.taskDao().insertTask(DEFAULT_TASK)
+        val task = Task("title", "description")
+        database.taskDao().insertTask(task)
 
         // When a task with the same id is inserted
-        val newTask = Task(NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED, DEFAULT_ID)
+        val newTask = Task("title2", "description2", true, task.id)
         database.taskDao().insertTask(newTask)
 
-        // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(DEFAULT_TASK.id)
-
-        // The loaded data contains the expected values
-        assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
+        // THEN - The loaded data contains the expected values
+        val loaded = database.taskDao().getTaskById(task.id)
+        assertThat(loaded?.id).isEqualTo(task.id)
+        assertThat(loaded?.title).isEqualTo("title2")
+        assertThat(loaded?.description).isEqualTo("description2")
+        assertThat(loaded?.isCompleted).isTrue()
     }
 
     @Test
     fun insertTaskAndGetTasks() = runBlocking {
         // GIVEN - insert a task
-        val task = Task("title", "description", true, "id")
+        val task = Task("title", "description")
         database.taskDao().insertTask(task)
 
         // WHEN - Get tasks from the database
         val tasks = database.taskDao().getTasks()
 
         // THEN - There is only 1 task in the database, and contains the expected values
-        assertThat(tasks.size, `is`(1))
-        assertThat<Task>(tasks[0] as Task, notNullValue())
-        assertThat(tasks[0].id, `is`(task.id))
-        assertThat(tasks[0].title, `is`(task.title))
-        assertThat(tasks[0].description, `is`(task.description))
-        assertThat(tasks[0].isCompleted, `is`(task.isCompleted))
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].id).isEqualTo(task.id)
+        assertThat(tasks[0].title).isEqualTo(task.title)
+        assertThat(tasks[0].description).isEqualTo(task.description)
+        assertThat(tasks[0].isCompleted).isEqualTo(task.isCompleted)
     }
 
     @Test
     fun updateTaskAndGetById() = runBlocking {
         // When inserting a task
-        database.taskDao().insertTask(DEFAULT_TASK)
+        val originalTask = Task("title", "description")
+        database.taskDao().insertTask(originalTask)
 
         // When the task is updated
-        val updatedTask = Task(NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED, DEFAULT_ID)
+        val updatedTask = Task("new title", "new description", true, originalTask.id)
         database.taskDao().updateTask(updatedTask)
 
-        // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(DEFAULT_ID)
-
-        // The loaded data contains the expected values
-        assertTask(loaded, DEFAULT_ID, NEW_TITLE, NEW_DESCRIPTION, NEW_IS_COMPLETED)
+        // THEN - The loaded data contains the expected values
+        val loaded = database.taskDao().getTaskById(originalTask.id)
+        assertThat(loaded?.id).isEqualTo(originalTask.id)
+        assertThat(loaded?.title).isEqualTo("new title")
+        assertThat(loaded?.description).isEqualTo("new description")
+        assertThat(loaded?.isCompleted).isEqualTo(true)
     }
 
     @Test
     fun updateCompletedAndGetById() = runBlocking {
         // When inserting a task
-        database.taskDao().insertTask(DEFAULT_TASK)
+        val task = Task("title", "description", true)
+        database.taskDao().insertTask(task)
 
         // When the task is updated
-        database.taskDao().updateCompleted(DEFAULT_TASK.id, false)
+        database.taskDao().updateCompleted(task.id, false)
 
-        // When getting the task by id from the database
-        val loaded = database.taskDao().getTaskById(DEFAULT_ID)
-
-        // The loaded data contains the expected values
-        assertTask(loaded, DEFAULT_TASK.id, DEFAULT_TASK.title, DEFAULT_TASK.description, false)
+        // THEN - The loaded data contains the expected values
+        val loaded = database.taskDao().getTaskById(task.id)
+        assertThat(loaded?.id).isEqualTo(task.id)
+        assertThat(loaded?.title).isEqualTo(task.title)
+        assertThat(loaded?.description).isEqualTo(task.description)
+        assertThat(loaded?.isCompleted).isFalse()
     }
 
     @Test
     fun deleteTaskByIdAndGettingTasks() = runBlocking {
         // Given a task inserted
-        database.taskDao().insertTask(DEFAULT_TASK)
+        val task = Task("title", "description")
+        database.taskDao().insertTask(task)
 
         // When deleting a task by id
-        database.taskDao().deleteTaskById(DEFAULT_TASK.id)
+        database.taskDao().deleteTaskById(task.id)
 
-        // When getting the tasks
+        // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-
-        // The list is empty
-        assertThat(tasks.size, `is`(0))
+        assertThat(tasks).isEmpty()
     }
 
     @Test
     fun deleteTasksAndGettingTasks() = runBlocking {
         // Given a task inserted
-        database.taskDao().insertTask(DEFAULT_TASK)
+        database.taskDao().insertTask(Task("title", "description"))
 
         // When deleting all tasks
         database.taskDao().deleteTasks()
 
-        // When getting the tasks
+        // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-
-        // The list is empty
-        assertThat(tasks.size, `is`(0))
+        assertThat(tasks).isEmpty()
     }
 
     @Test
     fun deleteCompletedTasksAndGettingTasks() = runBlocking {
         // Given a completed task inserted
-        database.taskDao().insertTask(DEFAULT_TASK)
+        database.taskDao().insertTask(Task("completed", "task", true))
 
         // When deleting completed tasks
         database.taskDao().deleteCompletedTasks()
 
-        // When getting the tasks
+        // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-
-        // The list is empty
-        assertThat(tasks.size, `is`(0))
-    }
-
-    private fun assertTask(
-        task: Task?,
-        id: String,
-        title: String,
-        description: String,
-        completed: Boolean
-    ) {
-        assertThat<Task>(task as Task, notNullValue())
-        assertThat(task.id, `is`(id))
-        assertThat(task.title, `is`(title))
-        assertThat(task.description, `is`(description))
-        assertThat(task.isCompleted, `is`(completed))
-    }
-
-    companion object {
-
-        private val DEFAULT_TITLE = "title"
-        private val DEFAULT_DESCRIPTION = "description"
-        private val DEFAULT_ID = "id"
-        private val DEFAULT_IS_COMPLETED = true
-        private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IS_COMPLETED,
-          DEFAULT_ID)
-
-        private val NEW_TITLE = "title2"
-        private val NEW_DESCRIPTION = "description2"
-        private val NEW_IS_COMPLETED = true
+        assertThat(tasks).isEmpty()
     }
 }
