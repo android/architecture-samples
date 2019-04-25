@@ -23,7 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
-import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -100,16 +100,21 @@ class StatisticsViewModelTest {
         val errorViewModel = StatisticsViewModel(
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,
-                FakeFailingTasksRemoteDataSource)
+                FakeFailingTasksRemoteDataSource,
+                Dispatchers.Main  // Main is set in ViewModelScopeMainDispatcherRule
+            )
         )
 
         // When statistics are loaded
         errorViewModel.loadStatistics()
 
+        // Execute pending coroutines actions
+        testContext.triggerActions()
+
         // Then an error message is shown
         // TODO - Error is not being populated.
-        assertThat(LiveDataTestUtil.getValue(errorViewModel.empty)).isNull()
-        assertThat(LiveDataTestUtil.getValue(errorViewModel.error)).isNull()
+        assertThat(LiveDataTestUtil.getValue(errorViewModel.empty)).isTrue()
+        assertThat(LiveDataTestUtil.getValue(errorViewModel.error)).isTrue()
     }
 
     @Test
