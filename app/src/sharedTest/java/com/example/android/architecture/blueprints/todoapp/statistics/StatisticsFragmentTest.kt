@@ -29,9 +29,11 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -42,20 +44,22 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class StatisticsFragmentTest {
 
+    private lateinit var repository: TasksRepository
+
+    @Before
+    fun initRepository() {
+        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+    }
+
     @After
-    fun cleanupDb() {
-        // Given some tasks
-        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
-            runBlocking {
-                deleteAllTasks()
-            }
-        }
+    fun cleanupDb() = runBlocking {
+        ServiceLocator.resetForTests()
     }
 
     @Test
     fun tasks_showsNonEmptyMessage() {
         // Given some tasks
-        ServiceLocator.provideTasksRepository(getApplicationContext()).apply {
+        repository.apply {
             saveTaskBlocking(Task("Title1", "Description1", false))
             saveTaskBlocking(Task("Title2", "Description2", true))
         }

@@ -23,15 +23,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.succeeded
-import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.Executor
-
 
 /**
  * Integration test for the [TasksDataSource].
@@ -51,7 +48,7 @@ class TasksLocalDataSourceTest {
             .allowMainThreadQueries()
             .build()
 
-        localDataSource = TasksLocalDataSource(SingleExecutors(), database.taskDao())
+        localDataSource = TasksLocalDataSource(database.taskDao())
     }
 
     @After
@@ -167,10 +164,5 @@ class TasksLocalDataSourceTest {
         val results = localDataSource.getTasks() as Result.Success<List<Task>>
         val tasks = results.data
         assertThat(tasks).hasSize(2)
-    }
-
-    companion object {
-        class SingleExecutors : AppExecutors(simpleExecutor, simpleExecutor, simpleExecutor)
-        private val simpleExecutor = Executor { command -> command.run() }
     }
 }

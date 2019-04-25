@@ -50,7 +50,7 @@ class TasksDaoTest {
     fun closeDb() = database.close()
 
     @Test
-    fun insertTaskAndGetById() {
+    fun insertTaskAndGetById() = runBlocking {
         // GIVEN - insert a task
         val task = Task("title", "description", true, "id")
         database.taskDao().insertTask(task)
@@ -67,7 +67,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun insertTaskReplacesOnConflict() {
+    fun insertTaskReplacesOnConflict() = runBlocking {
         // Given that a task is inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -101,7 +101,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun updateTaskAndGetById() {
+    fun updateTaskAndGetById() = runBlocking {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 
@@ -117,7 +117,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun updateCompletedAndGetById() {
+    fun updateCompletedAndGetById() = runBlocking {
         // When inserting a task
         database.taskDao().insertTask(DEFAULT_TASK)
 

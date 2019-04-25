@@ -15,7 +15,6 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -39,7 +38,6 @@ import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
-import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
@@ -57,15 +55,14 @@ class TasksActivityTest {
 
     private lateinit var repository: TasksRepository
 
-    /**
-     * Make sure the tasks repository has no tasks on initialization.
-     * The tasks repository needs to be instantiated on the main thread.
-     */
-    @UiThreadTest
     @Before
     fun resetState() {
         repository = ServiceLocator.provideTasksRepository(getApplicationContext())
-        repository.deleteAllTasksBlocking()
+    }
+
+    @After
+    fun reset() {
+        ServiceLocator.resetForTests()
     }
 
     /**

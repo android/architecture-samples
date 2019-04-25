@@ -53,7 +53,7 @@ class TaskDetailFragmentTest {
 
     @After
     fun cleanupDb() = runBlocking {
-        repository.deleteAllTasks()
+        ServiceLocator.resetForTests()
     }
 
     @Test

@@ -15,13 +15,12 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import androidx.annotation.VisibleForTesting
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -29,11 +28,11 @@ import kotlinx.coroutines.withContext
  * Concrete implementation of a data source as a db.
  */
 class TasksLocalDataSource internal constructor(
-        private val appExecutors: AppExecutors,
-        private val tasksDao: TasksDao
+        private val tasksDao: TasksDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksDataSource {
 
-    override suspend fun getTasks(): Result<List<Task>> = withContext(Dispatchers.IO) {
+    override suspend fun getTasks(): Result<List<Task>> = withContext(ioDispatcher) {
         return@withContext try {
             Success(tasksDao.getTasks())
         } catch(e: Exception) {
@@ -41,7 +40,7 @@ class TasksLocalDataSource internal constructor(
         }
     }
 
-    override suspend fun getTask(taskId: String): Result<Task> = withContext(Dispatchers.IO) {
+    override suspend fun getTask(taskId: String): Result<Task> = withContext(ioDispatcher) {
         try {
             val task = tasksDao.getTaskById(taskId)
             if (task != null) {
@@ -54,12 +53,12 @@ class TasksLocalDataSource internal constructor(
         }
     }
 
-    override suspend fun saveTask(task: Task) {
-        appExecutors.diskIO.execute { tasksDao.insertTask(task) }
+    override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
+        tasksDao.insertTask(task)
     }
 
-    override suspend fun completeTask(task: Task) {
-        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, true) }
+    override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
+        tasksDao.updateCompleted(task.id, true)
     }
 
     override suspend fun completeTask(taskId: String) {
@@ -67,8 +66,8 @@ class TasksLocalDataSource internal constructor(
         // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
-    override suspend fun activateTask(task: Task) {
-        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, false) }
+    override suspend fun activateTask(task: Task) = withContext(ioDispatcher) {
+        tasksDao.updateCompleted(task.id, false)
     }
 
     override suspend fun activateTask(taskId: String) {
@@ -76,34 +75,15 @@ class TasksLocalDataSource internal constructor(
         // converting from a {@code taskId} to a {@link task} using its cached data.
     }
 
-    override suspend fun clearCompletedTasks() {
-        appExecutors.diskIO.execute { tasksDao.deleteCompletedTasks() }
+    override suspend fun clearCompletedTasks() = withContext<Unit>(ioDispatcher) {
+        tasksDao.deleteCompletedTasks()
     }
 
-    override suspend fun deleteAllTasks() {
-        appExecutors.diskIO.execute { tasksDao.deleteTasks() }
+    override suspend fun deleteAllTasks() = withContext(ioDispatcher) {
+        tasksDao.deleteTasks()
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        appExecutors.diskIO.execute { tasksDao.deleteTaskById(taskId) }
-    }
-
-    companion object {
-        private var INSTANCE: TasksLocalDataSource? = null
-
-        @JvmStatic
-        fun getInstance(appExecutors: AppExecutors, tasksDao: TasksDao): TasksLocalDataSource {
-            if (INSTANCE == null) {
-                synchronized(TasksLocalDataSource::javaClass) {
-                    INSTANCE = TasksLocalDataSource(appExecutors, tasksDao)
-                }
-            }
-            return INSTANCE!!
-        }
-
-        @VisibleForTesting
-        fun clearInstance() {
-            INSTANCE = null
-        }
+    override suspend fun deleteTask(taskId: String) = withContext<Unit>(ioDispatcher) {
+        tasksDao.deleteTaskById(taskId)
     }
 }

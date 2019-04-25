@@ -40,7 +40,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -52,14 +55,16 @@ import org.junit.runner.RunWith
 @LargeTest
 class AppNavigationTest {
 
-    private fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription()
-        : String {
-        var description = ""
-        onActivity {
-            description =
-                it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
-        }
-        return description
+    private lateinit var tasksRepository: TasksRepository
+
+    @Before
+    fun init() {
+        tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
+    }
+
+    @After
+    fun reset() {
+        ServiceLocator.resetForTests()
     }
 
     @Test
@@ -140,7 +145,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleUIBackButton() {
         val task = Task("UI <- button", "Description")
-        ServiceLocator.provideTasksRepository(getApplicationContext()).saveTaskBlocking(task)
+        tasksRepository.saveTaskBlocking(task)
 
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
 
@@ -171,7 +176,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleBackButton() {
         val task = Task("Back button", "Description")
-        ServiceLocator.provideTasksRepository(getApplicationContext()).saveTaskBlocking(task)
+        tasksRepository.saveTaskBlocking(task)
 
         ActivityScenario.launch(TasksActivity::class.java)
 
@@ -189,4 +194,13 @@ class AppNavigationTest {
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }
 
+    private fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription()
+        : String {
+        var description = ""
+        onActivity {
+            description =
+                it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
+        }
+        return description
+    }
 }

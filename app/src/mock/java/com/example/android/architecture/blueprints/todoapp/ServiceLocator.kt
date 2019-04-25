@@ -16,13 +16,13 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
+import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 /**
  * A Service Locator for the [TasksRepository]. This is the mock version, with a
@@ -31,20 +31,38 @@ import kotlinx.coroutines.Dispatchers
 
 object ServiceLocator {
 
-    @Volatile private var tasksRepository: TasksRepository? = null
+    private val lock = Any()
+    private lateinit var database: ToDoDatabase
+    private var tasksRepository: TasksRepository? = null
 
     fun provideTasksRepository(context: Context): TasksRepository {
-        return tasksRepository ?: synchronized(this) {
-            tasksRepository ?: createTasksRepository(context)
+        synchronized(this) {
+            return tasksRepository ?:
+                tasksRepository ?: createTasksRepository(context)
         }
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        val database = ToDoDatabase.getInstance(context)
-        return DefaultTasksRepository.getInstance(
+        database = Room.databaseBuilder(context.applicationContext,
+            ToDoDatabase::class.java, "Tasks.db")
+            .allowMainThreadQueries()
+            .build()
+
+        return DefaultTasksRepository(
             FakeTasksRemoteDataSource,
-            TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
-            Dispatchers.Unconfined
+            TasksLocalDataSource(database.taskDao())
         )
+    }
+
+    fun resetForTests() {
+        synchronized(lock) {
+            runBlocking {
+                FakeTasksRemoteDataSource.deleteAllTasks()
+            }
+            // Clear all data to avoid test pollution.
+            database.clearAllTables()
+            database.close()
+            tasksRepository = null
+        }
     }
 }

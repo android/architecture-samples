@@ -33,7 +33,7 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import kotlinx.coroutines.runBlocking
@@ -56,11 +56,16 @@ import org.robolectric.annotation.TextLayoutMode
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 class AddEditTaskFragmentTest {
+    private lateinit var repository: TasksRepository
 
     @Before
+    fun initRepository() {
+        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+    }
+
     @After
-    fun clearDb() = runBlocking {
-        ServiceLocator.provideTasksRepository(getApplicationContext()).deleteAllTasks()
+    fun cleanupDb() = runBlocking {
+        ServiceLocator.resetForTests()
     }
 
     @Test
@@ -100,8 +105,7 @@ class AddEditTaskFragmentTest {
         // THEN - Verify:
         // 1) That the repository saved the task
         // 2) Verify that we navigated back to the tasks screen.
-        val tasks = (ServiceLocator.provideTasksRepository(getApplicationContext())
-                        .getTasksBlocking(true) as Result.Success).data
+        val tasks = (repository.getTasksBlocking(true) as Result.Success).data
         assertThat(tasks.size, `is`(1))
         // The loaded data contains the expected values
         assertThat(tasks[0], notNullValue())

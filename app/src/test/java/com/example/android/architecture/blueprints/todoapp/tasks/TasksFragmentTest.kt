@@ -23,8 +23,8 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
 import org.hamcrest.core.IsNot.not
@@ -50,13 +50,13 @@ class TasksFragmentTest {
     private lateinit var repository: TasksRepository
 
     @Before
-    fun setup() {
+    fun initRepository() {
         repository = ServiceLocator.provideTasksRepository(getApplicationContext())
     }
 
     @After
-    fun tearDown() {
-        repository.deleteAllTasksBlocking()
+    fun cleanupDb() = runBlocking {
+        ServiceLocator.resetForTests()
     }
 
     @Test

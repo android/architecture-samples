@@ -21,8 +21,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
@@ -146,24 +146,24 @@ class DefaultTasksRepository(
         return Result.Error(Exception("Error fetching from remote and local"))
     }
 
-    override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
+    override suspend fun saveTask(task: Task) {
         // Do in memory cache update to keep the app UI up to date
         cacheAndPerform(task) {
-            awaitAll(
-                async { tasksRemoteDataSource.saveTask(it) },
-                async { tasksLocalDataSource.saveTask(it) }
-            )
+            coroutineScope {
+                launch { tasksRemoteDataSource.saveTask(it) }
+                launch { tasksLocalDataSource.saveTask(it) }
+            }
         }
     }
 
-    override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
+    override suspend fun completeTask(task: Task) {
         // Do in memory cache update to keep the app UI up to date
         cacheAndPerform(task) {
             it.isCompleted = true
-            awaitAll(
-                async { tasksRemoteDataSource.completeTask(it) },
-                async { tasksLocalDataSource.completeTask(it) }
-            )
+            coroutineScope {
+                launch { tasksRemoteDataSource.completeTask(it) }
+                launch { tasksLocalDataSource.completeTask(it) }
+            }
         }
     }
 
@@ -179,10 +179,10 @@ class DefaultTasksRepository(
         // Do in memory cache update to keep the app UI up to date
         cacheAndPerform(task) {
             it.isCompleted = false
-            awaitAll(
-                async { tasksRemoteDataSource.activateTask(it) },
-                async { tasksLocalDataSource.activateTask(it) }
-            )
+            coroutineScope {
+                launch { tasksRemoteDataSource.activateTask(it) }
+                launch { tasksLocalDataSource.activateTask(it) }
+            }
 
         }
     }
@@ -196,30 +196,30 @@ class DefaultTasksRepository(
     }
 
     override suspend fun clearCompletedTasks() {
+        coroutineScope {
+            launch { tasksRemoteDataSource.clearCompletedTasks() }
+            launch { tasksLocalDataSource.clearCompletedTasks() }
+        }
         withContext(ioDispatcher) {
-            awaitAll(
-                async { tasksRemoteDataSource.clearCompletedTasks() },
-                async { tasksLocalDataSource.clearCompletedTasks() }
-            )
             cachedTasks?.entries?.removeAll { it.value.isCompleted }
         }
     }
 
     override suspend fun deleteAllTasks() {
         withContext(ioDispatcher) {
-            awaitAll(
-                async { tasksRemoteDataSource.deleteAllTasks() },
-                async { tasksLocalDataSource.deleteAllTasks() }
-            )
+            coroutineScope {
+                launch { tasksRemoteDataSource.deleteAllTasks() }
+                launch { tasksLocalDataSource.deleteAllTasks() }
+            }
         }
         cachedTasks?.clear()
     }
 
-    override suspend fun deleteTask(taskId: String) = withContext(ioDispatcher) {
-        awaitAll(
-            async { tasksRemoteDataSource.deleteTask(taskId) },
-            async { tasksLocalDataSource.deleteTask(taskId) }
-        )
+    override suspend fun deleteTask(taskId: String) {
+        coroutineScope {
+            launch { tasksRemoteDataSource.deleteTask(taskId) }
+            launch { tasksLocalDataSource.deleteTask(taskId) }
+        }
 
         cachedTasks?.remove(taskId)
         Unit // Force return type
@@ -232,14 +232,14 @@ class DefaultTasksRepository(
         }
     }
 
-    private suspend fun refreshLocalDataSource(tasks: List<Task>) = withContext(Dispatchers.IO) {
+    private suspend fun refreshLocalDataSource(tasks: List<Task>) {
         tasksLocalDataSource.deleteAllTasks()
         for (task in tasks) {
             tasksLocalDataSource.saveTask(task)
         }
     }
 
-    private suspend fun refreshLocalDataSource(task: Task) = withContext(Dispatchers.IO) {
+    private suspend fun refreshLocalDataSource(task: Task) {
         tasksLocalDataSource.saveTask(task)
     }
 
@@ -258,41 +258,5 @@ class DefaultTasksRepository(
     private inline fun cacheAndPerform(task: Task, perform: (Task) -> Unit) {
         val cachedTask = cacheTask(task)
         perform(cachedTask)
-    }
-
-    companion object {
-
-        private var INSTANCE: DefaultTasksRepository? = null
-
-        /**
-         * Returns the single instance of this class, creating it if necessary.
-
-         * @param tasksRemoteDataSource the backend data source
-         * *
-         * @param tasksLocalDataSource  the device storage data source
-         * *
-         * @return the [DefaultTasksRepository] instance
-         */
-        @JvmStatic
-        fun getInstance(
-            tasksRemoteDataSource: TasksDataSource,
-            tasksLocalDataSource: TasksDataSource,
-            ioDispatcher: CoroutineDispatcher
-        ) =
-            INSTANCE ?: synchronized(DefaultTasksRepository::class.java) {
-                INSTANCE ?: DefaultTasksRepository(
-                    tasksRemoteDataSource, tasksLocalDataSource, ioDispatcher
-                )
-                    .also { INSTANCE = it }
-            }
-
-        /**
-         * Used to force [getInstance] to create a new instance
-         * next time it's called.
-         */
-        @JvmStatic
-        fun destroyInstance() {
-            INSTANCE = null
-        }
     }
 }

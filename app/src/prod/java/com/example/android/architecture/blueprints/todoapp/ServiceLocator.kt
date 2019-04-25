@@ -18,13 +18,12 @@ package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
-import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
-import kotlinx.coroutines.Dispatchers
 
 /**
  * A Service Locator for the [TasksRepository]. This is the prod version, with a
@@ -32,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
  */
 object ServiceLocator {
 
-    @Volatile private var tasksRepository: TasksRepository? = null
+    @Volatile var tasksRepository: TasksRepository? = null
 
     fun provideTasksRepository(context: Context): TasksRepository {
         return tasksRepository ?: synchronized(this) {
@@ -41,11 +40,12 @@ object ServiceLocator {
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        val database = ToDoDatabase.getInstance(context)
-        return DefaultTasksRepository.getInstance(
+        val database= Room.databaseBuilder(context.applicationContext,
+            ToDoDatabase::class.java, "Tasks.db")
+            .build()
+        return DefaultTasksRepository(
             TasksRemoteDataSource,
-            TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao()),
-            Dispatchers.IO
+            TasksLocalDataSource(database.taskDao())
         )
     }
 }
