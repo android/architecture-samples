@@ -24,11 +24,13 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
+import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -61,35 +63,28 @@ class AppNavigationTest {
     }
 
     @Test
-    fun clickOnStatisticsNavigationItem_ShowsStatisticsScreen() {
+    fun drawNavigationFromTasksToStatistics() {
         // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
             .perform(open()) // Open Drawer
 
         // Start statistics screen.
-        onView(withText(R.string.statistics_title)).perform(click())
+        onView(withId(R.id.nav_view))
+            .perform(navigateTo(R.id.statisticsFragment));
 
-        // Check that statistics Activity was opened.
+        // Check that statistics screen was opened.
         onView(withId(R.id.statistics)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun clickOnListNavigationItem_ShowsListScreen() {
-        // start up Statistics screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        activityScenario.onActivity {
-            it.findNavController(R.id.nav_host_fragment).navigate(R.id.statisticsFragment)
-        }
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
             .perform(open()) // Open Drawer
 
-        // Start tasks list screen.
-        onView(withText(R.string.list_title)).perform(click())
+        // Start statistics screen.
+        onView(withId(R.id.nav_view))
+            .perform(navigateTo(R.id.tasksFragment));
 
         // Check that Tasks Activity was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
@@ -178,7 +173,7 @@ class AppNavigationTest {
         val task = Task("Back button", "Description")
         ServiceLocator.provideTasksRepository(getApplicationContext()).saveTaskBlocking(task)
 
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        ActivityScenario.launch(TasksActivity::class.java)
 
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
@@ -186,11 +181,11 @@ class AppNavigationTest {
         onView(withId(R.id.fab_edit_task)).perform(click())
 
         // Confirm that if we click back once, we end up back at the task details page
-        Espresso.pressBack()
+        pressBack()
         onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
 
         // Confirm that if we click back a second time, we end up back at the home screen
-        Espresso.pressBack()
+        pressBack()
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }
 
