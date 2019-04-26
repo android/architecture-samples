@@ -65,9 +65,9 @@ class StatisticsFragmentTest {
 
         launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.AppTheme)
         val expectedActiveTaskText = getApplicationContext<Context>()
-            .getString(R.string.statistics_active_tasks, 1)
+            .getString(R.string.statistics_active_tasks, 50.0f)
         val expectedCompletedTaskText = getApplicationContext<Context>()
-            .getString(R.string.statistics_completed_tasks, 1)
+            .getString(R.string.statistics_completed_tasks, 50.0f)
         // check that both info boxes are displayed and contain the correct info
         onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
         onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))

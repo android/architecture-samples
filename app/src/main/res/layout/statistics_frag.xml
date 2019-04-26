@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="1dp"
-                android:text="@{@string/statistics_active_tasks(stats.numberOfActiveTasks)}"
+                android:text="@{@string/statistics_active_tasks(stats.activeTasksPercent)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
 
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="1dp"
-                android:text="@{@string/statistics_completed_tasks(stats.numberOfCompletedTasks)}"
+                android:text="@{@string/statistics_completed_tasks(stats.completedTasksPercent)}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
 

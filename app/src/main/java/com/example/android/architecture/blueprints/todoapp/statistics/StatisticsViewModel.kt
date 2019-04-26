@@ -50,21 +50,17 @@ class StatisticsViewModel(
     private val _empty = MutableLiveData<Boolean>()
     val empty: LiveData<Boolean> = _empty
 
-    private val _numberOfActiveTasks = MutableLiveData<Int>()
-    val numberOfActiveTasks: LiveData<Int> = _numberOfActiveTasks
+    private val _activeTasksPercent = MutableLiveData<Float>()
+    val activeTasksPercent: LiveData<Float> = _activeTasksPercent
 
-    private val _numberOfCompletedTasks = MutableLiveData<Int>()
-    val numberOfCompletedTasks: LiveData<Int> = _numberOfCompletedTasks
+    private val _completedTasksPercent = MutableLiveData<Float>()
+    val completedTasksPercent: LiveData<Float> = _completedTasksPercent
 
     private var activeTasks = 0
 
     private var completedTasks = 0
 
     fun start() {
-        loadStatistics()
-    }
-
-    fun loadStatistics() {
         _dataLoading.value = true
 
         viewModelScope.launch {
@@ -76,7 +72,7 @@ class StatisticsViewModel(
                     _error.value = true
                     activeTasks = 0
                     completedTasks = 0
-                    updateDataBindingObservables()
+                    computeStats(null)
                 }
             }
         }
@@ -85,29 +81,12 @@ class StatisticsViewModel(
     /**
      * Called when new data is ready.
      */
-    private fun computeStats(tasks: List<Task>) {
-        var completed = 0
-        var active = 0
-
-        for (task in tasks) {
-            if (task.isCompleted) {
-                completed += 1
-            } else {
-                active += 1
-            }
+    private fun computeStats(tasks: List<Task>?) {
+        getActiveAndCompletedStats(tasks).let {
+            _activeTasksPercent.value = it.activeTasksPercent
+            _completedTasksPercent.value = it.completedTasksPercent
         }
-        activeTasks = active
-        completedTasks = completed
-
-        updateDataBindingObservables()
-    }
-
-    private fun updateDataBindingObservables() {
-        _numberOfCompletedTasks.value = completedTasks
-
-        _numberOfActiveTasks.value = activeTasks
-
-        _empty.value = activeTasks + completedTasks == 0
+        _empty.value = tasks.isNullOrEmpty()
         _dataLoading.value = false
     }
 }

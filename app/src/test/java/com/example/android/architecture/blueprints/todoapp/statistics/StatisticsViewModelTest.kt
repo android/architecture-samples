@@ -66,7 +66,7 @@ class StatisticsViewModelTest {
         // Given an initialized StatisticsViewModel with no tasks
 
         // When loading of Tasks is requested
-        statisticsViewModel.loadStatistics()
+        statisticsViewModel.start()
 
         // Execute pending coroutines actions
         testContext.triggerActions()
@@ -81,18 +81,22 @@ class StatisticsViewModelTest {
         val task1 = Task("Title1", "Description1")
         val task2 = Task("Title2", "Description2", true)
         val task3 = Task("Title3", "Description3", true)
-        tasksRepository.addTasks(task1, task2, task3)
+        val task4 = Task("Title4", "Description4", true)
+        tasksRepository.addTasks(task1, task2, task3, task4)
 
         // When loading of Tasks is requested
-        statisticsViewModel.loadStatistics()
+        statisticsViewModel.start()
 
         // Execute pending coroutines actions
         testContext.triggerActions()
 
         // Then the results are not empty
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty)).isFalse()
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.numberOfActiveTasks)).isEqualTo(1)
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.numberOfCompletedTasks)).isEqualTo(2)
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty))
+            .isFalse()
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.activeTasksPercent))
+            .isEqualTo(25f)
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.completedTasksPercent))
+            .isEqualTo(75f)
     }
 
     @Test
@@ -106,7 +110,7 @@ class StatisticsViewModelTest {
         )
 
         // When statistics are loaded
-        errorViewModel.loadStatistics()
+        errorViewModel.start()
 
         // Execute pending coroutines actions
         testContext.triggerActions()
