@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -36,9 +37,11 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -49,12 +52,20 @@ import org.robolectric.annotation.TextLayoutMode
 /**
  * Integration test for the Add Task screen.
  */
+@ObsoleteCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 class AddEditTaskFragmentTest {
     private lateinit var repository: TasksRepository
+
+    // Executes each task synchronously using Architecture Components.
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
+    private val taskTitle = "title"
+    private val taskDescription = "description"
 
     @Before
     fun initRepository() {
@@ -85,32 +96,51 @@ class AddEditTaskFragmentTest {
     @Test
     fun validTask_isSaved() {
         // GIVEN - On the "Add Task" screen.
-        val bundle = AddEditTaskFragmentArgs(null,
-            getApplicationContext<Context>().getString(R.string.add_task)).toBundle()
-        val scenario = launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
         val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
+        launchFragment(navController)
 
         // WHEN - Valid title and description combination and click save
-        onView(withId(R.id.add_task_title))
-          .perform(replaceText("title")) // Type new task title
-        onView(withId(R.id.add_task_description)).perform(
-          replaceText("description")) // Type new task description and close the keyboard
-        onView(withId(R.id.fab_save_task)).perform(click())
+        saveNewTask()
 
-        // THEN - Verify:
-        // 1) That the repository saved the task
-        // 2) Verify that we navigated back to the tasks screen.
+        // THEN - Verify that the repository saved the task
         val tasks = (repository.getTasksBlocking(true) as Result.Success).data
         assertThat(tasks).hasSize(1)
-        assertThat(tasks[0].title).isEqualTo("title")
-        assertThat(tasks[0].description).isEqualTo("description")
+        assertThat(tasks[0].title).isEqualTo(taskTitle)
+        assertThat(tasks[0].description).isEqualTo(taskDescription)
+    }
 
+    @Test
+    fun validTask_navigatesBack() {
+        // GIVEN - On the "Add Task" screen.
+        val navController = mock(NavController::class.java)
+        launchFragment(navController)
+
+        // WHEN - Valid title and description combination and click save
+        saveNewTask()
+
+        repository.getTasksBlocking(true)
+
+        // THEN - Verify that we navigated back to the tasks screen.
         verify(navController).navigate(
             AddEditTaskFragmentDirections
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK))
+    }
+
+    private fun saveNewTask() {
+        onView(withId(R.id.add_task_title))
+            .perform(replaceText(taskTitle)) // Type new task title
+        onView(withId(R.id.add_task_description)).perform(
+            replaceText(taskDescription)) // Type new task description and close the keyboard
+        onView(withId(R.id.fab_save_task)).perform(click())
+    }
+
+    private fun launchFragment(navController: NavController?) {
+        val bundle = AddEditTaskFragmentArgs(null,
+            getApplicationContext<Context>().getString(R.string.add_task)).toBundle()
+        val scenario = launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
     }
 
 }
