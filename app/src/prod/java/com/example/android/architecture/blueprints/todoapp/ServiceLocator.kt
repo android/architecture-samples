@@ -48,4 +48,7 @@ object ServiceLocator {
             TasksLocalDataSource(database.taskDao())
         )
     }
+
+    fun resetForTests() {
+    }
 }
