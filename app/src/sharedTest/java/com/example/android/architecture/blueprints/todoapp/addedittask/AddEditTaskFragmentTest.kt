@@ -36,10 +36,10 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,9 +63,6 @@ class AddEditTaskFragmentTest {
     // Executes each task synchronously using Architecture Components.
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
-
-    private val taskTitle = "title"
-    private val taskDescription = "description"
 
     @Before
     fun initRepository() {
@@ -100,13 +97,15 @@ class AddEditTaskFragmentTest {
         launchFragment(navController)
 
         // WHEN - Valid title and description combination and click save
-        saveNewTask()
+        onView(withId(R.id.add_task_title)).perform(replaceText("title"))
+        onView(withId(R.id.add_task_description)).perform(replaceText("description"))
+        onView(withId(R.id.fab_save_task)).perform(click())
 
         // THEN - Verify that the repository saved the task
         val tasks = (repository.getTasksBlocking(true) as Result.Success).data
-        assertThat(tasks).hasSize(1)
-        assertThat(tasks[0].title).isEqualTo(taskTitle)
-        assertThat(tasks[0].description).isEqualTo(taskDescription)
+        assertEquals(tasks.size, 1)
+        assertEquals(tasks[0].title, "title")
+        assertEquals(tasks[0].description, "description")
     }
 
     @Test
@@ -116,7 +115,9 @@ class AddEditTaskFragmentTest {
         launchFragment(navController)
 
         // WHEN - Valid title and description combination and click save
-        saveNewTask()
+        onView(withId(R.id.add_task_title)).perform(replaceText("title"))
+        onView(withId(R.id.add_task_description)).perform(replaceText("description"))
+        onView(withId(R.id.fab_save_task)).perform(click())
 
         repository.getTasksBlocking(true)
 
@@ -124,14 +125,6 @@ class AddEditTaskFragmentTest {
         verify(navController).navigate(
             AddEditTaskFragmentDirections
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK))
-    }
-
-    private fun saveNewTask() {
-        onView(withId(R.id.add_task_title))
-            .perform(replaceText(taskTitle)) // Type new task title
-        onView(withId(R.id.add_task_description)).perform(
-            replaceText(taskDescription)) // Type new task description and close the keyboard
-        onView(withId(R.id.fab_save_task)).perform(click())
     }
 
     private fun launchFragment(navController: NavController?) {
