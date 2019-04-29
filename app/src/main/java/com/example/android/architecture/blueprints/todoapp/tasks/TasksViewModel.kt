@@ -106,11 +106,11 @@ class TasksViewModel(
             }
             TasksFilterType.ACTIVE_TASKS -> {
                 setFilter(R.string.label_active, R.string.no_tasks_active,
-                    R.drawable.ic_check_circle_24dp, false)
+                    R.drawable.ic_check_circle_96dp, false)
             }
             TasksFilterType.COMPLETED_TASKS -> {
                 setFilter(R.string.label_completed, R.string.no_tasks_completed,
-                    R.drawable.ic_verified_user_24dp, false)
+                    R.drawable.ic_verified_user_96dp, false)
             }
         }
     }

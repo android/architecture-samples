@@ -279,8 +279,8 @@ class TasksFragmentTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
 
-        // Verify the "You have no TO-DOs!" text is shown
-        onView(withText("You have no TO-DOs!")).check(matches(isDisplayed()))
+        // Verify the "You have no tasks!" text is shown
+        onView(withText("You have no tasks!")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -290,8 +290,8 @@ class TasksFragmentTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
 
-        // Verify the "You have no completed TO-DOs!" text is shown
-        onView(withText("You have no completed TO-DOs!")).check(matches((isDisplayed())))
+        // Verify the "You have no completed tasks!" text is shown
+        onView(withText("You have no completed tasks!")).check(matches((isDisplayed())))
     }
 
     @Test
@@ -301,8 +301,8 @@ class TasksFragmentTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
 
-        // Verify the "You have no active TO-DOs!" text is shown
-        onView(withText("You have no active TO-DOs!")).check(matches((isDisplayed())))
+        // Verify the "You have no active tasks!" text is shown
+        onView(withText("You have no active tasks!")).check(matches((isDisplayed())))
     }
 
     private fun checkboxWithText(text: String) : Matcher<View> {
