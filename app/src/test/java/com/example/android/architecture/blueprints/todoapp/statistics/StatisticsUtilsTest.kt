@@ -74,6 +74,7 @@ class StatisticsUtilsTest {
 
     @Test
     fun getActiveAndCompletedStats_both() {
+        // Given 3 completed tasks and 2 active tasks
         val tasks = listOf(
             Task("title", "desc", isCompleted = true),
             Task("title", "desc", isCompleted = true),
@@ -81,11 +82,10 @@ class StatisticsUtilsTest {
             Task("title", "desc", isCompleted = false),
             Task("title", "desc", isCompleted = false)
         )
-        // When there are on tasks
+        // When the list of tasks is computed
         val result = getActiveAndCompletedStats(tasks)
 
-        print(result)
-        // Both active and completed tasks are 0
+        // Then the result is 40-60
         assertThat(result.activeTasksPercent, `is`(40f))
         assertThat(result.completedTasksPercent, `is`(60f))
     }
