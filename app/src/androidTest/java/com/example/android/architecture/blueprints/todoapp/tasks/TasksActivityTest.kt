@@ -37,7 +37,10 @@ import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
+import com.example.android.architecture.blueprints.todoapp.util.monitorActivity
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
@@ -55,25 +58,28 @@ class TasksActivityTest {
 
     private lateinit var repository: TasksRepository
 
+    // An Idling Resource that waits for Data Binding to have no pending bindings
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
+
     @Before
-    fun resetState() {
+    fun init() {
         repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        repository.deleteAllTasksBlocking()
     }
 
     @After
     fun reset() {
-        ServiceLocator.resetForTests()
+        ServiceLocator.resetRepository()
     }
 
     /**
-     * Prepare your test fixture for this test. In this case we register an IdlingResources with
-     * Espresso. IdlingResource resource is a great way to tell Espresso when your app is in an
-     * idle state. This helps Espresso to synchronize your test actions, which makes tests
-     * significantly more reliable.
+     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
+     * are not scheduled in the main Looper (for example when executed on a different thread).
      */
     @Before
     fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
     /**
@@ -82,29 +88,32 @@ class TasksActivityTest {
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
     @Test
     fun createTask() {
-        // GIVEN - Start on home screen
-        ActivityScenario.launch(TasksActivity::class.java)
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        // WHEN - Click on the "+" button, add details, and save
+        // Click on the "+" button, add details, and save
         onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title))
-          .perform(typeText("title"))
-        onView(withId(R.id.add_task_description))
-          .perform(typeText("description"))
+        onView(withId(R.id.add_task_title)).perform(typeText("title"))
+        onView(withId(R.id.add_task_description)).perform(typeText("description"))
         onView(withId(R.id.fab_save_task)).perform(click())
 
-        // THEN - Verify task is displayed on screen
+        // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
     }
 
     @Test
     fun editTask() {
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
-        ActivityScenario.launch(TasksActivity::class.java)
+        repository.saveTaskBlocking(Task("TITLE1", DESCRIPTION))
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
@@ -126,7 +135,10 @@ class TasksActivityTest {
 
     @Test
     fun createOneTask_deleteTask() {
-        ActivityScenario.launch(TasksActivity::class.java)
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Add active task
         onView(withId(R.id.fab_add_task)).perform(click())
@@ -147,18 +159,12 @@ class TasksActivityTest {
 
     @Test
     fun createTwoTasks_deleteOneTask() {
-        ActivityScenario.launch(TasksActivity::class.java)
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION"))
 
-        // Add 2 active tasks
-        onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("TITLE1"))
-        onView(withId(R.id.add_task_description)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.fab_save_task)).perform(click())
-
-        onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("TITLE2"))
-        onView(withId(R.id.add_task_description)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.fab_save_task)).perform(click())
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Open the second task in details view
         onView(withText("TITLE2")).perform(click())
@@ -175,11 +181,16 @@ class TasksActivityTest {
     @Test
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 active task
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
-        ActivityScenario.launch(TasksActivity::class.java)
+        val taskTitle = "COMPLETED"
+        repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the task on the list
-        onView(withText("TITLE1")).perform(click())
+        onView(withText(taskTitle)).perform(click())
+
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
@@ -187,18 +198,22 @@ class TasksActivityTest {
         pressBack()
 
         // Check that the task is marked as completed
-        onView(allOf(withId(R.id.complete), hasSibling(withText("TITLE1"))))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
     }
 
     @Test
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 completed task
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION", true))
-        ActivityScenario.launch(TasksActivity::class.java)
+        val taskTitle = "ACTIVE"
+        repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the task on the list
-        onView(withText("TITLE1")).perform(click())
+        onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
@@ -206,18 +221,22 @@ class TasksActivityTest {
         pressBack()
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText("TITLE1"))))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
     }
 
     @Test
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
         // Add 1 active task
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
-        ActivityScenario.launch(TasksActivity::class.java)
+        val taskTitle = "ACT-COMP"
+        repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the task on the list
-        onView(withText("TITLE1")).perform(click())
+        onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
         // Click again to restore it to original state
@@ -227,18 +246,22 @@ class TasksActivityTest {
         pressBack()
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText("TITLE1"))))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
     }
 
     @Test
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
         // Add 1 completed task
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION", true))
-        ActivityScenario.launch(TasksActivity::class.java)
+        val taskTitle = "COMP-ACT"
+        repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
+
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the task on the list
-        onView(withText("TITLE1")).perform(click())
+        onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
         // Click again to restore it to original state
@@ -248,7 +271,7 @@ class TasksActivityTest {
         pressBack()
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText("TITLE1"))))
+        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
     }
 }

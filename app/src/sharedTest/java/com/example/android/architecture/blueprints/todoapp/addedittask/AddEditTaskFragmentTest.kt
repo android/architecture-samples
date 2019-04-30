@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.content.Context
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -33,6 +32,7 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Result
+import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
@@ -41,7 +41,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -60,18 +59,15 @@ import org.robolectric.annotation.TextLayoutMode
 class AddEditTaskFragmentTest {
     private lateinit var repository: TasksRepository
 
-    // Executes each task synchronously using Architecture Components.
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
     @Before
     fun initRepository() {
-        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        repository = FakeRepository()
+        ServiceLocator.tasksRepository = repository
     }
 
     @After
     fun cleanupDb() = runBlocking {
-        ServiceLocator.resetForTests()
+        ServiceLocator.resetRepository()
     }
 
     @Test
@@ -118,8 +114,6 @@ class AddEditTaskFragmentTest {
         onView(withId(R.id.add_task_title)).perform(replaceText("title"))
         onView(withId(R.id.add_task_description)).perform(replaceText("description"))
         onView(withId(R.id.fab_save_task)).perform(click())
-
-        repository.getTasksBlocking(true)
 
         // THEN - Verify that we navigated back to the tasks screen.
         verify(navController).navigate(

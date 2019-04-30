@@ -24,6 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import kotlinx.coroutines.runBlocking
 
 /**
  * A Service Locator for the [TasksRepository]. This is the prod version, with a
@@ -31,24 +32,41 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
  */
 object ServiceLocator {
 
+    private val lock = Any()
+    private var database: ToDoDatabase? = null
     @Volatile var tasksRepository: TasksRepository? = null
+        @VisibleForTesting set
 
     fun provideTasksRepository(context: Context): TasksRepository {
-        return tasksRepository ?: synchronized(this) {
-            tasksRepository ?: createTasksRepository(context)
+        synchronized(this) {
+            return tasksRepository ?:
+                tasksRepository ?: createTasksRepository(context)
         }
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        val database= Room.databaseBuilder(context.applicationContext,
+        database = Room.databaseBuilder(context.applicationContext,
             ToDoDatabase::class.java, "Tasks.db")
             .build()
+
         return DefaultTasksRepository(
             TasksRemoteDataSource,
-            TasksLocalDataSource(database.taskDao())
+            TasksLocalDataSource(database!!.taskDao())
         )
     }
 
-    fun resetForTests() {
+    @VisibleForTesting
+    fun resetRepository() {
+        synchronized(lock) {
+            runBlocking {
+                TasksRemoteDataSource.deleteAllTasks()
+            }
+            // Clear all data to avoid test pollution.
+            database?.apply {
+                clearAllTables()
+                close()
+            }
+            tasksRepository = null
+        }
     }
 }

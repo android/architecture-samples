@@ -31,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 
@@ -182,6 +183,10 @@ class TasksViewModel(
 
         _dataLoading.value = true
 
+        // Espresso does not work well with coroutines yet. See
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/982
+        EspressoIdlingResource.increment() // Set app as busy.
+
         viewModelScope.launch {
             val tasksResult = tasksRepository.getTasks(forceUpdate)
 
@@ -209,6 +214,7 @@ class TasksViewModel(
                 _snackbarText.value = Event(R.string.loading_tasks_error)
             }
 
+            EspressoIdlingResource.decrement() // Set app as idle.
             _dataLoading.value = false
         }
     }

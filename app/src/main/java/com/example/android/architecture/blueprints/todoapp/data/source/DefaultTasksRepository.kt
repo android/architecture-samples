@@ -42,16 +42,18 @@ class DefaultTasksRepository(
 
     private var cachedTasks: ConcurrentMap<String, Task>? = null
 
-    override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> =
-        withContext(ioDispatcher) {
+    override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
+
+        EspressoIdlingResource.increment() // Set app as busy.
+
+        return withContext(ioDispatcher) {
             // Respond immediately with cache if available and not dirty
             if (!forceUpdate) {
                 cachedTasks?.let { cachedTasks ->
+                    EspressoIdlingResource.decrement() // Set app as idle.
                     return@withContext Success(cachedTasks.values.sortedBy { it.id })
                 }
             }
-
-            EspressoIdlingResource.increment() // Set app as busy.
 
             val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
 
@@ -72,6 +74,7 @@ class DefaultTasksRepository(
 
             return@withContext Result.Error(Exception("Illegal state"))
         }
+    }
 
     private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
         // Remote first
@@ -99,16 +102,18 @@ class DefaultTasksRepository(
     /**
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> =
-        withContext(ioDispatcher) {
+    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
+
+        EspressoIdlingResource.increment() // Set app as busy.
+
+        return withContext(ioDispatcher) {
             // Respond immediately with cache if available
             if (!forceUpdate) {
                 getTaskWithId(taskId)?.let {
+                    EspressoIdlingResource.decrement() // Set app as idle.
                     return@withContext Success(it)
                 }
             }
-
-            EspressoIdlingResource.increment() // Set app as busy.
 
             val newTask = fetchTaskFromRemoteOrLocal(taskId, forceUpdate)
 
@@ -118,6 +123,7 @@ class DefaultTasksRepository(
             EspressoIdlingResource.decrement() // Set app as idle.
 
             return@withContext newTask
+        }
     }
 
     private suspend fun fetchTaskFromRemoteOrLocal(

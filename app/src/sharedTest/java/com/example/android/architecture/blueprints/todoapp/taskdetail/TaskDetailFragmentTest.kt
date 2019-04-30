@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
@@ -28,6 +27,7 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.runBlocking
@@ -48,12 +48,13 @@ class TaskDetailFragmentTest {
 
     @Before
     fun initRepository() {
-        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        repository = FakeRepository()
+        ServiceLocator.tasksRepository = repository
     }
 
     @After
     fun cleanupDb() = runBlocking {
-        ServiceLocator.resetForTests()
+        ServiceLocator.resetRepository()
     }
 
     @Test
