@@ -78,6 +78,11 @@ class TaskDetailViewModelTest {
 
     @Test
     fun deleteTask() {
+        // TODO
+    }
+
+    @Test
+    fun deleteTask_solution() {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 

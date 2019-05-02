@@ -29,6 +29,15 @@ class StatisticsUtilsTest {
     @Test
     fun getActiveAndCompletedStats_error() {
         // When there's an error loading stats
+        // TODO
+
+        // Both active and completed tasks are 0
+        // TODO
+    }
+
+    @Test
+    fun getActiveAndCompletedStats_error_solution() {
+        // When there's an error loading stats
         val result = getActiveAndCompletedStats(null)
 
         // Both active and completed tasks are 0
