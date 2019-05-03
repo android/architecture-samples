@@ -100,7 +100,7 @@ class TasksFragment : Fragment() {
 
     private fun setupSnackbar() {
         viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
+            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
         }
         arguments?.let {
             val message = TasksFragmentArgs.fromBundle(it).userMessage
