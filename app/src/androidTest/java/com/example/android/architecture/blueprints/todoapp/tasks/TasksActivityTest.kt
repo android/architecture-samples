@@ -104,22 +104,6 @@ class TasksActivityTest {
     }
 
     @Test
-    fun createTask_solution() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-
-        // Click on the "+" button, add details, and save
-        onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("title"))
-        onView(withId(R.id.add_task_description)).perform(typeText("description"))
-        onView(withId(R.id.fab_save_task)).perform(click())
-
-        // Then verify task is displayed on screen
-        onView(withText("title")).check(matches(isDisplayed()))
-    }
-
-    @Test
     fun editTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
 
@@ -285,5 +269,21 @@ class TasksActivityTest {
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
+    }
+
+    @Test
+    fun createTask_solution() {
+        // start up Tasks screen
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        // Click on the "+" button, add details, and save
+        onView(withId(R.id.fab_add_task)).perform(click())
+        onView(withId(R.id.add_task_title)).perform(typeText("title"))
+        onView(withId(R.id.add_task_description)).perform(typeText("description"))
+        onView(withId(R.id.fab_save_task)).perform(click())
+
+        // Then verify task is displayed on screen
+        onView(withText("title")).check(matches(isDisplayed()))
     }
 }

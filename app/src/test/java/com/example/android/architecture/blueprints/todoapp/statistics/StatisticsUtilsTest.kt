@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
+import org.junit.Ignore
 import org.junit.Test
 
 /**
@@ -36,23 +37,12 @@ class StatisticsUtilsTest {
     }
 
     @Test
-    fun getActiveAndCompletedStats_error_solution() {
-        // When there's an error loading stats
-        val result = getActiveAndCompletedStats(null)
-
-        // Both active and completed tasks are 0
-        assertThat(result.activeTasksPercent, `is`(0f))
-        assertThat(result.completedTasksPercent, `is`(0f))
-    }
-
-    @Test
     fun getActiveAndCompletedStats_empty() {
         // When there are no tasks
-        val result = getActiveAndCompletedStats(emptyList())
+        // TODO
 
         // Both active and completed tasks are 0
-        assertThat(result.activeTasksPercent, `is`(0f))
-        assertThat(result.completedTasksPercent, `is`(0f))
+        // TODO
     }
 
     @Test
@@ -97,5 +87,27 @@ class StatisticsUtilsTest {
         // Then the result is 40-60
         assertThat(result.activeTasksPercent, `is`(40f))
         assertThat(result.completedTasksPercent, `is`(60f))
+    }
+
+    @Test
+    @Ignore
+    fun getActiveAndCompletedStats_error_solution() {
+        // When there's an error loading stats
+        val result = getActiveAndCompletedStats(null)
+
+        // Both active and completed tasks are 0
+        assertThat(result.activeTasksPercent, `is`(0f))
+        assertThat(result.completedTasksPercent, `is`(0f))
+    }
+
+    @Test
+    @Ignore
+    fun getActiveAndCompletedStats_empty_solution() {
+        // When there are no tasks
+        val result = getActiveAndCompletedStats(emptyList())
+
+        // Both active and completed tasks are 0
+        assertThat(result.activeTasksPercent, `is`(0f))
+        assertThat(result.completedTasksPercent, `is`(0f))
     }
 }

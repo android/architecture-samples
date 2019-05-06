@@ -82,23 +82,6 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun deleteTask_solution() {
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
-        taskDetailViewModel.start(task.id)
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
-        // When the deletion of a task is requested
-        taskDetailViewModel.deleteTask()
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
-    }
-
-    @Test
     fun completeTask() {
         taskDetailViewModel.start(task.id)
 
@@ -171,5 +154,22 @@ class TaskDetailViewModelTest {
         // Then the event is triggered
         val value = LiveDataTestUtil.getValue(taskDetailViewModel.editTaskCommand)
         assertThat(value.getContentIfNotHandled()).isNotNull()
+    }
+
+    @Test
+    fun deleteTask_solution() {
+        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
+        taskDetailViewModel.start(task.id)
+
+        // Execute pending coroutines actions
+        testContext.triggerActions()
+
+        // When the deletion of a task is requested
+        taskDetailViewModel.deleteTask()
+
+        // Execute pending coroutines actions
+        testContext.triggerActions()
+
+        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
     }
 }

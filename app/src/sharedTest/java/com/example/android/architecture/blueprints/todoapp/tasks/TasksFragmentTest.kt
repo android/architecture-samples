@@ -74,24 +74,6 @@ class TasksFragmentTest {
     }
 
     @Test
-    fun clickAddTaskButton_navigateToAddEditFragment_solution() {
-        // GIVEN - On the home screen
-        val scenario = launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
-
-        // WHEN - Click on the "+" button
-        onView(withId(R.id.fab_add_task)).perform(click())
-
-        // THEN - Verify that we navigate to the add screen
-        verify(navController).navigate(
-            TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
-                null, getApplicationContext<Context>().getString(R.string.add_task)))
-    }
-
-    @Test
     fun displayTask_whenRepositoryHasData() {
         // GIVEN - One task already in the repository
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
@@ -317,6 +299,24 @@ class TasksFragmentTest {
 
         // Verify the "You have no active tasks!" text is shown
         onView(withText("You have no active tasks!")).check(matches((isDisplayed())))
+    }
+
+    @Test
+    fun clickAddTaskButton_navigateToAddEditFragment_solution() {
+        // GIVEN - On the home screen
+        val scenario = launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
+        val navController = mock(NavController::class.java)
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
+
+        // WHEN - Click on the "+" button
+        onView(withId(R.id.fab_add_task)).perform(click())
+
+        // THEN - Verify that we navigate to the add screen
+        verify(navController).navigate(
+          TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
+            null, getApplicationContext<Context>().getString(R.string.add_task)))
     }
 
     private fun checkboxWithText(text: String) : Matcher<View> {
