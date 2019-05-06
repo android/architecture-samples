@@ -1,7 +1,7 @@
 version: 2
 config_android:
   docker:
-  - image: circleci/android:api-28-alpha
+  - image: circleci/android:api-28
   working_directory: ~/project
   environment:
     JAVA_TOOL_OPTIONS: -Xmx1024m
@@ -17,7 +17,7 @@ setup_ftl:
 jobs:
   build_and_setup:
     docker:
-    - image: circleci/android:api-28-alpha
+    - image: circleci/android:api-28
     working_directory: ~/project
     environment:
     - JAVA_TOOL_OPTIONS: -Xmx1024m
@@ -49,7 +49,7 @@ jobs:
         - ./app/build
   run_ftl:
     docker:
-    - image: circleci/android:api-28-alpha
+    - image: circleci/android:api-28
     working_directory: ~/project
     environment:
     - JAVA_TOOL_OPTIONS: -Xmx1024m
@@ -71,7 +71,7 @@ jobs:
           sudo gcloud firebase test android run \
             --app app/build/outputs/apk/mock/debug/app-mock-debug.apk \
             --test app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk \
-            --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-blueprints \
+            --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-testingcodelab \
             --results-dir=${BUILD_DIR}
     - run:
         name: Download results
@@ -79,7 +79,7 @@ jobs:
           BUILD_DIR=build_${CIRCLE_BUILD_NUM}
           sudo pip install -U crcmod
           mkdir firebase_test_results
-          sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-blueprints/${BUILD_DIR} | tail -1` firebase_test_results/ | true
+          sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-testingcodelab/${BUILD_DIR} | tail -1` firebase_test_results/ | true
     - store_artifacts:
         path: firebase_test_results
 workflows:

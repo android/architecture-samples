@@ -109,7 +109,7 @@ class TasksActivityTest {
 
     @Test
     fun editTask() {
-        repository.saveTaskBlocking(Task("TITLE1", DESCRIPTION))
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
 
         // start up Tasks screen
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)

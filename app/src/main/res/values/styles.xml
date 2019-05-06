@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. --><style name="AppTheme" parent="Base.AppTheme" />
 
@@ -24,7 +24,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!-- For Android sdk versions 26+. -->
-        <item name="android:fontFamily">@font/opensans_font</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">@font/opensans_font</item>
         <!-- Target Android sdk versions < 26 and > 14. -->
         <item name="fontFamily">@font/opensans_font</item>
         <!-- sets the style for the overflow button -->

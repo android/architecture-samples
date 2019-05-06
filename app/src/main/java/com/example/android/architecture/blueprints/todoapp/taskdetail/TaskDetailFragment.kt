@@ -45,7 +45,7 @@ class TaskDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setupFab()
         viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
+            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
         }
 
         setupNavigation()
