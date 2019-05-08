@@ -19,44 +19,46 @@ package com.example.android.architecture.blueprints.todoapp
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineContext
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
-import java.util.concurrent.Executors
 import kotlin.coroutines.ContinuationInterceptor
 
 /**
- * Sets the main coroutines dispatcher for unit testing.
+ * Sets the main coroutines dispatcher to a [TestCoroutineScope] for unit testing. A
+ * [TestCoroutineScope] provides control over the execution of coroutines.
  *
- * Uses the deprecated TestCoroutineContext if provided. Otherwise it uses a new single thread
- * executor.
- * See https://medium.com/androiddevelopers/easy-coroutines-in-android-viewmodelscope-25bffb605471
- * and https://github.com/Kotlin/kotlinx.coroutines/issues/541
+ * Declare it as a JUnit Rule:
+ *
+ * ```
+ * @get:Rule
+ * var mainCoroutineRule = MainCoroutineRule()
+ * ```
+ *
+ * Use it directly as a [TestCoroutineScope]:
+ *
+ * ```
+ * mainCoroutineRule.pauseDispatcher()
+ * ...
+ * mainCoroutineRule.resumeDispatcher()
+ * ...
+ * mainCoroutineRule.runBlockingTest { }
+ * ...
+ *
+ * ```
  */
-@ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-class ViewModelScopeMainDispatcherRule(
-    private val testContext: TestCoroutineContext? = null
-) : TestWatcher() {
-
-    private val singleThreadExecutor = Executors.newSingleThreadExecutor()
+class MainCoroutineRule : TestWatcher(), TestCoroutineScope by TestCoroutineScope() {
 
     override fun starting(description: Description?) {
         super.starting(description)
-        if (testContext != null) {
-            Dispatchers.setMain(testContext[ContinuationInterceptor] as CoroutineDispatcher)
-        } else {
-            Dispatchers.setMain(singleThreadExecutor.asCoroutineDispatcher())
-        }
+        Dispatchers.setMain(this.coroutineContext[ContinuationInterceptor] as CoroutineDispatcher)
     }
 
     override fun finished(description: Description?) {
         super.finished(description)
-        singleThreadExecutor.shutdownNow()
         Dispatchers.resetMain()
     }
 }

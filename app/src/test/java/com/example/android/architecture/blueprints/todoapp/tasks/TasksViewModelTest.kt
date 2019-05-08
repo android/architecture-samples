@@ -18,8 +18,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
+import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTriggered
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -29,9 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineContext
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +37,7 @@ import org.junit.Test
 /**
  * Unit tests for the implementation of [TasksViewModel]
  */
-@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 class TasksViewModelTest {
 
     // Subject under test
@@ -48,13 +46,10 @@ class TasksViewModelTest {
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
 
-    // A CoroutineContext that can be controlled from tests
-    private val testContext = TestCoroutineContext()
-
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule(testContext)
+    var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
@@ -73,6 +68,9 @@ class TasksViewModelTest {
 
     @Test
     fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() {
+        // Pause dispatcher so we can verify initial values
+        mainCoroutineRule.pauseDispatcher()
+
         // Given an initialized TasksViewModel with initialized tasks
         // When loading of Tasks is requested
         tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
@@ -84,7 +82,7 @@ class TasksViewModelTest {
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isTrue()
 
         // Execute pending coroutines actions
-        testContext.triggerActions()
+        mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
@@ -102,9 +100,6 @@ class TasksViewModelTest {
         // Load tasks
         tasksViewModel.loadTasks(true)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // Then progress indicator is hidden
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
 
@@ -121,9 +116,6 @@ class TasksViewModelTest {
         // Load tasks
         tasksViewModel.loadTasks(true)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // Then progress indicator is hidden
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
 
@@ -138,9 +130,6 @@ class TasksViewModelTest {
 
         // Load tasks
         tasksViewModel.loadTasks(true)
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
 
         // Then progress indicator is hidden
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
@@ -173,15 +162,12 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clearCompletedTasks_clearsTasks() = runBlocking {
+    fun clearCompletedTasks_clearsTasks() = mainCoroutineRule.runBlockingTest {
         // When completed tasks are cleared
         tasksViewModel.clearCompletedTasks()
 
         // Fetch tasks
         tasksViewModel.loadTasks(true)
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
 
         // Fetch tasks
         val allTasks = LiveDataTestUtil.getValue(tasksViewModel.items)
@@ -237,9 +223,6 @@ class TasksViewModelTest {
         // Complete task
         tasksViewModel.completeTask(task, true)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // Verify the task is completed
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
 
@@ -256,9 +239,6 @@ class TasksViewModelTest {
 
         // Activate task
         tasksViewModel.completeTask(task, false)
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
 
         // Verify the task is active
         assertThat(tasksRepository.tasksServiceData[task.id]?.isActive).isTrue()

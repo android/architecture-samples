@@ -35,7 +35,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.monitorFragment
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -59,7 +59,7 @@ class StatisticsFragmentTest {
     }
 
     @After
-    fun cleanupDb() = runBlocking {
+    fun cleanupDb() = runBlockingTest {
         ServiceLocator.resetRepository()
     }
 
