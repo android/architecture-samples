@@ -21,6 +21,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -138,7 +139,7 @@ class TasksActivityTest {
 
         // Add active task
         onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("TITLE1"))
+        onView(withId(R.id.add_task_title)).perform(typeText("TITLE1"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description)).perform(typeText("DESCRIPTION"))
         onView(withId(R.id.fab_save_task)).perform(click())
 
@@ -279,7 +280,7 @@ class TasksActivityTest {
 
         // Click on the "+" button, add details, and save
         onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("title"))
+        onView(withId(R.id.add_task_title)).perform(typeText("title"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description)).perform(typeText("description"))
         onView(withId(R.id.fab_save_task)).perform(click())
 

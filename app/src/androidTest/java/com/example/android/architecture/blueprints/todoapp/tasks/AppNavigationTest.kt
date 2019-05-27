@@ -93,7 +93,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun drawNavigationFromTasksToStatistics() {
+    fun drawerNavigationFromTasksToStatistics() {
         // start up Tasks screen
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -113,11 +113,11 @@ class AppNavigationTest {
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
             .perform(open()) // Open Drawer
 
-        // Start statistics screen.
+        // Start tasks screen.
         onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.tasksFragment))
 
-        // Check that Tasks Activity was opened.
+        // Check that tasks screen was opened.
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }
 
