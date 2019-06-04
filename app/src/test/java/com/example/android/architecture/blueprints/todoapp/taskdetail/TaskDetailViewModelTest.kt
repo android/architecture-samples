@@ -17,6 +17,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
+import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil.getValue
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
@@ -66,11 +67,6 @@ class TaskDetailViewModelTest {
         assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).title).isEqualTo(task.title)
         assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).description)
             .isEqualTo(task.description)
-    }
-
-    @Test
-    fun deleteTask() {
-        // TODO
     }
 
     @Test
@@ -138,7 +134,12 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun deleteTask_solution() {
+    fun loadTask_loading() {
+        // TODO
+    }
+
+    @Test
+    fun deleteTask() {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 
@@ -146,5 +147,23 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.deleteTask()
 
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
+    }
+
+    @Test
+    fun loadTask_loading_solution() {
+        // Pause dispatcher so we can verify initial values
+        mainCoroutineRule.pauseDispatcher()
+
+        // Load the task in the viewmodel
+        taskDetailViewModel.start(task.id)
+
+        // Then progress indicator is shown
+        assertThat(getValue(taskDetailViewModel.dataLoading)).isTrue()
+
+        // Execute pending coroutines actions
+        mainCoroutineRule.resumeDispatcher()
+
+        // Then progress indicator is hidden
+        assertThat(getValue(taskDetailViewModel.dataLoading)).isFalse()
     }
 }
