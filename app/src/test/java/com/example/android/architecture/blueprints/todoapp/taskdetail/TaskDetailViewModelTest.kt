@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil.getValue
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
@@ -64,8 +63,8 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.start(task.id)
 
         // Then verify that the view was notified
-        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).title).isEqualTo(task.title)
-        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).description)
+        assertThat(getValue(taskDetailViewModel.task).title).isEqualTo(task.title)
+        assertThat(getValue(taskDetailViewModel.task).description)
             .isEqualTo(task.description)
     }
 
@@ -111,7 +110,7 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.start(task.id)
 
         // Then verify that data is not available
-        assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.isDataAvailable)).isFalse()
+        assertThat(getValue(taskDetailViewModel.isDataAvailable)).isFalse()
     }
 
     @Test
@@ -129,7 +128,7 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.editTask()
 
         // Then the event is triggered
-        val value = LiveDataTestUtil.getValue(taskDetailViewModel.editTaskCommand)
+        val value = getValue(taskDetailViewModel.editTaskCommand)
         assertThat(value.getContentIfNotHandled()).isNotNull()
     }
 

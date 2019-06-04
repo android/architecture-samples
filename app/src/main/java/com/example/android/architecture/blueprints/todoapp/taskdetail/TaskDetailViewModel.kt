@@ -86,7 +86,6 @@ class TaskDetailViewModel(
         }
     }
 
-
     fun start(taskId: String?) {
         _dataLoading.value = true
 
@@ -104,10 +103,10 @@ class TaskDetailViewModel(
                     }
                 }
             }
+            _dataLoading.value = false
             EspressoIdlingResource.decrement() // Set app as idle.
         }
     }
-
 
     private fun setTask(task: Task?) {
         this._task.value = task
@@ -116,12 +115,10 @@ class TaskDetailViewModel(
 
     private fun onTaskLoaded(task: Task) {
         setTask(task)
-        _dataLoading.value = false
     }
 
     private fun onDataNotAvailable(result: Result<Task>) {
         _task.value = null
-        _dataLoading.value = false
         _isDataAvailable.value = false
     }
 
