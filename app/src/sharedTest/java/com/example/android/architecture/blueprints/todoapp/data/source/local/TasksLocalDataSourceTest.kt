@@ -20,10 +20,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.data.Result
+import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.succeeded
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
 import org.junit.Assert.assertThat
@@ -34,6 +36,7 @@ import org.junit.runner.RunWith
 /**
  * Integration test for the [TasksDataSource].
  */
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class TasksLocalDataSourceTest {
@@ -58,7 +61,7 @@ class TasksLocalDataSourceTest {
     }
 
     @Test
-    fun saveTask_retrievesTask() = runBlocking {
+    fun saveTask_retrievesTask() = runBlockingTest {
         // GIVEN - a new task saved in the database
         val newTask = Task("title", "description", true)
         localDataSource.saveTask(newTask)
@@ -68,14 +71,14 @@ class TasksLocalDataSourceTest {
 
         // THEN - Same task is returned
         assertThat(result.succeeded, `is`(true))
-        result as Result.Success
+        result as Success
         assertThat(result.data.title, `is`("title"))
         assertThat(result.data.description, `is`("description"))
         assertThat(result.data.isCompleted, `is`(true))
     }
 
     @Test
-    fun completeTask_retrievedTaskIsComplete() = runBlocking {
+    fun completeTask_retrievedTaskIsComplete() = runBlockingTest {
         // Given a new task in the persistent repository
         val newTask = Task("title")
         localDataSource.saveTask(newTask)
@@ -92,7 +95,7 @@ class TasksLocalDataSourceTest {
     }
 
     @Test
-    fun activateTask_retrievedTaskIsActive() = runBlocking {
+    fun activateTask_retrievedTaskIsActive() = runBlockingTest {
         // Given a new completed task in the persistent repository
         val newTask = Task("Some title", "Some description", true)
         localDataSource.saveTask(newTask)
@@ -110,7 +113,7 @@ class TasksLocalDataSourceTest {
     }
 
     @Test
-    fun clearCompletedTask_taskNotRetrievable() = runBlocking {
+    fun clearCompletedTask_taskNotRetrievable() = runBlockingTest {
         // Given 2 new completed tasks and 1 active task in the persistent repository
         val newTask1 = Task("title")
         val newTask2 = Task("title2")
@@ -136,7 +139,7 @@ class TasksLocalDataSourceTest {
     }
 
     @Test
-    fun deleteAllTasks_emptyListOfRetrievedTask() = runBlocking {
+    fun deleteAllTasks_emptyListOfRetrievedTask() = runBlockingTest {
         // Given a new task in the persistent repository and a mocked callback
         val newTask = Task("title")
 
@@ -152,7 +155,7 @@ class TasksLocalDataSourceTest {
     }
 
     @Test
-    fun getTasks_retrieveSavedTasks() = runBlocking {
+    fun getTasks_retrieveSavedTasks() = runBlockingTest {
         // Given 2 new tasks in the persistent repository
         val newTask1 = Task("title")
         val newTask2 = Task("title")

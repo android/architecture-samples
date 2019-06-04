@@ -17,15 +17,13 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil.getValue
+import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +31,7 @@ import org.junit.Test
 /**
  * Unit tests for the implementation of [AddEditTaskViewModel].
  */
-@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 class AddEditTaskViewModelTest {
 
     // Subject under test
@@ -42,13 +40,10 @@ class AddEditTaskViewModelTest {
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
 
-    // A CoroutineContext that can be controlled from tests
-    private val testContext = TestCoroutineContext()
-
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule(testContext)
+    var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
@@ -64,7 +59,6 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel = AddEditTaskViewModel(tasksRepository)
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_showsSuccessMessageUi() {
         val newTitle = "New Task Title"
@@ -75,9 +69,6 @@ class AddEditTaskViewModelTest {
         }
         addEditTaskViewModel.saveTask()
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         val newTask = tasksRepository.tasksServiceData.values.first()
 
         // Then a task is saved in the repository and the view updated
@@ -87,6 +78,9 @@ class AddEditTaskViewModelTest {
 
     @Test
     fun loadTasks_loading() {
+        // Pause dispatcher so we can verify initial values
+        mainCoroutineRule.pauseDispatcher()
+
         // Load the task in the viewmodel
         addEditTaskViewModel.start(task.id)
 
@@ -94,7 +88,7 @@ class AddEditTaskViewModelTest {
         assertThat(getValue(addEditTaskViewModel.dataLoading)).isTrue()
 
         // Execute pending coroutines actions
-        testContext.triggerActions()
+        mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
         assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
@@ -108,45 +102,36 @@ class AddEditTaskViewModelTest {
         // Load the task with the viewmodel
         addEditTaskViewModel.start(task.id)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // Verify a task is loaded
         assertThat(getValue(addEditTaskViewModel.title)).isEqualTo(task.title)
         assertThat(getValue(addEditTaskViewModel.description)).isEqualTo(task.description)
         assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_emptyTitle_error() {
         saveTaskAndAssertSnackbarError("", "Some Task Description")
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_nullTitle_error() {
         saveTaskAndAssertSnackbarError(null, "Some Task Description")
     }
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_emptyDescription_error() {
         saveTaskAndAssertSnackbarError("Title", "")
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_nullDescription_error() {
         saveTaskAndAssertSnackbarError("Title", null)
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_nullDescriptionNullTitle_error() {
         saveTaskAndAssertSnackbarError(null, null)
     }
 
-    @ObsoleteCoroutinesApi
     @Test
     fun saveNewTaskToRepository_emptyDescriptionEmptyTitle_error() {
         saveTaskAndAssertSnackbarError("", "")

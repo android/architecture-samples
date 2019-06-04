@@ -36,8 +36,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -51,7 +50,6 @@ import org.robolectric.annotation.TextLayoutMode
 /**
  * Integration test for the Add Task screen.
  */
-@ObsoleteCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
@@ -66,7 +64,7 @@ class AddEditTaskFragmentTest {
     }
 
     @After
-    fun cleanupDb() = runBlocking {
+    fun cleanupDb() = runBlockingTest {
         ServiceLocator.resetRepository()
     }
 

@@ -21,7 +21,8 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -30,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TasksDaoTest {
@@ -50,7 +52,7 @@ class TasksDaoTest {
     fun closeDb() = database.close()
 
     @Test
-    fun insertTaskAndGetById() = runBlocking {
+    fun insertTaskAndGetById() = runBlockingTest {
         // GIVEN - insert a task
         val task = Task("title", "description")
         database.taskDao().insertTask(task)
@@ -67,7 +69,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun insertTaskReplacesOnConflict() = runBlocking {
+    fun insertTaskReplacesOnConflict() = runBlockingTest {
         // Given that a task is inserted
         val task = Task("title", "description")
         database.taskDao().insertTask(task)
@@ -85,7 +87,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun insertTaskAndGetTasks() = runBlocking {
+    fun insertTaskAndGetTasks() = runBlockingTest {
         // GIVEN - insert a task
         val task = Task("title", "description")
         database.taskDao().insertTask(task)
@@ -102,7 +104,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun updateTaskAndGetById() = runBlocking {
+    fun updateTaskAndGetById() = runBlockingTest {
         // When inserting a task
         val originalTask = Task("title", "description")
         database.taskDao().insertTask(originalTask)
@@ -120,7 +122,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun updateCompletedAndGetById() = runBlocking {
+    fun updateCompletedAndGetById() = runBlockingTest {
         // When inserting a task
         val task = Task("title", "description", true)
         database.taskDao().insertTask(task)
@@ -137,7 +139,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun deleteTaskByIdAndGettingTasks() = runBlocking {
+    fun deleteTaskByIdAndGettingTasks() = runBlockingTest {
         // Given a task inserted
         val task = Task("title", "description")
         database.taskDao().insertTask(task)
@@ -151,7 +153,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun deleteTasksAndGettingTasks() = runBlocking {
+    fun deleteTasksAndGettingTasks() = runBlockingTest {
         // Given a task inserted
         database.taskDao().insertTask(Task("title", "description"))
 
@@ -164,7 +166,7 @@ class TasksDaoTest {
     }
 
     @Test
-    fun deleteCompletedTasksAndGettingTasks() = runBlocking {
+    fun deleteCompletedTasksAndGettingTasks() = runBlockingTest {
         // Given a completed task inserted
         database.taskDao().insertTask(Task("completed", "task", true))
 

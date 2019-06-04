@@ -17,15 +17,13 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
+import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ViewModelScopeMainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +31,7 @@ import org.junit.Test
 /**
  * Unit tests for the implementation of [TaskDetailViewModel]
  */
-@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 class TaskDetailViewModelTest {
 
     // Subject under test
@@ -42,13 +40,10 @@ class TaskDetailViewModelTest {
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
 
-    // A CoroutineContext that can be controlled from tests
-    private val testContext = TestCoroutineContext()
-
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesMainDispatcherRule = ViewModelScopeMainDispatcherRule(testContext)
+    var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
@@ -67,9 +62,6 @@ class TaskDetailViewModelTest {
     fun getActiveTaskFromRepositoryAndLoadIntoView() {
         taskDetailViewModel.start(task.id)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // Then verify that the view was notified
         assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).title).isEqualTo(task.title)
         assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.task).description)
@@ -85,17 +77,13 @@ class TaskDetailViewModelTest {
     fun completeTask() {
         taskDetailViewModel.start(task.id)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
+        // Verify that the task was active initially
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
 
         // When the ViewModel is asked to complete the task
         taskDetailViewModel.setCompleted(true)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
+        // Then the task is completed and the snackbar shows the correct message
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
         assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_complete)
     }
@@ -106,17 +94,13 @@ class TaskDetailViewModelTest {
 
         taskDetailViewModel.start(task.id)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
+        // Verify that the task was completed initially
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
 
         // When the ViewModel is asked to complete the task
         taskDetailViewModel.setCompleted(false)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
+        // Then the task is not completed and the snackbar shows the correct message
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
         assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_active)
 
@@ -129,9 +113,6 @@ class TaskDetailViewModelTest {
 
         // Given an initialized ViewModel with an active task
         taskDetailViewModel.start(task.id)
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
 
         // Then verify that data is not available
         assertThat(LiveDataTestUtil.getValue(taskDetailViewModel.isDataAvailable)).isFalse()
@@ -161,14 +142,8 @@ class TaskDetailViewModelTest {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 
-        // Execute pending coroutines actions
-        testContext.triggerActions()
-
         // When the deletion of a task is requested
         taskDetailViewModel.deleteTask()
-
-        // Execute pending coroutines actions
-        testContext.triggerActions()
 
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
     }
