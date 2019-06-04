@@ -4,8 +4,8 @@ config_android:
   - image: circleci/android:api-28
   working_directory: ~/project
   environment:
-    JAVA_TOOL_OPTIONS: -Xmx1024m
-    GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
+    JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dkotlin.incremental=false"
     TERM: dumb
 setup_ftl:
 - run:
@@ -20,8 +20,8 @@ jobs:
     - image: circleci/android:api-28
     working_directory: ~/project
     environment:
-    - JAVA_TOOL_OPTIONS: -Xmx1024m
-    - GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false
+    - JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    - GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dkotlin.incremental=false"
     - TERM: dumb
     steps:
     - checkout
