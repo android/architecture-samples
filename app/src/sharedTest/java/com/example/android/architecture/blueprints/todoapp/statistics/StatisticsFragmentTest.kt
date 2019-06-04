@@ -35,6 +35,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.monitorFragment
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
@@ -46,6 +47,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @MediumTest
+@ExperimentalCoroutinesApi
 class StatisticsFragmentTest {
     private lateinit var repository: TasksRepository
 

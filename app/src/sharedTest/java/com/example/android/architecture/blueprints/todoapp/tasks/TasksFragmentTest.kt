@@ -25,6 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
@@ -46,6 +47,7 @@ import org.robolectric.annotation.TextLayoutMode
 @MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
+@ExperimentalCoroutinesApi
 class TasksFragmentTest {
 
     private lateinit var repository: TasksRepository

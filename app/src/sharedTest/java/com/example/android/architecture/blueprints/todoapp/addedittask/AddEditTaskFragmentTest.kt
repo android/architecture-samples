@@ -36,6 +36,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -54,6 +55,7 @@ import org.robolectric.annotation.TextLayoutMode
 @MediumTest
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
+@ExperimentalCoroutinesApi
 class AddEditTaskFragmentTest {
     private lateinit var repository: TasksRepository
 
