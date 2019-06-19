@@ -34,6 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.launch
 import java.util.ArrayList
+import javax.inject.Inject
 
 /**
  * Exposes the data to be used in the task list screen.
@@ -43,7 +44,7 @@ import java.util.ArrayList
  * property changes. This is done by assigning a [Bindable] annotation to the property's
  * getter method.
  */
-class TasksViewModel(
+class TasksViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 

@@ -25,6 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
  * whereas the [Bindable] getters allow us to add some logic to it. This is
  * preferable to having logic in the XML layout.
  */
-class StatisticsViewModel(
+class StatisticsViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 

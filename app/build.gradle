@@ -168,4 +168,10 @@ dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+    // Dagger
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+//    compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:$daggerAssistedInjectVersion"
+//    kapt "com.squareup.inject:assisted-inject-processor-dagger2:$daggerAssistedInjectVersion"
 }

@@ -47,6 +47,8 @@ ext {
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'
     dexMakerVersion = '2.12.1'
+    daggerVersion = '2.22.1'
+    daggerAssistedInjectVersion = '0.4.0'
     espressoVersion = '3.2.0-beta01'
     fragmentVersion = '1.1.0-alpha07'
     fragmentKtxVersion = '1.1.0-beta01'

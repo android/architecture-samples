@@ -24,13 +24,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
+import com.example.android.architecture.blueprints.todoapp.di.injector
+import com.example.android.architecture.blueprints.todoapp.di.viewModel
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 
@@ -40,7 +40,7 @@ import com.google.android.material.snackbar.Snackbar
 class TaskDetailFragment : Fragment() {
     private lateinit var viewDataBinding: TaskdetailFragBinding
 
-    private val viewModel by viewModels<TaskDetailViewModel> { getVmFactory() }
+    private val viewModel by viewModel { injector.taskDetailViewModel }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

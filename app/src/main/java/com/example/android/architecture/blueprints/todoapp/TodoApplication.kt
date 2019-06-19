@@ -2,6 +2,8 @@ package com.example.android.architecture.blueprints.todoapp
 
 import android.app.Application
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.di.DaggerApplicationComponent
+import com.example.android.architecture.blueprints.todoapp.di.InjectorProvider
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
@@ -11,7 +13,12 @@ import timber.log.Timber.DebugTree
  *
  * Also, sets up Timber in the DEBUG BuildConfig. Read Timber's documentation for production setups.
  */
-class TodoApplication : Application() {
+class TodoApplication : Application(), InjectorProvider {
+
+    override val component by lazy {
+        DaggerApplicationComponent
+            .factory().create(applicationContext)
+    }
 
     // Depends on the flavor,
     val taskRepository: TasksRepository
@@ -19,6 +26,8 @@ class TodoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
         if (BuildConfig.DEBUG) Timber.plant(DebugTree())
     }
 }
+

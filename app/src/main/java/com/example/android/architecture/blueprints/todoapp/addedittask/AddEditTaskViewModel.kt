@@ -26,6 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for the Add/Edit screen.
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
  * [com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel] for
  * how to deal with more complex scenarios.
  */
-class AddEditTaskViewModel(
+class AddEditTaskViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
