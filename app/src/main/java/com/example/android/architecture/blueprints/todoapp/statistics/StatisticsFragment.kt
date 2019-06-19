@@ -21,9 +21,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
+import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
 
 /**
  * Main UI for the statistics screen.
@@ -32,7 +33,7 @@ class StatisticsFragment : Fragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 
-    private lateinit var statisticsViewModel: StatisticsViewModel
+    private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
@@ -43,7 +44,6 @@ class StatisticsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        statisticsViewModel = obtainViewModel(StatisticsViewModel::class.java)
         viewDataBinding.stats = statisticsViewModel
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
     }
