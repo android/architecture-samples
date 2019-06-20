@@ -37,7 +37,8 @@ import javax.inject.Inject
  * preferable to having logic in the XML layout.
  */
 class StatisticsViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository,
+    private val statsUtils: StatisticsUtils
 ) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
@@ -88,7 +89,7 @@ class StatisticsViewModel @Inject constructor(
      * Called when new data is ready.
      */
     private fun computeStats(tasks: List<Task>?) {
-        getActiveAndCompletedStats(tasks).let {
+        statsUtils.getActiveAndCompletedStats(tasks).let {
             _activeTasksPercent.value = it.activeTasksPercent
             _completedTasksPercent.value = it.completedTasksPercent
         }

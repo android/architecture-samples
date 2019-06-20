@@ -17,21 +17,28 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import javax.inject.Inject
 
 /**
- * Function that does some trivial computation. Used to showcase unit tests.
+ * Class used to showcase dependency injection scoped to one module ([StatisticsModule]).
  */
-internal fun getActiveAndCompletedStats(tasks: List<Task>?): StatsResult {
+class StatisticsUtils @Inject constructor() {
 
-    return if (tasks == null || tasks.isEmpty()) {
-        StatsResult(0f, 0f)
-    } else {
-        val totalTasks = tasks.size
-        val numberOfActiveTasks = tasks.count { it.isActive }
-        StatsResult(
-            activeTasksPercent =  100f * numberOfActiveTasks / tasks.size,
-            completedTasksPercent = 100f * (totalTasks - numberOfActiveTasks) / tasks.size
-        )
+    /**
+     * Function that does some trivial computation. Used to showcase unit tests.
+     */
+    internal fun getActiveAndCompletedStats(tasks: List<Task>?): StatsResult {
+
+        return if (tasks == null || tasks.isEmpty()) {
+            StatsResult(0f, 0f)
+        } else {
+            val totalTasks = tasks.size
+            val numberOfActiveTasks = tasks.count { it.isActive }
+            StatsResult(
+                activeTasksPercent =  100f * numberOfActiveTasks / tasks.size,
+                completedTasksPercent = 100f * (totalTasks - numberOfActiveTasks) / tasks.size
+            )
+        }
     }
 }
 

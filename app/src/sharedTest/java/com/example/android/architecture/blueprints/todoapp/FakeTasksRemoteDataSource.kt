@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.data
+package com.example.android.architecture.blueprints.todoapp
 
+import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
+import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.google.common.collect.Lists
 import java.util.LinkedHashMap
@@ -36,7 +38,8 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun getTasks(): Result<List<Task>> {
-        return Success(Lists.newArrayList(TASKS_SERVICE_DATA.values))
+        return Success(Lists.newArrayList(
+            TASKS_SERVICE_DATA.values))
     }
 
     override suspend fun saveTask(task: Task) {
@@ -44,7 +47,9 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, true, task.id)
+        val completedTask = Task(
+            task.title, task.description, true, task.id
+        )
         TASKS_SERVICE_DATA.put(task.id, completedTask)
     }
 
@@ -53,7 +58,9 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, false, task.id)
+        val activeTask = Task(
+            task.title, task.description, false, task.id
+        )
         TASKS_SERVICE_DATA.put(task.id, activeTask)
     }
 

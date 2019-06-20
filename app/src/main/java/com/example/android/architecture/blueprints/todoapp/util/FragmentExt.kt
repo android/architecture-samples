@@ -20,15 +20,12 @@ package com.example.android.architecture.blueprints.todoapp.util
  */
 
 import android.app.Activity
-import androidx.fragment.app.Fragment
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 
 const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 
-fun Fragment.getVmFactory(): ViewModelFactory {
-    val repository = (requireContext().applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository)
-}
+//fun Fragment.getVmFactory(): ViewModelFactory {
+//    val repository = (requireContext().applicationContext as TodoApplication).taskRepository
+//    return ViewModelFactory(repository)
+//}

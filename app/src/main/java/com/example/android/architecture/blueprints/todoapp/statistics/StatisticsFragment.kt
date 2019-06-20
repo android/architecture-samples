@@ -20,20 +20,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
-import com.example.android.architecture.blueprints.todoapp.di.injector
-import com.example.android.architecture.blueprints.todoapp.di.viewModel
+import dagger.android.support.DaggerFragment
+import javax.inject.Inject
 
 /**
  * Main UI for the statistics screen.
  */
-class StatisticsFragment : Fragment() {
+class StatisticsFragment : DaggerFragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 
-    private val statisticsViewModel by viewModel { injector.statisticsViewModel }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var statisticsViewModel: StatisticsViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        statisticsViewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(StatisticsViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {

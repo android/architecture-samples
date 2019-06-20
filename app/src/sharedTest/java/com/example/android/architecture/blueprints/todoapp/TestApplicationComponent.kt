@@ -1,14 +1,16 @@
-package com.example.android.architecture.blueprints.todoapp.di
+package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.di.AddEditTaskModule
+import com.example.android.architecture.blueprints.todoapp.di.StatisticsModule
+import com.example.android.architecture.blueprints.todoapp.di.TaskDetailModule
+import com.example.android.architecture.blueprints.todoapp.di.TasksModule
+import com.example.android.architecture.blueprints.todoapp.di.ViewModelBuilder
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -21,27 +23,27 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(
-    modules = [
-        ApplicationModule::class,
-        AndroidSupportInjectionModule::class,
-        TasksModule::class,
-        TaskDetailModule::class,
-        AddEditTaskModule::class,
-        StatisticsModule::class
-    ])
-interface ApplicationComponent : AndroidInjector<TodoApplication> {
+@Component(modules = [
+    TestApplicationModule::class,
+    AndroidSupportInjectionModule::class,
+    ViewModelBuilder::class,
+    TasksModule::class,
+    TaskDetailModule::class,
+    AddEditTaskModule::class,
+    StatisticsModule::class])
+interface TestApplicationComponent : AndroidInjector<TestTodoApplication> {
 
     @Component.Factory
     interface Factory {
-        fun create(@BindsInstance applicationContext: Context): ApplicationComponent
+        fun create(@BindsInstance applicationContext: Context): TestApplicationComponent
     }
+
 
     val tasksRepository: TasksRepository
 }
 
 @Module
-class ApplicationModule {
+class TestApplicationModule {
 
     @Singleton
     @Provides
@@ -57,17 +59,14 @@ class ApplicationModule {
     @Named("TasksRemoteDataSource")
     @Provides
     fun provideTasksRemoteDataSource(): TasksDataSource {
-        return TasksRemoteDataSource
+        return FakeTasksRemoteDataSource
     }
 
     @Singleton
     @Named("TasksLocalDataSource")
     @Provides
-    fun provideTasksLocalDataSource(
-        database: ToDoDatabase,
-        ioDispatcher: CoroutineDispatcher
-    ): TasksDataSource {
-        return TasksLocalDataSource(database.taskDao(), ioDispatcher)
+    fun provideTasksLocalDataSource(): TasksDataSource {
+        return FakeTasksRemoteDataSource
     }
 
     @Singleton
@@ -80,5 +79,5 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun provideIoDispatcher() = Dispatchers.IO
+    fun provideIoDispatcher() : CoroutineDispatcher = Dispatchers.Main
 }

@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
@@ -33,9 +32,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.example.android.architecture.blueprints.todoapp.DaggerTestApplicationRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
@@ -47,6 +46,7 @@ import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -62,15 +62,19 @@ class TasksActivityTest {
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    @Before
-    fun init() {
-        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
-        repository.deleteAllTasksBlocking()
-    }
+    /**
+     * Sets up Dagger components for testing.
+     */
+    @get:Rule
+    val rule = DaggerTestApplicationRule()
 
-    @After
-    fun reset() {
-        ServiceLocator.resetRepository()
+    /**
+     * Gets a reference to the [TasksRepository] exposed by the [DaggerTestApplicationRule].
+     */
+    @Before
+    fun setupDaggerComponent() {
+        repository = rule.component.tasksRepository
+        repository.deleteAllTasksBlocking()
     }
 
     /**

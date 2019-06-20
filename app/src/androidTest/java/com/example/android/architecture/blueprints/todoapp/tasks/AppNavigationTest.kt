@@ -21,7 +21,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
@@ -37,16 +36,18 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.example.android.architecture.blueprints.todoapp.DaggerTestApplicationRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.monitorActivity
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -63,14 +64,19 @@ class AppNavigationTest {
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    @Before
-    fun init() {
-        tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
-    }
+    /**
+     * Sets up Dagger components for testing.
+     */
+    @get:Rule
+    val rule = DaggerTestApplicationRule()
 
-    @After
-    fun reset() {
-        ServiceLocator.resetRepository()
+    /**
+     * Gets a reference to the [TasksRepository] exposed by the [DaggerTestApplicationRule].
+     */
+    @Before
+    fun setupDaggerComponent() {
+        tasksRepository = rule.component.tasksRepository
+        tasksRepository.deleteAllTasksBlocking()
     }
 
     /**
