@@ -1,7 +1,5 @@
 package com.example.android.architecture.blueprints.todoapp.di
 
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
@@ -10,29 +8,6 @@ import dagger.Module
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.reflect.KClass
-
-//class ViewModelFactory<T : ViewModel> @Inject constructor(
-//    private val viewModel: Provider<T>
-//) : ViewModelProvider.Factory {
-//
-//    @Suppress("UNCHECKED_CAST")
-//    override fun <T : ViewModel> create(modelClass: Class<T>) = viewModel.get() as T
-//}
-
-//@Suppress("UNCHECKED_CAST")
-//inline fun <reified T : ViewModel> Fragment.getViewModel(crossinline factory: () -> T) =
-//    ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(modelClass: Class<T>) = factory() as T
-//    }).get(T::class.java)
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T : ViewModel> Fragment.viewModel(
-    crossinline provider: () -> T
-) = viewModels<T> {
-    object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>) = provider() as T
-    }
-}
 
 /**
  * ViewModelFactory which uses Dagger to create the instances.
