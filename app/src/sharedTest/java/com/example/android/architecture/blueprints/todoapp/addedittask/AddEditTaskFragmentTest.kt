@@ -91,21 +91,6 @@ class AddEditTaskFragmentTest {
     }
 
     @Test
-    fun validTask_isSaved() {
-        // GIVEN - On the "Add Task" screen.
-        val navController = mock(NavController::class.java)
-        launchFragment(navController)
-
-        // WHEN - Valid title and description combination and click save
-        onView(withId(R.id.add_task_title)).perform(replaceText("title"))
-        onView(withId(R.id.add_task_description)).perform(replaceText("description"))
-        onView(withId(R.id.fab_save_task)).perform(click())
-
-        // THEN - Verify that the repository saved the task
-        // TODO
-    }
-
-    @Test
     fun validTask_navigatesBack() {
         // GIVEN - On the "Add Task" screen.
         val navController = mock(NavController::class.java)
@@ -132,7 +117,7 @@ class AddEditTaskFragmentTest {
     }
 
     @Test
-    fun validTask_isSaved_solution() {
+    fun validTask_isSaved() {
         // GIVEN - On the "Add Task" screen.
         val navController = mock(NavController::class.java)
         launchFragment(navController)

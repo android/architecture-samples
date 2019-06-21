@@ -53,7 +53,7 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        statisticsViewModel = StatisticsViewModel(tasksRepository)
+        statisticsViewModel = StatisticsViewModel(tasksRepository, StatisticsUtils())
     }
 
     @Test
@@ -96,7 +96,8 @@ class StatisticsViewModelTest {
                     FakeFailingTasksRemoteDataSource,
                     FakeFailingTasksRemoteDataSource,
                     Dispatchers.Main  // Main is set in MainCoroutineRule
-                )
+                ),
+                StatisticsUtils()
             )
 
             // When statistics are loaded
