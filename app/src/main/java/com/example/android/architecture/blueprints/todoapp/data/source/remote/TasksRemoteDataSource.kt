@@ -20,7 +20,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.google.common.collect.Lists
 import kotlinx.coroutines.delay
 
 /**
@@ -44,7 +43,7 @@ object TasksRemoteDataSource : TasksDataSource {
      */
     override suspend fun getTasks(): Result<List<Task>> {
         // Simulate network by delaying the execution.
-        val tasks = Lists.newArrayList(TASKS_SERVICE_DATA.values)
+        val tasks = TASKS_SERVICE_DATA.values.toList()
         delay(SERVICE_LATENCY_IN_MILLIS)
         return Success(tasks)
     }

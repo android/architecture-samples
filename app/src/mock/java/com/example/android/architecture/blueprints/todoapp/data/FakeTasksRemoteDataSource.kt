@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.data
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.google.common.collect.Lists
 import java.util.LinkedHashMap
 
 /**
@@ -36,7 +35,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun getTasks(): Result<List<Task>> {
-        return Success(Lists.newArrayList(TASKS_SERVICE_DATA.values))
+        return Success(TASKS_SERVICE_DATA.values.toList())
     }
 
     override suspend fun saveTask(task: Task) {

@@ -20,7 +20,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.google.common.collect.Lists
 import java.util.LinkedHashMap
 
 /**
@@ -50,7 +49,7 @@ class FakeRepository : TasksRepository {
         if (shouldReturnError) {
             return Error(Exception("Test exception"))
         }
-        return Success(Lists.newArrayList(tasksServiceData.values))
+        return Success(tasksServiceData.values.toList())
     }
 
     override suspend fun saveTask(task: Task) {

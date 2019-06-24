@@ -42,7 +42,6 @@ ext {
     recyclerViewVersion = '1.0.0'
     appCompatVersion = '1.0.2'
 
-    guavaVersion = '27.0.1-android'
     junitVersion = '4.12'
     mockitoVersion = '2.8.9'
     dexMakerVersion = '2.12.1'
