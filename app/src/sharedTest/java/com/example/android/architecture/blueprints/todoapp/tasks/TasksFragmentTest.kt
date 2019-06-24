@@ -64,18 +64,6 @@ class TasksFragmentTest {
     }
 
     @Test
-    fun clickAddTaskButton_navigateToAddEditFragment() {
-        // GIVEN - On the home screen
-        // TODO
-
-        // WHEN - Click on the "+" button
-        // TODO
-
-        // THEN - Verify that we navigate to the add screen
-        // TODO
-    }
-
-    @Test
     fun displayTask_whenRepositoryHasData() {
         // GIVEN - One task already in the repository
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
@@ -304,7 +292,7 @@ class TasksFragmentTest {
     }
 
     @Test
-    fun clickAddTaskButton_navigateToAddEditFragment_solution() {
+    fun clickAddTaskButton_navigateToAddEditFragment() {
         // GIVEN - On the home screen
         val scenario = launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)

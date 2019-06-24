@@ -133,11 +133,6 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun loadTask_loading() {
-        // TODO
-    }
-
-    @Test
     fun deleteTask() {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
@@ -149,7 +144,7 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun loadTask_loading_solution() {
+    fun loadTask_loading() {
         // Pause dispatcher so we can verify initial values
         mainCoroutineRule.pauseDispatcher()
 

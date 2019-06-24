@@ -93,18 +93,6 @@ class TasksActivityTest {
     }
 
     @Test
-    fun createTask() {
-        // start up Tasks screen
-        // TODO
-
-        // Click on the "+" button, add details, and save
-        // TODO
-
-        // Then verify task is displayed on screen
-        // TODO
-    }
-
-    @Test
     fun editTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
 
@@ -273,7 +261,7 @@ class TasksActivityTest {
     }
 
     @Test
-    fun createTask_solution() {
+    fun createTask() {
         // start up Tasks screen
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)

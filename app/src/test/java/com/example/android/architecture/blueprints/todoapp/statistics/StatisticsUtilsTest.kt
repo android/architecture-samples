@@ -28,24 +28,6 @@ import org.junit.Test
 class StatisticsUtilsTest {
 
     @Test
-    fun getActiveAndCompletedStats_error() {
-        // When there's an error loading stats
-        // TODO
-
-        // Both active and completed tasks are 0
-        // TODO
-    }
-
-    @Test
-    fun getActiveAndCompletedStats_empty() {
-        // When there are no tasks
-        // TODO
-
-        // Both active and completed tasks are 0
-        // TODO
-    }
-
-    @Test
     fun getActiveAndCompletedStats_noCompleted() {
         val tasks = listOf(
             Task("title", "desc", isCompleted = false)
@@ -91,7 +73,7 @@ class StatisticsUtilsTest {
 
     @Test
     @Ignore
-    fun getActiveAndCompletedStats_error_solution() {
+    fun getActiveAndCompletedStats_error() {
         // When there's an error loading stats
         val result = getActiveAndCompletedStats(null)
 
@@ -102,7 +84,7 @@ class StatisticsUtilsTest {
 
     @Test
     @Ignore
-    fun getActiveAndCompletedStats_empty_solution() {
+    fun getActiveAndCompletedStats_empty() {
         // When there are no tasks
         val result = getActiveAndCompletedStats(emptyList())
 
