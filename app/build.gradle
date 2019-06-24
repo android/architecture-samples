@@ -3,15 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 android {
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.todomvvmlivekotlin"
+        applicationId "com.example.android.architecture.blueprints.dagger"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
