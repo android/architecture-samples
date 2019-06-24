@@ -14,14 +14,11 @@ import dagger.multibindings.IntoMap
 @Module
 abstract class TaskDetailModule {
 
-    @FragmentScoped
     @ContributesAndroidInjector(modules = [
         ViewModelBuilder::class
     ])
     internal abstract fun taskDetailFragment(): TaskDetailFragment
 
-
-    @FragmentScoped
     @Binds
     @IntoMap
     @ViewModelKey(TaskDetailViewModel::class)

@@ -14,13 +14,11 @@ import dagger.multibindings.IntoMap
 @Module
 abstract class AddEditTaskModule {
 
-    @FragmentScoped
     @ContributesAndroidInjector(modules = [
         ViewModelBuilder::class
     ])
     internal abstract fun addEditTaskFragment(): AddEditTaskFragment
 
-    @FragmentScoped
     @Binds
     @IntoMap
     @ViewModelKey(AddEditTaskViewModel::class)
