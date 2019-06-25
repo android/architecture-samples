@@ -62,11 +62,11 @@ class ApplicationModule {
     @Provides
     fun provideIoDispatcher() = Dispatchers.IO
 }
-//
-//@Module
-//abstract class ApplicationModuleBinds {
-//
-//    @Singleton
-//    @Binds
-//    abstract fun bindRepository(repo: DefaultTasksRepository): TasksRepository
-//}
+
+@Module
+abstract class ApplicationModuleBinds {
+
+    @Singleton
+    @Binds
+    abstract fun bindRepository(repo: DefaultTasksRepository): TasksRepository
+}
