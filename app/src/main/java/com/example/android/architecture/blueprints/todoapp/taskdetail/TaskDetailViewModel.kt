@@ -30,7 +30,6 @@ import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUs
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -109,7 +108,6 @@ class TaskDetailViewModel(
                     }
                 }
                 _dataLoading.value = false
-                EspressoIdlingResource.decrement() // Set app as idle.
             }
         }
     }
