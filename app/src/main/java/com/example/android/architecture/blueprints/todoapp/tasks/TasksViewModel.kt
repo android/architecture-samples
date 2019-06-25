@@ -31,7 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 
@@ -183,39 +183,37 @@ class TasksViewModel(
 
         _dataLoading.value = true
 
-        // Espresso does not work well with coroutines yet. See
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/982
-        EspressoIdlingResource.increment() // Set app as busy.
+        wrapEspressoIdlingResource {
 
-        viewModelScope.launch {
-            val tasksResult = tasksRepository.getTasks(forceUpdate)
+            viewModelScope.launch {
+                val tasksResult = tasksRepository.getTasks(forceUpdate)
 
-            if (tasksResult is Success) {
-                val tasks = tasksResult.data
+                if (tasksResult is Success) {
+                    val tasks = tasksResult.data
 
-                val tasksToShow = ArrayList<Task>()
-                // We filter the tasks based on the requestType
-                for (task in tasks) {
-                    when (_currentFiltering) {
-                        TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                        TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
-                        }
-                        TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
+                    val tasksToShow = ArrayList<Task>()
+                    // We filter the tasks based on the requestType
+                    for (task in tasks) {
+                        when (_currentFiltering) {
+                            TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
+                            TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
+                                tasksToShow.add(task)
+                            }
+                            TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
+                                tasksToShow.add(task)
+                            }
                         }
                     }
+                    isDataLoadingError.value = false
+                    _items.value = ArrayList(tasksToShow)
+                } else {
+                    isDataLoadingError.value = false
+                    _items.value = emptyList()
+                    _snackbarText.value = Event(R.string.loading_tasks_error)
                 }
-                isDataLoadingError.value = false
-                _items.value = ArrayList(tasksToShow)
-            } else {
-                isDataLoadingError.value = false
-                _items.value = emptyList()
-                _snackbarText.value = Event(R.string.loading_tasks_error)
-            }
 
-            EspressoIdlingResource.decrement() // Set app as idle.
-            _dataLoading.value = false
+                _dataLoading.value = false
+            }
         }
     }
 }

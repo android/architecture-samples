@@ -19,6 +19,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -44,36 +45,34 @@ class DefaultTasksRepository(
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
 
-        EspressoIdlingResource.increment() // Set app as busy.
+       wrapEspressoIdlingResource {
 
-        return withContext(ioDispatcher) {
-            // Respond immediately with cache if available and not dirty
-            if (!forceUpdate) {
-                cachedTasks?.let { cachedTasks ->
-                    EspressoIdlingResource.decrement() // Set app as idle.
-                    return@withContext Success(cachedTasks.values.sortedBy { it.id })
-                }
-            }
+           return withContext(ioDispatcher) {
+               // Respond immediately with cache if available and not dirty
+               if (!forceUpdate) {
+                   cachedTasks?.let { cachedTasks ->
+                       return@withContext Success(cachedTasks.values.sortedBy { it.id })
+                   }
+               }
 
-            val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
+               val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
 
-            // Refresh the cache with the new tasks
-            (newTasks as? Success)?.let { refreshCache(it.data) }
+               // Refresh the cache with the new tasks
+               (newTasks as? Success)?.let { refreshCache(it.data) }
 
-            EspressoIdlingResource.decrement() // Set app as idle.
+               cachedTasks?.values?.let { tasks ->
+                   return@withContext Result.Success(tasks.sortedBy { it.id })
+               }
 
-            cachedTasks?.values?.let { tasks ->
-                return@withContext Result.Success(tasks.sortedBy { it.id })
-            }
+               (newTasks as? Success)?.let {
+                   if (it.data.isEmpty()) {
+                       return@withContext Result.Success(it.data)
+                   }
+               }
 
-            (newTasks as? Success)?.let {
-                if (it.data.isEmpty()) {
-                    return@withContext Result.Success(it.data)
-                }
-            }
-
-            return@withContext Result.Error(Exception("Illegal state"))
-        }
+               return@withContext Result.Error(Exception("Illegal state"))
+           }
+       }
     }
 
     private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
@@ -104,25 +103,24 @@ class DefaultTasksRepository(
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
 
-        EspressoIdlingResource.increment() // Set app as busy.
+        wrapEspressoIdlingResource {
 
-        return withContext(ioDispatcher) {
-            // Respond immediately with cache if available
-            if (!forceUpdate) {
-                getTaskWithId(taskId)?.let {
-                    EspressoIdlingResource.decrement() // Set app as idle.
-                    return@withContext Success(it)
+            return withContext(ioDispatcher) {
+                // Respond immediately with cache if available
+                if (!forceUpdate) {
+                    getTaskWithId(taskId)?.let {
+                        EspressoIdlingResource.decrement() // Set app as idle.
+                        return@withContext Success(it)
+                    }
                 }
+
+                val newTask = fetchTaskFromRemoteOrLocal(taskId, forceUpdate)
+
+                // Refresh the cache with the new tasks
+                (newTask as? Success)?.let { cacheTask(it.data) }
+
+                return@withContext newTask
             }
-
-            val newTask = fetchTaskFromRemoteOrLocal(taskId, forceUpdate)
-
-            // Refresh the cache with the new tasks
-            (newTask as? Success)?.let { cacheTask(it.data) }
-
-            EspressoIdlingResource.decrement() // Set app as idle.
-
-            return@withContext newTask
         }
     }
 
