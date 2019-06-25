@@ -26,7 +26,10 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -35,7 +38,11 @@ import kotlinx.coroutines.launch
  * Fragment's actions listener.
  */
 class TaskDetailViewModel(
-    private val tasksRepository: TasksRepository
+    private val getTaskUseCase: GetTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val completeTaskUseCase: CompleteTaskUseCase,
+    private val activateTaskUseCase: ActivateTaskUseCase
+
 ) : ViewModel() {
 
     private val _task = MutableLiveData<Task>()
@@ -66,7 +73,7 @@ class TaskDetailViewModel(
 
     fun deleteTask() = viewModelScope.launch {
         taskId?.let {
-            tasksRepository.deleteTask(it)
+            deleteTaskUseCase(it)
             _deleteTaskCommand.value = Event(Unit)
         }
     }
@@ -78,10 +85,10 @@ class TaskDetailViewModel(
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = _task.value ?: return@launch
         if (completed) {
-            tasksRepository.completeTask(task)
+            completeTaskUseCase(task)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task)
+            activateTaskUseCase(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -95,7 +102,7 @@ class TaskDetailViewModel(
 
         viewModelScope.launch {
             if (taskId != null) {
-                tasksRepository.getTask(taskId, false).let { result ->
+                getTaskUseCase(taskId, false).let { result ->
                     if (result is Success) {
                         onTaskLoaded(result.data)
                     } else {

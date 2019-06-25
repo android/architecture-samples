@@ -27,13 +27,15 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.launch
-import java.util.ArrayList
 
 /**
  * Exposes the data to be used in the task list screen.
@@ -44,7 +46,10 @@ import java.util.ArrayList
  * getter method.
  */
 class TasksViewModel(
-    private val tasksRepository: TasksRepository
+    private val getTasksUseCase: GetTasksUseCase,
+    private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
+    private val completeTaskUseCase: CompleteTaskUseCase,
+    private val activateTaskUseCase: ActivateTaskUseCase
 ) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
@@ -126,7 +131,7 @@ class TasksViewModel(
 
     fun clearCompletedTasks() {
         viewModelScope.launch {
-            tasksRepository.clearCompletedTasks()
+            clearCompletedTasksUseCase()
             _snackbarText.value = Event(R.string.completed_tasks_cleared)
             loadTasks(false)
         }
@@ -134,10 +139,10 @@ class TasksViewModel(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            tasksRepository.completeTask(task)
+            completeTaskUseCase(task)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task)
+            activateTaskUseCase(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -188,34 +193,18 @@ class TasksViewModel(
         EspressoIdlingResource.increment() // Set app as busy.
 
         viewModelScope.launch {
-            val tasksResult = tasksRepository.getTasks(forceUpdate)
-
+            val tasksResult = getTasksUseCase(forceUpdate, _currentFiltering)
             if (tasksResult is Success) {
-                val tasks = tasksResult.data
-
-                val tasksToShow = ArrayList<Task>()
-                // We filter the tasks based on the requestType
-                for (task in tasks) {
-                    when (_currentFiltering) {
-                        TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                        TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
-                        }
-                        TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
-                        }
-                    }
-                }
                 isDataLoadingError.value = false
-                _items.value = ArrayList(tasksToShow)
+                _items.value = tasksResult.data
             } else {
                 isDataLoadingError.value = false
                 _items.value = emptyList()
                 _snackbarText.value = Event(R.string.loading_tasks_error)
             }
 
-            EspressoIdlingResource.decrement() // Set app as idle.
             _dataLoading.value = false
+            EspressoIdlingResource.decrement() // Set app as idle.
         }
     }
 }

@@ -24,6 +24,10 @@ import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTr
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
@@ -63,7 +67,12 @@ class TasksViewModelTest {
         val task3 = Task("Title3", "Description3", true)
         tasksRepository.addTasks(task1, task2, task3)
 
-        tasksViewModel = TasksViewModel(tasksRepository)
+        tasksViewModel = TasksViewModel(
+            GetTasksUseCase(tasksRepository),
+            ClearCompletedTasksUseCase(tasksRepository),
+            CompleteTaskUseCase(tasksRepository),
+            ActivateTaskUseCase(tasksRepository)
+        )
     }
 
     @Test

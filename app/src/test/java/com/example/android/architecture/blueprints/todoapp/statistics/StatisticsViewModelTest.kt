@@ -22,6 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,7 +54,7 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        statisticsViewModel = StatisticsViewModel(tasksRepository)
+        statisticsViewModel = StatisticsViewModel(GetTasksUseCase(tasksRepository))
     }
 
     @Test
@@ -91,13 +92,13 @@ class StatisticsViewModelTest {
     @Test
     fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() =
         mainCoroutineRule.runBlockingTest {
-            val errorViewModel = StatisticsViewModel(
-                DefaultTasksRepository(
-                    FakeFailingTasksRemoteDataSource,
-                    FakeFailingTasksRemoteDataSource,
-                    Dispatchers.Main  // Main is set in MainCoroutineRule
-                )
+
+            val failingRepository = DefaultTasksRepository(
+                FakeFailingTasksRemoteDataSource,
+                FakeFailingTasksRemoteDataSource,
+                Dispatchers.Main  // Main is set in MainCoroutineRule
             )
+            val errorViewModel = StatisticsViewModel(GetTasksUseCase(failingRepository))
 
             // When statistics are loaded
             errorViewModel.start()

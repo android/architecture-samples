@@ -22,6 +22,10 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -55,7 +59,12 @@ class TaskDetailViewModelTest {
         tasksRepository = FakeRepository()
         tasksRepository.addTasks(task)
 
-        taskDetailViewModel = TaskDetailViewModel(tasksRepository)
+        taskDetailViewModel = TaskDetailViewModel(
+            GetTaskUseCase(tasksRepository),
+            DeleteTaskUseCase(tasksRepository),
+            CompleteTaskUseCase(tasksRepository),
+            ActivateTaskUseCase(tasksRepository)
+        )
     }
 
     @Test

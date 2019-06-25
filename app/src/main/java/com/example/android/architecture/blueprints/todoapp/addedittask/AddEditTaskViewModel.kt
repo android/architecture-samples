@@ -24,7 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
 import kotlinx.coroutines.launch
 
 /**
@@ -37,7 +38,8 @@ import kotlinx.coroutines.launch
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
-    private val tasksRepository: TasksRepository
+    private val getTaskUseCase: GetTaskUseCase,
+    private val saveUseCase: SaveTaskUseCase
 ) : ViewModel() {
 
     // Two-way databinding, exposing MutableLiveData
@@ -82,7 +84,7 @@ class AddEditTaskViewModel(
         _dataLoading.value = true
 
         viewModelScope.launch {
-            tasksRepository.getTask(taskId).let { result ->
+            getTaskUseCase(taskId).let { result ->
                 if (result is Success) {
                     onTaskLoaded(result.data)
                 } else {
@@ -128,7 +130,7 @@ class AddEditTaskViewModel(
     }
 
     private fun createTask(newTask: Task) = viewModelScope.launch {
-        tasksRepository.saveTask(newTask)
+        saveUseCase(newTask)
         _taskUpdated.value = Event(Unit)
     }
 
@@ -137,7 +139,7 @@ class AddEditTaskViewModel(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            tasksRepository.saveTask(task)
+            saveUseCase(task)
             _taskUpdated.value = Event(Unit)
         }
     }

@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -44,13 +43,10 @@ class DefaultTasksRepository(
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
 
-        EspressoIdlingResource.increment() // Set app as busy.
-
         return withContext(ioDispatcher) {
             // Respond immediately with cache if available and not dirty
             if (!forceUpdate) {
                 cachedTasks?.let { cachedTasks ->
-                    EspressoIdlingResource.decrement() // Set app as idle.
                     return@withContext Success(cachedTasks.values.sortedBy { it.id })
                 }
             }
@@ -59,8 +55,6 @@ class DefaultTasksRepository(
 
             // Refresh the cache with the new tasks
             (newTasks as? Success)?.let { refreshCache(it.data) }
-
-            EspressoIdlingResource.decrement() // Set app as idle.
 
             cachedTasks?.values?.let { tasks ->
                 return@withContext Result.Success(tasks.sortedBy { it.id })
@@ -104,13 +98,10 @@ class DefaultTasksRepository(
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
 
-        EspressoIdlingResource.increment() // Set app as busy.
-
         return withContext(ioDispatcher) {
             // Respond immediately with cache if available
             if (!forceUpdate) {
                 getTaskWithId(taskId)?.let {
-                    EspressoIdlingResource.decrement() // Set app as idle.
                     return@withContext Success(it)
                 }
             }
@@ -119,8 +110,6 @@ class DefaultTasksRepository(
 
             // Refresh the cache with the new tasks
             (newTask as? Success)?.let { cacheTask(it.data) }
-
-            EspressoIdlingResource.decrement() // Set app as idle.
 
             return@withContext newTask
         }
