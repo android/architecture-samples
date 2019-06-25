@@ -17,12 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-
+import javax.inject.Inject
 
 /**
  * Class used to showcase dependency injection scoped to one module ([StatisticsModule]).
  */
-class StatisticsUtils {
+class StatisticsUtils @Inject constructor() {
 
     /**
      * Function that does some trivial computation. Used to showcase unit tests.

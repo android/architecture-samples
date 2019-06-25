@@ -8,6 +8,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME
 
 
-@Module
+@Module(includes = [ApplicationModuleBinds::class])
 class ApplicationModule {
 
     @Qualifier
@@ -27,18 +28,6 @@ class ApplicationModule {
     @Qualifier
     @Retention(RUNTIME)
     annotation class TasksLocalDataSource
-
-    @Singleton
-    @Provides
-    fun provideRepository(
-        @TasksRemoteDataSource tasksRemoteDataSource: TasksDataSource,
-        @TasksLocalDataSource tasksLocalDataSource: TasksDataSource,
-        ioDispatcher: CoroutineDispatcher
-    ): TasksRepository {
-        return DefaultTasksRepository(
-            tasksRemoteDataSource, tasksLocalDataSource, ioDispatcher
-        )
-    }
 
     @Singleton
     @TasksRemoteDataSource
@@ -73,3 +62,11 @@ class ApplicationModule {
     @Provides
     fun provideIoDispatcher() = Dispatchers.IO
 }
+//
+//@Module
+//abstract class ApplicationModuleBinds {
+//
+//    @Singleton
+//    @Binds
+//    abstract fun bindRepository(repo: DefaultTasksRepository): TasksRepository
+//}
