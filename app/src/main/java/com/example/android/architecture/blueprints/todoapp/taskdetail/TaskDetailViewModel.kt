@@ -31,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUs
 import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
 /**
@@ -96,22 +97,20 @@ class TaskDetailViewModel(
     fun start(taskId: String?) {
         _dataLoading.value = true
 
-        // Espresso does not work well with coroutines yet. See
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/982
-        EspressoIdlingResource.increment() // Set app as busy.
-
-        viewModelScope.launch {
-            if (taskId != null) {
-                getTaskUseCase(taskId, false).let { result ->
-                    if (result is Success) {
-                        onTaskLoaded(result.data)
-                    } else {
-                        onDataNotAvailable(result)
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                if (taskId != null) {
+                    getTaskUseCase(taskId, false).let { result ->
+                        if (result is Success) {
+                            onTaskLoaded(result.data)
+                        } else {
+                            onDataNotAvailable(result)
+                        }
                     }
                 }
+                _dataLoading.value = false
+                EspressoIdlingResource.decrement() // Set app as idle.
             }
-            _dataLoading.value = false
-            EspressoIdlingResource.decrement() // Set app as idle.
         }
     }
 

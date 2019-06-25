@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -35,6 +36,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
 /**
@@ -188,23 +190,20 @@ class TasksViewModel(
 
         _dataLoading.value = true
 
-        // Espresso does not work well with coroutines yet. See
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/982
-        EspressoIdlingResource.increment() // Set app as busy.
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                val tasksResult = getTasksUseCase(forceUpdate, _currentFiltering)
+                if (tasksResult is Success) {
+                    isDataLoadingError.value = false
+                    _items.value = tasksResult.data
+                } else {
+                    isDataLoadingError.value = false
+                    _items.value = emptyList()
+                    _snackbarText.value = Event(string.loading_tasks_error)
+                }
 
-        viewModelScope.launch {
-            val tasksResult = getTasksUseCase(forceUpdate, _currentFiltering)
-            if (tasksResult is Success) {
-                isDataLoadingError.value = false
-                _items.value = tasksResult.data
-            } else {
-                isDataLoadingError.value = false
-                _items.value = emptyList()
-                _snackbarText.value = Event(R.string.loading_tasks_error)
+                _dataLoading.value = false
             }
-
-            _dataLoading.value = false
-            EspressoIdlingResource.decrement() // Set app as idle.
         }
     }
 }
