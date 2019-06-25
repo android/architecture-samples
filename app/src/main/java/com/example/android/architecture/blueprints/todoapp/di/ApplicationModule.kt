@@ -12,17 +12,27 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention.RUNTIME
+
 
 @Module
 class ApplicationModule {
 
+    @Qualifier
+    @Retention(RUNTIME)
+    annotation class TasksRemoteDataSource
+
+    @Qualifier
+    @Retention(RUNTIME)
+    annotation class TasksLocalDataSource
+
     @Singleton
     @Provides
     fun provideRepository(
-        @Named("TasksRemoteDataSource") tasksRemoteDataSource: TasksDataSource,
-        @Named("TasksLocalDataSource") tasksLocalDataSource: TasksDataSource,
+        @TasksRemoteDataSource tasksRemoteDataSource: TasksDataSource,
+        @TasksLocalDataSource tasksLocalDataSource: TasksDataSource,
         ioDispatcher: CoroutineDispatcher
     ): TasksRepository {
         return DefaultTasksRepository(
@@ -31,14 +41,14 @@ class ApplicationModule {
     }
 
     @Singleton
-    @Named("TasksRemoteDataSource")
+    @TasksRemoteDataSource
     @Provides
     fun provideTasksRemoteDataSource(): TasksDataSource {
         return TasksRemoteDataSource
     }
 
     @Singleton
-    @Named("TasksLocalDataSource")
+    @TasksLocalDataSource
     @Provides
     fun provideTasksLocalDataSource(
         database: ToDoDatabase,
@@ -56,8 +66,7 @@ class ApplicationModule {
             context.applicationContext,
             ToDoDatabase::class.java,
             "Tasks.db"
-        )
-            .build()
+        ).build()
     }
 
     @Singleton
