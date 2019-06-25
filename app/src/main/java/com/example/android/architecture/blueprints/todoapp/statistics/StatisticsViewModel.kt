@@ -23,7 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -66,20 +66,18 @@ class StatisticsViewModel @Inject constructor(
     fun start() {
         _dataLoading.value = true
 
-        // Espresso does not work well with coroutines yet. See
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/982
-        EspressoIdlingResource.increment() // Set app as busy.
-
-        viewModelScope.launch {
-            tasksRepository.getTasks().let { result ->
-                if (result is Success) {
-                    _error.value = false
-                    computeStats(result.data)
-                } else {
-                    _error.value = true
-                    activeTasks = 0
-                    completedTasks = 0
-                    computeStats(null)
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                tasksRepository.getTasks().let { result ->
+                    if (result is Success) {
+                        _error.value = false
+                        computeStats(result.data)
+                    } else {
+                        _error.value = true
+                        activeTasks = 0
+                        completedTasks = 0
+                        computeStats(null)
+                    }
                 }
             }
         }
@@ -95,6 +93,5 @@ class StatisticsViewModel @Inject constructor(
         }
         _empty.value = tasks.isNullOrEmpty()
         _dataLoading.value = false
-        EspressoIdlingResource.decrement() // Set app as idle.
     }
 }
