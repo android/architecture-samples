@@ -89,7 +89,6 @@ class TasksFragment : Fragment() {
         this.setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
         setupFab()
-        viewDataBinding.viewmodel?.loadTasks(true)
     }
 
     private fun setupNavigation() {

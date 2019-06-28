@@ -87,6 +87,7 @@ class TasksViewModel(
     init {
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
+        loadTasks(true)
     }
 
     /**
@@ -180,7 +181,6 @@ class TasksViewModel(
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     fun loadTasks(forceUpdate: Boolean) {
-
         _dataLoading.value = true
 
         wrapEspressoIdlingResource {
@@ -215,5 +215,9 @@ class TasksViewModel(
                 _dataLoading.value = false
             }
         }
+    }
+
+    fun refresh() {
+        loadTasks(true)
     }
 }

@@ -87,7 +87,11 @@ class TaskDetailViewModel(
         }
     }
 
-    fun start(taskId: String?) {
+    fun start(taskId: String?, forceRefresh: Boolean = false) {
+        if (_isDataAvailable.value == true && !forceRefresh || _dataLoading.value == true) {
+            return
+        }
+
         // Show loading indicator
         _dataLoading.value = true
 
@@ -122,8 +126,8 @@ class TaskDetailViewModel(
         _isDataAvailable.value = false
     }
 
-    fun onRefresh() {
-        taskId?.let { start(it) }
+    fun refresh() {
+        taskId?.let { start(it, true) }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {

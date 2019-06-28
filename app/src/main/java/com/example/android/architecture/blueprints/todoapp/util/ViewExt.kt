@@ -21,16 +21,13 @@ package com.example.android.architecture.blueprints.todoapp.util
 
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -80,16 +77,4 @@ fun Fragment.setupRefreshLayout(
     scrollUpChild?.let {
         refreshLayout.scrollUpChild = it
     }
-}
-
-
-/**
- * Reloads the data when the pull-to-refresh is triggered.
- *
- * Creates the `android:onRefresh` for a [SwipeRefreshLayout].
- */
-@BindingAdapter("android:onRefresh")
-fun ScrollChildSwipeRefreshLayout.setSwipeRefreshLayoutOnRefreshListener(
-        viewModel: TasksViewModel) {
-    setOnRefreshListener { viewModel.loadTasks(true) }
 }
