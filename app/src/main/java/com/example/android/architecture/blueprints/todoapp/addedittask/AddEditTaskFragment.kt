@@ -27,6 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
+import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 
@@ -54,7 +55,8 @@ class AddEditTaskFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
         setupNavigation()
-        loadData()
+        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        viewModel.start(getTaskId())
     }
 
     private fun setupSnackbar() {
@@ -69,11 +71,6 @@ class AddEditTaskFragment : Fragment() {
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
-    }
-
-    private fun loadData() {
-        // Add or edit an existing task?
-        viewDataBinding.viewmodel?.start(getTaskId())
     }
 
     private fun getTaskId(): String? {

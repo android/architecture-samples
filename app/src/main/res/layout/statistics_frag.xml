@@ -17,63 +17,64 @@
 
     <data>
 
-        <import type="android.view.View" />
+        <import type="android.view.View"/>
 
         <variable
             name="stats"
-            type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel"/>
     </data>
 
-    <LinearLayout
+    <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
+        android:id="@+id/refresh_layout"
+        app:refreshing="@{stats.dataLoading}"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/loading"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:visibility="@{stats.dataLoading ? View.VISIBLE : View.GONE}" />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/statistics"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="@{stats.dataLoading ? View.GONE : View.VISIBLE}">
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/statistics"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/statistics_no_tasks"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="@{stats.dataLoading ? View.GONE : View.VISIBLE}">
 
-            <TextView
-                android:id="@+id/stats_active_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="1dp"
-                android:text="@{@string/statistics_active_tasks(stats.activeTasksPercent)}"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/statistics_no_tasks"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:visibility="@{stats.empty ? View.VISIBLE : View.GONE}"/>
 
-            <!-- android:paddingTop specified to temporarily work around -->
-            <!-- https://github.com/robolectric/robolectric/issues/4588 -->
-            <TextView
-                android:id="@+id/stats_completed_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="1dp"
-                android:text="@{@string/statistics_completed_tasks(stats.completedTasksPercent)}"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}" />
+                <TextView
+                    android:id="@+id/stats_active_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="1dp"
+                    android:text="@{@string/statistics_active_tasks(stats.activeTasksPercent)}"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}"/>
 
+                <!-- android:paddingTop specified to temporarily work around -->
+                <!-- https://github.com/robolectric/robolectric/issues/4588 -->
+                <TextView
+                    android:id="@+id/stats_completed_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="1dp"
+                    android:text="@{@string/statistics_completed_tasks(stats.completedTasksPercent)}"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:visibility="@{stats.empty ? View.GONE : View.VISIBLE}"/>
+
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+
+    </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 </layout>

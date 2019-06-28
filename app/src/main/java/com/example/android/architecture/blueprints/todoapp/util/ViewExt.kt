@@ -16,16 +16,19 @@
 package com.example.android.architecture.blueprints.todoapp.util
 
 /**
- * Extension functions for View and subclasses of View.
+ * Extension functions and Binding Adapters.
  */
 
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.Event
+import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -63,6 +66,22 @@ fun View.setupSnackbar(
         }
     })
 }
+
+fun Fragment.setupRefreshLayout(
+    refreshLayout: ScrollChildSwipeRefreshLayout,
+    scrollUpChild: View? = null
+) {
+    refreshLayout.setColorSchemeColors(
+        ContextCompat.getColor(requireActivity(), R.color.colorPrimary),
+        ContextCompat.getColor(requireActivity(), R.color.colorAccent),
+        ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark)
+    )
+    // Set the scrolling view in the custom SwipeRefreshLayout.
+    scrollUpChild?.let {
+        refreshLayout.scrollUpChild = it
+    }
+}
+
 
 /**
  * Reloads the data when the pull-to-refresh is triggered.

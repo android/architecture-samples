@@ -31,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
+import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 
@@ -50,6 +51,7 @@ class TaskDetailFragment : Fragment() {
         }
 
         setupNavigation()
+        this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
 
     private fun setupNavigation() {
@@ -73,14 +75,6 @@ class TaskDetailFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val taskId = arguments?.let {
-            TaskDetailFragmentArgs.fromBundle(it).TASKID
-        }
-        viewDataBinding.viewmodel?.start(taskId)
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -95,7 +89,13 @@ class TaskDetailFragment : Fragment() {
                 }
             }
         }
-        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
+        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+
+        val taskId = arguments?.let {
+            TaskDetailFragmentArgs.fromBundle(it).TASKID
+        }
+        viewDataBinding.viewmodel?.start(taskId)
+
         setHasOptionsMenu(true)
         return view
     }
