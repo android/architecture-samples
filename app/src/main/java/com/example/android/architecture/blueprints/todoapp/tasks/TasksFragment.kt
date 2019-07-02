@@ -69,7 +69,7 @@ class TasksFragment : Fragment() {
                 true
             }
             R.id.menu_refresh -> {
-                viewDataBinding.viewmodel?.loadTasks(true)
+                viewModel.loadTasks(true)
                 true
             }
             else -> false
@@ -86,9 +86,13 @@ class TasksFragment : Fragment() {
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         setupSnackbar()
         setupListAdapter()
-        this.setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
+        setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
         setupFab()
+
+        // Always reloading data for simplicity. Real apps should only do this on first load and
+        // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
+        viewModel.loadTasks(true)
     }
 
     private fun setupNavigation() {
