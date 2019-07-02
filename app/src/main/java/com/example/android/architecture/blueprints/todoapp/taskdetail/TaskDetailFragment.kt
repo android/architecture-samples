@@ -26,6 +26,7 @@ import android.widget.CheckBox
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
@@ -40,6 +41,8 @@ import com.google.android.material.snackbar.Snackbar
  */
 class TaskDetailFragment : Fragment() {
     private lateinit var viewDataBinding: TaskdetailFragBinding
+
+    private val args: TaskDetailFragmentArgs by navArgs()
 
     private val viewModel by viewModels<TaskDetailViewModel> { getVmFactory() }
 
@@ -61,9 +64,8 @@ class TaskDetailFragment : Fragment() {
             findNavController().navigate(action)
         })
         viewModel.editTaskCommand.observe(this, EventObserver {
-            val taskId = TaskDetailFragmentArgs.fromBundle(arguments!!).TASKID
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToAddEditTaskFragment(taskId,
+                .actionTaskDetailFragmentToAddEditTaskFragment(args.taskId,
                     resources.getString(R.string.edit_task))
             findNavController().navigate(action)
         })
@@ -91,10 +93,7 @@ class TaskDetailFragment : Fragment() {
         }
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
 
-        val taskId = arguments?.let {
-            TaskDetailFragmentArgs.fromBundle(it).TASKID
-        }
-        viewDataBinding.viewmodel?.start(taskId)
+        viewModel.start(args.taskId)
 
         setHasOptionsMenu(true)
         return view

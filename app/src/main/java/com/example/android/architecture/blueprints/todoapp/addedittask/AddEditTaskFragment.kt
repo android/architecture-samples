@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
@@ -37,6 +38,8 @@ import com.google.android.material.snackbar.Snackbar
 class AddEditTaskFragment : Fragment() {
 
     private lateinit var viewDataBinding: AddtaskFragBinding
+
+    private val args: AddEditTaskFragmentArgs by navArgs()
 
     private val viewModel by viewModels<AddEditTaskViewModel> { getVmFactory() }
 
@@ -56,7 +59,7 @@ class AddEditTaskFragment : Fragment() {
         setupSnackbar()
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        viewModel.start(getTaskId())
+        viewModel.start(args.taskId)
     }
 
     private fun setupSnackbar() {
@@ -71,11 +74,5 @@ class AddEditTaskFragment : Fragment() {
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
-    }
-
-    private fun getTaskId(): String? {
-        return arguments?.let {
-            AddEditTaskFragmentArgs.fromBundle(it).TASKID
-        }
     }
 }
