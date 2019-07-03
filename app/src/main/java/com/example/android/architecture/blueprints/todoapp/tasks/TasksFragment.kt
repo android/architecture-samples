@@ -37,7 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
-import java.util.ArrayList
 
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
@@ -159,7 +158,7 @@ class TasksFragment : Fragment() {
     private fun setupListAdapter() {
         val viewModel = viewDataBinding.viewmodel
         if (viewModel != null) {
-            listAdapter = TasksAdapter(ArrayList(0), viewModel)
+            listAdapter = TasksAdapter(viewModel)
             viewDataBinding.tasksList.adapter = listAdapter
         } else {
             Timber.w("ViewModel not initialized when attempting to set up adapter.")
