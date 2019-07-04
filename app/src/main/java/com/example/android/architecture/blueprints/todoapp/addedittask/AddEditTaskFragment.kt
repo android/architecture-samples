@@ -21,11 +21,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
+import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.DaggerFragment
@@ -37,6 +39,8 @@ import javax.inject.Inject
 class AddEditTaskFragment : DaggerFragment() {
 
     private lateinit var viewDataBinding: AddtaskFragBinding
+
+    private val args: AddEditTaskFragmentArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -63,7 +67,8 @@ class AddEditTaskFragment : DaggerFragment() {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
         setupNavigation()
-        loadData()
+        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        viewModel.start(args.taskId)
     }
 
     private fun setupSnackbar() {
@@ -78,16 +83,5 @@ class AddEditTaskFragment : DaggerFragment() {
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
-    }
-
-    private fun loadData() {
-        // Add or edit an existing task?
-        viewDataBinding.viewmodel?.start(getTaskId())
-    }
-
-    private fun getTaskId(): String? {
-        return arguments?.let {
-            AddEditTaskFragmentArgs.fromBundle(it).TASKID
-        }
     }
 }

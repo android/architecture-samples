@@ -65,10 +65,10 @@ class AddEditTaskViewModel @Inject constructor(
     private var taskCompleted = false
 
     fun start(taskId: String?) {
-        _dataLoading.value?.let { isLoading ->
-            // Already loading, ignore.
-            if (isLoading) return
+        if (_dataLoading.value == true) {
+            return
         }
+
         this.taskId = taskId
         if (taskId == null) {
             // No need to populate, it's a new task
@@ -79,6 +79,7 @@ class AddEditTaskViewModel @Inject constructor(
             // No need to populate, already have data.
             return
         }
+
         isNewTask = false
         _dataLoading.value = true
 

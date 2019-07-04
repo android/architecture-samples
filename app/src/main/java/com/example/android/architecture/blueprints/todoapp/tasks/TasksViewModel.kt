@@ -88,6 +88,7 @@ class TasksViewModel @Inject constructor(
     init {
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
+        loadTasks(true)
     }
 
     /**
@@ -128,7 +129,8 @@ class TasksViewModel @Inject constructor(
     fun clearCompletedTasks() {
         viewModelScope.launch {
             tasksRepository.clearCompletedTasks()
-            _snackbarText.value = Event(R.string.completed_tasks_cleared)
+            showSnackbarMessage(R.string.completed_tasks_cleared)
+            // Refresh list to show the new state
             loadTasks(false)
         }
     }
@@ -141,6 +143,8 @@ class TasksViewModel @Inject constructor(
             tasksRepository.activateTask(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
+        // Refresh list to show the new state
+        loadTasks(false)
     }
 
     /**
@@ -151,25 +155,18 @@ class TasksViewModel @Inject constructor(
     }
 
     /**
-     * Called by the [TasksAdapter].
+     * Called by Data Binding.
      */
-    internal fun openTask(taskId: String) {
+    fun openTask(taskId: String) {
         _openTaskEvent.value = Event(taskId)
     }
 
     fun showEditResultMessage(result: Int) {
         when (result) {
-            EDIT_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_saved_task_message)
-            )
-            ADD_EDIT_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_added_task_message)
-            )
-            DELETE_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_deleted_task_message)
-            )
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
         }
-
     }
 
     private fun showSnackbarMessage(message: Int) {
@@ -178,10 +175,8 @@ class TasksViewModel @Inject constructor(
 
     /**
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
-     * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     fun loadTasks(forceUpdate: Boolean) {
-
         _dataLoading.value = true
 
         wrapEspressoIdlingResource {
@@ -210,11 +205,15 @@ class TasksViewModel @Inject constructor(
                 } else {
                     isDataLoadingError.value = false
                     _items.value = emptyList()
-                    _snackbarText.value = Event(R.string.loading_tasks_error)
+                    showSnackbarMessage(R.string.loading_tasks_error)
                 }
 
                 _dataLoading.value = false
             }
         }
+    }
+
+    fun refresh() {
+        loadTasks(true)
     }
 }

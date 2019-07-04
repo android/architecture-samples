@@ -16,19 +16,13 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.databinding.BindingAdapter
-import android.widget.ListView
-
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.architecture.blueprints.todoapp.data.Task
 
 /**
- * Contains [BindingAdapter]s for the [Task] list.
+ * [BindingAdapter]s for the [Task]s list.
  */
-object TasksListBindings {
-
-    @BindingAdapter("app:items")
-    @JvmStatic fun setItems(listView: ListView, items: List<Task>) {
-        with(listView.adapter as TasksAdapter) {
-            replaceData(items)
-        }
-    }
+@BindingAdapter("app:items")
+fun setItems(listView: RecyclerView, items: List<Task>) {
+    (listView.adapter as TasksAdapter).submitList(items)
 }

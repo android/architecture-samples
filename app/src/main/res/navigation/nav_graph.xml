@@ -28,7 +28,7 @@
             android:id="@+id/action_taskDetailFragment_to_addEditTaskFragment"
             app:destination="@id/addEditTaskFragment" />
         <argument
-            android:name="TASK_ID"
+            android:name="taskId"
             app:argType="string" />
         <action
             android:id="@+id/action_taskDetailFragment_to_tasksFragment"
@@ -66,7 +66,7 @@
         android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment"
         android:label="{title}" >
         <argument
-            android:name="TASK_ID"
+            android:name="taskId"
             app:argType="string"
             app:nullable="true"/>
         <argument

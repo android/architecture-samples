@@ -24,7 +24,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.architecture.blueprints.todoapp.EventObserver
@@ -32,12 +31,12 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
+import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.DaggerFragment
 import timber.log.Timber
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -60,7 +59,7 @@ class TasksFragment : DaggerFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = viewModel
         }
@@ -79,7 +78,7 @@ class TasksFragment : DaggerFragment() {
                 true
             }
             R.id.menu_refresh -> {
-                viewDataBinding.viewmodel?.loadTasks(true)
+                viewModel.loadTasks(true)
                 true
             }
             else -> false
@@ -96,10 +95,13 @@ class TasksFragment : DaggerFragment() {
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         setupSnackbar()
         setupListAdapter()
-        setupRefreshLayout()
+        setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
         setupFab()
-        viewDataBinding.viewmodel?.loadTasks(true)
+
+        // Always reloading data for simplicity. Real apps should only do this on first load and
+        // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
+        viewModel.loadTasks(true)
     }
 
     private fun setupNavigation() {
@@ -129,11 +131,11 @@ class TasksFragment : DaggerFragment() {
             setOnMenuItemClickListener {
                 viewDataBinding.viewmodel?.run {
                     setFiltering(
-                            when (it.itemId) {
-                                R.id.active -> TasksFilterType.ACTIVE_TASKS
-                                R.id.completed -> TasksFilterType.COMPLETED_TASKS
-                                else -> TasksFilterType.ALL_TASKS
-                            }
+                        when (it.itemId) {
+                            R.id.active -> TasksFilterType.ACTIVE_TASKS
+                            R.id.completed -> TasksFilterType.COMPLETED_TASKS
+                            else -> TasksFilterType.ALL_TASKS
+                        }
                     )
                     loadTasks(false)
                 }
@@ -166,22 +168,10 @@ class TasksFragment : DaggerFragment() {
     private fun setupListAdapter() {
         val viewModel = viewDataBinding.viewmodel
         if (viewModel != null) {
-            listAdapter = TasksAdapter(ArrayList(0), viewModel)
+            listAdapter = TasksAdapter(viewModel)
             viewDataBinding.tasksList.adapter = listAdapter
         } else {
             Timber.w("ViewModel not initialized when attempting to set up adapter.")
-        }
-    }
-
-    private fun setupRefreshLayout() {
-        viewDataBinding.refreshLayout.run {
-            setColorSchemeColors(
-                    ContextCompat.getColor(requireActivity(), R.color.colorPrimary),
-                    ContextCompat.getColor(requireActivity(), R.color.colorAccent),
-                    ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark)
-            )
-            // Set the scrolling view in the custom SwipeRefreshLayout.
-            scrollUpChild = viewDataBinding.tasksList
         }
     }
 }

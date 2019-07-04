@@ -25,11 +25,13 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
+import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.DaggerFragment
@@ -41,6 +43,8 @@ import javax.inject.Inject
 class TaskDetailFragment : DaggerFragment() {
     private lateinit var viewDataBinding: TaskdetailFragBinding
 
+    private val args: TaskDetailFragmentArgs by navArgs()
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -51,26 +55,6 @@ class TaskDetailFragment : DaggerFragment() {
         viewModel = obtainViewModel(viewModelFactory)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
-        viewDataBinding = TaskdetailFragBinding.bind(view).apply {
-            viewmodel = viewModel
-            listener = object : TaskDetailUserActionsListener {
-                override fun onCompleteChanged(v: View) {
-                    viewmodel?.setCompleted((v as CheckBox).isChecked)
-                }
-            }
-        }
-        viewDataBinding.setLifecycleOwner(this.viewLifecycleOwner)
-        setHasOptionsMenu(true)
-        return view
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
@@ -79,7 +63,7 @@ class TaskDetailFragment : DaggerFragment() {
         }
 
         setupNavigation()
-
+        this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
 
     private fun setupNavigation() {
@@ -89,9 +73,8 @@ class TaskDetailFragment : DaggerFragment() {
             findNavController().navigate(action)
         })
         viewModel.editTaskCommand.observe(this, EventObserver {
-            val taskId = TaskDetailFragmentArgs.fromBundle(arguments!!).TASKID
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToAddEditTaskFragment(taskId,
+                .actionTaskDetailFragmentToAddEditTaskFragment(args.taskId,
                     resources.getString(R.string.edit_task))
             findNavController().navigate(action)
         })
@@ -103,12 +86,25 @@ class TaskDetailFragment : DaggerFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val taskId = arguments?.let {
-            TaskDetailFragmentArgs.fromBundle(it).TASKID
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
+        viewDataBinding = TaskdetailFragBinding.bind(view).apply {
+            viewmodel = viewModel
+            listener = object : TaskDetailUserActionsListener {
+                override fun onCompleteChanged(v: View) {
+                    viewmodel?.setCompleted((v as CheckBox).isChecked)
+                }
+            }
         }
-        viewDataBinding.viewmodel?.start(taskId)
+        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        viewModel.start(args.taskId)
+
+        setHasOptionsMenu(true)
+        return view
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

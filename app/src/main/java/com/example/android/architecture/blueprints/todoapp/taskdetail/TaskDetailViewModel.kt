@@ -57,13 +57,14 @@ class TaskDetailViewModel @Inject constructor(
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
+    private val taskId: String?
+        get() = _task.value?.id
+
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = Transformations.map(_task) { input: Task? ->
         input?.isCompleted ?: false
     }
 
-    val taskId: String?
-        get() = _task.value?.id
 
     fun deleteTask() = viewModelScope.launch {
         taskId?.let {
@@ -87,7 +88,12 @@ class TaskDetailViewModel @Inject constructor(
         }
     }
 
-    fun start(taskId: String?) {
+    fun start(taskId: String?, forceRefresh: Boolean = false) {
+        if (_isDataAvailable.value == true && !forceRefresh || _dataLoading.value == true) {
+            return
+        }
+
+        // Show loading indicator
         _dataLoading.value = true
 
         wrapEspressoIdlingResource {
@@ -121,8 +127,8 @@ class TaskDetailViewModel @Inject constructor(
         _isDataAvailable.value = false
     }
 
-    fun onRefresh() {
-        taskId?.let { start(it) }
+    fun refresh() {
+        taskId?.let { start(it, true) }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {
