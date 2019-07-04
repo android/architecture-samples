@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source
 
+import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 /**
@@ -28,9 +29,18 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
  */
 interface TasksDataSource {
 
+
+    fun observeTasks(): LiveData<Result<List<Task>>>
+
     suspend fun getTasks(): Result<List<Task>>
 
+    suspend fun refreshTasks()
+
+    fun observeTask(taskId: String): LiveData<Result<Task>>
+
     suspend fun getTask(taskId: String): Result<Task>
+
+    suspend fun refreshTask(taskId: String)
 
     suspend fun saveTask(task: Task)
 

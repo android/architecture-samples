@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
@@ -27,7 +28,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
 /**
@@ -38,7 +38,18 @@ class TaskDetailViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val _task = MutableLiveData<Task>()
+
+    private val _params = MutableLiveData<Pair<String, Boolean>>()
+
+    private val _task = _params.switchMap { (taskId, forceUpdate) ->
+        if (forceUpdate) {
+            viewModelScope.launch {
+                tasksRepository.refreshTasks()
+            }
+        }
+        tasksRepository.observeTask(taskId).switchMap { computeResult(it) }
+
+    }
     val task: LiveData<Task> = _task
 
     private val _isDataAvailable = MutableLiveData<Boolean>()
@@ -56,17 +67,13 @@ class TaskDetailViewModel(
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
-    private val taskId: String?
-        get() = _task.value?.id
-
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = Transformations.map(_task) { input: Task? ->
         input?.isCompleted ?: false
     }
 
-
     fun deleteTask() = viewModelScope.launch {
-        taskId?.let {
+        _params.value?.first?.let {
             tasksRepository.deleteTask(it)
             _deleteTaskCommand.value = Event(Unit)
         }
@@ -87,47 +94,43 @@ class TaskDetailViewModel(
         }
     }
 
-    fun start(taskId: String?, forceRefresh: Boolean = false) {
+    fun start(taskId: String?, forceRefresh: Boolean = true) {
         if (_isDataAvailable.value == true && !forceRefresh || _dataLoading.value == true) {
+            return
+        }
+        if (taskId == null) {
+            _isDataAvailable.value = false
             return
         }
 
         // Show loading indicator
         _dataLoading.value = true
 
-        wrapEspressoIdlingResource {
+        _params.value = Pair(taskId, forceRefresh)
+    }
 
-            viewModelScope.launch {
-                if (taskId != null) {
-                    tasksRepository.getTask(taskId, false).let { result ->
-                        if (result is Success) {
-                            onTaskLoaded(result.data)
-                        } else {
-                            onDataNotAvailable(result)
-                        }
-                    }
-                }
-                _dataLoading.value = false
-            }
+    private fun computeResult(taskResult: Result<Task>): LiveData<Task> {
+
+        _dataLoading.value = true
+        // TODO: This is a good case for liveData builder. Replace when stable.
+        val result = MutableLiveData<Task>()
+
+        if (taskResult is Success) {
+            result.value = taskResult.data
+            _isDataAvailable.value = true
+        } else {
+            result.value = null
+            showSnackbarMessage(R.string.loading_tasks_error)
+            _isDataAvailable.value = false
         }
+
+        _dataLoading.value = false
+        return result
     }
 
-    private fun setTask(task: Task?) {
-        this._task.value = task
-        _isDataAvailable.value = task != null
-    }
-
-    private fun onTaskLoaded(task: Task) {
-        setTask(task)
-    }
-
-    private fun onDataNotAvailable(result: Result<Task>) {
-        _task.value = null
-        _isDataAvailable.value = false
-    }
 
     fun refresh() {
-        taskId?.let { start(it, true) }
+        _params.value = _params.value?.copy(second = true)
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {

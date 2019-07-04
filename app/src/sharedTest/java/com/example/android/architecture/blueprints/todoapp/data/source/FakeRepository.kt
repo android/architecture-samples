@@ -16,10 +16,14 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import kotlinx.coroutines.runBlocking
 import java.util.LinkedHashMap
 
 /**
@@ -31,8 +35,37 @@ class FakeRepository : TasksRepository {
 
     private var shouldReturnError = false
 
+    private val observableTasks = MutableLiveData<Result<List<Task>>>()
+
     fun setReturnError(value: Boolean) {
         shouldReturnError = value
+    }
+
+    override suspend fun refreshTasks() {
+        observableTasks.value = getTasks()
+    }
+
+    override suspend fun refreshTask(taskId: String) {
+        refreshTasks()
+    }
+
+    override fun observeTasks(): LiveData<Result<List<Task>>> {
+        runBlocking { refreshTasks() }
+        return observableTasks
+    }
+
+    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+        return observableTasks.map { tasks ->
+            when (tasks) {
+                is Result.Loading -> Result.Loading
+                is Error -> Error(tasks.exception)
+                is Success -> {
+                    val task = tasks.data.firstOrNull() { it.id == taskId }
+                        ?: return@map Error(Exception("Not found"))
+                    Success(task)
+                }
+            }
+        }
     }
 
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
@@ -83,10 +116,12 @@ class FakeRepository : TasksRepository {
 
     override suspend fun deleteTask(taskId: String) {
         tasksServiceData.remove(taskId)
+        refreshTasks()
     }
 
     override suspend fun deleteAllTasks() {
         tasksServiceData.clear()
+        refreshTasks()
     }
 
     @VisibleForTesting
@@ -94,5 +129,6 @@ class FakeRepository : TasksRepository {
         for (task in tasks) {
             tasksServiceData[task.id] = task
         }
+        runBlocking { refreshTasks() }
     }
 }
