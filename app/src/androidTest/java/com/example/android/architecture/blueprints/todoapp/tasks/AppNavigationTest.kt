@@ -15,9 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.app.Activity
 import android.view.Gravity
-import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.test.core.app.ActivityScenario
@@ -232,15 +230,5 @@ class AppNavigationTest {
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
-    }
-
-    private fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription()
-        : String {
-        var description = ""
-        onActivity {
-            description =
-                it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
-        }
-        return description
     }
 }

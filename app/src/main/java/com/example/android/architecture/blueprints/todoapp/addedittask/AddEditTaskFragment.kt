@@ -67,9 +67,7 @@ class AddEditTaskFragment : DaggerFragment() {
     }
 
     private fun setupSnackbar() {
-        viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
-        }
+        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
     }
 
     private fun setupNavigation() {

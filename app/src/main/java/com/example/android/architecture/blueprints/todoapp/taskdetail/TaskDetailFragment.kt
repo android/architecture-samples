@@ -22,7 +22,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -53,10 +52,7 @@ class TaskDetailFragment : DaggerFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
-        viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
-        }
-
+        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
@@ -79,7 +75,7 @@ class TaskDetailFragment : DaggerFragment() {
 
     private fun setupFab() {
         activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
-            viewDataBinding.viewmodel?.editTask()
+            viewModel.editTask()
         }
     }
 
@@ -91,11 +87,6 @@ class TaskDetailFragment : DaggerFragment() {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {
             viewmodel = viewModel
-            listener = object : TaskDetailUserActionsListener {
-                override fun onCompleteChanged(v: View) {
-                    viewmodel?.setCompleted((v as CheckBox).isChecked)
-                }
-            }
         }
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         viewModel.start(args.taskId)
@@ -107,7 +98,7 @@ class TaskDetailFragment : DaggerFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_delete -> {
-                viewDataBinding.viewmodel?.deleteTask()
+                viewModel.deleteTask()
                 true
             }
             else -> false
