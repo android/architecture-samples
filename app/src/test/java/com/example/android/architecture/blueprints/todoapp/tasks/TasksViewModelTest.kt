@@ -24,9 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTr
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest

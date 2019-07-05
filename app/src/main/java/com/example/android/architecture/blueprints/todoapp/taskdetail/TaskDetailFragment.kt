@@ -22,7 +22,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -30,7 +29,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.tasks.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
@@ -49,10 +48,7 @@ class TaskDetailFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
-        viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
-        }
-
+        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
@@ -73,7 +69,7 @@ class TaskDetailFragment : Fragment() {
 
     private fun setupFab() {
         activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
-            viewDataBinding.viewmodel?.editTask()
+            viewModel.editTask()
         }
     }
 
@@ -85,11 +81,6 @@ class TaskDetailFragment : Fragment() {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {
             viewmodel = viewModel
-            listener = object : TaskDetailUserActionsListener {
-                override fun onCompleteChanged(v: View) {
-                    viewmodel?.setCompleted((v as CheckBox).isChecked)
-                }
-            }
         }
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
 
@@ -102,7 +93,7 @@ class TaskDetailFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_delete -> {
-                viewDataBinding.viewmodel?.deleteTask()
+                viewModel.deleteTask()
                 true
             }
             else -> false

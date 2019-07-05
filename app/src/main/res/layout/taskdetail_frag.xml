@@ -20,13 +20,11 @@
 
         <import type="android.view.View"/>
 
+        <import type="android.widget.CompoundButton" />
+
         <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel"/>
-
-        <variable
-            name="listener"
-            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailUserActionsListener"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -88,7 +86,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
                         android:checked="@{viewmodel.completed}"
-                        android:onClick="@{(view) -> listener.onCompleteChanged(view)}"
+                        android:onClick="@{(view) -> viewmodel.setCompleted(((CompoundButton)view).isChecked())}"
                         android:paddingTop="1dp"/>
 
                     <TextView
