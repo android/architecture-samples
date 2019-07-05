@@ -106,6 +106,7 @@ class TasksFragmentTest {
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
+        Thread.sleep(100) // TODO problem with RV and Espresso syncing.
         onView(withText("TITLE1")).check(matches(isDisplayed()))
     }
 
