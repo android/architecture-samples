@@ -33,7 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.DaggerTestApplication
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,7 +104,9 @@ class AddEditTaskFragmentTest {
         // THEN - Verify that we navigated back to the tasks screen.
         verify(navController).navigate(
             AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK))
+                .actionAddEditTaskFragmentToTasksFragment(
+                    ADD_EDIT_RESULT_OK
+                ))
     }
 
     private fun launchFragment(navController: NavController?) {

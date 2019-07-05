@@ -30,8 +30,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
+import com.example.android.architecture.blueprints.todoapp.tasks.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
@@ -49,15 +48,7 @@ class TaskDetailFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    //TODO
-    private val viewModel by viewModels<TaskDetailViewModel> { getVmFactory() }
-
-    private lateinit var viewModel: TaskDetailViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = obtainViewModel(viewModelFactory)
-    }
+    private val viewModel by viewModels<TaskDetailViewModel> { viewModelFactory }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -73,7 +64,9 @@ class TaskDetailFragment : DaggerFragment() {
     private fun setupNavigation() {
         viewModel.deleteTaskCommand.observe(this, EventObserver {
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
+                .actionTaskDetailFragmentToTasksFragment(
+                    DELETE_RESULT_OK
+                )
             findNavController().navigate(action)
         })
         viewModel.editTaskCommand.observe(this, EventObserver {

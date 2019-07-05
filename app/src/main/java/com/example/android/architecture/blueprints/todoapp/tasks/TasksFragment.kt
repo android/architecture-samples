@@ -31,7 +31,6 @@ import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,23 +44,15 @@ import javax.inject.Inject
  */
 class TasksFragment : DaggerFragment() {
 
-    //TODO
-
-    private val viewModel by viewModels<TasksViewModel> { getVmFactory() }
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var viewModel: TasksViewModel
+    private val viewModel by viewModels<TasksViewModel> { viewModelFactory}
 
     private lateinit var viewDataBinding: TasksFragBinding
 
     private lateinit var listAdapter: TasksAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = obtainViewModel(viewModelFactory)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -123,8 +114,9 @@ class TasksFragment : DaggerFragment() {
             view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
         }
         arguments?.let {
+            //TODO
             val message = TasksFragmentArgs.fromBundle(it).userMessage
-            viewDataBinding.viewmodel?.showEditResultMessage(message)
+            viewModel.showEditResultMessage(message)
         }
     }
 

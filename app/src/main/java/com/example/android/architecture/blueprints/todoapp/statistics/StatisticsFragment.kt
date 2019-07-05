@@ -24,7 +24,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.obtainViewModel
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
@@ -36,18 +35,10 @@ class StatisticsFragment : DaggerFragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 
-    //TODO
-    private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var statisticsViewModel: StatisticsViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        statisticsViewModel = obtainViewModel(viewModelFactory)
-    }
+    private val statisticsViewModel by viewModels<StatisticsViewModel> { viewModelFactory }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {

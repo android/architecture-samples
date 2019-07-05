@@ -16,7 +16,7 @@ deliberately simple and unopinionated.
 ### Differences with master
 
  - The ServiceLocator class is removed. Object creation and scoping is handled by Dagger.
- - Flavors `mock` and `prod` are no longer needed.
+ - Flavors `mock` and `prod` are no longer needed for testing so they're removed.
 
 
 ### Key files
