@@ -19,6 +19,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -42,6 +43,10 @@ class AddEditTaskFragment : DaggerFragment() {
 
     private val args: AddEditTaskFragmentArgs by navArgs()
 
+    // TODO
+
+    private val viewModel by viewModels<AddEditTaskViewModel> { getVmFactory() }
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -53,7 +58,7 @@ class AddEditTaskFragment : DaggerFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             this.viewmodel = viewModel

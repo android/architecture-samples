@@ -23,6 +23,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -47,6 +48,9 @@ class TaskDetailFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    //TODO
+    private val viewModel by viewModels<TaskDetailViewModel> { getVmFactory() }
 
     private lateinit var viewModel: TaskDetailViewModel
 
@@ -87,9 +91,9 @@ class TaskDetailFragment : DaggerFragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
         viewDataBinding = TaskdetailFragBinding.bind(view).apply {

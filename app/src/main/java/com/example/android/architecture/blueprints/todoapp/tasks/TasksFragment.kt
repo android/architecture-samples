@@ -24,6 +24,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.architecture.blueprints.todoapp.EventObserver
@@ -44,6 +45,10 @@ import javax.inject.Inject
  */
 class TasksFragment : DaggerFragment() {
 
+    //TODO
+
+    private val viewModel by viewModels<TasksViewModel> { getVmFactory() }
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -59,7 +64,7 @@ class TasksFragment : DaggerFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = viewModel
         }

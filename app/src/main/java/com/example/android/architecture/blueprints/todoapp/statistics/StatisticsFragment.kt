@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
@@ -35,6 +36,9 @@ class StatisticsFragment : DaggerFragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 
+    //TODO
+    private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -46,7 +50,7 @@ class StatisticsFragment : DaggerFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?): View? {
         viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
             false)
         return viewDataBinding.root
