@@ -16,15 +16,16 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <data>
-        <import type="android.view.View.OnClickListener" />
+
+        <import type="android.widget.CompoundButton" />
 
         <variable
             name="task"
             type="com.example.android.architecture.blueprints.todoapp.data.Task" />
 
         <variable
-            name="listener"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TaskItemUserActionsListener" />
+            name="viewmodel"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel"/>
     </data>
 
     <LinearLayout
@@ -36,14 +37,14 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/list_item_padding"
         android:paddingTop="@dimen/list_item_padding"
-        android:onClick="@{() -> listener.onTaskClicked(task)}">
+        android:onClick="@{() -> viewmodel.openTask(task.id)}">
 
         <CheckBox
             android:id="@+id/complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:onClick="@{(view) -> listener.onCompleteChanged(task, view)}"
+            android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}"
             android:checked="@{task.completed}"/>
 
         <TextView

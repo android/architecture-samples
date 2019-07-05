@@ -20,13 +20,11 @@
 
         <import type="android.view.View"/>
 
+        <import type="android.widget.CompoundButton" />
+
         <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel"/>
-
-        <variable
-            name="listener"
-            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailUserActionsListener"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -39,7 +37,7 @@
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:onRefreshListener="@{viewmodel::onRefresh}"
+            app:onRefreshListener="@{viewmodel::refresh}"
             app:refreshing="@{viewmodel.dataLoading}">
 
             <LinearLayout
@@ -65,7 +63,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/no_data"
-                        android:textAppearance="?android:attr/textAppearanceLarge"/>
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}"/>
                 </LinearLayout>
 
                 <RelativeLayout
@@ -78,36 +77,36 @@
                     android:paddingBottom="@dimen/activity_vertical_margin"
                     android:visibility="@{viewmodel.isDataAvailable ? View.VISIBLE : View.GONE}">
 
-                <!-- android:paddingTop specified to temporarily work around -->
-                <!-- https://github.com/robolectric/robolectric/issues/4588 -->
-                <CheckBox
-                    android:id="@+id/task_detail_complete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="@dimen/activity_horizontal_margin"
-                    android:onClick="@{(view) -> listener.onCompleteChanged(view)}"
-                    android:paddingTop="1dp"
-                    android:checked="@{viewmodel.completed}" />
+                    <!-- android:paddingTop specified to temporarily work around -->
+                    <!-- https://github.com/robolectric/robolectric/issues/4588 -->
+                    <CheckBox
+                        android:id="@+id/task_detail_complete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:checked="@{viewmodel.completed}"
+                        android:onClick="@{(view) -> viewmodel.setCompleted(((CompoundButton)view).isChecked())}"
+                        android:paddingTop="1dp"/>
 
-                <TextView
-                    android:id="@+id/task_detail_title"
-                    android:layout_toRightOf="@id/task_detail_complete"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="1dp"
-                    android:text="@{viewmodel.task.title}"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <TextView
+                        android:id="@+id/task_detail_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/task_detail_complete"
+                        android:paddingTop="1dp"
+                        android:text="@{viewmodel.task.title}"
+                        android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-                <TextView
-                    android:id="@+id/task_detail_description"
-                    android:layout_toRightOf="@id/task_detail_complete"
-                    android:layout_below="@id/task_detail_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="1dp"
-                    android:text="@{viewmodel.task.description}"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/task_detail_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/task_detail_title"
+                        android:layout_toRightOf="@id/task_detail_complete"
+                        android:paddingTop="1dp"
+                        android:text="@{viewmodel.task.description}"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 </RelativeLayout>
             </LinearLayout>
