@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -32,10 +31,6 @@ import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUs
 import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.util.ADD_EDIT_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.DELETE_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.EDIT_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -94,6 +89,7 @@ class TasksViewModel(
     init {
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
+        loadTasks(true)
     }
 
     /**
@@ -134,7 +130,8 @@ class TasksViewModel(
     fun clearCompletedTasks() {
         viewModelScope.launch {
             clearCompletedTasksUseCase()
-            _snackbarText.value = Event(R.string.completed_tasks_cleared)
+            showSnackbarMessage(R.string.completed_tasks_cleared)
+            // Refresh list to show the new state
             loadTasks(false)
         }
     }
@@ -147,6 +144,8 @@ class TasksViewModel(
             activateTaskUseCase(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
+        // Refresh list to show the new state
+        loadTasks(false)
     }
 
     /**
@@ -157,25 +156,18 @@ class TasksViewModel(
     }
 
     /**
-     * Called by the [TasksAdapter].
+     * Called by Data Binding.
      */
-    internal fun openTask(taskId: String) {
+    fun openTask(taskId: String) {
         _openTaskEvent.value = Event(taskId)
     }
 
     fun showEditResultMessage(result: Int) {
         when (result) {
-            EDIT_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_saved_task_message)
-            )
-            ADD_EDIT_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_added_task_message)
-            )
-            DELETE_RESULT_OK -> _snackbarText.setValue(
-                Event(R.string.successfully_deleted_task_message)
-            )
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
         }
-
     }
 
     private fun showSnackbarMessage(message: Int) {
@@ -184,10 +176,8 @@ class TasksViewModel(
 
     /**
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
-     * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     fun loadTasks(forceUpdate: Boolean) {
-
         _dataLoading.value = true
 
         wrapEspressoIdlingResource {
@@ -199,11 +189,15 @@ class TasksViewModel(
                 } else {
                     isDataLoadingError.value = false
                     _items.value = emptyList()
-                    _snackbarText.value = Event(string.loading_tasks_error)
+                    showSnackbarMessage(R.string.loading_tasks_error)
                 }
 
                 _dataLoading.value = false
             }
         }
+    }
+
+    fun refresh() {
+        loadTasks(true)
     }
 }

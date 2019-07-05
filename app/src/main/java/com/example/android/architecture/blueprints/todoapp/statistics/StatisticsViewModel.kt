@@ -61,7 +61,14 @@ class StatisticsViewModel(
 
     private var completedTasks = 0
 
+    init {
+        start()
+    }
+
     fun start() {
+        if (_dataLoading.value == true) {
+            return
+        }
         _dataLoading.value = true
 
         wrapEspressoIdlingResource {
@@ -79,6 +86,10 @@ class StatisticsViewModel(
                 }
             }
         }
+    }
+
+    fun refresh() {
+        start()
     }
 
     /**

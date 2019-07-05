@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -29,6 +28,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -179,8 +179,10 @@ class TasksActivityTest {
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Press back button to go back to the list
-        pressBack()
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription(
+            activityScenario.getToolbarNavigationContentDescription())
+        ).perform(click())
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
@@ -202,8 +204,10 @@ class TasksActivityTest {
         // Click on the checkbox in task details screen
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Press back button to go back to the list
-        pressBack()
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription(
+            activityScenario.getToolbarNavigationContentDescription())
+        ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
@@ -227,8 +231,10 @@ class TasksActivityTest {
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Press back button to go back to the list
-        pressBack()
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription(
+            activityScenario.getToolbarNavigationContentDescription())
+        ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
@@ -252,8 +258,10 @@ class TasksActivityTest {
         // Click again to restore it to original state
         onView(withId(R.id.task_detail_complete)).perform(click())
 
-        // Press back button to go back to the list
-        pressBack()
+        // Click on the navigation up button to go back to the list
+        onView(withContentDescription(
+            activityScenario.getToolbarNavigationContentDescription())
+        ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
