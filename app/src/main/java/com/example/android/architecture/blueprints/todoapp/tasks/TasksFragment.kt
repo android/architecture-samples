@@ -27,6 +27,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -45,7 +46,10 @@ class TasksFragment : Fragment() {
 
     private val viewModel by viewModels<TasksViewModel> { getVmFactory() }
 
+    private val args: TasksFragmentArgs by navArgs()
+
     private lateinit var viewDataBinding: TasksFragBinding
+
     private lateinit var listAdapter: TasksAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +64,7 @@ class TasksFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.menu_clear -> {
-                viewDataBinding.viewmodel?.clearCompletedTasks()
+                viewModel.clearCompletedTasks()
                 true
             }
             R.id.menu_filter -> {
@@ -95,21 +99,18 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewDataBinding.viewmodel?.openTaskEvent?.observe(this, EventObserver {
+        viewModel.openTaskEvent?.observe(this, EventObserver {
             openTaskDetails(it)
         })
-        viewDataBinding.viewmodel?.newTaskEvent?.observe(this, EventObserver {
+        viewModel.newTaskEvent?.observe(this, EventObserver {
             navigateToAddNewTask()
         })
     }
 
     private fun setupSnackbar() {
-        viewDataBinding.viewmodel?.let {
-            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_SHORT)
-        }
+        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
         arguments?.let {
-            val message = TasksFragmentArgs.fromBundle(it).userMessage
-            viewDataBinding.viewmodel?.showEditResultMessage(message)
+            viewModel.showEditResultMessage(args.userMessage)
         }
     }
 
@@ -119,16 +120,14 @@ class TasksFragment : Fragment() {
             menuInflater.inflate(R.menu.filter_tasks, menu)
 
             setOnMenuItemClickListener {
-                viewDataBinding.viewmodel?.run {
-                    setFiltering(
-                            when (it.itemId) {
-                                R.id.active -> TasksFilterType.ACTIVE_TASKS
-                                R.id.completed -> TasksFilterType.COMPLETED_TASKS
-                                else -> TasksFilterType.ALL_TASKS
-                            }
-                    )
-                    loadTasks(false)
-                }
+                viewModel.setFiltering(
+                    when (it.itemId) {
+                        R.id.active -> TasksFilterType.ACTIVE_TASKS
+                        R.id.completed -> TasksFilterType.COMPLETED_TASKS
+                        else -> TasksFilterType.ALL_TASKS
+                    }
+                )
+                viewModel.loadTasks(false)
                 true
             }
             show()
