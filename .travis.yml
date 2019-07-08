@@ -10,7 +10,6 @@ android:
 jdk:
 - oraclejdk8
 script:
-- cd todoapp
 - ./gradlew test
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
