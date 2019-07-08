@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ object EspressoIdlingResource {
 
     private const val RESOURCE = "GLOBAL"
 
-    @JvmField val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
+    @JvmField
+    val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
 
     fun increment() {
         countingIdlingResource.increment()
@@ -37,7 +38,7 @@ object EspressoIdlingResource {
     }
 }
 
-inline fun <T> wrapEspressoIdlingResource(function: () -> T) : T {
+inline fun <T> wrapEspressoIdlingResource(function: () -> T): T {
     // Espresso does not work well with coroutines yet. See
     // https://github.com/Kotlin/kotlinx.coroutines/issues/982
     EspressoIdlingResource.increment() // Set app as busy.

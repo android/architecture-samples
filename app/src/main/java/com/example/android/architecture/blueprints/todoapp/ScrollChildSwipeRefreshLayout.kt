@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
  * define which view controls this behavior.
  */
 class ScrollChildSwipeRefreshLayout @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : SwipeRefreshLayout(context, attrs) {
 
     var scrollUpChild: View? = null
 
     override fun canChildScrollUp() =
-            scrollUpChild?.canScrollVertically(-1) ?: super.canChildScrollUp()
+        scrollUpChild?.canScrollVertically(-1) ?: super.canChildScrollUp()
 }

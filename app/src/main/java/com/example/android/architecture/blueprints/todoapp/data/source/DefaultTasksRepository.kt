@@ -49,7 +49,6 @@ class DefaultTasksRepository(
         updateTasksFromRemoteDataSource()
     }
 
-
     override fun observeTasks(): LiveData<Result<List<Task>>> {
         return tasksLocalDataSource.observeTasks()
     }
@@ -136,7 +135,7 @@ class DefaultTasksRepository(
 //        }
     }
 
-    override suspend fun activateTask(taskId: String)  {
+    override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
             (getTaskWithId(taskId) as? Success)?.let { it ->
                 activateTask(it.data)

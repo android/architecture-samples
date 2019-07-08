@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ import java.util.UUID
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
-        @ColumnInfo(name = "title") var title: String = "",
-        @ColumnInfo(name = "description") var description: String = "",
-        @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
-        @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
+    @ColumnInfo(name = "title") var title: String = "",
+    @ColumnInfo(name = "description") var description: String = "",
+    @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+    @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 
     val titleForList: String

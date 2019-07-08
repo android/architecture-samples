@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,10 @@ class TasksFragment : Fragment() {
 
     private lateinit var listAdapter: TasksAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = viewModel
         }
@@ -99,10 +101,10 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.openTaskEvent?.observe(this, EventObserver {
+        viewModel.openTaskEvent.observe(this, EventObserver {
             openTaskDetails(it)
         })
-        viewModel.newTaskEvent?.observe(this, EventObserver {
+        viewModel.newTaskEvent.observe(this, EventObserver {
             navigateToAddNewTask()
         })
     }
@@ -144,8 +146,10 @@ class TasksFragment : Fragment() {
 
     private fun navigateToAddNewTask() {
         val action = TasksFragmentDirections
-            .actionTasksFragmentToAddEditTaskFragment(null,
-                resources.getString(R.string.add_task))
+            .actionTasksFragmentToAddEditTaskFragment(
+                null,
+                resources.getString(R.string.add_task)
+            )
         findNavController().navigate(action)
     }
 

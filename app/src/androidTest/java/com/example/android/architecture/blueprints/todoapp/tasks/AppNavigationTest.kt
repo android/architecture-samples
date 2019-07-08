@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,19 +186,19 @@ class AppNavigationTest {
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
-          withContentDescription(
-            activityScenario
-              .getToolbarNavigationContentDescription()
-          )
+            withContentDescription(
+                activityScenario
+                    .getToolbarNavigationContentDescription()
+            )
         ).perform(click())
         onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         onView(
-          withContentDescription(
-            activityScenario
-              .getToolbarNavigationContentDescription()
-          )
+            withContentDescription(
+                activityScenario
+                    .getToolbarNavigationContentDescription()
+            )
         ).perform(click())
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }

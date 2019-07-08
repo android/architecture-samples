@@ -20,6 +20,9 @@ import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 
+/**
+ * Interface to the data layer.
+ */
 interface TasksRepository {
 
     fun observeTasks(): LiveData<Result<List<Task>>>

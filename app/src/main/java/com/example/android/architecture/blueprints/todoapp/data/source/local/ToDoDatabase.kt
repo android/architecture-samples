@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 
 /**
  * The Room Database that contains the Task table.
+ *
+ * Note that exportSchema should be true in production databases.
  */
 @Database(entities = [Task::class], version = 1, exportSchema = false)
 abstract class ToDoDatabase : RoomDatabase() {

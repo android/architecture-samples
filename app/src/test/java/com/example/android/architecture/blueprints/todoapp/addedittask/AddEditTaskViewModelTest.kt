@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,8 @@ class AddEditTaskViewModelTest {
     var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
-    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     private val task = Task("Title1", "Description1")
 
@@ -117,6 +118,7 @@ class AddEditTaskViewModelTest {
     fun saveNewTaskToRepository_nullTitle_error() {
         saveTaskAndAssertSnackbarError(null, "Some Task Description")
     }
+
     @Test
     fun saveNewTaskToRepository_emptyDescription_error() {
         saveTaskAndAssertSnackbarError("Title", "")

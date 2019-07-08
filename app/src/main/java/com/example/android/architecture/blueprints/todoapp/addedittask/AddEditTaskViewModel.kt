@@ -29,11 +29,6 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the Add/Edit screen.
- *
- *
- * This ViewModel is different from TaskDetailViewModel in that it's not reacting to any data
- * changes. Data is loaded only once to fill the form so it's done with a one-shot operation using
- * the getTask method in the repository instead of observeTask.
  */
 class AddEditTaskViewModel(
     private val tasksRepository: TasksRepository
@@ -46,7 +41,7 @@ class AddEditTaskViewModel(
     val description = MutableLiveData<String>()
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> =_dataLoading
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
@@ -110,11 +105,11 @@ class AddEditTaskViewModel(
         val currentDescription = description.value
 
         if (currentTitle == null || currentDescription == null) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
+            _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
         if (Task(currentTitle, currentDescription).isEmpty) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
+            _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
 

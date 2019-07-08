@@ -98,6 +98,7 @@ object TasksRemoteDataSource : TasksDataSource {
         val newTask = Task(title, description)
         TASKS_SERVICE_DATA.put(newTask.id, newTask)
     }
+
     override suspend fun saveTask(task: Task) {
         TASKS_SERVICE_DATA.put(task.id, task)
     }

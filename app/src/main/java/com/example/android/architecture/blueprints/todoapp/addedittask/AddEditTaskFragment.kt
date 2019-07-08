@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,10 @@ class AddEditTaskFragment : Fragment() {
 
     private val viewModel by viewModels<AddEditTaskViewModel> { getVmFactory() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             this.viewmodel = viewModel

@@ -31,8 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import kotlinx.coroutines.launch
 
 /**
- * This ViewModel exposes a Task via a LiveData. When any of the initial parameters or the data in
- * the data layer change, the task will be updated automatically.
+ * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
     private val tasksRepository: TasksRepository
@@ -83,7 +82,7 @@ class TaskDetailViewModel(
         _editTaskCommand.value = Event(Unit)
     }
 
-        fun setCompleted(completed: Boolean) = viewModelScope.launch {
+    fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = _task.value ?: return@launch
         if (completed) {
             tasksRepository.completeTask(task)

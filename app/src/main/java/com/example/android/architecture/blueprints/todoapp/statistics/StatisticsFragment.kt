@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,14 @@ class StatisticsFragment : Fragment() {
 
     private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
-        viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
-                false)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewDataBinding = DataBindingUtil.inflate(
+            inflater, R.layout.statistics_frag, container,
+            false
+        )
         return viewDataBinding.root
     }
 

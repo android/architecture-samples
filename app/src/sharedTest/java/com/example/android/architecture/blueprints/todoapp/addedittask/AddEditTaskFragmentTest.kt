@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,8 +73,10 @@ class AddEditTaskFragmentTest {
     @Test
     fun emptyTask_isNotSaved() {
         // GIVEN - On the "Add Task" screen.
-        val bundle = AddEditTaskFragmentArgs(null,
-            getApplicationContext<Context>().getString(R.string.add_task)).toBundle()
+        val bundle = AddEditTaskFragmentArgs(
+            null,
+            getApplicationContext<Context>().getString(R.string.add_task)
+        ).toBundle()
         launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
 
         // WHEN - Enter invalid title and description combination and click save
@@ -100,12 +102,15 @@ class AddEditTaskFragmentTest {
         // THEN - Verify that we navigated back to the tasks screen.
         verify(navController).navigate(
             AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK))
+                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
+        )
     }
 
     private fun launchFragment(navController: NavController?) {
-        val bundle = AddEditTaskFragmentArgs(null,
-            getApplicationContext<Context>().getString(R.string.add_task)).toBundle()
+        val bundle = AddEditTaskFragmentArgs(
+            null,
+            getApplicationContext<Context>().getString(R.string.add_task)
+        ).toBundle()
         val scenario = launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)

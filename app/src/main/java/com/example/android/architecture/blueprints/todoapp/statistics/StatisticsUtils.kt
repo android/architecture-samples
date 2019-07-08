@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ internal fun getActiveAndCompletedStats(tasks: List<Task>?): StatsResult {
         val totalTasks = tasks.size
         val numberOfActiveTasks = tasks.count { it.isActive }
         StatsResult(
-            activeTasksPercent =  100f * numberOfActiveTasks / tasks.size,
+            activeTasksPercent = 100f * numberOfActiveTasks / tasks.size,
             completedTasksPercent = 100f * (totalTasks - numberOfActiveTasks) / tasks.size
         )
     }

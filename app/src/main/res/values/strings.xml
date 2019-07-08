@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright 2017, The Android Open Source Project
+  ~ Copyright (C) 2019 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -56,6 +56,6 @@
     <string name="refresh">Refresh</string>
     <string name="successfully_deleted_task_message">Task was deleted</string>
     <string name="successfully_added_task_message">Task added</string>
-    <string name="no_data_description"/>
+    <string name="no_data_description" />
 
 </resources>

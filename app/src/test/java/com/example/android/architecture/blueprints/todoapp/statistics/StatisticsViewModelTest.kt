@@ -105,7 +105,7 @@ class StatisticsViewModelTest {
             // Then an error message is shown
             assertThat(LiveDataTestUtil.getValue(errorViewModel.empty)).isTrue()
             assertThat(LiveDataTestUtil.getValue(errorViewModel.error)).isTrue()
-    }
+        }
 
     @Test
     fun loadTasks_loading() {
