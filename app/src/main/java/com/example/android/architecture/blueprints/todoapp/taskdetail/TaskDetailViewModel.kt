@@ -31,8 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdli
 import kotlinx.coroutines.launch
 
 /**
- * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
- * Fragment's actions listener.
+ * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
     private val tasksRepository: TasksRepository
