@@ -71,10 +71,6 @@ git checkout usecases
 
 Finally open the `android-architecture/` directory in Android Studio.
 
-## Contributors
-
-This project is **built by the community**, and curated by Google as well as other core [maintainers](https://github.com/googlesamples/android-architecture/wiki/Contributors).
-
 ### License
 
 
