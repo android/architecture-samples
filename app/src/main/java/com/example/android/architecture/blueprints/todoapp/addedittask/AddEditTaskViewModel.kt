@@ -30,12 +30,6 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the Add/Edit screen.
- *
- *
- * This ViewModel only exposes [ObservableField]s, so it doesn't need to extend
- * [androidx.databinding.BaseObservable] and updates are notified automatically. See
- * [com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel] for
- * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
     private val getTaskUseCase: GetTaskUseCase,

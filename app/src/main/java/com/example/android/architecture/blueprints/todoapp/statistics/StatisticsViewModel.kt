@@ -27,13 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdli
 import kotlinx.coroutines.launch
 
 /**
- * Exposes the data to be used in the statistics screen.
- *
- *
- * This ViewModel uses both [ObservableField]s ([ObservableBoolean]s in this case) and
- * [Bindable] getters. The values in [ObservableField]s are used directly in the layout,
- * whereas the [Bindable] getters allow us to add some logic to it. This is
- * preferable to having logic in the XML layout.
+ * ViewModel for the statistics screen.
  */
 class StatisticsViewModel(
     private val getTasksUseCase: GetTasksUseCase
