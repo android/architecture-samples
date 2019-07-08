@@ -3,10 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 android {
     compileSdkVersion rootProject.compileSdkVersion
 
