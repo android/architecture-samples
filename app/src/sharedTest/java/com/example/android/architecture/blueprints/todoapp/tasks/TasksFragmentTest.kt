@@ -22,6 +22,8 @@ import android.view.View
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -85,7 +87,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
         // WHEN - On startup
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // THEN - Verify task is displayed on screen
         onView(withText("TITLE1")).check(matches(isDisplayed()))
@@ -95,7 +97,7 @@ class TasksFragmentTest {
     fun displayActiveTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         onView(withText("TITLE1")).check(matches(isDisplayed()))
 
@@ -112,7 +114,7 @@ class TasksFragmentTest {
     fun displayCompletedTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         onView(withText("TITLE1")).check(matches(isDisplayed()))
 
@@ -129,7 +131,7 @@ class TasksFragmentTest {
     fun deleteOneTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -148,7 +150,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -168,7 +170,7 @@ class TasksFragmentTest {
     fun markTaskAsComplete() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Mark the task as complete
         onView(checkboxWithText("TITLE1")).perform(click())
@@ -189,7 +191,7 @@ class TasksFragmentTest {
     fun markTaskAsActive() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Mark the task as active
         onView(checkboxWithText("TITLE1")).perform(click())
@@ -212,7 +214,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Verify that both of our tasks are shown
         onView(withId(R.id.menu_filter)).perform(click())
@@ -228,7 +230,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
         repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Verify that the active tasks (but not the completed task) are shown
         onView(withId(R.id.menu_filter)).perform(click())
@@ -245,7 +247,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
         repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Verify that the completed tasks (but not the active task) are shown
         onView(withId(R.id.menu_filter)).perform(click())
@@ -261,7 +263,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
 
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         // Click clear completed in menu
         openActionBarOverflowOrOptionsMenu(getApplicationContext())
@@ -276,7 +278,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
@@ -287,7 +289,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
@@ -298,7 +300,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
-        launch(TasksActivity::class.java)
+        launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
@@ -323,6 +325,15 @@ class TasksFragmentTest {
         verify(navController).navigate(
           TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
             null, getApplicationContext<Context>().getString(R.string.add_task)))
+    }
+
+    private fun launchActivity(): ActivityScenario<TasksActivity>? {
+        val activityScenario = launch(TasksActivity::class.java)
+        activityScenario.onActivity { activity ->
+            // Disable animations in RecyclerView
+            (activity.findViewById(R.id.tasks_list) as RecyclerView).itemAnimator = null
+        }
+        return activityScenario
     }
 
     private fun checkboxWithText(text: String) : Matcher<View> {
