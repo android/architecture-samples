@@ -30,4 +30,3 @@ interface ApplicationComponent : AndroidInjector<TodoApplication> {
         fun create(@BindsInstance applicationContext: Context): ApplicationComponent
     }
 }
-

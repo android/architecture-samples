@@ -184,9 +184,7 @@ class TasksViewModelTest {
     @Test
     fun showEditResultMessages_editOk_snackbarUpdated() {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(
-            EDIT_RESULT_OK
-        )
+        tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
 
         // The snackbar is updated
         assertSnackbarMessage(
@@ -196,9 +194,7 @@ class TasksViewModelTest {
     @Test
     fun showEditResultMessages_addOk_snackbarUpdated() {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(
-            ADD_EDIT_RESULT_OK
-        )
+        tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
 
         // The snackbar is updated
         assertSnackbarMessage(
@@ -208,9 +204,7 @@ class TasksViewModelTest {
     @Test
     fun showEditResultMessages_deleteOk_snackbarUpdated() {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(
-            DELETE_RESULT_OK
-        )
+        tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         // The snackbar is updated
         assertSnackbarMessage(

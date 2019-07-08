@@ -73,9 +73,7 @@ class AddEditTaskFragment : DaggerFragment() {
     private fun setupNavigation() {
         viewModel.taskUpdatedEvent.observe(this, EventObserver {
             val action = AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(
-                    ADD_EDIT_RESULT_OK
-                )
+                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
     }

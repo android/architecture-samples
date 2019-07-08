@@ -60,9 +60,7 @@ class TaskDetailFragment : DaggerFragment() {
     private fun setupNavigation() {
         viewModel.deleteTaskCommand.observe(this, EventObserver {
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToTasksFragment(
-                    DELETE_RESULT_OK
-                )
+                .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
             findNavController().navigate(action)
         })
         viewModel.editTaskCommand.observe(this, EventObserver {
@@ -89,6 +87,7 @@ class TaskDetailFragment : DaggerFragment() {
             viewmodel = viewModel
         }
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+
         viewModel.start(args.taskId)
 
         setHasOptionsMenu(true)

@@ -104,9 +104,7 @@ class AddEditTaskFragmentTest {
         // THEN - Verify that we navigated back to the tasks screen.
         verify(navController).navigate(
             AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(
-                    ADD_EDIT_RESULT_OK
-                ))
+                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK))
     }
 
     private fun launchFragment(navController: NavController?) {
