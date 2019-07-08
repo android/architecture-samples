@@ -23,13 +23,13 @@ This project hosts each sample app in separate repository branches. For more inf
 | ------------- | ------------- |
 | [master](/) | The base for the rest of the branches. Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. |
 | [dagger](tree/dagger/) | A simple Dagger setup that gets rid of the two product flavors for testing. |
-| [usecases](tree/usecases/) | Adds a new domain layer that uses UseCases for business logic |
+| [usecases](tree/usecases/) | Adds a new domain layer that uses UseCases for business logic. |
 
 ### Samples in progress - Kotlin
 
 | Sample | Description |
 | ------------- | ------------- |
-| [reactive](tree/dagger/) | Modifies the data layer so UIs can react to changes automatically using Room as source of truth |
+| [reactive](tree/dagger/) | Modifies the data layer so UIs can react to changes automatically using Room as source of truth. |
 
 ### Old samples - Kotlin and Java
 
@@ -49,8 +49,8 @@ The app in this project aims to be simple enough that you can understand it quic
 
 ## Who is it for?
 
-*   Intermediate developers and beginners looking for a way to structure their app in a testable and maintainable way
-*   Advanced developers looking for quick reference
+*   Intermediate developers and beginners looking for a way to structure their app in a testable and maintainable way.
+*   Advanced developers looking for quick reference.
 
 ## Opening a sample in Android Studio
 
@@ -61,8 +61,8 @@ Clone the repository:
 ```
 git clone git@github.com:googlesamples/android-architecture.git
 ```
+This also checks out the master branch. If you want to change to a different sample: 
 
-Checkout the todo-mvp sample:
 ```
 git checkout usecases
 ```
