@@ -11,7 +11,7 @@ In this branch you'll find:
 *   A presentation layer that contains a fragment (View) and a **ViewModel** per screen (or feature).
 *   Reactive UIs using **LiveData** observables and **Data Binding**.
 *   A **data layer** with a repository and two data sources (local using Room and remote) that are queried with one-shot operations (no listeners or data streams).
-*   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html) (except in the Dagger branch)
+*   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html) (except in the Dagger branch).
 *   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device or Robolectric.
 
 ## Variations
@@ -22,7 +22,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | Sample | Description |
 | ------------- | ------------- |
 | [master](/) | The base for the rest of the branches. Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. |
-| [dagger](tree/dagger/) | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
+| [dagger-android](tree/dagger-android/) | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
 | [usecases](tree/usecases/) | Adds a new domain layer that uses UseCases for business logic. |
 
 ### Samples in development - Kotlin
