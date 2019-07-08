@@ -180,8 +180,10 @@ class TasksActivityTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(
-            activityScenario.getToolbarNavigationContentDescription())
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
         ).perform(click())
 
         // Check that the task is marked as completed
@@ -205,8 +207,10 @@ class TasksActivityTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(
-            activityScenario.getToolbarNavigationContentDescription())
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
         ).perform(click())
 
         // Check that the task is marked as active
@@ -232,8 +236,10 @@ class TasksActivityTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(
-            activityScenario.getToolbarNavigationContentDescription())
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
         ).perform(click())
 
         // Check that the task is marked as active
@@ -259,8 +265,10 @@ class TasksActivityTest {
         onView(withId(R.id.task_detail_complete)).perform(click())
 
         // Click on the navigation up button to go back to the list
-        onView(withContentDescription(
-            activityScenario.getToolbarNavigationContentDescription())
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
         ).perform(click())
 
         // Check that the task is marked as active

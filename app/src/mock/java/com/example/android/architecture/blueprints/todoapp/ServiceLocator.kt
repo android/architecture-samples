@@ -33,19 +33,21 @@ object ServiceLocator {
 
     private val lock = Any()
     private var database: ToDoDatabase? = null
-    @Volatile var tasksRepository: TasksRepository? = null
+    @Volatile
+    var tasksRepository: TasksRepository? = null
         @VisibleForTesting set
 
     fun provideTasksRepository(context: Context): TasksRepository {
         synchronized(this) {
-            return tasksRepository ?:
-                tasksRepository ?: createTasksRepository(context)
+            return tasksRepository ?: tasksRepository ?: createTasksRepository(context)
         }
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        database = Room.databaseBuilder(context.applicationContext,
-            ToDoDatabase::class.java, "Tasks.db")
+        database = Room.databaseBuilder(
+            context.applicationContext,
+            ToDoDatabase::class.java, "Tasks.db"
+        )
             .build()
 
         return DefaultTasksRepository(

@@ -61,8 +61,10 @@ class TasksLocalDataSourceTest {
     @Before
     fun setup() {
         // using an in-memory database for testing, since it doesn't survive killing the process
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
-            ToDoDatabase::class.java)
+        database = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            ToDoDatabase::class.java
+        )
             .allowMainThreadQueries()
             .build()
 

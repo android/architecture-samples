@@ -38,7 +38,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  * actually necessary in this case, as the product ID can be passed in a public method.
  */
 class ViewModelFactory constructor(
-        private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =

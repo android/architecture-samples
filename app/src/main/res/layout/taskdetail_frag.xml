@@ -14,17 +14,17 @@
   ~ limitations under the License.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <import type="android.widget.CompoundButton" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/no_data"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}"/>
+                        android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}" />
                 </LinearLayout>
 
                 <RelativeLayout
@@ -87,7 +87,7 @@
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
                         android:checked="@{viewmodel.completed}"
                         android:onClick="@{(view) -> viewmodel.setCompleted(((CompoundButton)view).isChecked())}"
-                        android:paddingTop="1dp"/>
+                        android:paddingTop="1dp" />
 
                     <TextView
                         android:id="@+id/task_detail_title"
@@ -96,7 +96,7 @@
                         android:layout_toRightOf="@id/task_detail_complete"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.title}"
-                        android:textAppearance="?android:attr/textAppearanceLarge"/>
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
                         android:id="@+id/task_detail_description"
@@ -106,7 +106,7 @@
                         android:layout_toRightOf="@id/task_detail_complete"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.description}"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -120,7 +120,7 @@
             android:src="@drawable/ic_edit"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"
-            app:layout_anchorGravity="bottom|right|end"/>
+            app:layout_anchorGravity="bottom|right|end" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

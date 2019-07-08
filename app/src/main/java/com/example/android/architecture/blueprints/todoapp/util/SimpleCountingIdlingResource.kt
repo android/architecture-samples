@@ -34,7 +34,8 @@ class SimpleCountingIdlingResource(private val resourceName: String) : IdlingRes
     private val counter = AtomicInteger(0)
 
     // written from main thread, read from any thread.
-    @Volatile private var resourceCallback: IdlingResource.ResourceCallback? = null
+    @Volatile
+    private var resourceCallback: IdlingResource.ResourceCallback? = null
 
     override fun getName() = resourceName
 

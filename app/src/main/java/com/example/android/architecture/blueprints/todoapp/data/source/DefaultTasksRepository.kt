@@ -182,7 +182,7 @@ class DefaultTasksRepository(
         }
     }
 
-    override suspend fun activateTask(taskId: String)  {
+    override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
             getTaskWithId(taskId)?.let {
                 activateTask(it)
