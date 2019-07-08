@@ -5,7 +5,7 @@
 
 Android Architecture Blueprints is a project to showcase different architectural approaches to developing Android apps. In its different branches you'll find the same app (a TODO app) implemented with small differences.
 
-In this master branch you'll find:
+In this branch you'll find:
 *   Kotlin **[Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html)** for background operations.
 *   A single-activity architecture, using the **[Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)** to manage fragment operations.
 *   A presentation layer that contains a fragment (View) and a **ViewModel** per screen (or feature).
