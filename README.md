@@ -22,10 +22,10 @@ This project hosts each sample app in separate repository branches. For more inf
 | Sample | Description |
 | ------------- | ------------- |
 | [master](/) | The base for the rest of the branches. Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. |
-| [dagger](tree/dagger/) | A simple Dagger setup that gets rid of the two product flavors for testing. |
+| [dagger](tree/dagger/) | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
 | [usecases](tree/usecases/) | Adds a new domain layer that uses UseCases for business logic. |
 
-### Samples in progress - Kotlin
+### Samples in development - Kotlin
 
 | Sample | Description |
 | ------------- | ------------- |
@@ -61,7 +61,7 @@ Clone the repository:
 ```
 git clone git@github.com:googlesamples/android-architecture.git
 ```
-This also checks out the master branch. If you want to change to a different sample: 
+This step checks out the master branch. If you want to change to a different sample: 
 
 ```
 git checkout usecases
