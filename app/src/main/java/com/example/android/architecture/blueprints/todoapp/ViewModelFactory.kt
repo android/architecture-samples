@@ -31,16 +31,13 @@ import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetail
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 
 /**
- * A creator is used to inject the product ID into the ViewModel
- *
- *
- * This creator is to showcase how to inject dependencies into ViewModels. It's not
- * actually necessary in this case, as the product ID can be passed in a public method.
+ * Factory for all ViewModels.
  */
+@Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModelProvider.NewInstanceFactory() {
-
+git
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
