@@ -45,11 +45,10 @@ import javax.inject.Inject
  */
 class TasksFragment : DaggerFragment() {
 
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel by viewModels<TasksViewModel> { viewModelFactory}
+    private val viewModel by viewModels<TasksViewModel> { viewModelFactory }
 
     private val args: TasksFragmentArgs by navArgs()
 
