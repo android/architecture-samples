@@ -34,12 +34,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 /**
- * Exposes the data to be used in the task list screen.
- *
- *
- * [BaseObservable] implements a listener registration mechanism which is notified when a
- * property changes. This is done by assigning a [Bindable] annotation to the property's
- * getter method.
+ * ViewModel for the task list screen.
  */
 class TasksViewModel @Inject constructor(
     private val tasksRepository: TasksRepository

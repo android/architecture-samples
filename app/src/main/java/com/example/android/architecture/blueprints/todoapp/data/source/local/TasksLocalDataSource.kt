@@ -62,8 +62,7 @@ class TasksLocalDataSource internal constructor(
     }
 
     override suspend fun completeTask(taskId: String) {
-        // Not required for the local data source because the {@link DefaultTasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+        tasksDao.updateCompleted(taskId, true)
     }
 
     override suspend fun activateTask(task: Task) = withContext(ioDispatcher) {
@@ -71,8 +70,7 @@ class TasksLocalDataSource internal constructor(
     }
 
     override suspend fun activateTask(taskId: String) {
-        // Not required for the local data source because the {@link DefaultTasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+        tasksDao.updateCompleted(taskId, false)
     }
 
     override suspend fun clearCompletedTasks() = withContext<Unit>(ioDispatcher) {
