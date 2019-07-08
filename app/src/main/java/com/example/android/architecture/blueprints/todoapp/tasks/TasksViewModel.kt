@@ -96,22 +96,30 @@ class TasksViewModel @Inject constructor(
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         when (requestType) {
             TasksFilterType.ALL_TASKS -> {
-                setFilter(R.string.label_all, R.string.no_tasks_all,
-                    R.drawable.logo_no_fill, true)
+                setFilter(
+                    R.string.label_all, R.string.no_tasks_all,
+                    R.drawable.logo_no_fill, true
+                )
             }
             TasksFilterType.ACTIVE_TASKS -> {
-                setFilter(R.string.label_active, R.string.no_tasks_active,
-                    R.drawable.ic_check_circle_96dp, false)
+                setFilter(
+                    R.string.label_active, R.string.no_tasks_active,
+                    R.drawable.ic_check_circle_96dp, false
+                )
             }
             TasksFilterType.COMPLETED_TASKS -> {
-                setFilter(R.string.label_completed, R.string.no_tasks_completed,
-                    R.drawable.ic_verified_user_96dp, false)
+                setFilter(
+                    R.string.label_completed, R.string.no_tasks_completed,
+                    R.drawable.ic_verified_user_96dp, false
+                )
             }
         }
     }
 
-    private fun setFilter(@StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
-            @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean) {
+    private fun setFilter(
+        @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
+        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
+    ) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
         _noTaskIconRes.value = noTaskIconDrawable

@@ -46,7 +46,8 @@ class AddEditTaskViewModelTest {
     var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
-    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     private val task = Task("Title1", "Description1")
 
@@ -117,6 +118,7 @@ class AddEditTaskViewModelTest {
     fun saveNewTaskToRepository_nullTitle_error() {
         saveTaskAndAssertSnackbarError(null, "Some Task Description")
     }
+
     @Test
     fun saveNewTaskToRepository_emptyDescription_error() {
         saveTaskAndAssertSnackbarError("Title", "")

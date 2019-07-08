@@ -42,7 +42,7 @@ class AddEditTaskViewModel @Inject constructor(
     val description = MutableLiveData<String>()
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> =_dataLoading
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
@@ -106,11 +106,11 @@ class AddEditTaskViewModel @Inject constructor(
         val currentDescription = description.value
 
         if (currentTitle == null || currentDescription == null) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
+            _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
         if (Task(currentTitle, currentDescription).isEmpty) {
-            _snackbarText.value =  Event(R.string.empty_task_message)
+            _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
 

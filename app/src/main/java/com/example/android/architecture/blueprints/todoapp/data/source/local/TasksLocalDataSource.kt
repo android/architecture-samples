@@ -28,14 +28,14 @@ import kotlinx.coroutines.withContext
  * Concrete implementation of a data source as a db.
  */
 class TasksLocalDataSource internal constructor(
-        private val tasksDao: TasksDao,
+    private val tasksDao: TasksDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksDataSource {
 
     override suspend fun getTasks(): Result<List<Task>> = withContext(ioDispatcher) {
         return@withContext try {
             Success(tasksDao.getTasks())
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Error(e)
         }
     }

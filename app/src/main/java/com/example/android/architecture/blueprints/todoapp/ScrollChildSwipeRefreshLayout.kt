@@ -29,12 +29,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
  * define which view controls this behavior.
  */
 class ScrollChildSwipeRefreshLayout @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : SwipeRefreshLayout(context, attrs) {
 
     var scrollUpChild: View? = null
 
     override fun canChildScrollUp() =
-            scrollUpChild?.canScrollVertically(-1) ?: super.canChildScrollUp()
+        scrollUpChild?.canScrollVertically(-1) ?: super.canChildScrollUp()
 }

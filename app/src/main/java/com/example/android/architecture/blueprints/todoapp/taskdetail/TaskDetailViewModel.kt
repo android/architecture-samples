@@ -76,7 +76,7 @@ class TaskDetailViewModel @Inject constructor(
         _editTaskCommand.value = Event(Unit)
     }
 
-        fun setCompleted(completed: Boolean) = viewModelScope.launch {
+    fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = _task.value ?: return@launch
         if (completed) {
             tasksRepository.completeTask(task)

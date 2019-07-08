@@ -192,19 +192,19 @@ class AppNavigationTest {
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
-          withContentDescription(
-            activityScenario
-              .getToolbarNavigationContentDescription()
-          )
+            withContentDescription(
+                activityScenario
+                    .getToolbarNavigationContentDescription()
+            )
         ).perform(click())
         onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         onView(
-          withContentDescription(
-            activityScenario
-              .getToolbarNavigationContentDescription()
-          )
+            withContentDescription(
+                activityScenario
+                    .getToolbarNavigationContentDescription()
+            )
         ).perform(click())
         onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
     }

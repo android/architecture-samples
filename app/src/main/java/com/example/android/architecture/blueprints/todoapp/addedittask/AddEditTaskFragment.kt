@@ -47,8 +47,10 @@ class AddEditTaskFragment : DaggerFragment() {
 
     private val viewModel by viewModels<AddEditTaskViewModel> { viewModelFactory }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             this.viewmodel = viewModel

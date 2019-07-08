@@ -326,8 +326,10 @@ class TasksFragmentTest {
 
         // THEN - Verify that we navigate to the add screen
         verify(navController).navigate(
-          TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
-            null, getApplicationContext<Context>().getString(R.string.add_task)))
+            TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
+                null, getApplicationContext<Context>().getString(R.string.add_task)
+            )
+        )
     }
 
     private fun launchActivity(): ActivityScenario<TasksActivity>? {
@@ -339,7 +341,7 @@ class TasksFragmentTest {
         return activityScenario
     }
 
-    private fun checkboxWithText(text: String) : Matcher<View> {
+    private fun checkboxWithText(text: String): Matcher<View> {
         return allOf(withId(R.id.complete), hasSibling(withText(text)))
     }
 }
