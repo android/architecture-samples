@@ -21,15 +21,15 @@ This project hosts each sample app in separate repository branches. For more inf
 ### Stable samples - Kotlin
 | Sample | Description |
 | ------------- | ------------- |
-| [master](/) | The base for the rest of the branches. Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. |
-| [dagger-android](tree/dagger-android/) | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
-| [usecases](tree/usecases/) | Adds a new domain layer that uses UseCases for business logic. |
+| [master](https://github.com/googlesamples/android-architecture/tree/master) | The base for the rest of the branches. Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. |
+| [dagger-android](https://github.com/googlesamples/android-architecture/tree/dagger-android) | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
+| [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic. |
 
 ### Samples in development - Kotlin
 
 | Sample | Description |
 | ------------- | ------------- |
-| [reactive](tree/dagger/) | Modifies the data layer so UIs can react to changes automatically using Room as source of truth. |
+| [reactive](https://github.com/googlesamples/android-architecture/tree/reactive) | Modifies the data layer so UIs react to changes automatically using Room as source of truth. |
 
 ### Old samples - Kotlin and Java
 
