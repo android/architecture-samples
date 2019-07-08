@@ -37,7 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 class ViewModelFactory constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModelProvider.NewInstanceFactory() {
-git
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
