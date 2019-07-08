@@ -46,7 +46,8 @@ class TaskDetailViewModelTest {
     var mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
-    @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     val task = Task("Title1", "Description1")
 

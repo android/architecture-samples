@@ -32,7 +32,7 @@
             app:argType="string" />
         <action
             android:id="@+id/action_taskDetailFragment_to_tasksFragment"
-            app:destination="@id/tasksFragment"/>
+            app:destination="@id/tasksFragment" />
     </fragment>
     <fragment
         android:id="@+id/statisticsFragment"
@@ -41,7 +41,7 @@
         <action
             android:id="@+id/action_statisticsFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
-            app:popUpTo="@+id/tasksFragment"/>
+            app:popUpTo="@+id/tasksFragment" />
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
@@ -55,30 +55,30 @@
             app:destination="@id/taskDetailFragment" />
         <action
             android:id="@+id/action_tasksFragment_to_addEditTaskFragment"
-            app:destination="@id/addEditTaskFragment"/>
+            app:destination="@id/addEditTaskFragment" />
         <argument
             android:name="userMessage"
             app:argType="integer"
-            android:defaultValue="0"/>
+            android:defaultValue="0" />
     </fragment>
     <fragment
         android:id="@+id/addEditTaskFragment"
         android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment"
-        android:label="{title}" >
+        android:label="{title}">
         <argument
             android:name="taskId"
             app:argType="string"
-            app:nullable="true"/>
+            app:nullable="true" />
         <argument
             android:name="title"
             app:argType="string"
-            app:nullable="false"/>
+            app:nullable="false" />
         <action
             android:id="@+id/action_addEditTaskFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
-            app:popUpTo="@+id/tasksFragment"/>
+            app:popUpTo="@+id/tasksFragment" />
     </fragment>
     <argument
         android:name="userMessage"
-        android:defaultValue="0"/>
+        android:defaultValue="0" />
 </navigation>

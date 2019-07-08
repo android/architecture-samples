@@ -56,6 +56,6 @@
     <string name="refresh">Refresh</string>
     <string name="successfully_deleted_task_message">Task was deleted</string>
     <string name="successfully_added_task_message">Task added</string>
-    <string name="no_data_description"/>
+    <string name="no_data_description" />
 
 </resources>

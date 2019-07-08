@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android" >
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -25,7 +25,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
     </data>
 
     <LinearLayout
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}"
-            android:checked="@{task.completed}"/>
+            android:checked="@{task.completed}" />
 
         <TextView
             android:id="@+id/title"

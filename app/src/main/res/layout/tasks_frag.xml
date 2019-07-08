@@ -14,17 +14,17 @@
   ~ limitations under the License.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
-        <import type="androidx.core.content.ContextCompat"/>
+        <import type="androidx.core.content.ContextCompat" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
 
     </data>
 
@@ -66,14 +66,14 @@
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:gravity="center_vertical"
                         android:text="@{context.getString(viewmodel.currentFilteringLabel)}"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/tasks_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:items="@{viewmodel.items}"/>
+                        app:items="@{viewmodel.items}" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -89,7 +89,7 @@
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:layout_gravity="center"
-                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}"/>
+                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}" />
 
                     <TextView
                         android:id="@+id/noTasksMain"
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginBottom="@dimen/list_item_padding"
-                        android:text="@{context.getString(viewmodel.noTasksLabel)}"/>
+                        android:text="@{context.getString(viewmodel.noTasksLabel)}" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -111,7 +111,7 @@
             android:src="@drawable/ic_add"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"
-            app:layout_anchorGravity="bottom|right|end"/>
+            app:layout_anchorGravity="bottom|right|end" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
 

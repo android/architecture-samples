@@ -15,15 +15,15 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -62,7 +62,7 @@
                         android:maxLines="1"
                         android:text="@={viewmodel.title}"
                         android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <EditText
                         android:id="@+id/add_task_description"
@@ -72,7 +72,7 @@
                         android:gravity="top"
                         android:hint="@string/description_hint"
                         android:imeOptions="flagNoExtractUi"
-                        android:text="@={viewmodel.description}"/>
+                        android:text="@={viewmodel.description}" />
 
                 </LinearLayout>
             </ScrollView>
@@ -87,6 +87,6 @@
             android:onClick="@{() -> viewmodel.saveTask()}"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"
-            app:layout_anchorGravity="bottom|right|end"/>
+            app:layout_anchorGravity="bottom|right|end" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
