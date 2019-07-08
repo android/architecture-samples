@@ -31,10 +31,10 @@ import java.util.UUID
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
-        @ColumnInfo(name = "title") var title: String = "",
-        @ColumnInfo(name = "description") var description: String = "",
-        @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
-        @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
+    @ColumnInfo(name = "title") var title: String = "",
+    @ColumnInfo(name = "description") var description: String = "",
+    @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+    @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 
     val titleForList: String

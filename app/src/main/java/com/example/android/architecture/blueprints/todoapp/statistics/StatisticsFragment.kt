@@ -37,9 +37,9 @@ class StatisticsFragment : Fragment() {
     private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View? {
         viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
-                false)
+            false)
         return viewDataBinding.root
     }
 

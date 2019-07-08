@@ -45,34 +45,34 @@ class DefaultTasksRepository(
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
 
-       wrapEspressoIdlingResource {
+        wrapEspressoIdlingResource {
 
-           return withContext(ioDispatcher) {
-               // Respond immediately with cache if available and not dirty
-               if (!forceUpdate) {
-                   cachedTasks?.let { cachedTasks ->
-                       return@withContext Success(cachedTasks.values.sortedBy { it.id })
-                   }
-               }
+            return withContext(ioDispatcher) {
+                // Respond immediately with cache if available and not dirty
+                if (!forceUpdate) {
+                    cachedTasks?.let { cachedTasks ->
+                        return@withContext Success(cachedTasks.values.sortedBy { it.id })
+                    }
+                }
 
-               val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
+                val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
 
-               // Refresh the cache with the new tasks
-               (newTasks as? Success)?.let { refreshCache(it.data) }
+                // Refresh the cache with the new tasks
+                (newTasks as? Success)?.let { refreshCache(it.data) }
 
-               cachedTasks?.values?.let { tasks ->
-                   return@withContext Result.Success(tasks.sortedBy { it.id })
-               }
+                cachedTasks?.values?.let { tasks ->
+                    return@withContext Result.Success(tasks.sortedBy { it.id })
+                }
 
-               (newTasks as? Success)?.let {
-                   if (it.data.isEmpty()) {
-                       return@withContext Result.Success(it.data)
-                   }
-               }
+                (newTasks as? Success)?.let {
+                    if (it.data.isEmpty()) {
+                        return@withContext Result.Success(it.data)
+                    }
+                }
 
-               return@withContext Result.Error(Exception("Illegal state"))
-           }
-       }
+                return@withContext Result.Error(Exception("Illegal state"))
+            }
+        }
     }
 
     private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
@@ -191,7 +191,7 @@ class DefaultTasksRepository(
         }
     }
 
-    override suspend fun activateTask(taskId: String)  {
+    override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
             getTaskWithId(taskId)?.let {
                 activateTask(it)

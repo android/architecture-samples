@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  */
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
-        private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
