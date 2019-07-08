@@ -28,6 +28,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.android.architecture.blueprints.todoapp.R
 import com.google.android.material.navigation.NavigationView
 
+/**
+ * Main activity for the todoapp. Holds the Navigation Host Fragment and the Drawer, Toolbar, etc.
+ */
 class TasksActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
@@ -39,18 +42,19 @@ class TasksActivity : AppCompatActivity() {
         setupNavigationDrawer()
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        val navController : NavController = findNavController(R.id.nav_host_fragment)
+        val navController: NavController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration =
             AppBarConfiguration.Builder(R.id.tasksFragment, R.id.statisticsFragment)
                 .setDrawerLayout(drawerLayout)
                 .build()
         setupActionBarWithNavController(navController, appBarConfiguration)
         findViewById<NavigationView>(R.id.nav_view)
-          .setupWithNavController(navController)
+            .setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
+            || super.onSupportNavigateUp()
     }
 
     private fun setupNavigationDrawer() {

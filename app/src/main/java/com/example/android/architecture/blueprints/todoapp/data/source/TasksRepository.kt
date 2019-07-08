@@ -19,6 +19,9 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 
+/**
+ * Interface to the data layer.
+ */
 interface TasksRepository {
 
     suspend fun getTasks(forceUpdate: Boolean = false): Result<List<Task>>
