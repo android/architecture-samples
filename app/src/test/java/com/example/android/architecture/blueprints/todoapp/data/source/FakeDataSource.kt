@@ -21,9 +21,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 
-class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) :
-    TasksDataSource {
-
+class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDataSource {
     override suspend fun getTasks(): Result<List<Task>> {
         tasks?.let { return Success(it) }
         return Error(
@@ -63,7 +61,7 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) :
     }
 
     override suspend fun deleteAllTasks() {
-        tasks = mutableListOf()
+        tasks?.clear()
     }
 
     override suspend fun deleteTask(taskId: String) {
