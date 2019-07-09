@@ -31,7 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 interface TasksDao {
 
     /**
-     * Observes list of tasks. Not using the Paging library for simplicity.
+     * Observes list of tasks.
      *
      * @return all tasks.
      */

@@ -17,8 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.FakeFailingTasksRemoteDataSource
-import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
+import com.example.android.architecture.blueprints.todoapp.awaitNextValue
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
@@ -64,7 +64,7 @@ class StatisticsViewModelTest {
         statisticsViewModel.start()
 
         // Then the results are empty
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty)).isTrue()
+        assertThat(statisticsViewModel.empty.awaitNextValue()).isTrue()
     }
 
     @Test
@@ -80,11 +80,11 @@ class StatisticsViewModelTest {
         statisticsViewModel.start()
 
         // Then the results are not empty
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.empty))
+        assertThat(statisticsViewModel.empty.awaitNextValue())
             .isFalse()
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.activeTasksPercent))
+        assertThat(statisticsViewModel.activeTasksPercent.awaitNextValue())
             .isEqualTo(25f)
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.completedTasksPercent))
+        assertThat(statisticsViewModel.completedTasksPercent.awaitNextValue())
             .isEqualTo(75f)
     }
 
@@ -103,8 +103,8 @@ class StatisticsViewModelTest {
             errorViewModel.start()
 
             // Then an error message is shown
-            assertThat(LiveDataTestUtil.getValue(errorViewModel.empty)).isTrue()
-            assertThat(LiveDataTestUtil.getValue(errorViewModel.error)).isTrue()
+            assertThat(errorViewModel.empty.awaitNextValue()).isTrue()
+            assertThat(errorViewModel.error.awaitNextValue()).isTrue()
         }
 
     @Test
@@ -116,12 +116,12 @@ class StatisticsViewModelTest {
         statisticsViewModel.start()
 
         // Then progress indicator is shown
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.dataLoading)).isTrue()
+        assertThat(statisticsViewModel.dataLoading.awaitNextValue()).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.dataLoading)).isFalse()
+        assertThat(statisticsViewModel.dataLoading.awaitNextValue()).isFalse()
     }
 }

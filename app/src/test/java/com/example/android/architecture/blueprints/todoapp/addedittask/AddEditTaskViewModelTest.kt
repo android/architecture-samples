@@ -16,10 +16,10 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil.getValue
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
+import com.example.android.architecture.blueprints.todoapp.awaitNextValue
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
@@ -86,13 +86,13 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isTrue()
+        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isFalse()
     }
 
     @Test
@@ -104,9 +104,9 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Verify a task is loaded
-        assertThat(getValue(addEditTaskViewModel.title)).isEqualTo(task.title)
-        assertThat(getValue(addEditTaskViewModel.description)).isEqualTo(task.description)
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(addEditTaskViewModel.title.awaitNextValue()).isEqualTo(task.title)
+        assertThat(addEditTaskViewModel.description.awaitNextValue()).isEqualTo(task.description)
+        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isFalse()
     }
 
     @Test

@@ -42,8 +42,10 @@ class TaskDetailViewModel(
 
     private val _task = _params.switchMap { (taskId, forceUpdate) ->
         if (forceUpdate) {
+            _dataLoading.value = true
             viewModelScope.launch {
                 tasksRepository.refreshTasks()
+                _dataLoading.value = false
             }
         }
         tasksRepository.observeTask(taskId).switchMap { computeResult(it) }
@@ -93,8 +95,9 @@ class TaskDetailViewModel(
         }
     }
 
-    fun start(taskId: String?, forceRefresh: Boolean = true) {
-        if (_isDataAvailable.value == true && !forceRefresh || _dataLoading.value == true) {
+    fun start(taskId: String?) {
+        // If we're already loading or already loaded, return (might be a config change)
+        if (_dataLoading.value == true || taskId == _params.value?.first) {
             return
         }
         if (taskId == null) {
@@ -102,15 +105,11 @@ class TaskDetailViewModel(
             return
         }
 
-        // Show loading indicator
-        _dataLoading.value = true
-
-        _params.value = Pair(taskId, forceRefresh)
+        _params.value = Pair(taskId, false)
     }
 
     private fun computeResult(taskResult: Result<Task>): LiveData<Task> {
 
-        _dataLoading.value = true
         // TODO: This is a good case for liveData builder. Replace when stable.
         val result = MutableLiveData<Task>()
 
@@ -123,7 +122,6 @@ class TaskDetailViewModel(
             _isDataAvailable.value = false
         }
 
-        _dataLoading.value = false
         return result
     }
 

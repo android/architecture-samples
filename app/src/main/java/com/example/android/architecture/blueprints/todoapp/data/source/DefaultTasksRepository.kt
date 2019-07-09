@@ -87,7 +87,6 @@ class DefaultTasksRepository(
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-
         if (forceUpdate) {
             updateTaskFromRemoteDataSource(taskId)
         }
@@ -95,24 +94,17 @@ class DefaultTasksRepository(
     }
 
     override suspend fun saveTask(task: Task) {
-        // Do in memory cache update to keep the app UI up to date
-//        cacheAndPerform(task) {
-            coroutineScope {
-                launch { tasksRemoteDataSource.saveTask(task) }
-                launch { tasksLocalDataSource.saveTask(task) }
-            }
-//        }
+        coroutineScope {
+            launch { tasksRemoteDataSource.saveTask(task) }
+            launch { tasksLocalDataSource.saveTask(task) }
+        }
     }
 
     override suspend fun completeTask(task: Task) {
-        // Do in memory cache update to keep the app UI up to date
-//        cacheAndPerform(task) {
-            task.isCompleted = true
-            coroutineScope {
-                launch { tasksRemoteDataSource.completeTask(task) }
-                launch { tasksLocalDataSource.completeTask(task) }
-            }
-//        }
+        coroutineScope {
+            launch { tasksRemoteDataSource.completeTask(task) }
+            launch { tasksLocalDataSource.completeTask(task) }
+        }
     }
 
     override suspend fun completeTask(taskId: String) {
@@ -124,15 +116,10 @@ class DefaultTasksRepository(
     }
 
     override suspend fun activateTask(task: Task) = withContext<Unit>(ioDispatcher) {
-        // Do in memory cache update to keep the app UI up to date
-//        cacheAndPerform(task) {
-            task.isCompleted = false
-            coroutineScope {
-                launch { tasksRemoteDataSource.activateTask(task) }
-                launch { tasksLocalDataSource.activateTask(task) }
-            }
-
-//        }
+        coroutineScope {
+            launch { tasksRemoteDataSource.activateTask(task) }
+            launch { tasksLocalDataSource.activateTask(task) }
+        }
     }
 
     override suspend fun activateTask(taskId: String) {
@@ -148,9 +135,6 @@ class DefaultTasksRepository(
             launch { tasksRemoteDataSource.clearCompletedTasks() }
             launch { tasksLocalDataSource.clearCompletedTasks() }
         }
-//        withContext(ioDispatcher) {
-//            cachedTasks?.entries?.removeAll { it.value.isCompleted }
-//        }
     }
 
     override suspend fun deleteAllTasks() {
@@ -160,7 +144,6 @@ class DefaultTasksRepository(
                 launch { tasksLocalDataSource.deleteAllTasks() }
             }
         }
-//        cachedTasks?.clear()
     }
 
     override suspend fun deleteTask(taskId: String) {
@@ -168,45 +151,9 @@ class DefaultTasksRepository(
             launch { tasksRemoteDataSource.deleteTask(taskId) }
             launch { tasksLocalDataSource.deleteTask(taskId) }
         }
-
-//        cachedTasks?.remove(taskId)
-        Unit // Force return type
     }
-//
-//    private fun refreshCache(tasks: List<Task>) {
-////        cachedTasks?.clear()
-//        tasks.sortedBy { it.id }.forEach {
-//            cacheAndPerform(it) {}
-//        }
-//    }
-//
-//    private suspend fun refreshLocalDataSource(tasks: List<Task>) {
-//        tasksLocalDataSource.deleteAllTasks()
-//        for (task in tasks) {
-//            tasksLocalDataSource.saveTask(task)
-//        }
-//    }
-//
-//    private suspend fun refreshLocalDataSource(task: Task) {
-//        tasksLocalDataSource.saveTask(task)
-//    }
 
     private suspend fun getTaskWithId(id: String): Result<Task> {
         return tasksLocalDataSource.getTask(id)
     }
-//
-//    private fun cacheTask(task: Task): Task {
-//        val cachedTask = Task(task.title, task.description, task.isCompleted, task.id)
-//        // Create if it doesn't exist.
-//        if (cachedTasks == null) {
-//            cachedTasks = ConcurrentHashMap()
-//        }
-//        cachedTasks?.put(cachedTask.id, cachedTask)
-//        return cachedTask
-//    }
-//
-//    private inline fun cacheAndPerform(task: Task, perform: (Task) -> Unit) {
-//        val cachedTask = cacheTask(task)
-//        perform(cachedTask)
-//    }
 }

@@ -43,8 +43,10 @@ class TasksViewModel(
 
     private val _items: LiveData<List<Task>> = _forceUpdate.switchMap { forceUpdate ->
         if (forceUpdate) {
+            _dataLoading.value = true
             viewModelScope.launch {
                 tasksRepository.refreshTasks()
+                _dataLoading.value = false
             }
         }
         tasksRepository.observeTasks().switchMap { filterTasks(it) }
@@ -82,7 +84,7 @@ class TasksViewModel(
     private val _newTaskEvent = MutableLiveData<Event<Unit>>()
     val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
 
-    private var resultMessageShown: Boolean = true
+    private var resultMessageShown: Boolean = false
 
     // This LiveData depends on another so we can use a transformation.
     val empty: LiveData<Boolean> = Transformations.map(_items) {
@@ -126,6 +128,8 @@ class TasksViewModel(
                 )
             }
         }
+        // Refresh list
+        loadTasks(false)
     }
 
     private fun setFilter(
@@ -142,8 +146,6 @@ class TasksViewModel(
         viewModelScope.launch {
             tasksRepository.clearCompletedTasks()
             showSnackbarMessage(R.string.completed_tasks_cleared)
-            // Refresh list to show the new state
-            loadTasks(false)
         }
     }
 
@@ -155,8 +157,6 @@ class TasksViewModel(
             tasksRepository.activateTask(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
-        // Refresh list to show the new state
-        loadTasks(false)
     }
 
     /**
@@ -188,7 +188,6 @@ class TasksViewModel(
     }
 
     private fun filterTasks(tasksResult: Result<List<Task>>): LiveData<List<Task>> {
-        _dataLoading.value = true
         // TODO: This is a good case for liveData builder. Replace when stable.
         val result = MutableLiveData<List<Task>>()
 
@@ -203,7 +202,6 @@ class TasksViewModel(
             isDataLoadingError.value = true
         }
 
-        _dataLoading.value = false
         return result
     }
 
@@ -214,7 +212,7 @@ class TasksViewModel(
         _forceUpdate.value = forceUpdate
     }
 
-    private suspend fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
+    private fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
             val tasksToShow = ArrayList<Task>()
             // We filter the tasks based on the requestType
             for (task in tasks) {

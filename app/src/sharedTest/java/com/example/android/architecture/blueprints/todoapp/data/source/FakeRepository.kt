@@ -55,6 +55,7 @@ class FakeRepository : TasksRepository {
     }
 
     override fun observeTask(taskId: String): LiveData<Result<Task>> {
+        runBlocking { refreshTasks() }
         return observableTasks.map { tasks ->
             when (tasks) {
                 is Result.Loading -> Result.Loading
