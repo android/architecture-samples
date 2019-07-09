@@ -28,6 +28,7 @@ import org.junit.Test
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
  */
+@ExperimentalCoroutinesApi
 class DefaultTasksRepositoryTest {
 
     private val task1 = Task("Title1", "Description1")
@@ -157,7 +158,7 @@ class DefaultTasksRepositoryTest {
 
     @Test
     fun getTasks_refreshesLocalDataSource() = runBlockingTest {
-        val initialLocal = tasksLocalDataSource.tasks
+        val initialLocal = tasksLocalDataSource.tasks!!.toList()
 
         // First load will fetch from remote
         val newTasks = (tasksRepository.getTasks() as Success).data
@@ -219,7 +220,7 @@ class DefaultTasksRepositoryTest {
     fun getTask_repositoryCachesAfterFirstApiCall() = runBlockingTest {
         // Trigger the repository to load data, which loads from remote
         tasksRemoteDataSource.tasks = mutableListOf(task1)
-        val initial = tasksRepository.getTask(task1.id)
+        tasksRepository.getTask(task1.id)
 
         // Configure the remote data source to store a different task
         tasksRemoteDataSource.tasks = mutableListOf(task2)
@@ -236,7 +237,7 @@ class DefaultTasksRepositoryTest {
     fun getTask_forceRefresh() = runBlockingTest {
         // Trigger the repository to load data, which loads from remote and caches
         tasksRemoteDataSource.tasks = mutableListOf(task1)
-        val initial = tasksRepository.getTask(task1.id)
+        tasksRepository.getTask(task1.id)
 
         // Configure the remote data source to return a different task
         tasksRemoteDataSource.tasks = mutableListOf(task2)

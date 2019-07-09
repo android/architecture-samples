@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
@@ -45,16 +46,21 @@ object ServiceLocator {
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        database = Room.databaseBuilder(
+        return DefaultTasksRepository(TasksRemoteDataSource, createTaskLocalDataSource(context))
+    }
+
+    private fun createTaskLocalDataSource(context: Context): TasksDataSource {
+        val database = database ?: createDataBase(context)
+        return TasksLocalDataSource(database.taskDao())
+    }
+
+    private fun createDataBase(context: Context): ToDoDatabase {
+        val result = Room.databaseBuilder(
             context.applicationContext,
             ToDoDatabase::class.java, "Tasks.db"
-        )
-            .build()
-
-        return DefaultTasksRepository(
-            TasksRemoteDataSource,
-            TasksLocalDataSource(database!!.taskDao())
-        )
+        ).build()
+        database = result
+        return result
     }
 
     @VisibleForTesting
@@ -68,6 +74,7 @@ object ServiceLocator {
                 clearAllTables()
                 close()
             }
+            database = null
             tasksRepository = null
         }
     }
