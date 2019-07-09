@@ -74,6 +74,7 @@ object ServiceLocator {
                 clearAllTables()
                 close()
             }
+            database = null
             tasksRepository = null
         }
     }
