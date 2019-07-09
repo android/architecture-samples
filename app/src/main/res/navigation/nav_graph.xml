@@ -41,7 +41,7 @@
         <action
             android:id="@+id/action_statisticsFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
-            app:popUpTo="@+id/tasksFragment" />
+            />
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
@@ -76,7 +76,7 @@
         <action
             android:id="@+id/action_addEditTaskFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
-            app:popUpTo="@+id/tasksFragment" />
+            />
     </fragment>
     <argument
         android:name="userMessage"

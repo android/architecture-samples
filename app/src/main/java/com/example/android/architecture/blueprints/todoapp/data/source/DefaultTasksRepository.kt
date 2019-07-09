@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Result
+import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.di.ApplicationModule.TasksLocalDataSource
@@ -64,16 +65,16 @@ class DefaultTasksRepository @Inject constructor(
                 (newTasks as? Success)?.let { refreshCache(it.data) }
 
                 cachedTasks?.values?.let { tasks ->
-                    return@withContext Result.Success(tasks.sortedBy { it.id })
+                    return@withContext Success(tasks.sortedBy { it.id })
                 }
 
                 (newTasks as? Success)?.let {
                     if (it.data.isEmpty()) {
-                        return@withContext Result.Success(it.data)
+                        return@withContext Success(it.data)
                     }
                 }
 
-                return@withContext Result.Error(Exception("Illegal state"))
+                return@withContext Error(Exception("Illegal state"))
             }
         }
     }
@@ -82,8 +83,8 @@ class DefaultTasksRepository @Inject constructor(
         // Remote first
         val remoteTasks = tasksRemoteDataSource.getTasks()
         when (remoteTasks) {
-            is Result.Error -> Timber.w("Remote data source fetch failed")
-            is Result.Success -> {
+            is Error -> Timber.w("Remote data source fetch failed")
+            is Success -> {
                 refreshLocalDataSource(remoteTasks.data)
                 return remoteTasks
             }
@@ -92,13 +93,13 @@ class DefaultTasksRepository @Inject constructor(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Result.Error(Exception("Can't force refresh: remote data source is unavailable"))
+            return Error(Exception("Can't force refresh: remote data source is unavailable"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTasks()
-        if (localTasks is Result.Success) return localTasks
-        return Result.Error(Exception("Error fetching from remote and local"))
+        if (localTasks is Success) return localTasks
+        return Error(Exception("Error fetching from remote and local"))
     }
 
     /**
@@ -134,8 +135,8 @@ class DefaultTasksRepository @Inject constructor(
         // Remote first
         val remoteTask = tasksRemoteDataSource.getTask(taskId)
         when (remoteTask) {
-            is Result.Error -> Timber.w("Remote data source fetch failed")
-            is Result.Success -> {
+            is Error -> Timber.w("Remote data source fetch failed")
+            is Success -> {
                 refreshLocalDataSource(remoteTask.data)
                 return remoteTask
             }
@@ -144,13 +145,13 @@ class DefaultTasksRepository @Inject constructor(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Result.Error(Exception("Refresh failed"))
+            return Error(Exception("Refresh failed"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTask(taskId)
-        if (localTasks is Result.Success) return localTasks
-        return Result.Error(Exception("Error fetching from remote and local"))
+        if (localTasks is Success) return localTasks
+        return Error(Exception("Error fetching from remote and local"))
     }
 
     override suspend fun saveTask(task: Task) {
@@ -229,7 +230,6 @@ class DefaultTasksRepository @Inject constructor(
         }
 
         cachedTasks?.remove(taskId)
-        Unit // Force return type
     }
 
     private fun refreshCache(tasks: List<Task>) {
