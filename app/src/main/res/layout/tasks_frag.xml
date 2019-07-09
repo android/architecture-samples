@@ -89,7 +89,8 @@
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:layout_gravity="center"
-                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}" />
+                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}"
+                        android:contentDescription="@string/no_tasks_image_content_description" />
 
                     <TextView
                         android:id="@+id/no_tasks_text"

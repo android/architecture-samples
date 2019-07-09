@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">Todo</string>
+    <string name="app_name">Tasks</string>
     <string name="add_task">New Task</string>
     <string name="edit_task">Edit Task</string>
     <string name="task_marked_complete">Task marked complete</string>
@@ -25,10 +25,10 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_task">Delete task</string>
-    <string name="navigation_view_header_title">Todo</string>
+    <string name="navigation_view_header_title">Tasks</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your task here.</string>
-    <string name="empty_task_message">TO DOs cannot be empty</string>
+    <string name="empty_task_message">Tasks cannot be empty</string>
     <string name="successfully_saved_task_message">Task saved</string>
     <string name="list_title">Task List</string>
     <string name="statistics_title">Statistics</string>
@@ -57,5 +57,9 @@
     <string name="successfully_deleted_task_message">Task was deleted</string>
     <string name="successfully_added_task_message">Task added</string>
     <string name="no_data_description" />
+
+    <!-- Content Descriptions -->
+    <string name="tasks_header_image_content_description">Tasks header image</string>
+    <string name="no_tasks_image_content_description">No tasks image</string>
 
 </resources>
