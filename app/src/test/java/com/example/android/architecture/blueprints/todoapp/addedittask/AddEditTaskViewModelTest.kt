@@ -149,6 +149,6 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.saveTask()
 
         // Then the snackbar shows an error
-        assertSnackbarMessage(addEditTaskViewModel.snackbarMessage, string.empty_task_message)
+        assertSnackbarMessage(addEditTaskViewModel.snackbarText, string.empty_task_message)
     }
 }
