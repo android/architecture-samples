@@ -1,0 +1,63 @@
+buildscript {
+    ext.kotlinVersion = '1.3.31'
+    ext.navigationVersion = "2.1.0-alpha06"
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+// Define versions in a single place
+ext {
+    // Sdk and tools
+    // Support library and architecture components support minSdk 14 and above.
+    minSdkVersion = 14
+    targetSdkVersion = 28
+    compileSdkVersion = 28
+
+    // App dependencies
+    androidXVersion = '1.0.0'
+    androidXTestCoreVersion = '1.2.0'
+    androidXTestExtKotlinRunnerVersion = '1.1.1'
+    androidXTestRulesVersion = '1.2.0-beta01'
+    androidXAnnotations = '1.0.1'
+    androidXLegacySupport = '1.0.0'
+    appCompatVersion = '1.0.2'
+    archLifecycleVersion = '2.1.0-rc01'
+    archTestingVersion = '2.0.0'
+    cardVersion = '1.0.0'
+    coroutinesVersion = '1.2.1'
+    dexMakerVersion = '2.12.1'
+    espressoVersion = '3.2.0-beta01'
+    fragmentVersion = '1.1.0-alpha07'
+    fragmentKtxVersion = '1.1.0-rc01'
+    hamcrestVersion = '1.3'
+    junitVersion = '4.12'
+    materialVersion = '1.0.0'
+    mockitoVersion = '2.8.9'
+    recyclerViewVersion = '1.0.0'
+    robolectricVersion = '4.3-beta-1'
+    roomVersion = '2.1.0'
+    rulesVersion = '1.0.1'
+    timberVersion = '4.7.1'
+    truthVersion = '0.44'
+}
