@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Build test and lint
           command: |
-            ./gradlew assembleMockDebug assembleProdDebug assembleMockDebugAndroidTest testMockDebug testProdDebug lintMockDebug lintProdDebug
+            ./gradlew assembleDebug assembleDebugAndroidTest testDebug lintDebug
       - run:
           name: Save test results
           command: |
@@ -69,9 +69,9 @@ jobs:
           command: |
             BUILD_DIR=build_${CIRCLE_BUILD_NUM}
             sudo gcloud firebase test android run \
-              --app app/build/outputs/apk/mock/debug/app-mock-debug.apk \
-              --test app/build/outputs/apk/androidTest/mock/debug/app-mock-debug-androidTest.apk \
-              --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-testingcodelab \
+              --app app/build/outputs/apk/debug/app-debug.apk \
+              --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+              --results-bucket cloud-test-${GOOGLE_PROJECT_ID}-blueprints \
               --results-dir=${BUILD_DIR}
       - run:
           name: Download results
@@ -79,7 +79,7 @@ jobs:
             BUILD_DIR=build_${CIRCLE_BUILD_NUM}
             sudo pip install -U crcmod
             mkdir firebase_test_results
-            sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-testingcodelab/${BUILD_DIR} | tail -1` firebase_test_results/ | true
+            sudo gsutil -m mv -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID}-blueprints/${BUILD_DIR} | tail -1` firebase_test_results/ | true
       - store_artifacts:
           path: firebase_test_results
 workflows:
