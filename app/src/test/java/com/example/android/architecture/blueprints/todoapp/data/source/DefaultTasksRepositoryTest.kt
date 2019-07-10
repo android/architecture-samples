@@ -200,7 +200,7 @@ class DefaultTasksRepositoryTest {
     fun getTask_repositoryCachesAfterFirstApiCall() = runBlockingTest {
         // Trigger the repository to load data, which loads from remote
         tasksRemoteDataSource.tasks = mutableListOf(task1)
-        val initial = tasksRepository.getTask(task1.id, true)
+        tasksRepository.getTask(task1.id, true)
 
         // Configure the remote data source to store a different task
         tasksRemoteDataSource.tasks = mutableListOf(task2)
@@ -217,7 +217,7 @@ class DefaultTasksRepositoryTest {
     fun getTask_forceRefresh() = runBlockingTest {
         // Trigger the repository to load data, which loads from remote and caches
         tasksRemoteDataSource.tasks = mutableListOf(task1)
-        val initial = tasksRepository.getTask(task1.id)
+        tasksRepository.getTask(task1.id)
 
         // Configure the remote data source to return a different task
         tasksRemoteDataSource.tasks = mutableListOf(task2)
