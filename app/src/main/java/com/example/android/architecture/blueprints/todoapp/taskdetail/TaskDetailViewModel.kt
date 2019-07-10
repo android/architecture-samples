@@ -18,8 +18,8 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
@@ -37,24 +37,14 @@ class TaskDetailViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
+    private val _taskId = MutableLiveData<String>()
 
-    private val _params = MutableLiveData<Pair<String, Boolean>>()
-
-    private val _task = _params.switchMap { (taskId, forceUpdate) ->
-        if (forceUpdate) {
-            _dataLoading.value = true
-            viewModelScope.launch {
-                tasksRepository.refreshTasks()
-                _dataLoading.value = false
-            }
-        }
-        tasksRepository.observeTask(taskId).switchMap { computeResult(it) }
-
+    private val _task = _taskId.switchMap { taskId ->
+        tasksRepository.observeTask(taskId).map { computeResult(it) }
     }
-    val task: LiveData<Task> = _task
+    val task: LiveData<Task?> = _task
 
-    private val _isDataAvailable = MutableLiveData<Boolean>()
-    val isDataAvailable: LiveData<Boolean> = _isDataAvailable
+    val isDataAvailable: LiveData<Boolean> = _task.map { it != null }
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -69,12 +59,12 @@ class TaskDetailViewModel(
     val snackbarMessage: LiveData<Event<Int>> = _snackbarText
 
     // This LiveData depends on another so we can use a transformation.
-    val completed: LiveData<Boolean> = Transformations.map(_task) { input: Task? ->
+    val completed: LiveData<Boolean> = _task.map { input: Task? ->
         input?.isCompleted ?: false
     }
 
     fun deleteTask() = viewModelScope.launch {
-        _params.value?.first?.let {
+        _taskId.value?.let {
             tasksRepository.deleteTask(it)
             _deleteTaskCommand.value = Event(Unit)
         }
@@ -97,38 +87,32 @@ class TaskDetailViewModel(
 
     fun start(taskId: String?) {
         // If we're already loading or already loaded, return (might be a config change)
-        if (_dataLoading.value == true || taskId == _params.value?.first) {
+        if (_dataLoading.value == true || taskId == _taskId.value) {
             return
         }
-        if (taskId == null) {
-            _isDataAvailable.value = false
-            return
-        }
-
-        _params.value = Pair(taskId, false)
+        // Trigger the load
+        _taskId.value = taskId
     }
 
-    private fun computeResult(taskResult: Result<Task>): LiveData<Task> {
-
-        // TODO: This is a good case for liveData builder. Replace when stable.
-        val result = MutableLiveData<Task>()
-
-        if (taskResult is Success) {
-            result.value = taskResult.data
-            _isDataAvailable.value = true
+    private fun computeResult(taskResult: Result<Task>): Task? {
+        return if (taskResult is Success) {
+            taskResult.data
         } else {
-            result.value = null
             showSnackbarMessage(R.string.loading_tasks_error)
-            _isDataAvailable.value = false
+            null
         }
-
-        return result
     }
 
 
     fun refresh() {
-        // Recreate the parameters to force a new data load.
-        _params.value = _params.value?.copy(second = true)
+        // Refresh the repository and the task will be updated automatically.
+        _task.value?.let {
+            _dataLoading.value = true
+            viewModelScope.launch {
+                tasksRepository.refreshTask(it.id)
+                _dataLoading.value = false
+            }
+        }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {

@@ -68,8 +68,8 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.start(task.id)
 
         // Then verify that the view was notified
-        assertThat(taskDetailViewModel.task.awaitNextValue().title).isEqualTo(task.title)
-        assertThat(taskDetailViewModel.task.awaitNextValue().description)
+        assertThat(taskDetailViewModel.task.awaitNextValue()?.title).isEqualTo(task.title)
+        assertThat(taskDetailViewModel.task.awaitNextValue()?.description)
             .isEqualTo(task.description)
     }
 
