@@ -60,9 +60,6 @@ class StatisticsViewModelTest {
     fun loadEmptyTasksFromRepository_EmptyResults() = mainCoroutineRule.runBlockingTest {
         // Given an initialized StatisticsViewModel with no tasks
 
-        // When loading of Tasks is requested
-        statisticsViewModel.start()
-
         // Then the results are empty
         assertThat(statisticsViewModel.empty.awaitNextValue()).isTrue()
     }
@@ -75,9 +72,6 @@ class StatisticsViewModelTest {
         val task3 = Task("Title3", "Description3", true)
         val task4 = Task("Title4", "Description4", true)
         tasksRepository.addTasks(task1, task2, task3, task4)
-
-        // When loading of Tasks is requested
-        statisticsViewModel.start()
 
         // Then the results are not empty
         assertThat(statisticsViewModel.empty.awaitNextValue())
@@ -99,9 +93,6 @@ class StatisticsViewModelTest {
                 )
             )
 
-            // When statistics are loaded
-            errorViewModel.start()
-
             // Then an error message is shown
             assertThat(errorViewModel.empty.awaitNextValue()).isTrue()
             assertThat(errorViewModel.error.awaitNextValue()).isTrue()
@@ -113,7 +104,7 @@ class StatisticsViewModelTest {
         mainCoroutineRule.pauseDispatcher()
 
         // Load the task in the viewmodel
-        statisticsViewModel.start()
+        statisticsViewModel.refresh()
 
         // Then progress indicator is shown
         assertThat(statisticsViewModel.dataLoading.awaitNextValue()).isTrue()

@@ -19,7 +19,10 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.data.Result
+import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -33,68 +36,30 @@ class StatisticsViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val _dataLoading = MutableLiveData<Boolean>()
+    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks()
+    private val _dataLoading = MutableLiveData<Boolean>(false)
+    private val stats: LiveData<StatsResult?> = tasks.map {
+        if (it is Success) {
+            getActiveAndCompletedStats(it.data)
+        } else {
+            null
+        }
+    }
+
+    val activeTasksPercent = stats.map {
+        it?.activeTasksPercent ?: 0f }
+    val completedTasksPercent: LiveData<Float> = stats.map { it?.completedTasksPercent ?: 0f }
     val dataLoading: LiveData<Boolean> = _dataLoading
-
-    private val _error = MutableLiveData<Boolean>()
-    val error: LiveData<Boolean> = _error
-
-    /**
-     * Controls whether the stats are shown or a "No data" message.
-     */
-    private val _empty = MutableLiveData<Boolean>()
-    val empty: LiveData<Boolean> = _empty
-
-    private val _activeTasksPercent = MutableLiveData<Float>()
-    val activeTasksPercent: LiveData<Float> = _activeTasksPercent
-
-    private val _completedTasksPercent = MutableLiveData<Float>()
-    val completedTasksPercent: LiveData<Float> = _completedTasksPercent
-
-    private var activeTasks = 0
-
-    private var completedTasks = 0
-
-    init {
-        start()
-    }
-
-    fun start() {
-        if (_dataLoading.value == true) {
-            return
-        }
-        _dataLoading.value = true
-
-        wrapEspressoIdlingResource {
-            viewModelScope.launch {
-                tasksRepository.getTasks().let { result ->
-                    if (result is Success) {
-                        _error.value = false
-                        computeStats(result.data)
-                    } else {
-                        _error.value = true
-                        activeTasks = 0
-                        completedTasks = 0
-                        computeStats(null)
-                    }
-                }
-            }
-        }
-    }
+    val error: LiveData<Boolean> = tasks.map { it is Error }
+    val empty: LiveData<Boolean> = tasks.map { (it as? Success)?.data.isNullOrEmpty() }
 
     fun refresh() {
-        start()
-    }
-
-    /**
-     * Called when new data is ready.
-     */
-    private fun computeStats(tasks: List<Task>?) {
-        getActiveAndCompletedStats(tasks).let {
-            _activeTasksPercent.value = it.activeTasksPercent
-            _completedTasksPercent.value = it.completedTasksPercent
+        _dataLoading.value = true
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                tasksRepository.refreshTasks()
+                _dataLoading.value = false
+            }
         }
-        _empty.value = tasks.isNullOrEmpty()
-        _dataLoading.value = false
     }
 }
