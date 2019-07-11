@@ -144,7 +144,7 @@ class TasksViewModelTest {
         assertThat(tasksViewModel.items.awaitNextValue()).isEmpty()
 
         // And the snackbar updated
-        assertSnackbarMessage(tasksViewModel.snackbarMessage, R.string.loading_tasks_error)
+        assertSnackbarMessage(tasksViewModel.snackbarText, R.string.loading_tasks_error)
     }
 
     @Test
@@ -187,7 +187,7 @@ class TasksViewModelTest {
 
         // Verify snackbar is updated
         assertSnackbarMessage(
-            tasksViewModel.snackbarMessage, R.string.completed_tasks_cleared
+            tasksViewModel.snackbarText, R.string.completed_tasks_cleared
         )
     }
 
@@ -198,7 +198,7 @@ class TasksViewModelTest {
 
         // The snackbar is updated
         assertSnackbarMessage(
-            tasksViewModel.snackbarMessage, R.string.successfully_saved_task_message
+            tasksViewModel.snackbarText, R.string.successfully_saved_task_message
         )
     }
 
@@ -209,7 +209,7 @@ class TasksViewModelTest {
 
         // The snackbar is updated
         assertSnackbarMessage(
-            tasksViewModel.snackbarMessage, R.string.successfully_added_task_message
+            tasksViewModel.snackbarText, R.string.successfully_added_task_message
         )
     }
 
@@ -219,7 +219,7 @@ class TasksViewModelTest {
         tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         // The snackbar is updated
-        assertSnackbarMessage(tasksViewModel.snackbarMessage, R.string.successfully_deleted_task_message)
+        assertSnackbarMessage(tasksViewModel.snackbarText, R.string.successfully_deleted_task_message)
     }
 
     @Test
@@ -236,7 +236,7 @@ class TasksViewModelTest {
 
         // The snackbar is updated
         assertSnackbarMessage(
-            tasksViewModel.snackbarMessage, R.string.task_marked_complete
+            tasksViewModel.snackbarText, R.string.task_marked_complete
         )
     }
 
@@ -254,7 +254,7 @@ class TasksViewModelTest {
 
         // The snackbar is updated
         assertSnackbarMessage(
-            tasksViewModel.snackbarMessage, R.string.task_marked_active
+            tasksViewModel.snackbarText, R.string.task_marked_active
         )
     }
 

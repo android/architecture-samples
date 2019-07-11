@@ -320,7 +320,7 @@ class TasksFragmentTest {
         }
 
         // WHEN - Click on the "+" button
-        onView(withId(R.id.fab_add_task)).perform(click())
+        onView(withId(R.id.add_task_fab)).perform(click())
 
         // THEN - Verify that we navigate to the add screen
         verify(navController).navigate(
@@ -340,6 +340,6 @@ class TasksFragmentTest {
     }
 
     private fun checkboxWithText(text: String): Matcher<View> {
-        return allOf(withId(R.id.complete), hasSibling(withText(text)))
+        return allOf(withId(R.id.complete_checkbox), hasSibling(withText(text)))
     }
 }

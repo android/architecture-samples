@@ -88,7 +88,7 @@ class TaskDetailViewModelTest {
 
         // Then the task is completed and the snackbar shows the correct message
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
-        assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_complete)
+        assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_complete)
     }
 
     @Test
@@ -111,7 +111,7 @@ class TaskDetailViewModelTest {
         // Then the task is not completed and the snackbar shows the correct message
         val newTask = (tasksRepository.getTask(task.id) as Success).data
         assertTrue(newTask.isActive)
-        assertSnackbarMessage(taskDetailViewModel.snackbarMessage, R.string.task_marked_active)
+        assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
     }
 
     @Test
@@ -133,7 +133,7 @@ class TaskDetailViewModelTest {
     @Test
     fun updateSnackbar_nullValue() {
         // Before setting the Snackbar text, get its current value
-        val snackbarText = taskDetailViewModel.snackbarMessage.value
+        val snackbarText = taskDetailViewModel.snackbarText.value
 
         // Check that the value is null
         assertThat(snackbarText).isNull()
@@ -145,7 +145,7 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.editTask()
 
         // Then the event is triggered
-        val value = taskDetailViewModel.editTaskCommand.awaitNextValue()
+        val value = taskDetailViewModel.editTaskEvent.awaitNextValue()
         assertThat(value.getContentIfNotHandled()).isNotNull()
     }
 

@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.getVmFactory
+import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 
 /**
@@ -34,7 +34,7 @@ class StatisticsFragment : Fragment() {
 
     private lateinit var viewDataBinding: StatisticsFragBinding
 
-    private val statisticsViewModel by viewModels<StatisticsViewModel> { getVmFactory() }
+    private val viewModel by viewModels<StatisticsViewModel> { getViewModelFactory() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +49,7 @@ class StatisticsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewDataBinding.viewmodel = statisticsViewModel
+        viewDataBinding.viewmodel = viewModel
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }

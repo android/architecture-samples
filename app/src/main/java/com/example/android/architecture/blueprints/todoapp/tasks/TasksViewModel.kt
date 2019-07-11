@@ -71,7 +71,7 @@ class TasksViewModel(
     val tasksAddViewVisible: LiveData<Boolean> = _tasksAddViewVisible
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
+    val snackbarText: LiveData<Event<Int>> = _snackbarText
 
     private var currentFiltering = TasksFilterType.ALL_TASKS
 

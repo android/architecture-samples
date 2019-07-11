@@ -17,18 +17,19 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="192dp"
+    android:layout_height="@dimen/header_height"
     android:background="?attr/colorPrimaryDark"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="@dimen/header_padding"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:layout_width="100dp"
+        android:layout_width="@dimen/header_image_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/logo_no_fill" />
+        android:src="@drawable/logo_no_fill"
+        android:contentDescription="@string/tasks_header_image_content_description" />
 
     <TextView
         android:layout_width="wrap_content"
