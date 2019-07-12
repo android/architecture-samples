@@ -101,6 +101,7 @@ class StatisticsFragmentTest {
         onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
         onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))
         onView(withId(R.id.stats_completed_text)).check(matches(isDisplayed()))
-        onView(withId(R.id.stats_completed_text)).check(matches(withText(expectedCompletedTaskText)))
+        onView(withId(R.id.stats_completed_text))
+            .check(matches(withText(expectedCompletedTaskText)))
     }
 }
