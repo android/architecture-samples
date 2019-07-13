@@ -35,7 +35,7 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
 
 
 @Module(includes = [ApplicationModuleBinds::class])
-class ApplicationModule {
+object ApplicationModule {
 
     @Qualifier
     @Retention(RUNTIME)
@@ -45,6 +45,7 @@ class ApplicationModule {
     @Retention(RUNTIME)
     annotation class TasksLocalDataSource
 
+    @JvmStatic
     @Singleton
     @TasksRemoteDataSource
     @Provides
@@ -52,6 +53,7 @@ class ApplicationModule {
         return TasksRemoteDataSource
     }
 
+    @JvmStatic
     @Singleton
     @TasksLocalDataSource
     @Provides
@@ -64,6 +66,7 @@ class ApplicationModule {
         )
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideDataBase(context: Context): ToDoDatabase {
@@ -74,6 +77,7 @@ class ApplicationModule {
         ).build()
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideIoDispatcher() = Dispatchers.IO
