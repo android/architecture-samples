@@ -284,7 +284,8 @@ class TasksRepositoryTest {
         // And the remote data source has data available
         setTasksAvailable(tasksRemoteDataSource, TASKS)
 
-        // Verify the tasks from the local data source are returned
+        // Verify the tasks from the remote data source are returned
+        verify(tasksRemoteDataSource).getTasks(loadTasksCallback)
         verify(loadTasksCallback).onTasksLoaded(TASKS)
     }
 
