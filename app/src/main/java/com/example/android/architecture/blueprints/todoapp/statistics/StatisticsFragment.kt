@@ -38,7 +38,7 @@ class StatisticsFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val statisticsViewModel by viewModels<StatisticsViewModel> { viewModelFactory }
+    private val viewModel by viewModels<StatisticsViewModel> { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,9 +53,9 @@ class StatisticsFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewDataBinding.viewmodel = statisticsViewModel
+        viewDataBinding.viewmodel = viewModel
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        statisticsViewModel.start()
+        viewModel.start()
     }
 }

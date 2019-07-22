@@ -52,18 +52,18 @@ class TaskDetailFragment : DaggerFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
-        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
+        view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
 
     private fun setupNavigation() {
-        viewModel.deleteTaskCommand.observe(this, EventObserver {
+        viewModel.deleteTaskEvent.observe(this, EventObserver {
             val action = TaskDetailFragmentDirections
                 .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
             findNavController().navigate(action)
         })
-        viewModel.editTaskCommand.observe(this, EventObserver {
+        viewModel.editTaskEvent.observe(this, EventObserver {
             val action = TaskDetailFragmentDirections
                 .actionTaskDetailFragmentToAddEditTaskFragment(
                     args.taskId,
@@ -74,7 +74,7 @@ class TaskDetailFragment : DaggerFragment() {
     }
 
     private fun setupFab() {
-        activity?.findViewById<View>(R.id.fab_edit_task)?.setOnClickListener {
+        activity?.findViewById<View>(R.id.edit_task_fab)?.setOnClickListener {
             viewModel.editTask()
         }
     }

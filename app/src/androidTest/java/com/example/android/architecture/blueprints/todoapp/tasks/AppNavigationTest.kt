@@ -108,10 +108,10 @@ class AppNavigationTest {
 
         // Start statistics screen.
         onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.statisticsFragment))
+            .perform(navigateTo(R.id.statistics_fragment_dest))
 
         // Check that statistics screen was opened.
-        onView(withId(R.id.statistics)).check(matches(isDisplayed()))
+        onView(withId(R.id.statistics_layout)).check(matches(isDisplayed()))
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
@@ -119,10 +119,10 @@ class AppNavigationTest {
 
         // Start tasks screen.
         onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.tasksFragment))
+            .perform(navigateTo(R.id.tasks_fragment_dest))
 
         // Check that tasks screen was opened.
-        onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
+        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -156,7 +156,7 @@ class AppNavigationTest {
 
         // When the user navigates to the stats screen
         activityScenario.onActivity {
-            it.findNavController(R.id.nav_host_fragment).navigate(R.id.statisticsFragment)
+            it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
         }
 
         // Then check that left drawer is closed at startup
@@ -188,7 +188,7 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("UI <- button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click())
+        onView(withId(R.id.edit_task_fab)).perform(click())
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
@@ -197,7 +197,7 @@ class AppNavigationTest {
                     .getToolbarNavigationContentDescription()
             )
         ).perform(click())
-        onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         onView(
@@ -206,7 +206,7 @@ class AppNavigationTest {
                     .getToolbarNavigationContentDescription()
             )
         ).perform(click())
-        onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
+        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -221,14 +221,14 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.fab_edit_task)).perform(click())
+        onView(withId(R.id.edit_task_fab)).perform(click())
 
         // Confirm that if we click back once, we end up back at the task details page
         pressBack()
-        onView(withId(R.id.task_detail_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
 
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
-        onView(withId(R.id.tasksContainer)).check(matches(isDisplayed()))
+        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
     }
 }

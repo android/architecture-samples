@@ -30,8 +30,8 @@ import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
-import dagger.android.support.DaggerFragment
 import javax.inject.Inject
+import dagger.android.support.DaggerFragment
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -69,7 +69,7 @@ class AddEditTaskFragment : DaggerFragment() {
     }
 
     private fun setupSnackbar() {
-        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
+        view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
     }
 
     private fun setupNavigation() {
