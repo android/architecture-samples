@@ -59,7 +59,7 @@ class TasksViewModel @Inject constructor(
     val tasksAddViewVisible: LiveData<Boolean> = _tasksAddViewVisible
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
+    val snackbarText: LiveData<Event<Int>> = _snackbarText
 
     private var _currentFiltering = TasksFilterType.ALL_TASKS
 
