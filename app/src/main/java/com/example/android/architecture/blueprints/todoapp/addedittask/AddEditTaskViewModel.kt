@@ -46,10 +46,10 @@ class AddEditTaskViewModel(
     val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
+    val snackbarText: LiveData<Event<Int>> = _snackbarText
 
-    private val _taskUpdated = MutableLiveData<Event<Unit>>()
-    val taskUpdatedEvent: LiveData<Event<Unit>> = _taskUpdated
+    private val _taskUpdatedEvent = MutableLiveData<Event<Unit>>()
+    val taskUpdatedEvent: LiveData<Event<Unit>> = _taskUpdatedEvent
 
     private var taskId: String? = null
 
@@ -126,7 +126,7 @@ class AddEditTaskViewModel(
 
     private fun createTask(newTask: Task) = viewModelScope.launch {
         saveUseCase(newTask)
-        _taskUpdated.value = Event(Unit)
+        _taskUpdatedEvent.value = Event(Unit)
     }
 
     private fun updateTask(task: Task) {
@@ -135,7 +135,7 @@ class AddEditTaskViewModel(
         }
         viewModelScope.launch {
             saveUseCase(task)
-            _taskUpdated.value = Event(Unit)
+            _taskUpdatedEvent.value = Event(Unit)
         }
     }
 }
