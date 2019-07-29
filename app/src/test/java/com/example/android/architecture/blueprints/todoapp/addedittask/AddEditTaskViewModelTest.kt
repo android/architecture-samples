@@ -19,9 +19,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
-import com.example.android.architecture.blueprints.todoapp.awaitNextValue
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -86,13 +86,13 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
-        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isTrue()
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isFalse()
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
     }
 
     @Test
@@ -104,9 +104,9 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Verify a task is loaded
-        assertThat(addEditTaskViewModel.title.awaitNextValue()).isEqualTo(task.title)
-        assertThat(addEditTaskViewModel.description.awaitNextValue()).isEqualTo(task.description)
-        assertThat(addEditTaskViewModel.dataLoading.awaitNextValue()).isFalse()
+        assertThat(addEditTaskViewModel.title.getOrAwaitValue()).isEqualTo(task.title)
+        assertThat(addEditTaskViewModel.description.getOrAwaitValue()).isEqualTo(task.description)
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
     }
 
     @Test

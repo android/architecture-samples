@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source
 
+import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -23,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 /**
@@ -44,6 +46,11 @@ class DefaultTasksRepositoryTest {
     // Class under test
     private lateinit var tasksRepository: DefaultTasksRepository
 
+    // Set the main coroutines dispatcher for unit testing.
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
+
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
@@ -51,7 +58,7 @@ class DefaultTasksRepositoryTest {
         tasksLocalDataSource = FakeDataSource(localTasks.toMutableList())
         // Get a reference to the class under test
         tasksRepository = DefaultTasksRepository(
-            tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Unconfined
+            tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Main
         )
     }
 
@@ -60,7 +67,7 @@ class DefaultTasksRepositoryTest {
     fun getTasks_emptyRepositoryAndUninitializedCache() = runBlockingTest {
         val emptySource = FakeDataSource()
         val tasksRepository = DefaultTasksRepository(
-            emptySource, emptySource, Dispatchers.Unconfined
+            emptySource, emptySource, Dispatchers.Main
         )
 
         assertThat(tasksRepository.getTasks() is Success).isTrue()

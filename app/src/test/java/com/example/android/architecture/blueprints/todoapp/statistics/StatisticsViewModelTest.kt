@@ -18,10 +18,10 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.FakeFailingTasksRemoteDataSource
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.awaitNextValue
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,7 +61,7 @@ class StatisticsViewModelTest {
         // Given an initialized StatisticsViewModel with no tasks
 
         // Then the results are empty
-        assertThat(statisticsViewModel.empty.awaitNextValue()).isTrue()
+        assertThat(statisticsViewModel.empty.getOrAwaitValue()).isTrue()
     }
 
     @Test
@@ -74,29 +74,28 @@ class StatisticsViewModelTest {
         tasksRepository.addTasks(task1, task2, task3, task4)
 
         // Then the results are not empty
-        assertThat(statisticsViewModel.empty.awaitNextValue())
+        assertThat(statisticsViewModel.empty.getOrAwaitValue())
             .isFalse()
-        assertThat(statisticsViewModel.activeTasksPercent.awaitNextValue())
+        assertThat(statisticsViewModel.activeTasksPercent.getOrAwaitValue())
             .isEqualTo(25f)
-        assertThat(statisticsViewModel.completedTasksPercent.awaitNextValue())
+        assertThat(statisticsViewModel.completedTasksPercent.getOrAwaitValue())
             .isEqualTo(75f)
     }
 
     @Test
-    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() =
-        mainCoroutineRule.runBlockingTest {
-            val errorViewModel = StatisticsViewModel(
-                DefaultTasksRepository(
-                    FakeFailingTasksRemoteDataSource,
-                    FakeFailingTasksRemoteDataSource,
-                    Dispatchers.Main  // Main is set in MainCoroutineRule
-                )
+    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay(){
+        val errorViewModel = StatisticsViewModel(
+            DefaultTasksRepository(
+                FakeFailingTasksRemoteDataSource,
+                FakeFailingTasksRemoteDataSource,
+                Dispatchers.Main  // Main is set in MainCoroutineRule
             )
+        )
 
-            // Then an error message is shown
-            assertThat(errorViewModel.empty.awaitNextValue()).isTrue()
-            assertThat(errorViewModel.error.awaitNextValue()).isTrue()
-        }
+        // Then an error message is shown
+        assertThat(errorViewModel.empty.getOrAwaitValue()).isTrue()
+        assertThat(errorViewModel.error.getOrAwaitValue()).isTrue()
+    }
 
     @Test
     fun loadTasks_loading() {
@@ -107,12 +106,12 @@ class StatisticsViewModelTest {
         statisticsViewModel.refresh()
 
         // Then progress indicator is shown
-        assertThat(statisticsViewModel.dataLoading.awaitNextValue()).isTrue()
+        assertThat(statisticsViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(statisticsViewModel.dataLoading.awaitNextValue()).isFalse()
+        assertThat(statisticsViewModel.dataLoading.getOrAwaitValue()).isFalse()
     }
 }
