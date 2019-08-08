@@ -53,14 +53,14 @@ class TaskDetailViewModel(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    private val _editTaskCommand = MutableLiveData<Event<Unit>>()
-    val editTaskCommand: LiveData<Event<Unit>> = _editTaskCommand
+    private val _editTaskEvent = MutableLiveData<Event<Unit>>()
+    val editTaskEvent: LiveData<Event<Unit>> = _editTaskEvent
 
-    private val _deleteTaskCommand = MutableLiveData<Event<Unit>>()
-    val deleteTaskCommand: LiveData<Event<Unit>> = _deleteTaskCommand
+    private val _deleteTaskEvent = MutableLiveData<Event<Unit>>()
+    val deleteTaskEvent: LiveData<Event<Unit>> = _deleteTaskEvent
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarMessage: LiveData<Event<Int>> = _snackbarText
+    val snackbarText: LiveData<Event<Int>> = _snackbarText
 
     private val taskId: String?
         get() = _task.value?.id
@@ -74,12 +74,12 @@ class TaskDetailViewModel(
     fun deleteTask() = viewModelScope.launch {
         taskId?.let {
             deleteTaskUseCase(it)
-            _deleteTaskCommand.value = Event(Unit)
+            _deleteTaskEvent.value = Event(Unit)
         }
     }
 
     fun editTask() {
-        _editTaskCommand.value = Event(Unit)
+        _editTaskEvent.value = Event(Unit)
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {

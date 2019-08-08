@@ -102,15 +102,15 @@ class TasksActivityTest {
 
         // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
-        onView(withId(R.id.task_detail_title)).check(matches(withText("TITLE1")))
-        onView(withId(R.id.task_detail_description)).check(matches(withText("DESCRIPTION")))
-        onView(withId(R.id.task_detail_complete)).check(matches(not(isChecked())))
+        onView(withId(R.id.task_detail_title_text)).check(matches(withText("TITLE1")))
+        onView(withId(R.id.task_detail_description_text)).check(matches(withText("DESCRIPTION")))
+        onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
 
         // Click on the edit button, edit, and save
-        onView(withId(R.id.fab_edit_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(replaceText("NEW TITLE"))
-        onView(withId(R.id.add_task_description)).perform(replaceText("NEW DESCRIPTION"))
-        onView(withId(R.id.fab_save_task)).perform(click())
+        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
+        onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
+        onView(withId(R.id.save_task_fab)).perform(click())
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
@@ -126,10 +126,11 @@ class TasksActivityTest {
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Add active task
-        onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("TITLE1"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.fab_save_task)).perform(click())
+        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_title_edit_text))
+            .perform(typeText("TITLE1"), closeSoftKeyboard())
+        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("DESCRIPTION"))
+        onView(withId(R.id.save_task_fab)).perform(click())
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -177,7 +178,7 @@ class TasksActivityTest {
         onView(withText(taskTitle)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -187,7 +188,7 @@ class TasksActivityTest {
         ).perform(click())
 
         // Check that the task is marked as completed
-        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
+        onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
     }
 
@@ -204,7 +205,7 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -214,7 +215,7 @@ class TasksActivityTest {
         ).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
+        onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
     }
 
@@ -231,9 +232,9 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -243,7 +244,7 @@ class TasksActivityTest {
         ).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
+        onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
     }
 
@@ -260,9 +261,9 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete)).perform(click())
+        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -272,7 +273,7 @@ class TasksActivityTest {
         ).perform(click())
 
         // Check that the task is marked as active
-        onView(allOf(withId(R.id.complete), hasSibling(withText(taskTitle))))
+        onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
     }
 
@@ -283,10 +284,11 @@ class TasksActivityTest {
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the "+" button, add details, and save
-        onView(withId(R.id.fab_add_task)).perform(click())
-        onView(withId(R.id.add_task_title)).perform(typeText("title"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description)).perform(typeText("description"))
-        onView(withId(R.id.fab_save_task)).perform(click())
+        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_title_edit_text))
+            .perform(typeText("title"), closeSoftKeyboard())
+        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("description"))
+        onView(withId(R.id.save_task_fab)).perform(click())
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
