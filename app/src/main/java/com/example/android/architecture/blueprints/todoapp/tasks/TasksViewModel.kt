@@ -22,7 +22,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -57,19 +56,19 @@ class TasksViewModel(
     private val _tasksAddViewVisible = MutableLiveData<Boolean>()
     val tasksAddViewVisible: LiveData<Boolean> = _tasksAddViewVisible
 
-    private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarText: LiveData<Event<Int>> = _snackbarText
+    private val _snackbarText = MutableLiveData<Int>()
+    val snackbarText: LiveData<Int> = _snackbarText
 
     private var _currentFiltering = TasksFilterType.ALL_TASKS
 
     // Not used at the moment
     private val isDataLoadingError = MutableLiveData<Boolean>()
 
-    private val _openTaskEvent = MutableLiveData<Event<String>>()
-    val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
+    private val _openTaskEvent = MutableLiveData<String>()
+    val openTaskEvent: LiveData<String> = _openTaskEvent
 
-    private val _newTaskEvent = MutableLiveData<Event<Unit>>()
-    val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
+    private val _newTaskEvent = MutableLiveData<Unit>()
+    val newTaskEvent: LiveData<Unit> = _newTaskEvent
 
     // This LiveData depends on another so we can use a transformation.
     val empty: LiveData<Boolean> = Transformations.map(_items) {
@@ -150,14 +149,14 @@ class TasksViewModel(
      * Called by the Data Binding library and the FAB's click listener.
      */
     fun addNewTask() {
-        _newTaskEvent.value = Event(Unit)
+        _newTaskEvent.value = Unit
     }
 
     /**
      * Called by Data Binding.
      */
     fun openTask(taskId: String) {
-        _openTaskEvent.value = Event(taskId)
+        _openTaskEvent.value = taskId
     }
 
     fun showEditResultMessage(result: Int) {
@@ -169,7 +168,7 @@ class TasksViewModel(
     }
 
     private fun showSnackbarMessage(message: Int) {
-        _snackbarText.value = Event(message)
+        _snackbarText.value = message
     }
 
     /**

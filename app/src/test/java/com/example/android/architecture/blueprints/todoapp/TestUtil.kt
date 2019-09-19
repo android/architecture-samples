@@ -20,14 +20,14 @@ import androidx.lifecycle.LiveData
 import org.junit.Assert.assertEquals
 
 fun assertLiveDataEventTriggered(
-    liveData: LiveData<Event<String>>,
+    liveData: LiveData<String>,
     taskId: String
 ) {
     val value = LiveDataTestUtil.getValue(liveData)
-    assertEquals(value.getContentIfNotHandled(), taskId)
+    assertEquals(value, taskId)
 }
 
-fun assertSnackbarMessage(snackbarLiveData: LiveData<Event<Int>>, messageId: Int) {
-    val value: Event<Int> = LiveDataTestUtil.getValue(snackbarLiveData)
-    assertEquals(value.getContentIfNotHandled(), messageId)
+fun assertSnackbarMessage(snackbarLiveData: LiveData<Int>, messageId: Int) {
+    val value: Int = LiveDataTestUtil.getValue(snackbarLiveData)
+    assertEquals(value, messageId)
 }

@@ -146,7 +146,7 @@ class TasksViewModelTest {
 
         // Then the event is triggered
         val value = LiveDataTestUtil.getValue(tasksViewModel.newTaskEvent)
-        assertThat(value.getContentIfNotHandled()).isNotNull()
+        assertThat(value).isNotNull()
     }
 
     @Test

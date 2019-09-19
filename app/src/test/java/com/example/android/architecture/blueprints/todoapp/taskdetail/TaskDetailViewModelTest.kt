@@ -130,7 +130,7 @@ class TaskDetailViewModelTest {
 
         // Then the event is triggered
         val value = getValue(taskDetailViewModel.editTaskEvent)
-        assertThat(value.getContentIfNotHandled()).isNotNull()
+        assertThat(value).isNotNull()
     }
 
     @Test
