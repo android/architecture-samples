@@ -28,7 +28,7 @@ sealed class Result<out R> {
     data class Error(val exception: Exception) : Result<Nothing>()
     object Loading : Result<Nothing>()
 
-    override fun toString() = when (this) {
+    override fun toString(): String = when (this) {
         is Success<*> -> "Success[data=$data]"
         is Error -> "Error[exception=$exception]"
         Loading -> "Loading"
