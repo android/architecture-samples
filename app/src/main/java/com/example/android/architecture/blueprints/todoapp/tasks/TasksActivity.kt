@@ -25,7 +25,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.android.architecture.blueprints.todoapp.R
-import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.tasks_act.*
 
 /**
@@ -33,27 +32,27 @@ import kotlinx.android.synthetic.main.tasks_act.*
  */
 class TasksActivity : AppCompatActivity() {
 
-	private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setContentView(R.layout.tasks_act)
-		drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark)
-		setSupportActionBar(findViewById(R.id.toolbar))
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.tasks_act)
+        drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark)
+        setSupportActionBar(findViewById(R.id.toolbar))
 
-		val navController: NavController = findNavController(R.id.nav_host_fragment)
-		appBarConfiguration =
-				AppBarConfiguration.Builder(R.id.tasks_fragment_dest, R.id.statistics_fragment_dest)
-						.setDrawerLayout(drawerLayout)
-						.build()
-		setupActionBarWithNavController(navController, appBarConfiguration)
-		navView.setupWithNavController(navController)
-	}
+        val navController: NavController = findNavController(R.id.nav_host_fragment)
+        appBarConfiguration =
+                AppBarConfiguration.Builder(R.id.tasks_fragment_dest, R.id.statistics_fragment_dest)
+                        .setDrawerLayout(drawerLayout)
+                        .build()
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+    }
 
-	override fun onSupportNavigateUp(): Boolean {
-		return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
-				|| super.onSupportNavigateUp()
-	}
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
+    }
 }
 
 // Keys for navigation
