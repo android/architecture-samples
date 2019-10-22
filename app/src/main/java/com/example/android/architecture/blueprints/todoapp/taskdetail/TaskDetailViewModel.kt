@@ -102,7 +102,7 @@ class TaskDetailViewModel(
                         if (result is Success) {
                             onTaskLoaded(result.data)
                         } else {
-                            onDataNotAvailable(result)
+                            onDataNotAvailable()
                         }
                     }
                 }
@@ -120,7 +120,7 @@ class TaskDetailViewModel(
         setTask(task)
     }
 
-    private fun onDataNotAvailable(result: Result<Task>) {
+    private fun onDataNotAvailable() {
         _task.value = null
         _isDataAvailable.value = false
     }

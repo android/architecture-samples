@@ -21,16 +21,16 @@
         <import type="android.view.View" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
     </data>
 
     <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
         android:id="@+id/refresh_layout"
-        app:refreshing="@{viewmodel.dataLoading}"
-        app:onRefreshListener="@{viewmodel::refresh}"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:onRefreshListener="@{viewModel::refresh}"
+        app:refreshing="@{viewModel.dataLoading}">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,23 +46,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
+                android:visibility="@{safeUnbox(viewModel.dataLoading ? View.GONE : View.VISIBLE)}">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/statistics_no_tasks"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:visibility="@{viewmodel.empty ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{safeUnbox(viewModel.empty ? View.VISIBLE : View.GONE)}" />
 
                 <TextView
                     android:id="@+id/stats_active_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="1dp"
-                    android:text="@{@string/statistics_active_tasks(viewmodel.activeTasksPercent)}"
+                    android:text="@{@string/statistics_active_tasks(viewModel.activeTasksPercent)}"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:visibility="@{viewmodel.empty ? View.GONE : View.VISIBLE}" />
+                    android:visibility="@{safeUnbox(viewModel.empty ? View.GONE : View.VISIBLE)}" />
 
                 <!-- android:paddingTop specified to temporarily work around -->
                 <!-- https://github.com/robolectric/robolectric/issues/4588 -->
@@ -71,9 +71,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="1dp"
-                    android:text="@{@string/statistics_completed_tasks(viewmodel.completedTasksPercent)}"
+                    android:text="@{@string/statistics_completed_tasks(viewModel.completedTasksPercent)}"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:visibility="@{viewmodel.empty ? View.GONE : View.VISIBLE}" />
+                    android:visibility="@{safeUnbox(viewModel.empty ? View.GONE : View.VISIBLE)}" />
 
             </LinearLayout>
         </LinearLayout>

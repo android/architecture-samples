@@ -47,8 +47,7 @@ class TasksActivity : AppCompatActivity() {
 						.setDrawerLayout(drawerLayout)
 						.build()
 		setupActionBarWithNavController(navController, appBarConfiguration)
-		findViewById<NavigationView>(R.id.nav_view)
-				.setupWithNavController(navController)
+		navView.setupWithNavController(navController)
 	}
 
 	override fun onSupportNavigateUp(): Boolean {

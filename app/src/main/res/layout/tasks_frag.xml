@@ -23,7 +23,7 @@
         <import type="androidx.core.content.ContextCompat" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
 
     </data>
@@ -39,8 +39,8 @@
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:onRefreshListener="@{viewmodel::refresh}"
-            app:refreshing="@{viewmodel.dataLoading}">
+            app:onRefreshListener="@{viewModel::refresh}"
+            app:refreshing="@{viewModel.dataLoading}">
 
             <RelativeLayout
                 android:id="@+id/tasks_container_layout"
@@ -54,7 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="@{viewmodel.empty ? View.GONE : View.VISIBLE}">
+                    android:visibility="@{viewModel.empty ? View.GONE : View.VISIBLE}">
 
                     <TextView
                         android:id="@+id/filtering_text"
@@ -65,15 +65,15 @@
                         android:layout_marginRight="@dimen/list_item_padding"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:gravity="center_vertical"
-                        android:text="@{context.getString(viewmodel.currentFilteringLabel)}"
+                        android:text="@{context.getString(viewModel.currentFilteringLabel)}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/tasks_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:items="@{viewmodel.items}" />
+                        app:items="@{viewModel.items}"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -82,15 +82,15 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:orientation="vertical"
-                    android:visibility="@{viewmodel.empty ? View.VISIBLE : View.GONE}">
+                    android:visibility="@{viewModel.empty ? View.VISIBLE : View.GONE}">
 
                     <ImageView
                         android:id="@+id/no_tasks_icon"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:layout_gravity="center"
-                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}"
-                        android:contentDescription="@string/no_tasks_image_content_description" />
+                        android:contentDescription="@string/no_tasks_image_content_description"
+                        android:src="@{ContextCompat.getDrawable(context, viewModel.noTaskIconRes)}" />
 
                     <TextView
                         android:id="@+id/no_tasks_text"
@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginBottom="@dimen/list_item_padding"
-                        android:text="@{context.getString(viewmodel.noTasksLabel)}" />
+                        android:text="@{context.getString(viewModel.noTasksLabel)}" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -115,4 +115,3 @@
             app:layout_anchorGravity="bottom|right|end" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
-
