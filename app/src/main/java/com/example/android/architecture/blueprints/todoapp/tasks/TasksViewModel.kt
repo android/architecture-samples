@@ -35,9 +35,7 @@ import java.util.ArrayList
 /**
  * ViewModel for the task list screen.
  */
-class TasksViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>> = _items

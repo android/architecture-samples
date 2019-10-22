@@ -54,21 +54,21 @@
 
                     <EditText
                         android:id="@+id/add_task_title_edit_text"
-                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@null"
                         android:hint="@string/title_hint"
                         android:imeOptions="flagNoExtractUi"
                         android:maxLines="1"
                         android:text="@={viewmodel.title}"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/add_task_description_edit_text"
-                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="350dp"
+                        android:background="@null"
                         android:gravity="top"
                         android:hint="@string/description_hint"
                         android:imeOptions="flagNoExtractUi"
@@ -83,8 +83,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_done"
             android:onClick="@{() -> viewmodel.saveTask()}"
+            android:src="@drawable/ic_done"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"
             app:layout_anchorGravity="bottom|right|end" />

@@ -103,6 +103,6 @@ class TaskDetailFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
+        inflater.inflate(R.menu.taskdetail_frag_menu, menu)
     }
 }
