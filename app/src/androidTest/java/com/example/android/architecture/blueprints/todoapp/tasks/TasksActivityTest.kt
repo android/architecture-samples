@@ -110,7 +110,7 @@ class TasksActivityTest {
         onView(withId(R.id.edit_task_button)).perform(click())
         onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
         onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        onView(withId(R.id.add_task_save_button)).perform(click())
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
@@ -130,7 +130,7 @@ class TasksActivityTest {
         onView(withId(R.id.add_task_title_edit_text))
             .perform(typeText("TITLE1"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description_edit_text)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        onView(withId(R.id.add_task_save_button)).perform(click())
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -288,7 +288,7 @@ class TasksActivityTest {
         onView(withId(R.id.add_task_title_edit_text))
             .perform(typeText("title"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description_edit_text)).perform(typeText("description"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        onView(withId(R.id.add_task_save_button)).perform(click())
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
