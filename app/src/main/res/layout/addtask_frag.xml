@@ -79,7 +79,7 @@
         </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/save_task_fab"
+            android:id="@+id/add_task_save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
