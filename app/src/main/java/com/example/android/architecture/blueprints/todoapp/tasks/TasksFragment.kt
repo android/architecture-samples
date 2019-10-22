@@ -57,7 +57,7 @@ class TasksFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
-            viewModel = viewModel
+            viewmodel = viewModel
         }
         setHasOptionsMenu(true)
         return viewDataBinding.root
@@ -159,7 +159,7 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupListAdapter() {
-        val viewModel = viewDataBinding.viewModel
+        val viewModel = viewDataBinding.viewmodel
         if (viewModel != null) {
             listAdapter = TasksAdapter(viewModel)
             viewDataBinding.tasksList.adapter = listAdapter
