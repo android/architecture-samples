@@ -182,7 +182,7 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("UI <- button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_button)).perform(click())
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
@@ -215,7 +215,7 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_button)).perform(click())
 
         // Confirm that if we click back once, we end up back at the task details page
         pressBack()

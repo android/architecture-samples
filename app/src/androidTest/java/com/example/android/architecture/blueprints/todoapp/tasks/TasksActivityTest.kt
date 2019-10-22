@@ -107,7 +107,7 @@ class TasksActivityTest {
         onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
 
         // Click on the edit button, edit, and save
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_button)).perform(click())
         onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
         onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
         onView(withId(R.id.save_task_fab)).perform(click())

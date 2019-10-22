@@ -55,14 +55,12 @@ android {
         }
         production {
             dimension "default"
-            applicationIdSuffix ""
-            versionNameSuffix ""
         }
-        acceptance {
-            dimension "default"
-            applicationIdSuffix ".acc"
-            versionNameSuffix "-acc"
-        }
+//        acceptance {
+//            dimension "default"
+//            applicationIdSuffix ".acc"
+//            versionNameSuffix "-acc"
+//        }
     }
 
     // Remove mockRelease as it's not needed.
