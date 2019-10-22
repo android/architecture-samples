@@ -126,7 +126,7 @@ class TasksActivityTest {
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Add active task
-        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_button)).perform(click())
         onView(withId(R.id.add_task_title_edit_text))
             .perform(typeText("TITLE1"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description_edit_text)).perform(typeText("DESCRIPTION"))
@@ -284,7 +284,7 @@ class TasksActivityTest {
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Click on the "+" button, add details, and save
-        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_button)).perform(click())
         onView(withId(R.id.add_task_title_edit_text))
             .perform(typeText("title"), closeSoftKeyboard())
         onView(withId(R.id.add_task_description_edit_text)).perform(typeText("description"))

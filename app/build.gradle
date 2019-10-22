@@ -32,10 +32,14 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled true
+            debuggable true
+            versionNameSuffix "-SNAPSHOT"
         }
 
         release {
+            debuggable false
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -49,8 +53,15 @@ android {
             dimension "default"
             applicationIdSuffix = ".mock"
         }
-        prod {
+        production {
             dimension "default"
+            applicationIdSuffix ""
+            versionNameSuffix ""
+        }
+        acceptance {
+            dimension "default"
+            applicationIdSuffix ".acc"
+            versionNameSuffix "-acc"
         }
     }
 

@@ -92,7 +92,7 @@ class TasksFragment : Fragment() {
         setupListAdapter()
         setupRefreshLayout(binding.refreshLayout, binding.tasksList)
         setupNavigation()
-        setupFab()
+        binding.addTaskButton.setOnClickListener { navigateToAddNewTask() }
 
         // Always reloading data for simplicity. Real apps should only do this on first load and
         // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
@@ -132,14 +132,6 @@ class TasksFragment : Fragment() {
                 true
             }
             show()
-        }
-    }
-
-    private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
-            it.setOnClickListener {
-                navigateToAddNewTask()
-            }
         }
     }
 

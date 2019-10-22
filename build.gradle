@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlinVersion = '1.3.50'
-    ext.navigationVersion = "2.1.0-alpha06"
+    ext.navigationVersion = '2.1.0-alpha06'
     repositories {
         google()
         jcenter()

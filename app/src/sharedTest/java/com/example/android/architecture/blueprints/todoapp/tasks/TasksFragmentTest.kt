@@ -319,7 +319,7 @@ class TasksFragmentTest {
         }
 
         // WHEN - Click on the "+" button
-        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_button)).perform(click())
 
         // THEN - Verify that we navigate to the add screen
         verify(navController).navigate(
