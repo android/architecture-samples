@@ -31,8 +31,8 @@ ext {
     // Sdk and tools
     // Support library and architecture components support minSdk 14 and above.
     minSdkVersion = 19
-    targetSdkVersion = 29
-    compileSdkVersion = 29
+    targetSdkVersion = 28
+    compileSdkVersion = 28
 
     // App dependencies
     androidXVersion = '1.0.0'
