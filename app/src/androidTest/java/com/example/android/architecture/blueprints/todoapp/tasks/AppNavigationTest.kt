@@ -29,10 +29,7 @@ import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.R
@@ -56,173 +53,173 @@ import org.junit.runner.RunWith
 @LargeTest
 class AppNavigationTest {
 
-    private lateinit var tasksRepository: TasksRepository
+	private lateinit var tasksRepository: TasksRepository
 
-    // An Idling Resource that waits for Data Binding to have no pending bindings
-    private val dataBindingIdlingResource = DataBindingIdlingResource()
+	// An Idling Resource that waits for Data Binding to have no pending bindings
+	private val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    @Before
-    fun init() {
-        tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
-    }
+	@Before
+	fun init() {
+		tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
+	}
 
-    @After
-    fun reset() {
-        ServiceLocator.resetRepository()
-    }
+	@After
+	fun reset() {
+		ServiceLocator.resetRepository()
+	}
 
-    /**
-     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
-     * are not scheduled in the main Looper (for example when executed on a different thread).
-     */
-    @Before
-    fun registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
-        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
-    }
+	/**
+	 * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
+	 * are not scheduled in the main Looper (for example when executed on a different thread).
+	 */
+	@Before
+	fun registerIdlingResource() {
+		IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+		IdlingRegistry.getInstance().register(dataBindingIdlingResource)
+	}
 
-    /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
-    }
+	/**
+	 * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+	 */
+	@After
+	fun unregisterIdlingResource() {
+		IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+		IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+	}
 
-    @Test
-    fun drawerNavigationFromTasksToStatistics() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+	@Test
+	fun drawerNavigationFromTasksToStatistics() {
+		// start up Tasks screen
+		val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+		dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-            .perform(open()) // Open Drawer
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+				.perform(open()) // Open Drawer
 
-        // Start statistics screen.
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.statistics_fragment_dest))
+		// Start statistics screen.
+		onView(withId(R.id.navView))
+				.perform(navigateTo(R.id.statistics_fragment_dest))
 
-        // Check that statistics screen was opened.
-        onView(withId(R.id.statistics_layout)).check(matches(isDisplayed()))
+		// Check that statistics screen was opened.
+		onView(withId(R.id.statistics_layout)).check(matches(isDisplayed()))
 
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-            .perform(open()) // Open Drawer
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+				.perform(open()) // Open Drawer
 
-        // Start tasks screen.
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.tasks_fragment_dest))
+		// Start tasks screen.
+		onView(withId(R.id.navView))
+				.perform(navigateTo(R.id.tasks_fragment_dest))
 
-        // Check that tasks screen was opened.
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-    }
+		// Check that tasks screen was opened.
+		onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+	}
 
-    @Test
-    fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+	@Test
+	fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
+		// start up Tasks screen
+		val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+		dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        // Check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+		// Check that left drawer is closed at startup
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 
-        // Open Drawer
-        onView(
-            withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
+		// Open Drawer
+		onView(
+				withContentDescription(
+						activityScenario
+								.getToolbarNavigationContentDescription()
+				)
+		).perform(click())
 
-        // Check if drawer is open
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
-    }
+		// Check if drawer is open
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+	}
 
-    @Test
-    fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+	@Test
+	fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
+		// start up Tasks screen
+		val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+		dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        // When the user navigates to the stats screen
-        activityScenario.onActivity {
-            it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
-        }
+		// When the user navigates to the stats screen
+		activityScenario.onActivity {
+			it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
+		}
 
-        // Then check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+		// Then check that left drawer is closed at startup
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 
-        // When the drawer is opened
-        onView(
-            withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
+		// When the drawer is opened
+		onView(
+				withContentDescription(
+						activityScenario
+								.getToolbarNavigationContentDescription()
+				)
+		).perform(click())
 
-        // Then check that the drawer is open
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
-    }
+		// Then check that the drawer is open
+		onView(withId(R.id.drawerLayout))
+				.check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+	}
 
-    @Test
-    fun taskDetailScreen_doubleUIBackButton() {
-        val task = Task("UI <- button", "Description")
-        tasksRepository.saveTaskBlocking(task)
+	@Test
+	fun taskDetailScreen_doubleUIBackButton() {
+		val task = Task("UI <- button", "Description")
+		tasksRepository.saveTaskBlocking(task)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+		// start up Tasks screen
+		val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+		dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        // Click on the task on the list
-        onView(withText("UI <- button")).perform(click())
-        // Click on the edit task button
-        onView(withId(R.id.edit_task_button)).perform(click())
+		// Click on the task on the list
+		onView(withText("UI <- button")).perform(click())
+		// Click on the edit task button
+		onView(withId(R.id.edit_task_button)).perform(click())
 
-        // Confirm that if we click "<-" once, we end up back at the task details page
-        onView(
-            withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
-        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
+		// Confirm that if we click "<-" once, we end up back at the task details page
+		onView(
+				withContentDescription(
+						activityScenario
+								.getToolbarNavigationContentDescription()
+				)
+		).perform(click())
+		onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
 
-        // Confirm that if we click "<-" a second time, we end up back at the home screen
-        onView(
-            withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-    }
+		// Confirm that if we click "<-" a second time, we end up back at the home screen
+		onView(
+				withContentDescription(
+						activityScenario
+								.getToolbarNavigationContentDescription()
+				)
+		).perform(click())
+		onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+	}
 
-    @Test
-    fun taskDetailScreen_doubleBackButton() {
-        val task = Task("Back button", "Description")
-        tasksRepository.saveTaskBlocking(task)
+	@Test
+	fun taskDetailScreen_doubleBackButton() {
+		val task = Task("Back button", "Description")
+		tasksRepository.saveTaskBlocking(task)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+		// start up Tasks screen
+		val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+		dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        // Click on the task on the list
-        onView(withText("Back button")).perform(click())
-        // Click on the edit task button
-        onView(withId(R.id.edit_task_button)).perform(click())
+		// Click on the task on the list
+		onView(withText("Back button")).perform(click())
+		// Click on the edit task button
+		onView(withId(R.id.edit_task_button)).perform(click())
 
-        // Confirm that if we click back once, we end up back at the task details page
-        pressBack()
-        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
+		// Confirm that if we click back once, we end up back at the task details page
+		pressBack()
+		onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
 
-        // Confirm that if we click back a second time, we end up back at the home screen
-        pressBack()
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-    }
+		// Confirm that if we click back a second time, we end up back at the home screen
+		pressBack()
+		onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+	}
 }
