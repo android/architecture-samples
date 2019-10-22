@@ -35,8 +35,8 @@
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:enabled="@{viewmodel.dataLoading}"
-            app:refreshing="@{viewmodel.dataLoading}">
+            app:enabled="@{viewmodel.loading}"
+            app:refreshing="@{viewmodel.loading}">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                     android:paddingTop="@dimen/activity_vertical_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/activity_vertical_margin"
-                    android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
+                    android:visibility="@{viewmodel.loading ? View.GONE : View.VISIBLE}">
 
                     <EditText
                         android:id="@+id/add_task_title_edit_text"

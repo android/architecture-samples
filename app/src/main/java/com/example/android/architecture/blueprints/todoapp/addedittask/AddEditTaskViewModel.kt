@@ -38,8 +38,8 @@ class AddEditTaskViewModel(private val tasksRepository: TasksRepository) : ViewM
     // Two-way databinding, exposing MutableLiveData
     val description = MutableLiveData<String>()
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarText: LiveData<Event<Int>> = _snackbarText
@@ -51,12 +51,12 @@ class AddEditTaskViewModel(private val tasksRepository: TasksRepository) : ViewM
 
     private var isNewTask: Boolean = false
 
-    private var isDataLoaded = false
+    private var isLoaded = false
 
     private var taskCompleted = false
 
     fun start(taskId: String?) {
-        if (_dataLoading.value == true) {
+        if (_loading.value == true) {
             return
         }
 
@@ -66,13 +66,13 @@ class AddEditTaskViewModel(private val tasksRepository: TasksRepository) : ViewM
             isNewTask = true
             return
         }
-        if (isDataLoaded) {
+        if (isLoaded) {
             // No need to populate, already have data.
             return
         }
 
         isNewTask = false
-        _dataLoading.value = true
+        _loading.value = true
 
         viewModelScope.launch {
             tasksRepository.getTask(taskId).let { result ->
@@ -89,12 +89,12 @@ class AddEditTaskViewModel(private val tasksRepository: TasksRepository) : ViewM
         title.value = task.title
         description.value = task.description
         taskCompleted = task.isCompleted
-        _dataLoading.value = false
-        isDataLoaded = true
+        _loading.value = false
+        isLoaded = true
     }
 
     private fun onDataNotAvailable() {
-        _dataLoading.value = false
+        _loading.value = false
     }
 
     // Called when clicking on fab.

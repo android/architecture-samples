@@ -77,13 +77,13 @@ class TasksViewModelTest {
         tasksViewModel.loadTasks(true)
 
         // Then progress indicator is shown
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isTrue()
+        assertThat(LiveDataTestUtil.getValue(tasksViewModel.loading)).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
+        assertThat(LiveDataTestUtil.getValue(tasksViewModel.loading)).isFalse()
 
         // And data correctly loaded
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.items)).hasSize(3)
@@ -99,7 +99,7 @@ class TasksViewModelTest {
         tasksViewModel.loadTasks(true)
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
+        assertThat(LiveDataTestUtil.getValue(tasksViewModel.loading)).isFalse()
 
         // And data correctly loaded
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.items)).hasSize(1)
@@ -115,7 +115,7 @@ class TasksViewModelTest {
         tasksViewModel.loadTasks(true)
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
+        assertThat(LiveDataTestUtil.getValue(tasksViewModel.loading)).isFalse()
 
         // And data correctly loaded
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.items)).hasSize(2)
@@ -130,7 +130,7 @@ class TasksViewModelTest {
         tasksViewModel.loadTasks(true)
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isFalse()
+        assertThat(LiveDataTestUtil.getValue(tasksViewModel.loading)).isFalse()
 
         // And the list of items is empty
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.items)).isEmpty()

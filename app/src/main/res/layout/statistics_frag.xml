@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:onRefreshListener="@{viewModel::refresh}"
-        app:refreshing="@{viewModel.dataLoading}">
+        app:refreshing="@{viewModel.loading}">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="@{safeUnbox(viewModel.dataLoading ? View.GONE : View.VISIBLE)}">
+                android:visibility="@{safeUnbox(viewModel.loading ? View.GONE : View.VISIBLE)}">
 
                 <TextView
                     android:layout_width="match_parent"

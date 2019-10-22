@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:onRefreshListener="@{viewmodel::refresh}"
-            app:refreshing="@{viewmodel.dataLoading}">
+            app:refreshing="@{viewmodel.loading}">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/no_data"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}" />
+                        android:visibility="@{viewmodel.loading ? View.GONE : View.VISIBLE}" />
                 </LinearLayout>
 
                 <RelativeLayout
