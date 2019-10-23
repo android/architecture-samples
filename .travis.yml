@@ -4,13 +4,15 @@ android:
   - tools
   - platform-tools
   - build-tools-28.0.3
-  - android-28
+  - android-29
   - extra-android-m2repository
   - extra-google-m2repository
 jdk:
 - oraclejdk8
 script:
 - ./gradlew test
+before_install:
+    - yes | sdkmanager "platforms;android-29"
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
