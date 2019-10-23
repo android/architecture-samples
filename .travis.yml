@@ -12,6 +12,7 @@ jdk:
 script:
 - ./gradlew test
 before_install:
+    - yes | sdkmanager "platforms;android-28"
     - yes | sdkmanager "platforms;android-29"
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
