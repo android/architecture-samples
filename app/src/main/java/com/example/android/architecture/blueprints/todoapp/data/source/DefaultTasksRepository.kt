@@ -78,8 +78,7 @@ class DefaultTasksRepository(
 
     private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
         // Remote first
-        val remoteTasks = tasksRemoteDataSource.getTasks()
-        when (remoteTasks) {
+        when (val remoteTasks = tasksRemoteDataSource.getTasks()) {
             is Error -> Timber.w("Remote data source fetch failed")
             is Success -> {
                 refreshLocalDataSource(remoteTasks.data)
@@ -103,9 +102,7 @@ class DefaultTasksRepository(
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-
         wrapEspressoIdlingResource {
-
             return withContext(ioDispatcher) {
                 // Respond immediately with cache if available
                 if (!forceUpdate) {
@@ -130,8 +127,7 @@ class DefaultTasksRepository(
         forceUpdate: Boolean
     ): Result<Task> {
         // Remote first
-        val remoteTask = tasksRemoteDataSource.getTask(taskId)
-        when (remoteTask) {
+        when (val remoteTask = tasksRemoteDataSource.getTask(taskId)) {
             is Error -> Timber.w("Remote data source fetch failed")
             is Success -> {
                 refreshLocalDataSource(remoteTask.data)

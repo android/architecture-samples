@@ -29,10 +29,7 @@ import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.R
@@ -96,23 +93,23 @@ class AppNavigationTest {
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
             .perform(open()) // Open Drawer
 
         // Start statistics screen.
-        onView(withId(R.id.nav_view))
+        onView(withId(R.id.navView))
             .perform(navigateTo(R.id.statistics_fragment_dest))
 
         // Check that statistics screen was opened.
         onView(withId(R.id.statistics_layout)).check(matches(isDisplayed()))
 
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
             .perform(open()) // Open Drawer
 
         // Start tasks screen.
-        onView(withId(R.id.nav_view))
+        onView(withId(R.id.navView))
             .perform(navigateTo(R.id.tasks_fragment_dest))
 
         // Check that tasks screen was opened.
@@ -126,7 +123,7 @@ class AppNavigationTest {
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 
         // Open Drawer
@@ -138,7 +135,7 @@ class AppNavigationTest {
         ).perform(click())
 
         // Check if drawer is open
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
     }
 
@@ -154,7 +151,7 @@ class AppNavigationTest {
         }
 
         // Then check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 
         // When the drawer is opened
@@ -166,7 +163,7 @@ class AppNavigationTest {
         ).perform(click())
 
         // Then check that the drawer is open
-        onView(withId(R.id.drawer_layout))
+        onView(withId(R.id.drawerLayout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
     }
 
@@ -182,7 +179,7 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("UI <- button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_button)).perform(click())
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
@@ -215,7 +212,7 @@ class AppNavigationTest {
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_button)).perform(click())
 
         // Confirm that if we click back once, we end up back at the task details page
         pressBack()

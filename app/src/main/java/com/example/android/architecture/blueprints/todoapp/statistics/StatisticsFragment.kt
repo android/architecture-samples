@@ -32,7 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayo
  */
 class StatisticsFragment : Fragment() {
 
-    private lateinit var viewDataBinding: StatisticsFragBinding
+    private lateinit var binding: StatisticsFragBinding
 
     private val viewModel by viewModels<StatisticsViewModel> { getViewModelFactory() }
 
@@ -40,18 +40,16 @@ class StatisticsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewDataBinding = DataBindingUtil.inflate(
-            inflater, R.layout.statistics_frag, container,
-            false
-        )
-        return viewDataBinding.root
+        binding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
+                false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewDataBinding.viewmodel = viewModel
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
-        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this.viewLifecycleOwner
+        this.setupRefreshLayout(binding.refreshLayout)
         viewModel.start()
     }
 }

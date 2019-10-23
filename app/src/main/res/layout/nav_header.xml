@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/header_height"
     android:background="?attr/colorPrimaryDark"
@@ -28,8 +27,8 @@
         android:layout_width="@dimen/header_image_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/logo_no_fill"
-        android:contentDescription="@string/tasks_header_image_content_description" />
+        android:contentDescription="@string/tasks_header_image_content_description"
+        android:src="@drawable/logo_no_fill" />
 
     <TextView
         android:layout_width="wrap_content"

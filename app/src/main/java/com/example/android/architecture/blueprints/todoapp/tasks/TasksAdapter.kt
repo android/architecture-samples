@@ -32,7 +32,6 @@ class TasksAdapter(private val viewModel: TasksViewModel) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-
         holder.bind(viewModel, item)
     }
 
@@ -44,7 +43,6 @@ class TasksAdapter(private val viewModel: TasksViewModel) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(viewModel: TasksViewModel, item: Task) {
-
             binding.viewmodel = viewModel
             binding.task = item
             binding.executePendingBindings()

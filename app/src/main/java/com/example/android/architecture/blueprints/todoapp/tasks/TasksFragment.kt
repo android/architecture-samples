@@ -48,7 +48,7 @@ class TasksFragment : Fragment() {
 
     private val args: TasksFragmentArgs by navArgs()
 
-    private lateinit var viewDataBinding: TasksFragBinding
+    private lateinit var binding: TasksFragBinding
 
     private lateinit var listAdapter: TasksAdapter
 
@@ -56,11 +56,10 @@ class TasksFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
-            viewmodel = viewModel
-        }
+        binding = TasksFragBinding.inflate(inflater, container, false)
+        binding.viewmodel = viewModel
         setHasOptionsMenu(true)
-        return viewDataBinding.root
+        return binding.root
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
@@ -81,19 +80,19 @@ class TasksFragment : Fragment() {
         }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu)
+        inflater.inflate(R.menu.tasks_frag_menu, menu)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         // Set the lifecycle owner to the lifecycle of the view
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        binding.lifecycleOwner = this.viewLifecycleOwner
         setupSnackbar()
         setupListAdapter()
-        setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
+        setupRefreshLayout(binding.refreshLayout, binding.tasksList)
         setupNavigation()
-        setupFab()
+        binding.addTaskButton.setOnClickListener { navigateToAddNewTask() }
 
         // Always reloading data for simplicity. Real apps should only do this on first load and
         // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
@@ -136,14 +135,6 @@ class TasksFragment : Fragment() {
         }
     }
 
-    private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
-            it.setOnClickListener {
-                navigateToAddNewTask()
-            }
-        }
-    }
-
     private fun navigateToAddNewTask() {
         val action = TasksFragmentDirections
             .actionTasksFragmentToAddEditTaskFragment(
@@ -159,10 +150,10 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupListAdapter() {
-        val viewModel = viewDataBinding.viewmodel
+        val viewModel = binding.viewmodel
         if (viewModel != null) {
             listAdapter = TasksAdapter(viewModel)
-            viewDataBinding.tasksList.adapter = listAdapter
+            binding.tasksList.adapter = listAdapter
         } else {
             Timber.w("ViewModel not initialized when attempting to set up adapter.")
         }

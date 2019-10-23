@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlinVersion = '1.3.31'
-    ext.navigationVersion = "2.1.0-alpha06"
+    ext.kotlinVersion = '1.3.50'
+    ext.navigationVersion = '2.1.0-alpha06'
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 
@@ -30,7 +30,7 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     // Support library and architecture components support minSdk 14 and above.
-    minSdkVersion = 14
+    minSdkVersion = 19
     targetSdkVersion = 28
     compileSdkVersion = 28
 
@@ -41,8 +41,8 @@ ext {
     androidXTestRulesVersion = '1.2.0-beta01'
     androidXAnnotations = '1.0.1'
     androidXLegacySupport = '1.0.0'
-    appCompatVersion = '1.0.2'
-    archLifecycleVersion = '2.1.0-rc01'
+    appCompatVersion = '1.1.0'
+    archLifecycleVersion = '2.2.0-beta01'
     archTestingVersion = '2.0.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'
@@ -56,7 +56,7 @@ ext {
     mockitoVersion = '2.8.9'
     recyclerViewVersion = '1.0.0'
     robolectricVersion = '4.3-beta-1'
-    roomVersion = '2.1.0'
+    roomVersion = '2.2.0'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '0.44'

@@ -30,20 +30,18 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
-import java.util.ArrayList
+import java.util.*
 
 /**
  * ViewModel for the task list screen.
  */
-class TasksViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>> = _items
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
     val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel
@@ -117,8 +115,7 @@ class TasksViewModel(
 
     private fun setFilter(
         @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
-        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
-    ) {
+        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
         _noTaskIconRes.value = noTaskIconDrawable
@@ -176,10 +173,9 @@ class TasksViewModel(
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
-        _dataLoading.value = true
+        _loading.value = true
 
         wrapEspressoIdlingResource {
-
             viewModelScope.launch {
                 val tasksResult = tasksRepository.getTasks(forceUpdate)
 
@@ -207,7 +203,7 @@ class TasksViewModel(
                     showSnackbarMessage(R.string.loading_tasks_error)
                 }
 
-                _dataLoading.value = false
+                _loading.value = false
             }
         }
     }

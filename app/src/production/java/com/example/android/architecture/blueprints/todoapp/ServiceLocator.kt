@@ -28,7 +28,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
 import kotlinx.coroutines.runBlocking
 
 /**
- * A Service Locator for the [TasksRepository]. This is the prod version, with a
+ * A Service Locator for the [TasksRepository]. This is the prod version, with
  * the "real" [TasksRemoteDataSource].
  */
 object ServiceLocator {

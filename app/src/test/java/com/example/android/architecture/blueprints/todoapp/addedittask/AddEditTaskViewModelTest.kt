@@ -86,13 +86,13 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isTrue()
+        assertThat(getValue(addEditTaskViewModel.loading)).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(getValue(addEditTaskViewModel.loading)).isFalse()
     }
 
     @Test
@@ -106,7 +106,7 @@ class AddEditTaskViewModelTest {
         // Verify a task is loaded
         assertThat(getValue(addEditTaskViewModel.title)).isEqualTo(task.title)
         assertThat(getValue(addEditTaskViewModel.description)).isEqualTo(task.description)
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(getValue(addEditTaskViewModel.loading)).isFalse()
     }
 
     @Test

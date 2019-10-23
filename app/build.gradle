@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
@@ -32,14 +33,16 @@ android {
         debug {
             minifyEnabled false
             testCoverageEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+            debuggable true
+            versionNameSuffix "-SNAPSHOT"
         }
 
         release {
+            debuggable false
             minifyEnabled true
-            useProguard true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -53,7 +56,7 @@ android {
             dimension "default"
             applicationIdSuffix = ".mock"
         }
-        prod {
+        production {
             dimension "default"
         }
     }

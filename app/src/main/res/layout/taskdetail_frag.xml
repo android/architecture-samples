@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:onRefreshListener="@{viewmodel::refresh}"
-            app:refreshing="@{viewmodel.dataLoading}">
+            app:refreshing="@{viewmodel.loading}">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/no_data"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}" />
+                        android:visibility="@{viewmodel.loading ? View.GONE : View.VISIBLE}" />
                 </LinearLayout>
 
                 <RelativeLayout
@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
                         android:checked="@{viewmodel.completed}"
                         android:onClick="@{(view) -> viewmodel.setCompleted(((CompoundButton)view).isChecked())}"
                         android:paddingTop="1dp" />
@@ -93,7 +93,7 @@
                         android:id="@+id/task_detail_title_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/task_detail_complete_checkbox"
+                        android:layout_toEndOf="@id/task_detail_complete_checkbox"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.title}"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -103,7 +103,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/task_detail_title_text"
-                        android:layout_toRightOf="@id/task_detail_complete_checkbox"
+                        android:layout_toEndOf="@id/task_detail_complete_checkbox"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.description}"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -113,7 +113,7 @@
         </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/edit_task_fab"
+            android:id="@+id/edit_task_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"

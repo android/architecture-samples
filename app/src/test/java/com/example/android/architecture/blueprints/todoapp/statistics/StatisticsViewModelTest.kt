@@ -116,12 +116,12 @@ class StatisticsViewModelTest {
         statisticsViewModel.start()
 
         // Then progress indicator is shown
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.dataLoading)).isTrue()
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.loading)).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.dataLoading)).isFalse()
+        assertThat(LiveDataTestUtil.getValue(statisticsViewModel.loading)).isFalse()
     }
 }

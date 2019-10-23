@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -43,8 +42,8 @@ class TaskDetailViewModel(
     private val _isDataAvailable = MutableLiveData<Boolean>()
     val isDataAvailable: LiveData<Boolean> = _isDataAvailable
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
 
     private val _editTaskEvent = MutableLiveData<Event<Unit>>()
     val editTaskEvent: LiveData<Event<Unit>> = _editTaskEvent
@@ -87,26 +86,25 @@ class TaskDetailViewModel(
     }
 
     fun start(taskId: String?, forceRefresh: Boolean = false) {
-        if (_isDataAvailable.value == true && !forceRefresh || _dataLoading.value == true) {
+        if (_isDataAvailable.value == true && !forceRefresh || _loading.value == true) {
             return
         }
 
         // Show loading indicator
-        _dataLoading.value = true
+        _loading.value = true
 
         wrapEspressoIdlingResource {
-
             viewModelScope.launch {
                 if (taskId != null) {
                     tasksRepository.getTask(taskId, false).let { result ->
                         if (result is Success) {
                             onTaskLoaded(result.data)
                         } else {
-                            onDataNotAvailable(result)
+                            onDataNotAvailable()
                         }
                     }
                 }
-                _dataLoading.value = false
+                _loading.value = false
             }
         }
     }
@@ -120,7 +118,7 @@ class TaskDetailViewModel(
         setTask(task)
     }
 
-    private fun onDataNotAvailable(result: Result<Task>) {
+    private fun onDataNotAvailable() {
         _task.value = null
         _isDataAvailable.value = false
     }

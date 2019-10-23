@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:onRefreshListener="@{viewmodel::refresh}"
-            app:refreshing="@{viewmodel.dataLoading}">
+            app:refreshing="@{viewmodel.loading}">
 
             <RelativeLayout
                 android:id="@+id/tasks_container_layout"
@@ -72,8 +72,8 @@
                         android:id="@+id/tasks_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:items="@{viewmodel.items}" />
+                        app:items="@{viewmodel.items}"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -89,8 +89,8 @@
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:layout_gravity="center"
-                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}"
-                        android:contentDescription="@string/no_tasks_image_content_description" />
+                        android:contentDescription="@string/no_tasks_image_content_description"
+                        android:src="@{ContextCompat.getDrawable(context, viewmodel.noTaskIconRes)}" />
 
                     <TextView
                         android:id="@+id/no_tasks_text"
@@ -105,7 +105,7 @@
         </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_task_fab"
+            android:id="@+id/add_task_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
@@ -115,4 +115,3 @@
             app:layout_anchorGravity="bottom|right|end" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
-

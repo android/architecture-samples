@@ -16,12 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -39,7 +34,7 @@ import com.google.android.material.snackbar.Snackbar
  * Main UI for the task detail screen.
  */
 class TaskDetailFragment : Fragment() {
-    private lateinit var viewDataBinding: TaskdetailFragBinding
+    private lateinit var binding: TaskdetailFragBinding
 
     private val args: TaskDetailFragmentArgs by navArgs()
 
@@ -47,10 +42,10 @@ class TaskDetailFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupFab()
+        binding.editTaskButton.setOnClickListener { viewModel.editTask() }
         view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
         setupNavigation()
-        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        this.setupRefreshLayout(binding.refreshLayout)
     }
 
     private fun setupNavigation() {
@@ -69,22 +64,15 @@ class TaskDetailFragment : Fragment() {
         })
     }
 
-    private fun setupFab() {
-        activity?.findViewById<View>(R.id.edit_task_fab)?.setOnClickListener {
-            viewModel.editTask()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
-        viewDataBinding = TaskdetailFragBinding.bind(view).apply {
-            viewmodel = viewModel
-        }
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        binding = TaskdetailFragBinding.bind(view)
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this.viewLifecycleOwner
 
         viewModel.start(args.taskId)
 
@@ -103,6 +91,6 @@ class TaskDetailFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
+        inflater.inflate(R.menu.taskdetail_frag_menu, menu)
     }
 }

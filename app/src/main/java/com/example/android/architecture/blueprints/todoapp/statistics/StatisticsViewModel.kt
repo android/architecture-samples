@@ -29,12 +29,10 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for the statistics screen.
  */
-class StatisticsViewModel(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+class StatisticsViewModel(private val tasksRepository: TasksRepository) : ViewModel() {
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
 
     private val _error = MutableLiveData<Boolean>()
     val error: LiveData<Boolean> = _error
@@ -60,10 +58,10 @@ class StatisticsViewModel(
     }
 
     fun start() {
-        if (_dataLoading.value == true) {
+        if (_loading.value == true) {
             return
         }
-        _dataLoading.value = true
+        _loading.value = true
 
         wrapEspressoIdlingResource {
             viewModelScope.launch {
@@ -95,6 +93,6 @@ class StatisticsViewModel(
             _completedTasksPercent.value = it.completedTasksPercent
         }
         _empty.value = tasks.isNullOrEmpty()
-        _dataLoading.value = false
+        _loading.value = false
     }
 }

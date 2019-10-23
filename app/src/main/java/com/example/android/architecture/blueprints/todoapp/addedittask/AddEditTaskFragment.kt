@@ -37,7 +37,7 @@ import com.google.android.material.snackbar.Snackbar
  */
 class AddEditTaskFragment : Fragment() {
 
-    private lateinit var viewDataBinding: AddtaskFragBinding
+    private lateinit var binding: AddtaskFragBinding
 
     private val args: AddEditTaskFragmentArgs by navArgs()
 
@@ -48,19 +48,19 @@ class AddEditTaskFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
-        viewDataBinding = AddtaskFragBinding.bind(root).apply {
+        binding = AddtaskFragBinding.bind(root).apply {
             this.viewmodel = viewModel
         }
         // Set the lifecycle owner to the lifecycle of the view
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
-        return viewDataBinding.root
+        binding.lifecycleOwner = this.viewLifecycleOwner
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
         setupNavigation()
-        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        this.setupRefreshLayout(binding.refreshLayout)
         viewModel.start(args.taskId)
     }
 

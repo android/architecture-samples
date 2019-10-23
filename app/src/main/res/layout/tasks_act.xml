@@ -18,7 +18,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".tasks.TasksActivity"
@@ -49,13 +49,14 @@
             android:layout_height="match_parent"
 
             app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph" />
+            app:navGraph="@navigation/nav_graph"
+            tools:ignore="FragmentTagUsage" />
 
     </LinearLayout>
 
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
+        android:id="@+id/navView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
