@@ -19,11 +19,11 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.repository.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
+import com.example.android.architecture.blueprints.todoapp.domain.repository.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksLocalDataSource
+import com.example.android.architecture.blueprints.todoapp.data.db.ToDoDatabase
 import kotlinx.coroutines.runBlocking
 
 /**

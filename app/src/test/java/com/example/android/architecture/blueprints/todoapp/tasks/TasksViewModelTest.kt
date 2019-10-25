@@ -24,10 +24,10 @@ import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTr
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ClearCompletedTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTasksUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -66,10 +66,10 @@ class TasksViewModelTest {
         tasksRepository.addTasks(task1, task2, task3)
 
         tasksViewModel = TasksViewModel(
-            GetTasksUseCase(tasksRepository),
-            ClearCompletedTasksUseCase(tasksRepository),
-            CompleteTaskUseCase(tasksRepository),
-            ActivateTaskUseCase(tasksRepository)
+                GetTasksUseCase(tasksRepository),
+                ClearCompletedTasksUseCase(tasksRepository),
+                CompleteTaskUseCase(tasksRepository),
+                ActivateTaskUseCase(tasksRepository)
         )
     }
 

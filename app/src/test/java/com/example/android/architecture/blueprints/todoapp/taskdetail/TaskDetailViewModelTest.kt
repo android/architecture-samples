@@ -22,10 +22,10 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.DeleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTaskUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -61,10 +61,10 @@ class TaskDetailViewModelTest {
         tasksRepository.addTasks(task)
 
         taskDetailViewModel = TaskDetailViewModel(
-            GetTaskUseCase(tasksRepository),
-            DeleteTaskUseCase(tasksRepository),
-            CompleteTaskUseCase(tasksRepository),
-            ActivateTaskUseCase(tasksRepository)
+                GetTaskUseCase(tasksRepository),
+                DeleteTaskUseCase(tasksRepository),
+                CompleteTaskUseCase(tasksRepository),
+                ActivateTaskUseCase(tasksRepository)
         )
     }
 

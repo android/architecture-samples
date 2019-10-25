@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.app.Application
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.repository.TasksRepository
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 

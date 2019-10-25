@@ -24,16 +24,16 @@ import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.SaveTaskUseCase
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the Add/Edit screen.
  */
 class AddEditTaskViewModel(
-    private val getTaskUseCase: GetTaskUseCase,
-    private val saveUseCase: SaveTaskUseCase
+        private val getTaskUseCase: GetTaskUseCase,
+        private val saveUseCase: SaveTaskUseCase
 ) : ViewModel() {
 
     // Two-way databinding, exposing MutableLiveData

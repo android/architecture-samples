@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.data.source
+package com.example.android.architecture.blueprints.todoapp.data.repository
 
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.domain.repository.TasksRepository
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -35,9 +33,9 @@ import java.util.concurrent.ConcurrentMap
  * data source fails. Remote is the source of truth.
  */
 class DefaultTasksRepository(
-    private val tasksRemoteDataSource: TasksDataSource,
-    private val tasksLocalDataSource: TasksDataSource,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+        private val tasksRemoteDataSource: TasksDataSource,
+        private val tasksLocalDataSource: TasksDataSource,
+        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksRepository {
 
     private var cachedTasks: ConcurrentMap<String, Task>? = null
@@ -72,27 +70,24 @@ class DefaultTasksRepository(
     }
 
     private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
-        // Remote first
-        val remoteTasks = tasksRemoteDataSource.getTasks()
-        when (remoteTasks) {
-            is Error -> Timber.w("Remote data source fetch failed")
-            is Success -> {
-                refreshLocalDataSource(remoteTasks.data)
-                return remoteTasks
-            }
-            else -> throw IllegalStateException()
-        }
-
-        // Don't read from local if it's forced
         if (forceUpdate) {
-            return Error(Exception("Can't force refresh: remote data source is unavailable"))
+            return fetchTasksFromRemote()
         }
 
-        // Local if remote fails
+        // if not forced, try local first
+        return when (val localTaskResult = fetchTasksFromLocal()) {
+            is Success -> localTaskResult
+            else -> fetchTasksFromRemote()
+        }
+    }
+
+    private suspend fun fetchTasksFromLocal(): Result<List<Task>> {
         val localTasks = tasksLocalDataSource.getTasks()
         if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
+        return Error(Exception("Results not found Locally"))
     }
+
+    private suspend fun fetchTasksFromRemote(): Result<List<Task>> = tasksRemoteDataSource.getTasks()
 
     /**
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
@@ -117,29 +112,37 @@ class DefaultTasksRepository(
     }
 
     private suspend fun fetchTaskFromRemoteOrLocal(
-        taskId: String,
-        forceUpdate: Boolean
+            taskId: String,
+            forceUpdate: Boolean
     ): Result<Task> {
-        // Remote first
-        val remoteTask = tasksRemoteDataSource.getTask(taskId)
-        when (remoteTask) {
-            is Error -> Timber.w("Remote data source fetch failed")
+        if (forceUpdate) {
+            return fetchTaskFromRemote(taskId)
+        }
+
+        // if not forced, try local first
+        return when (val localResult = fetchTaskFromLocal(taskId)) {
+            is Success -> localResult
+            else -> fetchTaskFromRemote(taskId)
+        }
+    }
+
+    private suspend fun fetchTaskFromLocal(taskId: String): Result<Task> {
+        val localTasks = tasksLocalDataSource.getTask(taskId)
+        if (localTasks is Success) return localTasks
+        return Error(Exception("Refresh failed Locally"))
+    }
+
+    private suspend fun fetchTaskFromRemote(taskId: String): Result<Task> {
+        return when (val remoteTask = tasksRemoteDataSource.getTask(taskId)) {
             is Success -> {
                 refreshLocalDataSource(remoteTask.data)
                 return remoteTask
             }
-            else -> throw IllegalStateException()
+            else -> {
+                Timber.w("Remote data source fetch failed")
+                Error(Exception("Refresh failed"))
+            }
         }
-
-        // Don't read from local if it's forced
-        if (forceUpdate) {
-            return Error(Exception("Refresh failed"))
-        }
-
-        // Local if remote fails
-        val localTasks = tasksLocalDataSource.getTask(taskId)
-        if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
     }
 
     override suspend fun saveTask(task: Task) {

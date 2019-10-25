@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source.local
+package com.example.android.architecture.blueprints.todoapp.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert

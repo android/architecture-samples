@@ -20,9 +20,9 @@ import com.example.android.architecture.blueprints.todoapp.FakeFailingTasksRemot
 import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.repository.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTasksUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -94,9 +94,9 @@ class StatisticsViewModelTest {
         mainCoroutineRule.runBlockingTest {
 
             val failingRepository = DefaultTasksRepository(
-                FakeFailingTasksRemoteDataSource,
-                FakeFailingTasksRemoteDataSource,
-                Dispatchers.Main  // Main is set in MainCoroutineRule
+                    FakeFailingTasksRemoteDataSource,
+                    FakeFailingTasksRemoteDataSource,
+                    Dispatchers.Main  // Main is set in MainCoroutineRule
             )
             val errorViewModel = StatisticsViewModel(GetTasksUseCase(failingRepository))
 

@@ -18,14 +18,14 @@ package com.example.android.architecture.blueprints.todoapp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.repository.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ClearCompletedTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.DeleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.SaveTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
@@ -42,26 +42,26 @@ class ViewModelFactory constructor(
                 when {
                     isAssignableFrom(StatisticsViewModel::class.java) ->
                         StatisticsViewModel(
-                            GetTasksUseCase(tasksRepository)
+                                GetTasksUseCase(tasksRepository)
                         )
                     isAssignableFrom(TaskDetailViewModel::class.java) ->
                         TaskDetailViewModel(
-                            GetTaskUseCase(tasksRepository),
-                            DeleteTaskUseCase(tasksRepository),
-                            CompleteTaskUseCase(tasksRepository),
-                            ActivateTaskUseCase(tasksRepository)
+                                GetTaskUseCase(tasksRepository),
+                                DeleteTaskUseCase(tasksRepository),
+                                CompleteTaskUseCase(tasksRepository),
+                                ActivateTaskUseCase(tasksRepository)
                         )
                     isAssignableFrom(AddEditTaskViewModel::class.java) ->
                         AddEditTaskViewModel(
-                            GetTaskUseCase(tasksRepository),
-                            SaveTaskUseCase(tasksRepository)
+                                GetTaskUseCase(tasksRepository),
+                                SaveTaskUseCase(tasksRepository)
                         )
                     isAssignableFrom(TasksViewModel::class.java) ->
                         TasksViewModel(
-                            GetTasksUseCase(tasksRepository),
-                            ClearCompletedTasksUseCase(tasksRepository),
-                            CompleteTaskUseCase(tasksRepository),
-                            ActivateTaskUseCase(tasksRepository)
+                                GetTasksUseCase(tasksRepository),
+                                ClearCompletedTasksUseCase(tasksRepository),
+                                CompleteTaskUseCase(tasksRepository),
+                                ActivateTaskUseCase(tasksRepository)
                         )
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

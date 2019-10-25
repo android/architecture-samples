@@ -26,10 +26,10 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.DeleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -37,10 +37,10 @@ import kotlinx.coroutines.launch
  * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
-    private val getTaskUseCase: GetTaskUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val completeTaskUseCase: CompleteTaskUseCase,
-    private val activateTaskUseCase: ActivateTaskUseCase
+        private val getTaskUseCase: GetTaskUseCase,
+        private val deleteTaskUseCase: DeleteTaskUseCase,
+        private val completeTaskUseCase: CompleteTaskUseCase,
+        private val activateTaskUseCase: ActivateTaskUseCase
 
 ) : ViewModel() {
 

@@ -27,10 +27,10 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ActivateTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.ClearCompletedTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.CompleteTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -38,10 +38,10 @@ import kotlinx.coroutines.launch
  * ViewModel for the task list screen.
  */
 class TasksViewModel(
-    private val getTasksUseCase: GetTasksUseCase,
-    private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
-    private val completeTaskUseCase: CompleteTaskUseCase,
-    private val activateTaskUseCase: ActivateTaskUseCase
+        private val getTasksUseCase: GetTasksUseCase,
+        private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
+        private val completeTaskUseCase: CompleteTaskUseCase,
+        private val activateTaskUseCase: ActivateTaskUseCase
 ) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }

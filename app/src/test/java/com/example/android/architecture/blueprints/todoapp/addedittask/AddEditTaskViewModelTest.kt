@@ -22,8 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.GetTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.usecase.SaveTaskUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -60,8 +60,8 @@ class AddEditTaskViewModelTest {
 
         // Create class under test
         addEditTaskViewModel = AddEditTaskViewModel(
-            GetTaskUseCase(tasksRepository),
-            SaveTaskUseCase(tasksRepository)
+                GetTaskUseCase(tasksRepository),
+                SaveTaskUseCase(tasksRepository)
         )
     }
 
