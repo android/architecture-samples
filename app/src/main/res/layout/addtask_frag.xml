@@ -60,6 +60,7 @@
                         android:hint="@string/title_hint"
                         android:imeOptions="flagNoExtractUi"
                         android:maxLines="1"
+                        android:inputType="text"
                         android:text="@={viewmodel.title}"
                         android:textStyle="bold"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
