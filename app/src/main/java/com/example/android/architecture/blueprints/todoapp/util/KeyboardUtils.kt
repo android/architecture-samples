@@ -7,7 +7,7 @@ import android.widget.EditText
 
 
 /**
- * Created by Santanu 😁 on 2019-11-12.
+ * Ext func to hide the keyboard
  */
 fun View.hideKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
