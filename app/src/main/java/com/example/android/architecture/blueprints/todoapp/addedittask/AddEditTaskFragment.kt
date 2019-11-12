@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
+import com.example.android.architecture.blueprints.todoapp.util.showKeyboard
 import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
@@ -44,8 +45,8 @@ class AddEditTaskFragment : Fragment() {
     private val viewModel by viewModels<AddEditTaskViewModel> { getViewModelFactory() }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
@@ -61,6 +62,7 @@ class AddEditTaskFragment : Fragment() {
         setupSnackbar()
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        viewDataBinding.addTaskTitleEditText.showKeyboard() // force opens up the keyboard
         viewModel.start(args.taskId)
     }
 
@@ -71,7 +73,7 @@ class AddEditTaskFragment : Fragment() {
     private fun setupNavigation() {
         viewModel.taskUpdatedEvent.observe(this, EventObserver {
             val action = AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
+                    .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
     }
