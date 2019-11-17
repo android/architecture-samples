@@ -4,6 +4,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenLocal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
@@ -19,6 +20,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenLocal()
     }
 }
 
@@ -42,7 +44,7 @@ ext {
     androidXAnnotations = '1.0.1'
     androidXLegacySupport = '1.0.0'
     appCompatVersion = '1.0.2'
-    archLifecycleVersion = '2.2.0-alpha01'
+    archLifecycleVersion = '2.2.0-rc02'
     archTestingVersion = '2.0.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'
@@ -56,7 +58,7 @@ ext {
     mockitoVersion = '2.8.9'
     recyclerViewVersion = '1.0.0'
     robolectricVersion = '4.3-beta-1'
-    roomVersion = '2.1.0'
+    roomVersion = '2.2.0'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '0.44'

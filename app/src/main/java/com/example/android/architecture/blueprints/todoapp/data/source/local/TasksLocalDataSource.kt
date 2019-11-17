@@ -24,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 /**
@@ -34,13 +36,13 @@ class TasksLocalDataSource internal constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksDataSource {
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
+    override fun observeTasks(): Flow<Result<List<Task>>> {
         return tasksDao.observeTasks().map {
             Success(it)
         }
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+    override fun observeTask(taskId: String): Flow<Result<Task>> {
         return tasksDao.observeTaskById(taskId).map {
             Success(it)
         }

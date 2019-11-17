@@ -17,10 +17,12 @@ package com.example.android.architecture.blueprints.todoapp.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import kotlinx.coroutines.flow.Flow
 import java.util.LinkedHashMap
 
 /**
@@ -40,22 +42,23 @@ object FakeTasksRemoteDataSource : TasksDataSource {
         refreshTasks()
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
-        return observableTasks
+    override fun observeTasks(): Flow<Result<List<Task>>> {
+        return observableTasks.asFlow()
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+    override fun observeTask(taskId: String): Flow<Result<Task>> {
         return observableTasks.map { tasks ->
             when (tasks) {
                 is Result.Loading -> Result.Loading
                 is Error -> Error(tasks.exception)
                 is Success -> {
                     val task = tasks.data.firstOrNull() { it.id == taskId }
-                        ?: return@map Error(Exception("Not found"))
+                            ?: return@map Error(Exception("Not found"))
                     Success(task)
                 }
             }
         }
+                .asFlow()
     }
 
     override suspend fun getTask(taskId: String): Result<Task> {

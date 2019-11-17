@@ -21,6 +21,8 @@ import androidx.lifecycle.liveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 object FakeFailingTasksRemoteDataSource : TasksDataSource {
     override suspend fun getTasks(): Result<List<Task>> {
@@ -31,16 +33,16 @@ object FakeFailingTasksRemoteDataSource : TasksDataSource {
         return Result.Error(Exception("Test"))
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
-        return liveData { emit(getTasks()) }
+    override fun observeTasks(): Flow<Result<List<Task>>> {
+        return flow { emit(getTasks()) }
     }
 
     override suspend fun refreshTasks() {
         TODO("not implemented")
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
-        return liveData { emit(getTask(taskId)) }
+    override fun observeTask(taskId: String): Flow<Result<Task>> {
+        return flow { emit(getTask(taskId)) }
     }
 
     override suspend fun refreshTask(taskId: String) {

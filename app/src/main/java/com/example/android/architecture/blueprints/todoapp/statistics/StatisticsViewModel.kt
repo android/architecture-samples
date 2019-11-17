@@ -16,11 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
@@ -36,7 +32,7 @@ class StatisticsViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks()
+    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks().asLiveData(viewModelScope.coroutineContext)
     private val _dataLoading = MutableLiveData<Boolean>(false)
     private val stats: LiveData<StatsResult?> = tasks.map {
         if (it is Success) {

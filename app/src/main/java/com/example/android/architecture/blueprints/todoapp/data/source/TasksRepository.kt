@@ -19,19 +19,21 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.nytimes.android.external.store4.StoreResponse
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Interface to the data layer.
  */
 interface TasksRepository {
 
-    fun observeTasks(): LiveData<Result<List<Task>>>
+    fun observeTasks(shouldRefresh: Boolean): Flow<Result<List<Task>>>
+
 
     suspend fun getTasks(forceUpdate: Boolean = false): Result<List<Task>>
 
-    suspend fun refreshTasks()
 
-    fun observeTask(taskId: String): LiveData<Result<Task>>
+    fun observeTask(taskId: String): Flow<Result<Task>>
 
     suspend fun getTask(taskId: String, forceUpdate: Boolean = false): Result<Task>
 
