@@ -32,7 +32,8 @@ class StatisticsViewModel(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks().asLiveData(viewModelScope.coroutineContext)
+    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks(shouldRefresh = false)
+            .asLiveData(viewModelScope.coroutineContext)
     private val _dataLoading = MutableLiveData<Boolean>(false)
     private val stats: LiveData<StatsResult?> = tasks.map {
         if (it is Success) {
@@ -49,11 +50,12 @@ class StatisticsViewModel(
     val error: LiveData<Boolean> = tasks.map { it is Error }
     val empty: LiveData<Boolean> = tasks.map { (it as? Success)?.data.isNullOrEmpty() }
 
+    //TODO MIKE migrate to store
     fun refresh() {
         _dataLoading.value = true
         wrapEspressoIdlingResource {
             viewModelScope.launch {
-                tasksRepository.refreshTasks()
+//                tasksRepository.refreshTasks()
                 _dataLoading.value = false
             }
         }

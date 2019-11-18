@@ -83,7 +83,7 @@ class TasksViewModel(
     private var resultMessageShown: Boolean = false
 
     // This LiveData depends on another so we can use a transformation.
-    val empty = _items.filter { it.isEmpty() }
+    val empty = _items.map { it.isEmpty() }.asLiveData(viewModelScope.coroutineContext)
 
     init {
         // Set initial state
@@ -222,15 +222,3 @@ class TasksViewModel(
         _forceUpdate.offer(true)
     }
 }
-
-
-abstract class Data {
-    abstract fun refresh()
-    abstract val items: List<Task>
-    abstract val dataLoading: Boolean
-    abstract val empty: Boolean
-    abstract val currentFilteringLabel: Int
-    abstract val context: Context
-}
-
-data class Result(val items: List<Task>)

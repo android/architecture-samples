@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.nytimes.android.external.store4.StoreResponse
@@ -29,17 +28,11 @@ interface TasksRepository {
 
     fun observeTasks(shouldRefresh: Boolean): Flow<Result<List<Task>>>
 
-
     suspend fun getTasks(forceUpdate: Boolean = false): Result<List<Task>>
 
-
-    fun observeTask(taskId: String): Flow<Result<Task>>
+    fun observeTask(taskId: String, shouldRefresh: Boolean): Flow<Result<Task>>
 
     suspend fun getTask(taskId: String, forceUpdate: Boolean = false): Result<Task>
-
-    suspend fun refreshTask(taskId: String)
-
-    suspend fun saveTask(task: Task)
 
     suspend fun completeTask(task: Task)
 
@@ -54,4 +47,6 @@ interface TasksRepository {
     suspend fun deleteAllTasks()
 
     suspend fun deleteTask(taskId: String)
+
+    suspend fun saveTask(task: Task)
 }

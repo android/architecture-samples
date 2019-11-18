@@ -20,9 +20,11 @@ import androidx.lifecycle.*
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -30,14 +32,15 @@ import kotlinx.coroutines.launch
  * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
-    private val tasksRepository: TasksRepository
+        private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val _taskId = MutableLiveData<String>()
+    private val _taskId = ConflatedBroadcastChannel<String>()
 
-    private val _task = _taskId.switchMap { taskId ->
-        tasksRepository.observeTask(taskId).asLiveData(viewModelScope.coroutineContext).map { computeResult(it) }
-    }
+    private val _task = _taskId.asFlow().flatMapLatest { taskId ->
+        tasksRepository.observeTask(taskId, true).map { computeResult(it) }
+    }.asLiveData(viewModelScope.coroutineContext)
+
     val task: LiveData<Task?> = _task
 
     val isDataAvailable: LiveData<Boolean> = _task.map { it != null }
@@ -82,16 +85,13 @@ class TaskDetailViewModel(
     }
 
     fun start(taskId: String?) {
-        // If we're already loading or already loaded, return (might be a config change)
-        if (_dataLoading.value == true || taskId == _taskId.value) {
-            return
-        }
+
         // Trigger the load
-        _taskId.value = taskId
+        _taskId.offer(taskId!!)
     }
 
     private fun computeResult(taskResult: Result<Task>): Task? {
-        return if (taskResult is Success) {
+        return if (taskResult is Result.Success) {
             taskResult.data
         } else {
             showSnackbarMessage(R.string.loading_tasks_error)
@@ -101,14 +101,7 @@ class TaskDetailViewModel(
 
 
     fun refresh() {
-        // Refresh the repository and the task will be updated automatically.
-        _task.value?.let {
-            _dataLoading.value = true
-            viewModelScope.launch {
-                tasksRepository.refreshTask(it.id)
-                _dataLoading.value = false
-            }
-        }
+        _task.value?.id?.let { _taskId.offer(it) }
     }
 
     private fun showSnackbarMessage(@StringRes message: Int) {

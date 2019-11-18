@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,10 +43,17 @@ class DefaultTasksRepository(
             )
             .build()
 
+    val taskStore = FlowStoreBuilder.fromNonFlow<String, Result<Task>, Result<Task>> { tasksRemoteDataSource.getTask(it) }
+            .persister(
+                    reader = { tasksLocalDataSource.observeTask(it) },
+                    writer = { key, result: Result<Task> -> saveTask(result) }
+            )
+            .build()
+
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
         if (forceUpdate) {
             try {
-                tasksStore.get(Unit)
+                return tasksStore.get(Unit)
             } catch (ex: Exception) {
                 return Result.Error(ex)
             }
@@ -55,12 +63,13 @@ class DefaultTasksRepository(
 
 
     override fun observeTasks(shouldRefresh: Boolean): Flow<Result<List<Task>>> {
-        return tasksStore.stream(StoreRequest.cached(key = Unit, refresh = true)).map { it.requireData() }
+        return tasksStore.stream(StoreRequest.cached(key = Unit, refresh = true)).filter { it  !is StoreResponse.Loading}.map { it.requireData() }
     }
 
-    override suspend fun refreshTask(taskId: String) {
-        updateTaskFromRemoteDataSource(taskId)
+    override fun observeTask(taskId: String, shouldRefresh: Boolean): Flow<Result<Task>> {
+        return taskStore.stream(StoreRequest.cached(taskId, refresh = shouldRefresh)).filter { it  !is StoreResponse.Loading}.map { it.requireData() }
     }
+
 
     private suspend fun updateTasksFromRemoteDataSource(remoteTasks: Result<List<Task>>) {
         if (remoteTasks is Success) {
@@ -74,26 +83,20 @@ class DefaultTasksRepository(
         }
     }
 
-    override fun observeTask(taskId: String): Flow<Result<Task>> {
-        return tasksLocalDataSource.observeTask(taskId)
-    }
-
-    private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
-        val remoteTask = tasksRemoteDataSource.getTask(taskId)
-
-        if (remoteTask is Success) {
-            tasksLocalDataSource.saveTask(remoteTask.data)
-        }
-    }
 
     /**
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-        if (forceUpdate) {
-            updateTaskFromRemoteDataSource(taskId)
+    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> =
+            if (forceUpdate) taskStore.fresh(taskId)
+            else taskStore.get(taskId)
+
+
+     suspend fun saveTask(task: Result<Task>) {
+        if (task is Success) {
+            saveTask(task.data)
         }
-        return tasksLocalDataSource.getTask(taskId)
+
     }
 
     override suspend fun saveTask(task: Task) {
