@@ -42,7 +42,7 @@ ext {
     androidXAnnotations = '1.0.1'
     androidXLegacySupport = '1.0.0'
     appCompatVersion = '1.0.2'
-    archLifecycleVersion = '2.1.0-rc01'
+    archLifecycleVersion = '2.2.0-alpha01'
     archTestingVersion = '2.0.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'

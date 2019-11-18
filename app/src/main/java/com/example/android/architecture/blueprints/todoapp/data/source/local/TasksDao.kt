@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -28,6 +29,23 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
  */
 @Dao
 interface TasksDao {
+
+    /**
+     * Observes list of tasks.
+     *
+     * @return all tasks.
+     */
+    @Query("SELECT * FROM Tasks")
+    fun observeTasks(): LiveData<List<Task>>
+
+    /**
+     * Observes a single task.
+     *
+     * @param taskId the task id.
+     * @return the task with taskId.
+     */
+    @Query("SELECT * FROM Tasks WHERE entryid = :taskId")
+    fun observeTaskById(taskId: String): LiveData<Task>
 
     /**
      * Select all tasks from the tasks table.
