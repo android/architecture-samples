@@ -37,7 +37,7 @@ class TasksViewModel(
         private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val _forceUpdate = ConflatedBroadcastChannel<Boolean>(false)
+    private val _forceUpdate = ConflatedBroadcastChannel<Boolean>(true)
 
     private val _items: Flow<List<Task>> = _forceUpdate.asFlow().flatMapLatest { forceUpdate ->
         _dataLoading.value = forceUpdate
