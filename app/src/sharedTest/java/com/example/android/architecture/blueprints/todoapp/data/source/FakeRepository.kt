@@ -42,7 +42,7 @@ class FakeRepository : TasksRepository {
     }
 
     override suspend fun refreshTasks() {
-        observableTasks.value = getTasks()
+        observableTasks.postValue(getTasks())
     }
 
     override suspend fun refreshTask(taskId: String) {
