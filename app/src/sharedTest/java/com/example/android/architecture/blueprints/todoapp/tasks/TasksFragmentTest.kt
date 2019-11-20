@@ -124,6 +124,7 @@ class TasksFragmentTest {
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
+
         onView(withText("TITLE1")).check(matches(isDisplayed()))
     }
 

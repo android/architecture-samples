@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp
+package com.example.android.architecture.blueprints.todoapp.domain
 
-import androidx.lifecycle.LiveData
-import org.junit.Assert.assertEquals
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 
-fun assertLiveDataEventTriggered(
-    liveData: LiveData<Event<String>>,
-    taskId: String
+class RefreshTaskUseCase(
+    private val tasksRepository: TasksRepository
 ) {
-    val value = liveData.getOrAwaitValue()
-    assertEquals(value.getContentIfNotHandled(), taskId)
-}
-
-fun assertSnackbarMessage(snackbarLiveData: LiveData<Event<Int>>, messageId: Int) {
-    val value: Event<Int> = snackbarLiveData.getOrAwaitValue()
-    assertEquals(value.getContentIfNotHandled(), messageId)
+    suspend operator fun invoke(
+        currentFiltering: TasksFilterType = ALL_TASKS
+    ) {
+        return tasksRepository.refreshTasks()
+    }
 }

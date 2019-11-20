@@ -52,6 +52,5 @@ class StatisticsFragment : Fragment() {
         viewDataBinding.viewmodel = viewModel
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        viewModel.start()
     }
 }
