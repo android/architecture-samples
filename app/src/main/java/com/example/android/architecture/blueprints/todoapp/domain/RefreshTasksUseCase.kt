@@ -16,43 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.domain
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 
-class ObserveTasksUseCase(
+class RefreshTasksUseCase(
     private val tasksRepository: TasksRepository
 ) {
-    operator fun invoke(
-        currentFiltering: TasksFilterType = ALL_TASKS
-    ): LiveData<Result<List<Task>>> {
-        return tasksRepository.observeTasks().map {
-
-            if (it is Success && currentFiltering != ALL_TASKS) {
-                val tasksToShow = mutableListOf<Task>()
-                // We filter the tasks based on the requestType
-                for (task in it.data) {
-                    when (currentFiltering) {
-                        ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
-                        }
-                        COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
-                        }
-                        else -> throw NotImplementedError()
-                    }
-                }
-                Success(tasksToShow)
-            } else {
-                it
-            }
-        }
+    suspend operator fun invoke() {
+        return tasksRepository.refreshTasks()
     }
 }

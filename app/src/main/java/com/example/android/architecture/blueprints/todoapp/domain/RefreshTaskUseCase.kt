@@ -17,15 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp.domain
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 
 class RefreshTaskUseCase(
     private val tasksRepository: TasksRepository
 ) {
     suspend operator fun invoke(
-        currentFiltering: TasksFilterType = ALL_TASKS
+        taskId: String
     ) {
-        return tasksRepository.refreshTasks()
+        return tasksRepository.refreshTask(taskId)
     }
 }

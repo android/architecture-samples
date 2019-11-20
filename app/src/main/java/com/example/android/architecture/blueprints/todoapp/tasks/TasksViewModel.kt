@@ -19,8 +19,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
@@ -32,39 +33,43 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the task list screen.
  */
 class TasksViewModel(
-    private val getTasksUseCase: GetTasksUseCase,
+    private val observeTasksUseCase: ObserveTasksUseCase,
+    private val refreshTasksUseCase: RefreshTasksUseCase,
     private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
     private val completeTaskUseCase: CompleteTaskUseCase,
     private val activateTaskUseCase: ActivateTaskUseCase
 ) : ViewModel() {
 
-    private val _forceUpdate = MutableLiveData<Boolean>(false)
+    private var currentFiltering = MutableLiveData<TasksFilterType>(TasksFilterType.ALL_TASKS)
 
-    private val _items: LiveData<List<Task>> = _forceUpdate.switchMap { forceUpdate ->
-        if (forceUpdate) {
-            _dataLoading.value = true
-            viewModelScope.launch {
-                tasksRepository.refreshTasks()
-                _dataLoading.value = false
-            }
+    private val _items: LiveData<Result<List<Task>>> = currentFiltering.switchMap {
+        liveData {
+            emit(Result.Loading)
+            emitSource(observeTasksUseCase(it))
         }
-        tasksRepository.observeTasks().switchMap { filterTasks(it) }
-
     }
 
-    val items: LiveData<List<Task>> = _items
+    // Exposed items
+    val items: LiveData<List<Task>> = _items.map {
+        if (it is Success) {
+            dataLoading.value = false
+            it.data
+        } else {
+            dataLoading.value = false
+            showSnackbarMessage(R.string.loading_tasks_error)
+            emptyList()
+        }
+    }
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    val dataLoading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
     val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel
@@ -81,10 +86,8 @@ class TasksViewModel(
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarText: LiveData<Event<Int>> = _snackbarText
 
-    private var currentFiltering = TasksFilterType.ALL_TASKS
-
     // Not used at the moment
-    private val isDataLoadingError = MutableLiveData<Boolean>()
+    private val isDataLoadingError = _items.map { it !is Success }
 
     private val _openTaskEvent = MutableLiveData<Event<String>>()
     val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
@@ -95,8 +98,8 @@ class TasksViewModel(
     private var resultMessageShown: Boolean = false
 
     // This LiveData depends on another so we can use a transformation.
-    val empty: LiveData<Boolean> = Transformations.map(_items) {
-        it.isEmpty()
+    val empty: LiveData<Boolean> = _items.map {
+        (it as? Success)?.data?.isEmpty() ?: true
     }
 
     init {
@@ -113,7 +116,7 @@ class TasksViewModel(
      * [TasksFilterType.ACTIVE_TASKS]
      */
     fun setFiltering(requestType: TasksFilterType) {
-        currentFiltering = requestType
+        currentFiltering.value = requestType
 
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         when (requestType) {
@@ -195,49 +198,20 @@ class TasksViewModel(
         _snackbarText.value = Event(message)
     }
 
-    private fun filterTasks(tasksResult: Result<List<Task>>): LiveData<List<Task>> {
-        // TODO: This is a good case for liveData builder. Replace when stable.
-        val result = MutableLiveData<List<Task>>()
-
-        if (tasksResult is Success) {
-            isDataLoadingError.value = false
-            viewModelScope.launch {
-                result.value = filterItems(tasksResult.data, currentFiltering)
-            }
-        } else {
-            result.value = emptyList()
-            showSnackbarMessage(R.string.loading_tasks_error)
-            isDataLoadingError.value = true
-        }
-
-        return result
-    }
-
     /**
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
-        _forceUpdate.value = forceUpdate
-    }
-
-    private fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
-            val tasksToShow = ArrayList<Task>()
-            // We filter the tasks based on the requestType
-            for (task in tasks) {
-                when (filteringType) {
-                    TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                    TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
-                        tasksToShow.add(task)
-                    }
-                    TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
-                        tasksToShow.add(task)
-                    }
-                }
+        dataLoading.value = true
+        if (forceUpdate) {
+            viewModelScope.launch {
+                refreshTasksUseCase()
             }
-            return tasksToShow
         }
+    }
 
     fun refresh() {
-        _forceUpdate.value = true
+        loadTasks(true)
     }
 }
+

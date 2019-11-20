@@ -27,29 +27,29 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
-    private val getTaskUseCase: GetTaskUseCase,
+    private val observeTaskUseCase: ObserveTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val completeTaskUseCase: CompleteTaskUseCase,
-    private val activateTaskUseCase: ActivateTaskUseCase
+    private val activateTaskUseCase: ActivateTaskUseCase,
+    private val refreshTasksUseCase: RefreshTasksUseCase
 
 ) : ViewModel() {
 
     private val _taskId = MutableLiveData<String>()
 
     private val _task = _taskId.switchMap { taskId ->
-        tasksRepository.observeTask(taskId).map { computeResult(it) }
+        observeTaskUseCase(taskId).map { computeResult(it) }
     }
     val task: LiveData<Task?> = _task
 
@@ -118,7 +118,7 @@ class TaskDetailViewModel(
         _task.value?.let {
             _dataLoading.value = true
             viewModelScope.launch {
-                tasksRepository.refreshTask(it.id)
+                refreshTasksUseCase()
                 _dataLoading.value = false
             }
         }

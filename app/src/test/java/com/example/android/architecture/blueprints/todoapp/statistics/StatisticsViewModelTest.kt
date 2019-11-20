@@ -21,9 +21,9 @@ import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,7 +55,10 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        statisticsViewModel = StatisticsViewModel(GetTasksUseCase(tasksRepository))
+        statisticsViewModel = StatisticsViewModel(
+            ObserveTasksUseCase(tasksRepository),
+            RefreshTasksUseCase(tasksRepository)
+        )
     }
 
     @Test
@@ -94,7 +97,8 @@ class StatisticsViewModelTest {
         )
 
         val errorViewModel = StatisticsViewModel(
-            GetTasksUseCase(failingRepository)
+            ObserveTasksUseCase(failingRepository),
+            RefreshTasksUseCase(failingRepository)
         )
 
         // Then an error message is shown

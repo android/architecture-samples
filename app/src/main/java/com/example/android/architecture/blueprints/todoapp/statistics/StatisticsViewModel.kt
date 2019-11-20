@@ -25,7 +25,8 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
@@ -33,10 +34,11 @@ import kotlinx.coroutines.launch
  * ViewModel for the statistics screen.
  */
 class StatisticsViewModel(
-    private val getTasksUseCase: GetTasksUseCase
+    private val observeTasksUseCase: ObserveTasksUseCase,
+    private val refreshTasksUseCase: RefreshTasksUseCase
 ) : ViewModel() {
 
-    private val tasks: LiveData<Result<List<Task>>> = tasksRepository.observeTasks()
+    private val tasks: LiveData<Result<List<Task>>> = observeTasksUseCase()
     private val _dataLoading = MutableLiveData<Boolean>(false)
     private val stats: LiveData<StatsResult?> = tasks.map {
         if (it is Success) {
@@ -57,7 +59,7 @@ class StatisticsViewModel(
         _dataLoading.value = true
         wrapEspressoIdlingResource {
             viewModelScope.launch {
-                tasksRepository.refreshTasks()
+                refreshTasksUseCase()
                 _dataLoading.value = false
             }
         }

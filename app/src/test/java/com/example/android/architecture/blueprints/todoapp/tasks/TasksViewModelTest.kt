@@ -23,12 +23,13 @@ import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTr
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
-import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.example.android.architecture.blueprints.todoapp.domain.ActivateTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.ClearCompletedTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
+import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -67,7 +68,8 @@ class TasksViewModelTest {
         tasksRepository.addTasks(task1, task2, task3)
 
         tasksViewModel = TasksViewModel(
-            GetTasksUseCase(tasksRepository),
+            ObserveTasksUseCase(tasksRepository),
+            RefreshTasksUseCase(tasksRepository),
             ClearCompletedTasksUseCase(tasksRepository),
             CompleteTaskUseCase(tasksRepository),
             ActivateTaskUseCase(tasksRepository)
@@ -89,7 +91,7 @@ class TasksViewModelTest {
         tasksViewModel.items.observeForTesting {
 
             // Then progress indicator is shown
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isTrue()
+            assertThat(tasksViewModel.dataLoading.getOrAwaitValue(4)).isTrue()
 
             // Execute pending coroutines actions
             mainCoroutineRule.resumeDispatcher()
