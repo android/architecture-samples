@@ -59,17 +59,24 @@ class TasksViewModel(
 
     // Exposed items
     val items: LiveData<List<Task>> = _items.map {
-        if (it is Success) {
-            dataLoading.value = false
-            it.data
-        } else {
-            dataLoading.value = false
-            showSnackbarMessage(R.string.loading_tasks_error)
-            emptyList()
+        when (it) {
+            is Success -> {
+                dataLoading.value = false
+                it.data
+            }
+            is Result.Error -> {
+                dataLoading.value = false
+                showSnackbarMessage(R.string.loading_tasks_error)
+                emptyList()
+            }
+            is Result.Loading -> {
+                dataLoading.value = true
+                emptyList()
+            }
         }
     }
 
-    val dataLoading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    val dataLoading = MutableLiveData(false)
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
     val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel

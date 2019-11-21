@@ -32,6 +32,7 @@ import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
@@ -58,6 +59,8 @@ class TasksViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+
     @Before
     fun setupViewModel() {
         // We initialise the tasks to 3, with one active and two completed
@@ -68,7 +71,7 @@ class TasksViewModelTest {
         tasksRepository.addTasks(task1, task2, task3)
 
         tasksViewModel = TasksViewModel(
-            ObserveTasksUseCase(tasksRepository),
+            ObserveTasksUseCase(tasksRepository, testCoroutineDispatcher),
             RefreshTasksUseCase(tasksRepository),
             ClearCompletedTasksUseCase(tasksRepository),
             CompleteTaskUseCase(tasksRepository),
@@ -79,7 +82,7 @@ class TasksViewModelTest {
     @Test
     fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() {
         // Pause dispatcher so we can verify initial values
-        mainCoroutineRule.pauseDispatcher()
+        testCoroutineDispatcher.pauseDispatcher()
 
         // Given an initialized TasksViewModel with initialized tasks
         // When loading of Tasks is requested
@@ -94,7 +97,7 @@ class TasksViewModelTest {
             assertThat(tasksViewModel.dataLoading.getOrAwaitValue(4)).isTrue()
 
             // Execute pending coroutines actions
-            mainCoroutineRule.resumeDispatcher()
+            testCoroutineDispatcher.resumeDispatcher()
 
             // Then progress indicator is hidden
             assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
@@ -191,20 +194,25 @@ class TasksViewModelTest {
         // Fetch tasks
         tasksViewModel.loadTasks(true)
 
-        // Fetch tasks
-        val allTasks = tasksViewModel.items.getOrAwaitValue()
-        val completedTasks = allTasks.filter { it.isCompleted }
+        // ObserveForTesting instead of getOrAwaitValue because we receive two values (Loading
+        // and data).
+        tasksViewModel.items.observeForTesting {
 
-        // Verify there are no completed tasks left
-        assertThat(completedTasks).isEmpty()
+            // Fetch tasks
+            val allTasks = tasksViewModel.items.value!!
+            val completedTasks = allTasks.filter { it.isCompleted }
 
-        // Verify active task is not cleared
-        assertThat(allTasks).hasSize(1)
+            // Verify there are no completed tasks left
+            assertThat(completedTasks).isEmpty()
 
-        // Verify snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.completed_tasks_cleared
-        )
+            // Verify active task is not cleared
+            assertThat(allTasks).hasSize(1)
+
+            // Verify snackbar is updated
+            assertSnackbarMessage(
+                tasksViewModel.snackbarText, R.string.completed_tasks_cleared
+            )
+        }
     }
 
     @Test

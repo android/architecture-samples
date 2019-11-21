@@ -27,6 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
@@ -53,10 +54,12 @@ class StatisticsViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+
     @Before
     fun setupStatisticsViewModel() {
         statisticsViewModel = StatisticsViewModel(
-            ObserveTasksUseCase(tasksRepository),
+            ObserveTasksUseCase(tasksRepository, testCoroutineDispatcher),
             RefreshTasksUseCase(tasksRepository)
         )
     }

@@ -42,7 +42,7 @@ class FakeRepository : TasksRepository {
     }
 
     override suspend fun refreshTasks() {
-        observableTasks.value = getTasks()
+        observableTasks.postValue(getTasks())
     }
 
     override suspend fun refreshTask(taskId: String) {
@@ -61,7 +61,7 @@ class FakeRepository : TasksRepository {
                 is Result.Loading -> Result.Loading
                 is Error -> Error(tasks.exception)
                 is Success -> {
-                    val task = tasks.data.firstOrNull() { it.id == taskId }
+                    val task = tasks.data.firstOrNull { it.id == taskId }
                         ?: return@map Error(Exception("Not found"))
                     Success(task)
                 }

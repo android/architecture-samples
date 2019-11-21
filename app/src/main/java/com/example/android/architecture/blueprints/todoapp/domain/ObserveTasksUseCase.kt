@@ -26,14 +26,18 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ObserveTasksUseCase(
-    private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         currentFiltering: TasksFilterType = ALL_TASKS
-    ): LiveData<Result<List<Task>>> {
-        return tasksRepository.observeTasks().map {
+    ): LiveData<Result<List<Task>>> = withContext(dispatcher) {
+        tasksRepository.observeTasks().map {
 
             if (it is Success && currentFiltering != ALL_TASKS) {
                 val tasksToShow = mutableListOf<Task>()

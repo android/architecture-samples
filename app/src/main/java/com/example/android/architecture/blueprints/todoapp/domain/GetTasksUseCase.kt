@@ -10,6 +10,9 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 
+/**
+ * Not used. Left for sample completeness.
+ */
 class GetTasksUseCase(
     private val tasksRepository: TasksRepository
 ) {
