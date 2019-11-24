@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ //a useless comment
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Result
