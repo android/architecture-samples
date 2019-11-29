@@ -21,8 +21,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.test.core.app.ActivityScenario
 import com.example.android.architecture.blueprints.todoapp.R
 
-fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription()
-    : String {
+fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription(): String {
     var description = ""
     onActivity {
         description =

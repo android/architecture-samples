@@ -28,7 +28,7 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinatorLayout"
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -80,7 +80,7 @@
                     <!-- android:paddingTop specified to temporarily work around -->
                     <!-- https://github.com/robolectric/robolectric/issues/4588 -->
                     <CheckBox
-                        android:id="@+id/task_detail_complete"
+                        android:id="@+id/task_detail_complete_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -90,20 +90,20 @@
                         android:paddingTop="1dp" />
 
                     <TextView
-                        android:id="@+id/task_detail_title"
+                        android:id="@+id/task_detail_title_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/task_detail_complete"
+                        android:layout_toRightOf="@id/task_detail_complete_checkbox"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.title}"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+id/task_detail_description"
+                        android:id="@+id/task_detail_description_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/task_detail_title"
-                        android:layout_toRightOf="@id/task_detail_complete"
+                        android:layout_below="@id/task_detail_title_text"
+                        android:layout_toRightOf="@id/task_detail_complete_checkbox"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.description}"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -113,7 +113,7 @@
         </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_edit_task"
+            android:id="@+id/edit_task_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"

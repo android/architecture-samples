@@ -19,8 +19,11 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="list_item_padding">8dp</dimen>
-
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="list_item_padding">8dp</dimen>
+    <dimen name="header_height">192dp</dimen>
+    <dimen name="header_padding">16dp</dimen>
+    <dimen name="header_image_width">100dp</dimen>
 
 </resources>

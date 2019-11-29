@@ -24,10 +24,10 @@ import java.util.UUID
  * Immutable model class for a Task. In order to compile with Room, we can't use @JvmOverloads to
  * generate multiple constructors.
  *
- * @param title       title of the task
+ * @param title title of the task
  * @param description description of the task
  * @param isCompleted whether or not this task is completed
- * @param id          id of the task
+ * @param id id of the task
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
@@ -39,7 +39,6 @@ data class Task @JvmOverloads constructor(
 
     val titleForList: String
         get() = if (title.isNotEmpty()) title else description
-
 
     val isActive
         get() = !isCompleted

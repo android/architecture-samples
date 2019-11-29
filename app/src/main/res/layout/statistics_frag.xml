@@ -42,7 +42,7 @@
             android:paddingBottom="@dimen/activity_vertical_margin">
 
             <LinearLayout
-                android:id="@+id/statistics"
+                android:id="@+id/statistics_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"

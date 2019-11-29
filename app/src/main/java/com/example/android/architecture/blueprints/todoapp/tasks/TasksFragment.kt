@@ -57,7 +57,8 @@ class TasksFragment : DaggerFragment() {
     private lateinit var listAdapter: TasksAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
@@ -98,10 +99,6 @@ class TasksFragment : DaggerFragment() {
         setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
         setupFab()
-
-        // Always reloading data for simplicity. Real apps should only do this on first load and
-        // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
-        viewModel.loadTasks(true)
     }
 
     private fun setupNavigation() {
@@ -114,7 +111,7 @@ class TasksFragment : DaggerFragment() {
     }
 
     private fun setupSnackbar() {
-        view?.setupSnackbar(this, viewModel.snackbarMessage, Snackbar.LENGTH_SHORT)
+        view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
         arguments?.let {
             viewModel.showEditResultMessage(args.userMessage)
         }
@@ -133,7 +130,6 @@ class TasksFragment : DaggerFragment() {
                         else -> TasksFilterType.ALL_TASKS
                     }
                 )
-                viewModel.loadTasks(false)
                 true
             }
             show()
@@ -141,7 +137,7 @@ class TasksFragment : DaggerFragment() {
     }
 
     private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.fab_add_task)?.let {
+        activity?.findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
             it.setOnClickListener {
                 navigateToAddNewTask()
             }
