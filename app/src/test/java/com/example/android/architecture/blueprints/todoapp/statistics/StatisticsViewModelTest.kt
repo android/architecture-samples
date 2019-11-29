@@ -83,12 +83,12 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay(){
+    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         val errorViewModel = StatisticsViewModel(
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,
                 FakeFailingTasksRemoteDataSource,
-                Dispatchers.Main  // Main is set in MainCoroutineRule
+                Dispatchers.Main // Main is set in MainCoroutineRule
             )
         )
 

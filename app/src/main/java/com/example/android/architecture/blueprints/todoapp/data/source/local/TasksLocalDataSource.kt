@@ -47,11 +47,11 @@ class TasksLocalDataSource internal constructor(
     }
 
     override suspend fun refreshTask(taskId: String) {
-        //NO-OP
+        // NO-OP
     }
 
     override suspend fun refreshTasks() {
-        //NO-OP
+        // NO-OP
     }
 
     override suspend fun getTasks(): Result<List<Task>> = withContext(ioDispatcher) {

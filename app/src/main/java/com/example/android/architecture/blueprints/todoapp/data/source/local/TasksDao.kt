@@ -84,7 +84,7 @@ interface TasksDao {
     /**
      * Update the complete status of a task
      *
-     * @param taskId    id of the task
+     * @param taskId id of the task
      * @param completed status to be updated
      */
     @Query("UPDATE tasks SET completed = :completed WHERE entryid = :taskId")

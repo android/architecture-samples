@@ -24,7 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
  */
 interface TasksDataSource {
 
-
     fun observeTasks(): LiveData<Result<List<Task>>>
 
     suspend fun getTasks(): Result<List<Task>>
