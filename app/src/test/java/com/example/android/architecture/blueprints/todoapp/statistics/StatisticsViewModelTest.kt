@@ -88,7 +88,7 @@ class StatisticsViewModelTest {
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,
                 FakeFailingTasksRemoteDataSource,
-                Dispatchers.Main  // Main is set in MainCoroutineRule
+                Dispatchers.Main // Main is set in MainCoroutineRule
             ),
             StatisticsUtils()
         )

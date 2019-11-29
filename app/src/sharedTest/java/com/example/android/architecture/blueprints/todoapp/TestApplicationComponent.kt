@@ -45,6 +45,5 @@ interface TestApplicationComponent : AndroidInjector<TestTodoApplication> {
         fun create(@BindsInstance applicationContext: Context): TestApplicationComponent
     }
 
-
     val tasksRepository: TasksRepository
 }
