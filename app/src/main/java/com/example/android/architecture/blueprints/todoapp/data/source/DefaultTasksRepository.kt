@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * TODO
+ * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  */
 class DefaultTasksRepository @Inject constructor(
     @TasksRemoteDataSource private val tasksRemoteDataSource: TasksDataSource,

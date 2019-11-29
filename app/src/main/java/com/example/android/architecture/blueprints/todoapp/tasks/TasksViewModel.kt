@@ -52,7 +52,6 @@ class TasksViewModel @Inject constructor(
             }
         }
         tasksRepository.observeTasks().switchMap { filterTasks(it) }
-
     }
 
     val items: LiveData<List<Task>> = _items
@@ -135,8 +134,10 @@ class TasksViewModel @Inject constructor(
     }
 
     private fun setFilter(
-        @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
-        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
+        @StringRes filteringLabelString: Int,
+        @StringRes noTasksLabelString: Int,
+        @DrawableRes noTaskIconDrawable: Int,
+        tasksAddVisible: Boolean
     ) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
@@ -208,7 +209,7 @@ class TasksViewModel @Inject constructor(
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
+     * @param forceUpdate Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
         _forceUpdate.value = forceUpdate

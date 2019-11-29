@@ -83,7 +83,7 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay(){
+    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
         val errorViewModel = StatisticsViewModel(
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,

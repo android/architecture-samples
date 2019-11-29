@@ -41,7 +41,8 @@ class StatisticsFragment : DaggerFragment() {
     private val viewModel by viewModels<StatisticsViewModel> { viewModelFactory }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = DataBindingUtil.inflate(
