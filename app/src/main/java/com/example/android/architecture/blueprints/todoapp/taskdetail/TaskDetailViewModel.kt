@@ -112,7 +112,6 @@ class TaskDetailViewModel(
         }
     }
 
-
     fun refresh() {
         // Refresh the repository and the task will be updated automatically.
         _task.value?.let {

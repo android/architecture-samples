@@ -281,4 +281,3 @@ class DefaultTasksRepositoryTest {
         assertThat(afterDeleteTasks).doesNotContain(task1)
     }
 }
-

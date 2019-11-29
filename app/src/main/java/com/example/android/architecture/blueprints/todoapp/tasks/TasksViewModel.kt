@@ -151,8 +151,10 @@ class TasksViewModel(
     }
 
     private fun setFilter(
-        @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
-        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
+        @StringRes filteringLabelString: Int,
+        @StringRes noTasksLabelString: Int,
+        @DrawableRes noTaskIconDrawable: Int,
+        tasksAddVisible: Boolean
     ) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
@@ -206,7 +208,7 @@ class TasksViewModel(
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
+     * @param forceUpdate Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
         dataLoading.value = true

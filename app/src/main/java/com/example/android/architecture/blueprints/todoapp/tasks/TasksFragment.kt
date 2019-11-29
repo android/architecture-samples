@@ -53,7 +53,8 @@ class TasksFragment : Fragment() {
     private lateinit var listAdapter: TasksAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {

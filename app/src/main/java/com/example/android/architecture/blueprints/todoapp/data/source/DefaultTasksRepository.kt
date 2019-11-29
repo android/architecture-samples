@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
- * TODO
+ * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  */
 class DefaultTasksRepository(
     private val tasksRemoteDataSource: TasksDataSource,
