@@ -1,12 +1,13 @@
 buildscript {
-    ext.kotlinVersion = '1.3.31'
+    ext.kotlinVersion = '1.3.50'
     ext.navigationVersion = "2.1.0-alpha06"
+    ext.ktlintVersion = '0.33.0'
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 
@@ -15,15 +16,23 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.24.0"
+}
+
 allprojects {
     repositories {
         google()
         jcenter()
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    apply plugin: 'com.diffplug.gradle.spotless'
+    spotless {
+        kotlin {
+            target "**/*.kt"
+            targetExclude ".idea/"
+            ktlint(ktlintVersion)
+        }
+    }
 }
 
 // Define versions in a single place
