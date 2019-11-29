@@ -223,4 +223,3 @@ class TasksViewModel(
         loadTasks(true)
     }
 }
-

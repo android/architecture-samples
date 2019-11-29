@@ -14,5 +14,4 @@ class GetTaskUseCase(
             return tasksRepository.getTask(taskId, forceUpdate)
         }
     }
-
 }

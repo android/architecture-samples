@@ -76,7 +76,7 @@ class ObserveTasksUseCaseTest {
     }
 
     @Test
-    fun loadTasks_completedFilter() = runBlockingTest{
+    fun loadTasks_completedFilter() = runBlockingTest {
         // Given a repository with 1 active and 2 completed tasks:
         tasksRepository.addTasks(
             Task("title", "desc", false),
@@ -93,7 +93,7 @@ class ObserveTasksUseCaseTest {
     }
 
     @Test
-    fun loadTasks_activeFilter() = runBlockingTest{
+    fun loadTasks_activeFilter() = runBlockingTest {
         // Given a repository with 1 active and 2 completed tasks:
         tasksRepository.addTasks(
             Task("title", "desc", false),

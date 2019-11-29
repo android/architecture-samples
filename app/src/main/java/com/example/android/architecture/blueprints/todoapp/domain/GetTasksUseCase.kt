@@ -47,5 +47,4 @@ class GetTasksUseCase(
             return tasksResult
         }
     }
-
 }
