@@ -64,7 +64,7 @@ class DefaultTasksRepositoryTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun getTasks_emptyRepositoryAndUninitializedCache() = runBlockingTest {
+    fun getTasks_emptyRepositoryAndUninitializedCache() = mainCoroutineRule.runBlockingTest {
         val emptySource = FakeDataSource()
         val tasksRepository = DefaultTasksRepository(
             emptySource, emptySource, Dispatchers.Main
@@ -74,7 +74,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_repositoryCachesAfterFirstApiCall() = runBlockingTest {
+    fun getTasks_repositoryCachesAfterFirstApiCall() = mainCoroutineRule.runBlockingTest {
         // Trigger the repository to load data, which loads from remote and caches
         val initial = tasksRepository.getTasks()
 
@@ -87,7 +87,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_requestsAllTasksFromRemoteDataSource() = runBlockingTest {
+    fun getTasks_requestsAllTasksFromRemoteDataSource() = mainCoroutineRule.runBlockingTest {
         // When tasks are requested from the tasks repository
         val tasks = tasksRepository.getTasks(true) as Success
 
@@ -96,7 +96,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun saveTask_savesToLocalAndRemote() = runBlockingTest {
+    fun saveTask_savesToLocalAndRemote() = mainCoroutineRule.runBlockingTest {
         // Make sure newTask is not in the remote or local datasources
         assertThat(tasksRemoteDataSource.tasks).doesNotContain(newTask)
         assertThat(tasksLocalDataSource.tasks).doesNotContain(newTask)
@@ -110,7 +110,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = runBlockingTest {
+    fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = mainCoroutineRule.runBlockingTest {
         // First call returns from REMOTE
         val tasks = tasksRepository.getTasks()
 
@@ -129,7 +129,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_WithDirtyCache_remoteUnavailable_error() = runBlockingTest {
+    fun getTasks_WithDirtyCache_remoteUnavailable_error() = mainCoroutineRule.runBlockingTest {
         // Make remote data source unavailable
         tasksRemoteDataSource.tasks = null
 
@@ -141,16 +141,17 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() = runBlockingTest {
-        // When the remote data source is unavailable
-        tasksRemoteDataSource.tasks = null
+    fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() =
+        mainCoroutineRule.runBlockingTest {
+            // When the remote data source is unavailable
+            tasksRemoteDataSource.tasks = null
 
-        // The repository fetches from the local source
-        assertThat((tasksRepository.getTasks() as Success).data).isEqualTo(localTasks)
-    }
+            // The repository fetches from the local source
+            assertThat((tasksRepository.getTasks() as Success).data).isEqualTo(localTasks)
+        }
 
     @Test
-    fun getTasks_WithBothDataSourcesUnavailable_returnsError() = runBlockingTest {
+    fun getTasks_WithBothDataSourcesUnavailable_returnsError() = mainCoroutineRule.runBlockingTest {
         // When both sources are unavailable
         tasksRemoteDataSource.tasks = null
         tasksLocalDataSource.tasks = null
@@ -160,7 +161,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTasks_refreshesLocalDataSource() = runBlockingTest {
+    fun getTasks_refreshesLocalDataSource() = mainCoroutineRule.runBlockingTest {
         val initialLocal = tasksLocalDataSource.tasks
 
         // First load will fetch from remote
@@ -172,7 +173,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun completeTask_completesTaskToServiceAPIUpdatesCache() = runBlockingTest {
+    fun completeTask_completesTaskToServiceAPIUpdatesCache() = mainCoroutineRule.runBlockingTest {
         // Save a task
         tasksRepository.saveTask(newTask)
 
@@ -187,7 +188,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun completeTask_activeTaskToServiceAPIUpdatesCache() = runBlockingTest {
+    fun completeTask_activeTaskToServiceAPIUpdatesCache() = mainCoroutineRule.runBlockingTest {
         // Save a task
         tasksRepository.saveTask(newTask)
         tasksRepository.completeTask(newTask.id)
@@ -204,7 +205,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTask_repositoryCachesAfterFirstApiCall() = runBlockingTest {
+    fun getTask_repositoryCachesAfterFirstApiCall() = mainCoroutineRule.runBlockingTest {
         // Trigger the repository to load data, which loads from remote
         tasksRemoteDataSource.tasks = mutableListOf(task1)
         tasksRepository.getTask(task1.id, true)
@@ -221,7 +222,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun getTask_forceRefresh() = runBlockingTest {
+    fun getTask_forceRefresh() = mainCoroutineRule.runBlockingTest {
         // Trigger the repository to load data, which loads from remote and caches
         tasksRemoteDataSource.tasks = mutableListOf(task1)
         tasksRepository.getTask(task1.id)
@@ -239,7 +240,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun clearCompletedTasks() = runBlockingTest {
+    fun clearCompletedTasks() = mainCoroutineRule.runBlockingTest {
         val completedTask = task1.copy().apply { isCompleted = true }
         tasksRemoteDataSource.tasks = mutableListOf(completedTask, task2)
         tasksRepository.clearCompletedTasks()
@@ -252,7 +253,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun deleteAllTasks() = runBlockingTest {
+    fun deleteAllTasks() = mainCoroutineRule.runBlockingTest {
         val initialTasks = (tasksRepository.getTasks() as? Success)?.data
 
         // Delete all tasks
@@ -267,7 +268,7 @@ class DefaultTasksRepositoryTest {
     }
 
     @Test
-    fun deleteSingleTask() = runBlockingTest {
+    fun deleteSingleTask() = mainCoroutineRule.runBlockingTest {
         val initialTasks = (tasksRepository.getTasks(true) as? Success)?.data
 
         // Delete first task

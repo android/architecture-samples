@@ -106,7 +106,7 @@ class TaskDetailViewModelTest {
             // When the ViewModel is asked to complete the task
             taskDetailViewModel.setCompleted(false)
 
-            runBlockingTest {
+            mainCoroutineRule.runBlockingTest {
                 // Then the task is not completed and the snackbar shows the correct message
                 val newTask = (tasksRepository.getTask(task.id) as Success).data
                 assertTrue(newTask.isActive)

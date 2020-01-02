@@ -61,7 +61,7 @@ class DefaultTasksRepository(
         val remoteTasks = tasksRemoteDataSource.getTasks()
 
         if (remoteTasks is Success) {
-            // Real apps might want to do a proper sync.
+            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
             tasksLocalDataSource.deleteAllTasks()
             remoteTasks.data.forEach { task ->
                 tasksLocalDataSource.saveTask(task)
