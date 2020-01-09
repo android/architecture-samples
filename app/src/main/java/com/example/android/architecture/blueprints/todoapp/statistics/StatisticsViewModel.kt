@@ -25,11 +25,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for the statistics screen.
  */
-class StatisticsViewModel(
+class StatisticsViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
