@@ -33,6 +33,7 @@ import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBl
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.core.IsNot.not
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,6 +51,11 @@ class TaskDetailFragmentTest {
     @Before
     fun init() {
         repository = ApplicationProvider.getApplicationContext<TodoApplication>().appComponent.tasksRepository
+        repository.deleteAllTasksBlocking()
+    }
+
+    @After
+    fun tearDown() {
         repository.deleteAllTasksBlocking()
     }
 

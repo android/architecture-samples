@@ -48,6 +48,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @ExperimentalCoroutinesApi
 class StatisticsFragmentTest {
+
     private lateinit var repository: TasksRepository
 
     // An Idling Resource that waits for Data Binding to have no pending bindings

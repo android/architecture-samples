@@ -16,7 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
@@ -64,7 +64,7 @@ class TasksActivityTest {
 
     @Before
     fun init() {
-        repository = getApplicationContext<TodoApplication>().appComponent.tasksRepository
+        repository = ApplicationProvider.getApplicationContext<TodoApplication>().appComponent.tasksRepository
         repository.deleteAllTasksBlocking()
     }
 

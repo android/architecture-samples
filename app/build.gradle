@@ -13,7 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner 'com.example.android.architecture.blueprints.todoapp.tasks.CustomTestRunner'
+        testInstrumentationRunner 'com.example.android.architecture.blueprints.todoapp.CustomTestRunner'
     }
 
     android {
@@ -150,6 +150,6 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
 
     // Using Dagger in androidTest and Robolectric too
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
 }

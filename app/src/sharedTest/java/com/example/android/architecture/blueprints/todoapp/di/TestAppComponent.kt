@@ -1,6 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.di
 
 import android.content.Context
+import com.example.android.architecture.blueprints.todoapp.TestTodoApplication
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
