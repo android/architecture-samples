@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.util
+
+package com.example.android.architecture.blueprints.todoapp
+
+import android.app.Application
+import android.content.Context
+import androidx.test.runner.AndroidJUnitRunner
 
 /**
- * Extension functions for Fragment.
+ * A custom [AndroidJUnitRunner] used to replace the application used in tests with a
+ * [TestTodoApplication].
  */
+class CustomTestRunner : AndroidJUnitRunner() {
 
-import androidx.fragment.app.Fragment
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
-
-fun Fragment.getViewModelFactory(): ViewModelFactory {
-    val repository = (requireContext().applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository)
+    override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
+        return super.newApplication(cl, TestTodoApplication::class.java.name, context)
+    }
 }

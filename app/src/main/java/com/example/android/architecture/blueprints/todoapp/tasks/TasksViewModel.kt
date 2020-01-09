@@ -31,11 +31,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 import java.util.ArrayList
+import javax.inject.Inject
 
 /**
  * ViewModel for the task list screen.
  */
-class TasksViewModel(
+class TasksViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 

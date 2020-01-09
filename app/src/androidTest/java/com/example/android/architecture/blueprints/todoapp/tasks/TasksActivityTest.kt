@@ -16,7 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
@@ -35,7 +35,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
@@ -64,13 +64,8 @@ class TasksActivityTest {
 
     @Before
     fun init() {
-        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        repository = ApplicationProvider.getApplicationContext<TodoApplication>().appComponent.tasksRepository
         repository.deleteAllTasksBlocking()
-    }
-
-    @After
-    fun reset() {
-        ServiceLocator.resetRepository()
     }
 
     /**

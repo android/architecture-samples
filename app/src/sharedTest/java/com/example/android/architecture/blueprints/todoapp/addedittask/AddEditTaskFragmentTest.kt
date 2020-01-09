@@ -30,15 +30,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.util.deleteAllTasksBlocking
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -57,17 +55,13 @@ import org.robolectric.annotation.TextLayoutMode
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 @ExperimentalCoroutinesApi
 class AddEditTaskFragmentTest {
+
     private lateinit var repository: TasksRepository
 
     @Before
-    fun initRepository() {
-        repository = FakeRepository()
-        ServiceLocator.tasksRepository = repository
-    }
-
-    @After
-    fun cleanupDb() = runBlockingTest {
-        ServiceLocator.resetRepository()
+    fun init() {
+        repository = getApplicationContext<TodoApplication>().appComponent.tasksRepository
+        repository.deleteAllTasksBlocking()
     }
 
     @Test

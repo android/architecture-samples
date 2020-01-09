@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 
@@ -46,6 +46,7 @@ ext {
     archTestingVersion = '2.0.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'
+    daggerVersion = '2.25.4'
     dexMakerVersion = '2.12.1'
     espressoVersion = '3.2.0-beta01'
     fragmentVersion = '1.1.0-alpha07'
