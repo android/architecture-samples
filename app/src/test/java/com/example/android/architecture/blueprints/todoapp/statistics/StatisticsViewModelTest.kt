@@ -44,7 +44,7 @@ class StatisticsViewModelTest {
     private lateinit var statisticsViewModel: StatisticsViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private val tasksRepository = FakeRepository()
+    private lateinit var tasksRepository: FakeRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -53,6 +53,8 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
+        tasksRepository = FakeRepository()
+
         statisticsViewModel = StatisticsViewModel(tasksRepository)
     }
 
