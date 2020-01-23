@@ -28,7 +28,6 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
-import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 
 /**
@@ -58,11 +57,9 @@ class StatisticsViewModel(
 
     fun refresh() {
         _dataLoading.value = true
-        wrapEspressoIdlingResource {
-            viewModelScope.launch {
-                refreshTasksUseCase()
-                _dataLoading.value = false
-            }
+        viewModelScope.launch {
+            refreshTasksUseCase()
+            _dataLoading.value = false
         }
     }
 }

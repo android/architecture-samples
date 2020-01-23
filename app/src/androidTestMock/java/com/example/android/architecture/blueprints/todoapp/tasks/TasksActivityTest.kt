@@ -259,6 +259,8 @@ class TasksActivityTest {
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
