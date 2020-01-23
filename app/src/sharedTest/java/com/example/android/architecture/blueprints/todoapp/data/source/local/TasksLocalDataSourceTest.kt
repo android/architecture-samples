@@ -47,7 +47,6 @@ class TasksLocalDataSourceTest {
     private lateinit var localDataSource: TasksLocalDataSource
     private lateinit var database: ToDoDatabase
 
-
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -166,7 +165,6 @@ class TasksLocalDataSourceTest {
         // Then the retrieved tasks is an empty list
         val result = localDataSource.getTasks() as Success
         assertThat(result.data.isEmpty(), `is`(true))
-
     }
 
     @Test

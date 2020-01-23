@@ -15,26 +15,19 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source
 
+import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
 
 /**
- * Concrete implementation to load tasks from the data sources into a cache.
- *
- * To simplify the sample, this repository only uses the local data source only if the remote
- * data source fails. Remote is the source of truth.
+ * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  */
 class DefaultTasksRepository(
     private val tasksRemoteDataSource: TasksDataSource,
@@ -42,160 +35,105 @@ class DefaultTasksRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksRepository {
 
-    private var cachedTasks: ConcurrentMap<String, Task>? = null
-
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
-
+        // Set app as busy while this function executes.
         wrapEspressoIdlingResource {
 
-            return withContext(ioDispatcher) {
-                // Respond immediately with cache if available and not dirty
-                if (!forceUpdate) {
-                    cachedTasks?.let { cachedTasks ->
-                        return@withContext Success(cachedTasks.values.sortedBy { it.id })
-                    }
+            if (forceUpdate) {
+                try {
+                    updateTasksFromRemoteDataSource()
+                } catch (ex: Exception) {
+                    return Result.Error(ex)
                 }
-
-                val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
-
-                // Refresh the cache with the new tasks
-                (newTasks as? Success)?.let { refreshCache(it.data) }
-
-                cachedTasks?.values?.let { tasks ->
-                    return@withContext Success(tasks.sortedBy { it.id })
-                }
-
-                (newTasks as? Success)?.let {
-                    if (it.data.isEmpty()) {
-                        return@withContext Success(it.data)
-                    }
-                }
-
-                return@withContext Error(Exception("Illegal state"))
             }
+            return tasksLocalDataSource.getTasks()
         }
     }
 
-    private suspend fun fetchTasksFromRemoteOrLocal(forceUpdate: Boolean): Result<List<Task>> {
-        // Remote first
+    override suspend fun refreshTasks() {
+        updateTasksFromRemoteDataSource()
+    }
+
+    override fun observeTasks(): LiveData<Result<List<Task>>> {
+        return tasksLocalDataSource.observeTasks()
+    }
+
+    override suspend fun refreshTask(taskId: String) {
+        updateTaskFromRemoteDataSource(taskId)
+    }
+
+    private suspend fun updateTasksFromRemoteDataSource() {
         val remoteTasks = tasksRemoteDataSource.getTasks()
-        when (remoteTasks) {
-            is Error -> Timber.w("Remote data source fetch failed")
-            is Success -> {
-                refreshLocalDataSource(remoteTasks.data)
-                return remoteTasks
+
+        if (remoteTasks is Success) {
+            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
+            tasksLocalDataSource.deleteAllTasks()
+            remoteTasks.data.forEach { task ->
+                tasksLocalDataSource.saveTask(task)
             }
-            else -> throw IllegalStateException()
+        } else if (remoteTasks is Result.Error) {
+            throw remoteTasks.exception
         }
+    }
 
-        // Don't read from local if it's forced
-        if (forceUpdate) {
-            return Error(Exception("Can't force refresh: remote data source is unavailable"))
+    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+        return tasksLocalDataSource.observeTask(taskId)
+    }
+
+    private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
+        val remoteTask = tasksRemoteDataSource.getTask(taskId)
+
+        if (remoteTask is Success) {
+            tasksLocalDataSource.saveTask(remoteTask.data)
         }
-
-        // Local if remote fails
-        val localTasks = tasksLocalDataSource.getTasks()
-        if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
     }
 
     /**
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-
+        // Set app as busy while this function executes.
         wrapEspressoIdlingResource {
-
-            return withContext(ioDispatcher) {
-                // Respond immediately with cache if available
-                if (!forceUpdate) {
-                    getTaskWithId(taskId)?.let {
-                        EspressoIdlingResource.decrement() // Set app as idle.
-                        return@withContext Success(it)
-                    }
-                }
-
-                val newTask = fetchTaskFromRemoteOrLocal(taskId, forceUpdate)
-
-                // Refresh the cache with the new tasks
-                (newTask as? Success)?.let { cacheTask(it.data) }
-
-                return@withContext newTask
+            if (forceUpdate) {
+                updateTaskFromRemoteDataSource(taskId)
             }
+            return tasksLocalDataSource.getTask(taskId)
         }
-    }
-
-    private suspend fun fetchTaskFromRemoteOrLocal(
-        taskId: String,
-        forceUpdate: Boolean
-    ): Result<Task> {
-        // Remote first
-        val remoteTask = tasksRemoteDataSource.getTask(taskId)
-        when (remoteTask) {
-            is Error -> Timber.w("Remote data source fetch failed")
-            is Success -> {
-                refreshLocalDataSource(remoteTask.data)
-                return remoteTask
-            }
-            else -> throw IllegalStateException()
-        }
-
-        // Don't read from local if it's forced
-        if (forceUpdate) {
-            return Error(Exception("Refresh failed"))
-        }
-
-        // Local if remote fails
-        val localTasks = tasksLocalDataSource.getTask(taskId)
-        if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
     }
 
     override suspend fun saveTask(task: Task) {
-        // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task) {
-            coroutineScope {
-                launch { tasksRemoteDataSource.saveTask(it) }
-                launch { tasksLocalDataSource.saveTask(it) }
-            }
+        coroutineScope {
+            launch { tasksRemoteDataSource.saveTask(task) }
+            launch { tasksLocalDataSource.saveTask(task) }
         }
     }
 
     override suspend fun completeTask(task: Task) {
-        // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task) {
-            it.isCompleted = true
-            coroutineScope {
-                launch { tasksRemoteDataSource.completeTask(it) }
-                launch { tasksLocalDataSource.completeTask(it) }
-            }
+        coroutineScope {
+            launch { tasksRemoteDataSource.completeTask(task) }
+            launch { tasksLocalDataSource.completeTask(task) }
         }
     }
 
     override suspend fun completeTask(taskId: String) {
         withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.let {
-                completeTask(it)
+            (getTaskWithId(taskId) as? Success)?.let { it ->
+                completeTask(it.data)
             }
         }
     }
 
-    override suspend fun activateTask(task: Task) = withContext(ioDispatcher) {
-        // Do in memory cache update to keep the app UI up to date
-        cacheAndPerform(task) {
-            it.isCompleted = false
-            coroutineScope {
-                launch { tasksRemoteDataSource.activateTask(it) }
-                launch { tasksLocalDataSource.activateTask(it) }
-            }
-
+    override suspend fun activateTask(task: Task) = withContext<Unit>(ioDispatcher) {
+        coroutineScope {
+            launch { tasksRemoteDataSource.activateTask(task) }
+            launch { tasksLocalDataSource.activateTask(task) }
         }
     }
 
     override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.let {
-                activateTask(it)
+            (getTaskWithId(taskId) as? Success)?.let { it ->
+                activateTask(it.data)
             }
         }
     }
@@ -204,9 +142,6 @@ class DefaultTasksRepository(
         coroutineScope {
             launch { tasksRemoteDataSource.clearCompletedTasks() }
             launch { tasksLocalDataSource.clearCompletedTasks() }
-        }
-        withContext(ioDispatcher) {
-            cachedTasks?.entries?.removeAll { it.value.isCompleted }
         }
     }
 
@@ -217,7 +152,6 @@ class DefaultTasksRepository(
                 launch { tasksLocalDataSource.deleteAllTasks() }
             }
         }
-        cachedTasks?.clear()
     }
 
     override suspend fun deleteTask(taskId: String) {
@@ -225,42 +159,9 @@ class DefaultTasksRepository(
             launch { tasksRemoteDataSource.deleteTask(taskId) }
             launch { tasksLocalDataSource.deleteTask(taskId) }
         }
-
-        cachedTasks?.remove(taskId)
     }
 
-    private fun refreshCache(tasks: List<Task>) {
-        cachedTasks?.clear()
-        tasks.sortedBy { it.id }.forEach {
-            cacheAndPerform(it) {}
-        }
-    }
-
-    private suspend fun refreshLocalDataSource(tasks: List<Task>) {
-        tasksLocalDataSource.deleteAllTasks()
-        for (task in tasks) {
-            tasksLocalDataSource.saveTask(task)
-        }
-    }
-
-    private suspend fun refreshLocalDataSource(task: Task) {
-        tasksLocalDataSource.saveTask(task)
-    }
-
-    private fun getTaskWithId(id: String) = cachedTasks?.get(id)
-
-    private fun cacheTask(task: Task): Task {
-        val cachedTask = Task(task.title, task.description, task.isCompleted, task.id)
-        // Create if it doesn't exist.
-        if (cachedTasks == null) {
-            cachedTasks = ConcurrentHashMap()
-        }
-        cachedTasks?.put(cachedTask.id, cachedTask)
-        return cachedTask
-    }
-
-    private inline fun cacheAndPerform(task: Task, perform: (Task) -> Unit) {
-        val cachedTask = cacheTask(task)
-        perform(cachedTask)
+    private suspend fun getTaskWithId(id: String): Result<Task> {
+        return tasksLocalDataSource.getTask(id)
     }
 }

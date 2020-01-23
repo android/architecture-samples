@@ -15,6 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source.remote
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
@@ -34,6 +37,34 @@ object TasksRemoteDataSource : TasksDataSource {
     init {
         addTask("Build tower in Pisa", "Ground looks good, no foundation work required.")
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
+    }
+
+    private val observableTasks = MutableLiveData<Result<List<Task>>>()
+
+    override suspend fun refreshTasks() {
+        observableTasks.value = getTasks()
+    }
+
+    override suspend fun refreshTask(taskId: String) {
+        refreshTasks()
+    }
+
+    override fun observeTasks(): LiveData<Result<List<Task>>> {
+        return observableTasks
+    }
+
+    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+        return observableTasks.map { tasks ->
+            when (tasks) {
+                is Result.Loading -> Result.Loading
+                is Error -> Error(tasks.exception)
+                is Success -> {
+                    val task = tasks.data.firstOrNull() { it.id == taskId }
+                        ?: return@map Error(Exception("Not found"))
+                    Success(task)
+                }
+            }
+        }
     }
 
     override suspend fun getTasks(): Result<List<Task>> {

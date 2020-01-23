@@ -53,7 +53,8 @@ class TasksFragment : Fragment() {
     private lateinit var listAdapter: TasksAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
@@ -94,10 +95,6 @@ class TasksFragment : Fragment() {
         setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
         setupFab()
-
-        // Always reloading data for simplicity. Real apps should only do this on first load and
-        // when navigating back to this destination. TODO: https://issuetracker.google.com/79672220
-        viewModel.loadTasks(true)
     }
 
     private fun setupNavigation() {
@@ -129,7 +126,6 @@ class TasksFragment : Fragment() {
                         else -> TasksFilterType.ALL_TASKS
                     }
                 )
-                viewModel.loadTasks(false)
                 true
             }
             show()

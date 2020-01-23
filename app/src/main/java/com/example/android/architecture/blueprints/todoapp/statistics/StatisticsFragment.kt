@@ -37,7 +37,8 @@ class StatisticsFragment : Fragment() {
     private val viewModel by viewModels<StatisticsViewModel> { getViewModelFactory() }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = DataBindingUtil.inflate(
@@ -52,6 +53,5 @@ class StatisticsFragment : Fragment() {
         viewDataBinding.viewmodel = viewModel
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        viewModel.start()
     }
 }
