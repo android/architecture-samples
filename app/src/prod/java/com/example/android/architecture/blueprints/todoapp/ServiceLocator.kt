@@ -46,7 +46,8 @@ object ServiceLocator {
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        val newRepo = DefaultTasksRepository(TasksRemoteDataSource, createTaskLocalDataSource(context))
+        val newRepo =
+            DefaultTasksRepository(TasksRemoteDataSource, createTaskLocalDataSource(context))
         tasksRepository = newRepo
         return newRepo
     }
@@ -59,7 +60,7 @@ object ServiceLocator {
     private fun createDataBase(context: Context): ToDoDatabase {
         val result = Room.databaseBuilder(
             context.applicationContext,
-            ToDoDatabase::class.java, "Tasks.db"
+            ToDoDatabase::class.java, DB_NAME
         ).build()
         database = result
         return result
@@ -81,3 +82,5 @@ object ServiceLocator {
         }
     }
 }
+
+private const val DB_NAME = "Tasks.db"

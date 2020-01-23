@@ -25,5 +25,5 @@ import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 
 fun Fragment.getViewModelFactory(): ViewModelFactory {
     val repository = (requireContext().applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository)
+    return ViewModelFactory(repository, this)
 }

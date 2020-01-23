@@ -15,8 +15,14 @@
  */
 package com.example.android.architecture.blueprints.todoapp
 
+import android.app.Application
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel
@@ -28,22 +34,27 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  */
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
-    private val tasksRepository: TasksRepository
-) : ViewModelProvider.NewInstanceFactory() {
+        private val tasksRepository: TasksRepository,
+        owner: SavedStateRegistryOwner,
+        defaultArgs: Bundle? = null
+) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
 
-    override fun <T : ViewModel> create(modelClass: Class<T>) =
-        with(modelClass) {
-            when {
-                isAssignableFrom(StatisticsViewModel::class.java) ->
-                    StatisticsViewModel(tasksRepository)
-                isAssignableFrom(TaskDetailViewModel::class.java) ->
-                    TaskDetailViewModel(tasksRepository)
-                isAssignableFrom(AddEditTaskViewModel::class.java) ->
-                    AddEditTaskViewModel(tasksRepository)
-                isAssignableFrom(TasksViewModel::class.java) ->
-                    TasksViewModel(tasksRepository)
-                else ->
-                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-            }
-        } as T
+    override fun <T : ViewModel> create(
+            key: String,
+            modelClass: Class<T>,
+            handle: SavedStateHandle
+    ) = with(modelClass) {
+        when {
+            isAssignableFrom(StatisticsViewModel::class.java) ->
+                StatisticsViewModel(tasksRepository)
+            isAssignableFrom(TaskDetailViewModel::class.java) ->
+                TaskDetailViewModel(tasksRepository)
+            isAssignableFrom(AddEditTaskViewModel::class.java) ->
+                AddEditTaskViewModel(tasksRepository)
+            isAssignableFrom(TasksViewModel::class.java) ->
+                TasksViewModel(tasksRepository, handle)
+            else ->
+                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+        }
+    } as T
 }
