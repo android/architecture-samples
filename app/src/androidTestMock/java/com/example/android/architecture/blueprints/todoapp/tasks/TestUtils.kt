@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp
+package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.lifecycle.LiveData
-import org.junit.Assert.assertEquals
+import android.app.Activity
+import androidx.appcompat.widget.Toolbar
+import androidx.test.core.app.ActivityScenario
+import com.example.android.architecture.blueprints.todoapp.R
 
-fun assertLiveDataEventTriggered(
-    liveData: LiveData<Event<String>>,
-    taskId: String
-) {
-    val value = liveData.getOrAwaitValue()
-    assertEquals(value.getContentIfNotHandled(), taskId)
-}
-
-fun assertSnackbarMessage(snackbarLiveData: LiveData<Event<Int>>, messageId: Int) {
-    val value: Event<Int> = snackbarLiveData.getOrAwaitValue()
-    assertEquals(value.getContentIfNotHandled(), messageId)
+fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription(): String {
+    var description = ""
+    onActivity {
+        description =
+            it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
+    }
+    return description
 }

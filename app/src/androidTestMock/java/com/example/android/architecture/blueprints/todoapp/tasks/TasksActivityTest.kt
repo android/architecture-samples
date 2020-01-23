@@ -52,6 +52,9 @@ import org.junit.runner.RunWith
 
 /**
  * Large End-to-End test for the tasks module.
+ *
+ * UI tests usually use [ActivityTestRule] but there's no API to perform an action before
+ * each test. The workaround is to use `ActivityScenario.launch()` and `ActivityScenario.close()`.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -116,6 +119,8 @@ class TasksActivityTest {
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
         // Verify previous task is not displayed
         onView(withText("TITLE1")).check(doesNotExist())
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -141,6 +146,8 @@ class TasksActivityTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(doesNotExist())
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -162,6 +169,8 @@ class TasksActivityTest {
         onView(withText(string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(matches(isDisplayed()))
         onView(withText("TITLE2")).check(doesNotExist())
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -190,6 +199,8 @@ class TasksActivityTest {
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -217,6 +228,8 @@ class TasksActivityTest {
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -246,6 +259,8 @@ class TasksActivityTest {
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -275,6 +290,8 @@ class TasksActivityTest {
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 
     @Test
@@ -292,5 +309,7 @@ class TasksActivityTest {
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
+        // Make sure the activity is closed before resetting the db:
+        activityScenario.close()
     }
 }

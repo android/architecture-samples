@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.domain
 
-import android.app.Activity
-import androidx.appcompat.widget.Toolbar
-import androidx.test.core.app.ActivityScenario
-import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 
-fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription()
-    : String {
-    var description = ""
-    onActivity {
-        description =
-            it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
+class RefreshTasksUseCase(
+    private val tasksRepository: TasksRepository
+) {
+    suspend operator fun invoke() {
+        return tasksRepository.refreshTasks()
     }
-    return description
 }

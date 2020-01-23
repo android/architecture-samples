@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil.getValue
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
@@ -24,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -91,13 +91,13 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isTrue()
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
         // Then progress indicator is hidden
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
     }
 
     @Test
@@ -109,9 +109,9 @@ class AddEditTaskViewModelTest {
         addEditTaskViewModel.start(task.id)
 
         // Verify a task is loaded
-        assertThat(getValue(addEditTaskViewModel.title)).isEqualTo(task.title)
-        assertThat(getValue(addEditTaskViewModel.description)).isEqualTo(task.description)
-        assertThat(getValue(addEditTaskViewModel.dataLoading)).isFalse()
+        assertThat(addEditTaskViewModel.title.getOrAwaitValue()).isEqualTo(task.title)
+        assertThat(addEditTaskViewModel.description.getOrAwaitValue()).isEqualTo(task.description)
+        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
     }
 
     @Test

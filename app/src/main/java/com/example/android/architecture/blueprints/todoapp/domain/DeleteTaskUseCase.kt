@@ -12,5 +12,4 @@ class DeleteTaskUseCase(
             return tasksRepository.deleteTask(taskId)
         }
     }
-
 }

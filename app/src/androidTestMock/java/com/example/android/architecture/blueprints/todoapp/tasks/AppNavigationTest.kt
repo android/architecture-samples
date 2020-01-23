@@ -51,6 +51,9 @@ import org.junit.runner.RunWith
 /**
  * Tests for the [DrawerLayout] layout component in [TasksActivity] which manages
  * navigation within the app.
+ *
+ * UI tests usually use [ActivityTestRule] but there's no API to perform an action before
+ * each test. The workaround is to use `ActivityScenario.launch()` and `ActivityScenario.close()`.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -117,6 +120,8 @@ class AppNavigationTest {
 
         // Check that tasks screen was opened.
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
     }
 
     @Test
@@ -140,6 +145,8 @@ class AppNavigationTest {
         // Check if drawer is open
         onView(withId(R.id.drawer_layout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
     }
 
     @Test
@@ -168,6 +175,8 @@ class AppNavigationTest {
         // Then check that the drawer is open
         onView(withId(R.id.drawer_layout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
     }
 
     @Test
@@ -201,6 +210,8 @@ class AppNavigationTest {
             )
         ).perform(click())
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
     }
 
     @Test
@@ -224,5 +235,7 @@ class AppNavigationTest {
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
     }
 }

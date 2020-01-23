@@ -13,42 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.data.source
+
+package com.example.android.architecture.blueprints.todoapp.domain
 
 import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 
-/**
- * Main entry point for accessing tasks data.
- */
-interface TasksDataSource {
-
-    fun observeTasks(): LiveData<Result<List<Task>>>
-
-    suspend fun getTasks(): Result<List<Task>>
-
-    suspend fun refreshTasks()
-
-    fun observeTask(taskId: String): LiveData<Result<Task>>
-
-    suspend fun getTask(taskId: String): Result<Task>
-
-    suspend fun refreshTask(taskId: String)
-
-    suspend fun saveTask(task: Task)
-
-    suspend fun completeTask(task: Task)
-
-    suspend fun completeTask(taskId: String)
-
-    suspend fun activateTask(task: Task)
-
-    suspend fun activateTask(taskId: String)
-
-    suspend fun clearCompletedTasks()
-
-    suspend fun deleteAllTasks()
-
-    suspend fun deleteTask(taskId: String)
+class ObserveTaskUseCase(
+    private val tasksRepository: TasksRepository
+) {
+    operator fun invoke(
+        taskId: String
+    ): LiveData<Result<Task>> {
+        return tasksRepository.observeTask(taskId)
+    }
 }

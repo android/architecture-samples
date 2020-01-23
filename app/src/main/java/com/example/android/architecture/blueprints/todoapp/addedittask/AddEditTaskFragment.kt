@@ -44,7 +44,8 @@ class AddEditTaskFragment : Fragment() {
     private val viewModel by viewModels<AddEditTaskViewModel> { getViewModelFactory() }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)

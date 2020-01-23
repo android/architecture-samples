@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.util
 
-
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding

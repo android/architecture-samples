@@ -24,7 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.domain.ClearCompleted
 import com.example.android.architecture.blueprints.todoapp.domain.CompleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.DeleteTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.GetTaskUseCase
-import com.example.android.architecture.blueprints.todoapp.domain.GetTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTaskUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.ObserveTasksUseCase
+import com.example.android.architecture.blueprints.todoapp.domain.RefreshTasksUseCase
 import com.example.android.architecture.blueprints.todoapp.domain.SaveTaskUseCase
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel
@@ -42,14 +44,16 @@ class ViewModelFactory constructor(
                 when {
                     isAssignableFrom(StatisticsViewModel::class.java) ->
                         StatisticsViewModel(
-                            GetTasksUseCase(tasksRepository)
+                            ObserveTasksUseCase(tasksRepository),
+                            RefreshTasksUseCase(tasksRepository)
                         )
                     isAssignableFrom(TaskDetailViewModel::class.java) ->
                         TaskDetailViewModel(
-                            GetTaskUseCase(tasksRepository),
+                            ObserveTaskUseCase(tasksRepository),
                             DeleteTaskUseCase(tasksRepository),
                             CompleteTaskUseCase(tasksRepository),
-                            ActivateTaskUseCase(tasksRepository)
+                            ActivateTaskUseCase(tasksRepository),
+                            RefreshTasksUseCase(tasksRepository)
                         )
                     isAssignableFrom(AddEditTaskViewModel::class.java) ->
                         AddEditTaskViewModel(
@@ -58,7 +62,8 @@ class ViewModelFactory constructor(
                         )
                     isAssignableFrom(TasksViewModel::class.java) ->
                         TasksViewModel(
-                            GetTasksUseCase(tasksRepository),
+                            ObserveTasksUseCase(tasksRepository),
+                            RefreshTasksUseCase(tasksRepository),
                             ClearCompletedTasksUseCase(tasksRepository),
                             CompleteTaskUseCase(tasksRepository),
                             ActivateTaskUseCase(tasksRepository)

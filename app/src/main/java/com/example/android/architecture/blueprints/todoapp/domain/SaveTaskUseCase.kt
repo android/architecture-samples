@@ -13,5 +13,4 @@ class SaveTaskUseCase(
             return tasksRepository.saveTask(task)
         }
     }
-
 }
