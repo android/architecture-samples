@@ -32,7 +32,9 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.*
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import kotlinx.coroutines.launch
 
 /**
@@ -106,7 +108,7 @@ class TasksViewModel(
      * [TasksFilterType.ACTIVE_TASKS]
      */
     fun setFiltering(requestType: TasksFilterType) {
-        savedStateHandle.set(TASKS_FILTER_SAVED_STATE_KEY, requestType.ordinal)
+        savedStateHandle.set(TASKS_FILTER_SAVED_STATE_KEY, requestType)
 
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         when (requestType) {
@@ -237,8 +239,8 @@ class TasksViewModel(
     }
 
     private fun getSavedFilterType() : TasksFilterType {
-        return TasksFilterType
-            .values()[savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS.ordinal]
+        val get: TasksFilterType? = savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY)
+        return get ?: ALL_TASKS
     }
 }
 
