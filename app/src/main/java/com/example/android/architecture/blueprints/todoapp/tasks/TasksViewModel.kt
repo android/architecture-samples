@@ -19,8 +19,10 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
@@ -30,13 +32,17 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the task list screen.
  */
 class TasksViewModel(
-    private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _forceUpdate = MutableLiveData<Boolean>(false)
@@ -49,7 +55,7 @@ class TasksViewModel(
                 _dataLoading.value = false
             }
         }
-        tasksRepository.observeTasks().switchMap { filterTasks(it) }
+        tasksRepository.observeTasks().distinctUntilChanged().switchMap { filterTasks(it) }
     }
 
     val items: LiveData<List<Task>> = _items
@@ -72,8 +78,6 @@ class TasksViewModel(
     private val _snackbarText = MutableLiveData<Event<Int>>()
     val snackbarText: LiveData<Event<Int>> = _snackbarText
 
-    private var currentFiltering = TasksFilterType.ALL_TASKS
-
     // Not used at the moment
     private val isDataLoadingError = MutableLiveData<Boolean>()
 
@@ -92,7 +96,7 @@ class TasksViewModel(
 
     init {
         // Set initial state
-        setFiltering(TasksFilterType.ALL_TASKS)
+        setFiltering(getSavedFilterType())
         loadTasks(true)
     }
 
@@ -104,23 +108,23 @@ class TasksViewModel(
      * [TasksFilterType.ACTIVE_TASKS]
      */
     fun setFiltering(requestType: TasksFilterType) {
-        currentFiltering = requestType
+        savedStateHandle.set(TASKS_FILTER_SAVED_STATE_KEY, requestType)
 
         // Depending on the filter type, set the filtering label, icon drawables, etc.
         when (requestType) {
-            TasksFilterType.ALL_TASKS -> {
+            ALL_TASKS -> {
                 setFilter(
                     R.string.label_all, R.string.no_tasks_all,
                     R.drawable.logo_no_fill, true
                 )
             }
-            TasksFilterType.ACTIVE_TASKS -> {
+            ACTIVE_TASKS -> {
                 setFilter(
                     R.string.label_active, R.string.no_tasks_active,
                     R.drawable.ic_check_circle_96dp, false
                 )
             }
-            TasksFilterType.COMPLETED_TASKS -> {
+            COMPLETED_TASKS -> {
                 setFilter(
                     R.string.label_completed, R.string.no_tasks_completed,
                     R.drawable.ic_verified_user_96dp, false
@@ -195,7 +199,7 @@ class TasksViewModel(
         if (tasksResult is Success) {
             isDataLoadingError.value = false
             viewModelScope.launch {
-                result.value = filterItems(tasksResult.data, currentFiltering)
+                result.value = filterItems(tasksResult.data, getSavedFilterType())
             }
         } else {
             result.value = emptyList()
@@ -218,11 +222,11 @@ class TasksViewModel(
         // We filter the tasks based on the requestType
         for (task in tasks) {
             when (filteringType) {
-                TasksFilterType.ALL_TASKS -> tasksToShow.add(task)
-                TasksFilterType.ACTIVE_TASKS -> if (task.isActive) {
+                ALL_TASKS -> tasksToShow.add(task)
+                ACTIVE_TASKS -> if (task.isActive) {
                     tasksToShow.add(task)
                 }
-                TasksFilterType.COMPLETED_TASKS -> if (task.isCompleted) {
+                COMPLETED_TASKS -> if (task.isCompleted) {
                     tasksToShow.add(task)
                 }
             }
@@ -233,4 +237,11 @@ class TasksViewModel(
     fun refresh() {
         _forceUpdate.value = true
     }
+
+    private fun getSavedFilterType() : TasksFilterType {
+        return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
+    }
 }
+
+// Used to save the current filtering in SavedStateHandle.
+const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
