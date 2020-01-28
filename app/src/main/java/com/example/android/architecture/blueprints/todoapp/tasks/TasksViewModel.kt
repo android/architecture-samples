@@ -239,8 +239,7 @@ class TasksViewModel(
     }
 
     private fun getSavedFilterType() : TasksFilterType {
-        val get: TasksFilterType? = savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY)
-        return get ?: ALL_TASKS
+        return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
     }
 }
 
