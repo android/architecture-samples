@@ -17,6 +17,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -41,6 +42,8 @@ class TasksActivity : AppCompatActivity() {
         setContentView(R.layout.tasks_act)
         setupNavigationDrawer()
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        Log.d("+++", "main activity started")
 
         val navController: NavController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration =
