@@ -26,6 +26,10 @@ android {
                 java.srcDirs += sharedTestDir
             }
         }
+
+        lintOptions {
+            abortOnError false
+        }
     }
 
     buildTypes {
