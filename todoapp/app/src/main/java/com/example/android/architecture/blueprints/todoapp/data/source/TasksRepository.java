@@ -17,6 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Preconditions;
@@ -122,6 +124,7 @@ public class TasksRepository implements TasksDataSource {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void saveTask(@NonNull Task task) {
         Preconditions.checkNotNull(task);
@@ -135,6 +138,7 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.put(task.getId(), task);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void completeTask(@NonNull Task task) {
         Preconditions.checkNotNull(task);
@@ -150,12 +154,14 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.put(task.getId(), completedTask);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void completeTask(@NonNull String taskId) {
         Preconditions.checkNotNull(taskId);
         completeTask(getTaskWithId(taskId));
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void activateTask(@NonNull Task task) {
         Preconditions.checkNotNull(task);
@@ -171,6 +177,7 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.put(task.getId(), activeTask);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void activateTask(@NonNull String taskId) {
         Preconditions.checkNotNull(taskId);
@@ -202,6 +209,7 @@ public class TasksRepository implements TasksDataSource {
      * Note: {@link GetTaskCallback#onDataNotAvailable()} is fired if both data sources fail to
      * get the data.
      */
+    @SuppressLint("RestrictedApi")
     @Override
     public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
         Preconditions.checkNotNull(taskId);
@@ -267,6 +275,7 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.clear();
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void deleteTask(@NonNull String taskId) {
         mTasksRemoteDataSource.deleteTask(Preconditions.checkNotNull(taskId));
@@ -309,6 +318,7 @@ public class TasksRepository implements TasksDataSource {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Nullable
     private Task getTaskWithId(@NonNull String id) {
         Preconditions.checkNotNull(id);

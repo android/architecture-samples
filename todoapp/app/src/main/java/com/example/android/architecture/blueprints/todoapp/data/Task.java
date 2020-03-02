@@ -49,31 +49,6 @@ public final class Task {
     @ColumnInfo(name = "completed")
     private final boolean mCompleted;
 
-    public static Comparator<Task> nameComparator = new Comparator<Task>() {
-        @Override
-        public int compare(Task o1, Task o2) {
-            if (o1 == null || o2 == null) {
-                return -1;
-            } else {
-                return o1.getTitle().compareTo(o2.getTitle());
-            }
-        }
-    };
-    public static Comparator<Task> priorityComparator = new Comparator<Task>() {
-        @Override
-        public int compare(Task o1, Task o2) {
-
-            if (o1 == null || o2 == null) {
-                return -1;
-            } else {
-                if (o1.getPriority() == o2.getPriority()) {
-                    return o1.getTitle().compareTo(o2.getTitle());
-                } else {
-                    return o1.getPriority().compareTo(o2.getPriority());
-                }
-            }
-        }
-    };
     @ColumnInfo(name = "priority")
     private final Priority mPriority;
 
@@ -193,4 +168,29 @@ public final class Task {
         return mPriority;
     }
 
+    public static Comparator<Task> nameComparator = new Comparator<Task>() {
+        @Override
+        public int compare(Task o1, Task o2) {
+            if (o1 == null || o2 == null) {
+                return -1;
+            } else {
+                return o1.getTitle().compareTo(o2.getTitle());
+            }
+        }
+    };
+    public static Comparator<Task> PRIORITY_COMPARATOR = new Comparator<Task>() {
+        @Override
+        public int compare(Task o1, Task o2) {
+
+            if (o1 == null || o2 == null) {
+                return -1;
+            } else {
+                if (o1.getPriority() == o2.getPriority()) {
+                    return o1.getTitle().compareTo(o2.getTitle());
+                } else {
+                    return o1.getPriority().compareTo(o2.getPriority());
+                }
+            }
+        }
+    };
 }

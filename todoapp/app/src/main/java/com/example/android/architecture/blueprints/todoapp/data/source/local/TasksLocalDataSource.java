@@ -17,6 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Preconditions;
@@ -112,6 +114,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         mAppExecutors.diskIO().execute(runnable);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void saveTask(@NonNull final Task task) {
         Preconditions.checkNotNull(task);

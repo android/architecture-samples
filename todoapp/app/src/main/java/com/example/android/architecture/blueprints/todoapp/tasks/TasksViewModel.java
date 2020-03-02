@@ -144,7 +144,7 @@ public class TasksViewModel extends BaseObservable {
                 noTaskIconRes.set(mContext.getResources().getDrawable(
                         R.drawable.ic_verified_user_24dp));
                 tasksAddViewVisible.set(false);
-                items.sort(Task.priorityComparator);
+                items.sort(Task.PRIORITY_COMPARATOR);
                 notifyPropertyChanged(BR.viewmodel);
                 break;
 
@@ -245,7 +245,7 @@ public class TasksViewModel extends BaseObservable {
                             if (task.isActive() || task.isCompleted() || task.isEmpty()) {
                                 tasksToShow.add(task);
                             }
-                            tasksToShow.sort(Task.priorityComparator);
+                            tasksToShow.sort(Task.PRIORITY_COMPARATOR);
                             break;
 
                         case A_TO_Z_TASKS:
