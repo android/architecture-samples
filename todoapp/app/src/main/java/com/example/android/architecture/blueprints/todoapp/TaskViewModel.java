@@ -24,6 +24,7 @@ import androidx.databinding.Bindable;
 import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
 
+import com.example.android.architecture.blueprints.todoapp.data.Priority;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -40,6 +41,8 @@ public abstract class TaskViewModel extends BaseObservable
     public final ObservableField<String> title = new ObservableField<>();
 
     public final ObservableField<String> description = new ObservableField<>();
+
+    public final ObservableField<String> priority = new ObservableField<>();
 
     private final ObservableField<Task> mTaskObservable = new ObservableField<>();
 
@@ -61,9 +64,11 @@ public abstract class TaskViewModel extends BaseObservable
                 if (task != null) {
                     title.set(task.getTitle());
                     description.set(task.getDescription());
+                    priority.set(task.getPriority().getPriority());
                 } else {
                     title.set(mContext.getString(R.string.no_data));
                     description.set(mContext.getString(R.string.no_data_description));
+                    priority.set(Priority.NONE.getPriority());
                 }
             }
         });

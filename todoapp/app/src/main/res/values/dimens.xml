@@ -22,5 +22,6 @@
     <dimen name="list_item_padding">8dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
-
+    <dimen name="item_padding_left">65dp</dimen>
+    <dimen name="item_padding_right">15dp</dimen>
 </resources>
