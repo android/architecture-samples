@@ -20,6 +20,7 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
+import com.example.android.architecture.blueprints.todoapp.data.Priority;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
@@ -70,7 +71,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     private TasksRemoteDataSource() {}
 
     private static void addTask(String title, String description, String id) {
-        Task newTask = new Task(title, description, id);
+        Task newTask = new Task(title, description, Priority.NONE, id);
         TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
     }
 
@@ -117,7 +118,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull Task task) {
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
 
@@ -129,7 +130,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull Task task) {
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getId());
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
     }
 

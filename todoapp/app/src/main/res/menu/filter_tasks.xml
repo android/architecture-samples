@@ -23,4 +23,11 @@
     <item
         android:id="@+id/completed"
         android:title="@string/nav_completed" />
+
+    <item
+        android:id="@+id/atoz"
+        android:title="@string/nav_a_to_z" />
+    <item
+        android:id="@+id/priority"
+        android:title="@string/nav_priority" />
 </menu>

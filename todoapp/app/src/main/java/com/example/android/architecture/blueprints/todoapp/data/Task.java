@@ -24,6 +24,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -48,6 +49,34 @@ public final class Task {
     @ColumnInfo(name = "completed")
     private final boolean mCompleted;
 
+    public static Comparator<Task> nameComparator = new Comparator<Task>() {
+        @Override
+        public int compare(Task o1, Task o2) {
+            if (o1 == null || o2 == null) {
+                return -1;
+            } else {
+                return o1.getTitle().compareTo(o2.getTitle());
+            }
+        }
+    };
+    public static Comparator<Task> priorityComparator = new Comparator<Task>() {
+        @Override
+        public int compare(Task o1, Task o2) {
+
+            if (o1 == null || o2 == null) {
+                return -1;
+            } else {
+                if (o1.getPriority() == o2.getPriority()) {
+                    return o1.getTitle().compareTo(o2.getTitle());
+                } else {
+                    return o1.getPriority().compareTo(o2.getPriority());
+                }
+            }
+        }
+    };
+    @ColumnInfo(name = "priority")
+    private final Priority mPriority;
+
     /**
      * Use this constructor to create a new active Task.
      *
@@ -55,8 +84,8 @@ public final class Task {
      * @param description description of the task
      */
     @Ignore
-    public Task(@Nullable String title, @Nullable String description) {
-        this(title, description, UUID.randomUUID().toString(), false);
+    public Task(@Nullable String title, @Nullable String description, @Nullable Priority priority) {
+        this(title, description, priority, UUID.randomUUID().toString(), false);
     }
 
     /**
@@ -68,37 +97,8 @@ public final class Task {
      * @param id          id of the task
      */
     @Ignore
-    public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
-        this(title, description, id, false);
-    }
-
-    /**
-     * Use this constructor to create a new completed Task.
-     *
-     * @param title       title of the task
-     * @param description description of the task
-     * @param completed   true if the task is completed, false if it's active
-     */
-    @Ignore
-    public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        this(title, description, UUID.randomUUID().toString(), completed);
-    }
-
-    /**
-     * Use this constructor to specify a completed Task if the Task already has an id (copy of
-     * another Task).
-     *
-     * @param title       title of the task
-     * @param description description of the task
-     * @param id          id of the task
-     * @param completed   true if the task is completed, false if it's active
-     */
-    public Task(@Nullable String title, @Nullable String description,
-                @NonNull String id, boolean completed) {
-        mId = id;
-        mTitle = title;
-        mDescription = description;
-        mCompleted = completed;
+    public Task(@Nullable String title, @Nullable String description, @Nullable Priority priority, @NonNull String id) {
+        this(title, description, priority, id, false);
     }
 
     @NonNull
@@ -109,6 +109,18 @@ public final class Task {
     @Nullable
     public String getTitle() {
         return mTitle;
+    }
+
+    /**
+     * Use this constructor to create a new completed Task.
+     *
+     * @param title       title of the task
+     * @param description description of the task
+     * @param completed   true if the task is completed, false if it's active
+     */
+    @Ignore
+    public Task(@Nullable String title, @Nullable String description, @Nullable Priority priority, boolean completed) {
+        this(title, description, priority, UUID.randomUUID().toString(), completed);
     }
 
     @Nullable
@@ -137,6 +149,7 @@ public final class Task {
         return (mTitle == null || mTitle.isEmpty()) && (mDescription == null || mDescription.isEmpty());
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -156,4 +169,28 @@ public final class Task {
     public String toString() {
         return "Task with title " + mTitle;
     }
+
+    /**
+     * Use this constructor to specify a completed Task if the Task already has an id (copy of
+     * another Task).
+     *
+     * @param title       title of the task
+     * @param description description of the task
+     * @param id          id of the task
+     * @param completed   true if the task is completed, false if it's active
+     */
+    public Task(@Nullable String title, @Nullable String description, @Nullable Priority priority,
+                @NonNull String id, boolean completed) {
+        mId = id;
+        mTitle = title;
+        mDescription = description;
+        mCompleted = completed;
+        mPriority = priority;
+    }
+
+    @Nullable
+    public Priority getPriority() {
+        return mPriority;
+    }
+
 }

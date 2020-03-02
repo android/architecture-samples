@@ -141,7 +141,7 @@ public class TasksRepository implements TasksDataSource {
         mTasksRemoteDataSource.completeTask(task);
         mTasksLocalDataSource.completeTask(task);
 
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getId(), true);
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedTasks == null) {
@@ -162,7 +162,7 @@ public class TasksRepository implements TasksDataSource {
         mTasksRemoteDataSource.activateTask(task);
         mTasksLocalDataSource.activateTask(task);
 
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getId());
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedTasks == null) {

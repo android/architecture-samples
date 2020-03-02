@@ -137,6 +137,24 @@ public class TasksViewModel extends BaseObservable {
                         R.drawable.ic_verified_user_24dp));
                 tasksAddViewVisible.set(false);
                 break;
+
+            case PRIORITY_TASKS:
+                currentFilteringLabel.set(mContext.getString(R.string.label_priority));
+                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_completed));
+                noTaskIconRes.set(mContext.getResources().getDrawable(
+                        R.drawable.ic_verified_user_24dp));
+                tasksAddViewVisible.set(false);
+                items.sort(Task.priorityComparator);
+                notifyPropertyChanged(BR.viewmodel);
+                break;
+
+            case A_TO_Z_TASKS:
+                currentFilteringLabel.set(mContext.getString(R.string.label_a_to_z));
+                noTasksLabel.set(mContext.getResources().getString(R.string.no_tasks_completed));
+                noTaskIconRes.set(mContext.getResources().getDrawable(
+                        R.drawable.ic_verified_user_24dp));
+                tasksAddViewVisible.set(false);
+                break;
         }
     }
 
@@ -222,6 +240,19 @@ public class TasksViewModel extends BaseObservable {
                             if (task.isCompleted()) {
                                 tasksToShow.add(task);
                             }
+                            break;
+                        case PRIORITY_TASKS:
+                            if (task.isActive() || task.isCompleted() || task.isEmpty()) {
+                                tasksToShow.add(task);
+                            }
+                            tasksToShow.sort(Task.priorityComparator);
+                            break;
+
+                        case A_TO_Z_TASKS:
+                            if (task.isActive() || task.isCompleted() || task.isEmpty()) {
+                                tasksToShow.add(task);
+                            }
+                            tasksToShow.sort(Task.nameComparator);
                             break;
                         default:
                             tasksToShow.add(task);

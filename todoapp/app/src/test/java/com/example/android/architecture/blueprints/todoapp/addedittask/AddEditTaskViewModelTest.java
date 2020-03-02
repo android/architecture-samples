@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.content.Context;
 
+import com.example.android.architecture.blueprints.todoapp.data.Priority;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -81,7 +82,7 @@ public class AddEditTaskViewModelTest {
 
     @Test
     public void populateTask_callsRepoAndUpdatesView() {
-        Task testTask = new Task("TITLE", "DESCRIPTION", "1");
+        Task testTask = new Task("TITLE", "DESCRIPTION", Priority.NONE, "1");
 
         // Get a reference to the class under test
         mAddEditTaskViewModel = new AddEditTaskViewModel(

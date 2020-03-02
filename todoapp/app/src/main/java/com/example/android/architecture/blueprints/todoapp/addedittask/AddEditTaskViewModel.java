@@ -23,9 +23,11 @@ import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.Priority;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.util.BindingUtils;
 
 /**
  * ViewModel for the Add/Edit screen.
@@ -40,6 +42,8 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     public final ObservableField<String> title = new ObservableField<>();
 
     public final ObservableField<String> description = new ObservableField<>();
+
+    public final ObservableField<Integer> priority = new ObservableField<>();
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
 
@@ -96,6 +100,7 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     public void onTaskLoaded(Task task) {
         title.set(task.getTitle());
         description.set(task.getDescription());
+        priority.set(BindingUtils.priorityToButtonId(task.getPriority()));
         dataLoading.set(false);
         mIsDataLoaded = true;
 
@@ -111,9 +116,9 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
     // Called when clicking on fab.
     public void saveTask() {
         if (isNewTask()) {
-            createTask(title.get(), description.get());
+            createTask(title.get(), description.get(), BindingUtils.buttonIdToPriority(priority.get()));
         } else {
-            updateTask(title.get(), description.get());
+            updateTask(title.get(), description.get(), BindingUtils.buttonIdToPriority(priority.get()));
         }
     }
 
@@ -126,8 +131,9 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
         return mIsNewTask;
     }
 
-    private void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
+    private void createTask(String title, String description, Priority priority) {
+
+        Task newTask = new Task(title, description, priority);
         if (newTask.isEmpty()) {
             snackbarText.set(mContext.getString(R.string.empty_task_message));
         } else {
@@ -136,11 +142,11 @@ public class AddEditTaskViewModel implements TasksDataSource.GetTaskCallback {
         }
     }
 
-    private void updateTask(String title, String description) {
+    private void updateTask(String title, String description, Priority priority) {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+        mTasksRepository.saveTask(new Task(title, description, priority, mTaskId));
         navigateOnTaskSaved(); // After an edit, go back to the list.
     }
 

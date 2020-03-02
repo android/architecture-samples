@@ -22,13 +22,16 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.converters.PriorityConverter;
 
 /**
  * The Room Database that contains the Task table.
  */
 @Database(entities = {Task.class}, version = 1)
+@TypeConverters({PriorityConverter.class})
 public abstract class ToDoDatabase extends RoomDatabase {
 
     private static ToDoDatabase INSTANCE;

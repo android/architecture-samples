@@ -33,5 +33,17 @@ public enum TasksFilterType {
     /**
      * Filters only the completed tasks.
      */
-    COMPLETED_TASKS
+    COMPLETED_TASKS,
+
+    /**
+     * Filter by priority
+     */
+    PRIORITY_TASKS,
+
+    /**
+     * Filters alphabetically
+     */
+    A_TO_Z_TASKS
+
+
 }

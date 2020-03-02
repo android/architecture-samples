@@ -160,6 +160,13 @@ public class TasksFragment extends Fragment {
                     case R.id.completed:
                         mTasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
+
+                    case R.id.priority:
+                        mTasksViewModel.setFiltering(TasksFilterType.PRIORITY_TASKS);
+                        break;
+                    case R.id.atoz:
+                        mTasksViewModel.setFiltering(TasksFilterType.A_TO_Z_TASKS);
+                        break;
                     default:
                         mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
@@ -173,8 +180,7 @@ public class TasksFragment extends Fragment {
     }
 
     private void setupFab() {
-        FloatingActionButton fab =
-                getActivity().findViewById(R.id.fab_add_task);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_add_task);
 
         fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(new View.OnClickListener() {

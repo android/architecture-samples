@@ -15,15 +15,18 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
+
+        <import type="com.example.android.architecture.blueprints.todoapp.util.BindingUtils" />
+
     </data>
 
     <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
@@ -41,10 +44,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
                 android:visibility="@{viewmodel.dataLoading ? View.GONE : View.VISIBLE}">
 
                 <EditText
@@ -54,15 +57,56 @@
                     android:hint="@string/title_hint"
                     android:maxLines="1"
                     android:text="@={viewmodel.title}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                 <EditText
                     android:id="@+id/add_task_description"
                     android:layout_width="match_parent"
-                    android:layout_height="350dp"
+                    android:layout_height="200dp"
                     android:gravity="top"
                     android:hint="@string/description_hint"
-                    android:text="@={viewmodel.description}"/>
+                    android:text="@={viewmodel.description}" />
+
+                <RadioGroup
+                    android:id="@+id/add_task_priority_radio_grp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkedButton="@={viewmodel.priority}"
+                    android:gravity="bottom"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/select_your_task_priority" />
+
+                    <RadioButton
+                        android:id="@+id/high"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pr_high" />
+
+                    <RadioButton
+                        android:id="@+id/medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pr_medium" />
+
+
+                    <RadioButton
+                        android:id="@+id/low"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pr_low" />
+
+
+                    <RadioButton
+                        android:id="@+id/none"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pr_none" />
+                </RadioGroup>
+
 
             </LinearLayout>
         </ScrollView>
