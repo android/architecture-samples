@@ -16,10 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Preconditions;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
@@ -58,8 +58,8 @@ public class TasksRepository implements TasksDataSource {
     // Prevent direct instantiation.
     private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
                             @NonNull TasksDataSource tasksLocalDataSource) {
-        mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
-        mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
+        mTasksRemoteDataSource = Preconditions.checkNotNull(tasksRemoteDataSource);
+        mTasksLocalDataSource = Preconditions.checkNotNull(tasksLocalDataSource);
     }
 
     /**
@@ -94,7 +94,7 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public void getTasks(@NonNull final LoadTasksCallback callback) {
-        checkNotNull(callback);
+        Preconditions.checkNotNull(callback);
 
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
@@ -124,7 +124,7 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void saveTask(@NonNull Task task) {
-        checkNotNull(task);
+        Preconditions.checkNotNull(task);
         mTasksRemoteDataSource.saveTask(task);
         mTasksLocalDataSource.saveTask(task);
 
@@ -137,7 +137,7 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull Task task) {
-        checkNotNull(task);
+        Preconditions.checkNotNull(task);
         mTasksRemoteDataSource.completeTask(task);
         mTasksLocalDataSource.completeTask(task);
 
@@ -152,13 +152,13 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        checkNotNull(taskId);
+        Preconditions.checkNotNull(taskId);
         completeTask(getTaskWithId(taskId));
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
-        checkNotNull(task);
+        Preconditions.checkNotNull(task);
         mTasksRemoteDataSource.activateTask(task);
         mTasksLocalDataSource.activateTask(task);
 
@@ -173,7 +173,7 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        checkNotNull(taskId);
+        Preconditions.checkNotNull(taskId);
         activateTask(getTaskWithId(taskId));
     }
 
@@ -204,8 +204,8 @@ public class TasksRepository implements TasksDataSource {
      */
     @Override
     public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
-        checkNotNull(taskId);
-        checkNotNull(callback);
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(callback);
 
         Task cachedTask = getTaskWithId(taskId);
 
@@ -269,8 +269,8 @@ public class TasksRepository implements TasksDataSource {
 
     @Override
     public void deleteTask(@NonNull String taskId) {
-        mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
-        mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
+        mTasksRemoteDataSource.deleteTask(Preconditions.checkNotNull(taskId));
+        mTasksLocalDataSource.deleteTask(Preconditions.checkNotNull(taskId));
 
         mCachedTasks.remove(taskId);
     }
@@ -311,7 +311,7 @@ public class TasksRepository implements TasksDataSource {
 
     @Nullable
     private Task getTaskWithId(@NonNull String id) {
-        checkNotNull(id);
+        Preconditions.checkNotNull(id);
         if (mCachedTasks == null || mCachedTasks.isEmpty()) {
             return null;
         } else {

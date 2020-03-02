@@ -16,11 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.test.espresso.IdlingResource;
+
+import androidx.core.util.Preconditions;
+import androidx.test.espresso.IdlingResource;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * An simple counter implementation of {@link IdlingResource} that determines idleness by
@@ -38,7 +40,7 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     // written from main thread, read from any thread.
-    private volatile ResourceCallback resourceCallback;
+    private volatile IdlingResource.ResourceCallback resourceCallback;
 
     /**
      * Creates a SimpleCountingIdlingResource
@@ -46,7 +48,7 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
      * @param resourceName the resource name this resource should report to Espresso.
      */
     public SimpleCountingIdlingResource(String resourceName) {
-        mResourceName = checkNotNull(resourceName);
+        mResourceName = Preconditions.checkNotNull(resourceName);
     }
 
     @Override
@@ -60,7 +62,7 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
     }
 
     @Override
-    public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
+    public void registerIdleTransitionCallback(IdlingResource.ResourceCallback resourceCallback) {
         this.resourceCallback = resourceCallback;
     }
 

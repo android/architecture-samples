@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.custom.action;
 
-import org.hamcrest.Matcher;
-
 import android.content.res.Resources.NotFoundException;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.PerformException;
@@ -25,15 +23,17 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.espresso.util.HumanReadables;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.core.widget.DrawerLayout;
+
+import org.hamcrest.Matcher;
+
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
-import static org.hamcrest.Matchers.allOf;
 
 /**
  * View actions for interacting with {@link NavigationView}

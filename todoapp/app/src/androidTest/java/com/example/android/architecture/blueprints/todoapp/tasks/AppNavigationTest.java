@@ -20,8 +20,9 @@ import android.support.test.espresso.NoActivityResumedException;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
+
+import androidx.core.widget.DrawerLayout;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 

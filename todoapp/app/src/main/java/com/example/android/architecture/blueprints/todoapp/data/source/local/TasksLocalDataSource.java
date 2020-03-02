@@ -16,10 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.util.Preconditions;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
@@ -114,7 +114,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void saveTask(@NonNull final Task task) {
-        checkNotNull(task);
+        Preconditions.checkNotNull(task);
         Runnable saveRunnable = new Runnable() {
             @Override
             public void run() {

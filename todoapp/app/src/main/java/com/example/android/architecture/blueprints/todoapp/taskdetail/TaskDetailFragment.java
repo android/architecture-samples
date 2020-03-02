@@ -16,11 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
-import android.databinding.Observable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,9 +24,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.Observable;
+import androidx.fragment.app.Fragment;
+
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
 /**
@@ -86,7 +87,7 @@ public class TaskDetailFragment extends Fragment {
 
     private void setupFab() {
         FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+                getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

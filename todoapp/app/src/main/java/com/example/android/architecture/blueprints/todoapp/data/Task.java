@@ -16,15 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.ObjectsCompat;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import java.util.UUID;
 
@@ -115,7 +113,7 @@ public final class Task {
 
     @Nullable
     public String getTitleForList() {
-        if (!Strings.isNullOrEmpty(mTitle)) {
+        if (mTitle != null && !mTitle.isEmpty()) {
             return mTitle;
         } else {
             return mDescription;
@@ -136,8 +134,7 @@ public final class Task {
     }
 
     public boolean isEmpty() {
-        return Strings.isNullOrEmpty(mTitle) &&
-               Strings.isNullOrEmpty(mDescription);
+        return (mTitle == null || mTitle.isEmpty()) && (mDescription == null || mDescription.isEmpty());
     }
 
     @Override
@@ -145,14 +142,14 @@ public final class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equal(mId, task.mId) &&
-               Objects.equal(mTitle, task.mTitle) &&
-               Objects.equal(mDescription, task.mDescription);
+        return ObjectsCompat.equals(mId, task.mId) &&
+                ObjectsCompat.equals(mTitle, task.mTitle) &&
+                ObjectsCompat.equals(mDescription, task.mDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mId, mTitle, mDescription);
+        return ObjectsCompat.hash(mId, mTitle, mDescription);
     }
 
     @Override
