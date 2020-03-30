@@ -39,6 +39,16 @@
         android:paddingTop="@dimen/list_item_padding"
         android:onClick="@{() -> viewmodel.openTask(task.id)}">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/priority_shape"
+            android:layout_marginLeft="4dp"
+            android:id="@+id/textview"
+            app:priorityImg="@{task.taskPriority}"
+            android:layout_marginRight="4dp"/>
+
         <CheckBox
             android:id="@+id/complete_checkbox"
             android:layout_width="wrap_content"

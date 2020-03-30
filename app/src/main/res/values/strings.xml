@@ -62,4 +62,14 @@
     <string name="tasks_header_image_content_description">Tasks header image</string>
     <string name="no_tasks_image_content_description">No tasks image</string>
 
+    <string-array name="priorities">
+        <item>NONE</item>
+        <item>HIGH</item>
+        <item>LOW</item>
+        <item>MEDIUM</item>
+    </string-array>
+    <string name="color_info">Red: High, Yellow: Medium, Green : Low </string>
+    <string name="sort_by_name">Sort by Name</string>
+    <string name="sort_by_priority">Prirotize</string>
+
 </resources>

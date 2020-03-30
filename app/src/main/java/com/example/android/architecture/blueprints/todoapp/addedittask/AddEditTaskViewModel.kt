@@ -25,13 +25,16 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.NumberGenerator
 import kotlinx.coroutines.launch
+import java.util.*
 
 /**
  * ViewModel for the Add/Edit screen.
  */
 class AddEditTaskViewModel(
     private val tasksRepository: TasksRepository
+
 ) : ViewModel() {
 
     // Two-way databinding, exposing MutableLiveData
@@ -56,6 +59,8 @@ class AddEditTaskViewModel(
     private var isDataLoaded = false
 
     private var taskCompleted = false
+
+    internal var taskPriority : String? = "None"
 
     fun start(taskId: String?) {
         if (_dataLoading.value == true) {
@@ -89,7 +94,9 @@ class AddEditTaskViewModel(
 
     private fun onTaskLoaded(task: Task) {
         title.value = task.title
+        taskId = task.taskID
         description.value = task.description
+
         taskCompleted = task.isCompleted
         _dataLoading.value = false
         isDataLoaded = true
@@ -108,18 +115,31 @@ class AddEditTaskViewModel(
             _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
-        if (Task(currentTitle, currentDescription).isEmpty) {
+        if (currentTitle.isEmpty() || currentDescription.isEmpty()) {
             _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
 
         val currentTaskId = taskId
         if (isNewTask || currentTaskId == null) {
-            createTask(Task(currentTitle, currentDescription))
+            createTask(Task(title =currentTitle,
+                    description = currentDescription,
+                    taskID = NumberGenerator.generator() ,
+                    isCompleted = false,
+                    priority = taskPriority?:"None",
+                    userName = "user345"))
+
         } else {
-            val task = Task(currentTitle, currentDescription, taskCompleted, currentTaskId)
+            val task =
+                    Task(title =currentTitle,
+                            description = currentDescription,
+                            taskID = currentTaskId,
+                            isCompleted = taskCompleted,
+                            priority = taskPriority?:"None",
+                            userName = "user345")
             updateTask(task)
         }
+
     }
 
     private fun createTask(newTask: Task) = viewModelScope.launch {
@@ -136,4 +156,5 @@ class AddEditTaskViewModel(
             _taskUpdatedEvent.value = Event(Unit)
         }
     }
+
 }

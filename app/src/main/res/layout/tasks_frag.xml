@@ -54,8 +54,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="@{viewmodel.empty ? View.GONE : View.VISIBLE}">
-
+                    android:visibility="@{viewmodel.empty ? View.GONE : View.VISIBLE}"
+                   >
                     <TextView
                         android:id="@+id/filtering_text"
                         android:layout_width="match_parent"
@@ -73,7 +73,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:items="@{viewmodel.items}" />
+                        app:items = "@{viewmodel.items}"
+                        />
                 </LinearLayout>
 
                 <LinearLayout
@@ -99,11 +100,20 @@
                         android:layout_gravity="center"
                         android:layout_marginBottom="@dimen/list_item_padding"
                         android:text="@{context.getString(viewmodel.noTasksLabel)}" />
+
                 </LinearLayout>
+
             </RelativeLayout>
 
         </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/footer"
+            android:text="@string/color_info"
+            android:layout_gravity="bottom|left"
+            android:textSize="16sp"/>
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_task_fab"
             android:layout_width="wrap_content"

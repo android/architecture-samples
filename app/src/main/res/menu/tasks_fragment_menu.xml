@@ -30,4 +30,13 @@
         android:id="@+id/menu_refresh"
         android:title="@string/refresh"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_sortby_name"
+        android:title="@string/sort_by_name"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_sortby_priority"
+        android:title="@string/sort_by_priority"
+        app:showAsAction="never" />
 </menu>

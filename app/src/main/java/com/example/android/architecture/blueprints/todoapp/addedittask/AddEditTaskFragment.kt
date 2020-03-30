@@ -19,6 +19,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -54,6 +55,16 @@ class AddEditTaskFragment : Fragment() {
         }
         // Set the lifecycle owner to the lifecycle of the view
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        viewDataBinding.spinner.onItemSelectedListener = object  : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+               viewModel.taskPriority = parent?.getItemAtPosition(position).toString()
+            }
+
+        }
         return viewDataBinding.root
     }
 
@@ -62,7 +73,7 @@ class AddEditTaskFragment : Fragment() {
         setupSnackbar()
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        viewModel.start(args.taskId)
+        viewModel.start(args.task)
     }
 
     private fun setupSnackbar() {

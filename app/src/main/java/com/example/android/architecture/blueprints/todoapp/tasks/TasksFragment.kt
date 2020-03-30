@@ -16,13 +16,20 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -61,10 +68,14 @@ class TasksFragment : Fragment() {
             viewmodel = viewModel
         }
         setHasOptionsMenu(true)
+        setFooter()
+       // val myAdpater = TasksAdapter(viewModel)
+      //  viewDataBinding.tasksList.adapter = myAdpater
+      //  myAdpater.submitList(viewModel.items.value)
         return viewDataBinding.root
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.menu_clear -> {
                 viewModel.clearCompletedTasks()
@@ -78,7 +89,21 @@ class TasksFragment : Fragment() {
                 viewModel.loadTasks(true)
                 true
             }
-            else -> false
+            R.id.menu_sortby_name -> {
+                (viewDataBinding.tasksList.adapter as TasksAdapter).submitList(viewModel.nameList)
+
+                true
+            }
+            R.id.menu_sortby_priority -> {
+                (viewDataBinding.tasksList.adapter as TasksAdapter).submitList(viewModel.priorityList)
+
+                true
+            }
+            else->{
+                setupListAdapter()
+                true
+            }
+
         }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -159,8 +184,22 @@ class TasksFragment : Fragment() {
         if (viewModel != null) {
             listAdapter = TasksAdapter(viewModel)
             viewDataBinding.tasksList.adapter = listAdapter
+          listAdapter.submitList(viewModel.items.value)
         } else {
             Timber.w("ViewModel not initialized when attempting to set up adapter.")
         }
+    }
+
+    private fun setFooter() {
+        val textView = viewDataBinding.footer
+        val text = textView.text
+        val ssb = SpannableStringBuilder(text)
+        val fcsRed = BackgroundColorSpan(Color.RED)
+        val fcsGreen = BackgroundColorSpan(Color.GREEN)
+        val bcsYellow = BackgroundColorSpan(Color.YELLOW)
+        ssb.setSpan(fcsRed, 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        ssb.setSpan(bcsYellow, 11, 17, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        ssb.setSpan(fcsGreen, 27, 32, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        textView.text = ssb
     }
 }

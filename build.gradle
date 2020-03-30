@@ -20,6 +20,8 @@ plugins {
     id "com.diffplug.gradle.spotless" version "3.24.0"
 }
 
+apply from: 'dependencies.gradle'
+
 allprojects {
     repositories {
         google()
@@ -69,4 +71,5 @@ ext {
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '1.0'
+
 }

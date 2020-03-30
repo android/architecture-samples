@@ -15,9 +15,11 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 import java.util.UUID
 
 /**
@@ -29,13 +31,18 @@ import java.util.UUID
  * @param isCompleted whether or not this task is completed
  * @param id id of the task
  */
+@Parcelize
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "description") var description: String = "",
     @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+    @ColumnInfo(name = "id") var taskID : String?,
+    @ColumnInfo(name = "priority") var priority : String,
+    @ColumnInfo(name = "username") var userName : String,
     @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
-) {
+) : Parcelable{
+
 
     val titleForList: String
         get() = if (title.isNotEmpty()) title else description
@@ -45,4 +52,9 @@ data class Task @JvmOverloads constructor(
 
     val isEmpty
         get() = title.isEmpty() || description.isEmpty()
+
+    val taskPriority:String
+        get() = priority
 }
+
+

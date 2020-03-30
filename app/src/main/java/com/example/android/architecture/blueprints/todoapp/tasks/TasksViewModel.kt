@@ -55,10 +55,14 @@ class TasksViewModel(
                 _dataLoading.value = false
             }
         }
-        tasksRepository.observeTasks().distinctUntilChanged().switchMap { filterTasks(it) }
+        tasksRepository.observeTasks().distinctUntilChanged().switchMap {
+            filterTasks(it)
+
+        }
     }
 
-    val items: LiveData<List<Task>> = _items
+    var items: LiveData<List<Task>> = _items
+
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -98,6 +102,7 @@ class TasksViewModel(
         // Set initial state
         setFiltering(getSavedFilterType())
         loadTasks(true)
+        //setSortByName()
     }
 
     /**
@@ -206,9 +211,26 @@ class TasksViewModel(
             showSnackbarMessage(R.string.loading_tasks_error)
             isDataLoadingError.value = true
         }
-
+        setOthers(result);
         return result
     }
+
+    lateinit var nameList : List<Task>
+    lateinit var priorityList : List<Task>
+
+    private fun setOthers(result: MutableLiveData<List<Task>>) {
+        val list1 = result.value?.toMutableList()
+        val list2 = result.value?.toMutableList()
+        if (list1 != null) {
+            nameList = list1
+        }
+
+        if (list2 != null) {
+            priorityList = list2
+        }
+
+    }
+
 
     /**
      * @param forceUpdate Pass in true to refresh the data in the [TasksDataSource]
@@ -241,7 +263,33 @@ class TasksViewModel(
     private fun getSavedFilterType() : TasksFilterType {
         return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
     }
+
+
+
+
+   /* fun setSortByName() {
+        items1 = items.value?.toMutableList()
+        items1?.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.title })
+
+        items2?.sortedWith(Comparator<Task> { a, b ->
+            when {
+                byPriority(a.priority) > byPriority(b.priority) -> 1
+                byPriority(b.priority) < byPriority(a.priority) -> -1
+                else -> 0
+            }
+        })
+    }*/
+
+    private fun byPriority(str: String): Int {
+        return when (str) {
+            "HIGH" -> 1
+            "MEDIUM" -> 2
+            "LOW" -> 3
+            else -> 4
+
+        }
+    }
 }
 
-// Used to save the current filtering in SavedStateHandle.
-const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
+    // Used to save the current filtering in SavedStateHandle.
+    const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"

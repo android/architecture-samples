@@ -23,104 +23,105 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.mapper.TasksResponseModelMapper
 import kotlinx.coroutines.delay
 
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-object TasksRemoteDataSource : TasksDataSource {
+class TasksRemoteDataSource : TasksDataSource {
 
-    private const val SERVICE_LATENCY_IN_MILLIS = 2000L
-
-    private var TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(2)
-
-    init {
-        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.")
-        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
-    }
-
-    private val observableTasks = MutableLiveData<Result<List<Task>>>()
-
-    override suspend fun refreshTasks() {
-        observableTasks.value = getTasks()
-    }
-
-    override suspend fun refreshTask(taskId: String) {
-        refreshTasks()
-    }
+    val mapper = TasksResponseModelMapper()
+    val service = TodoServiceFactory.makeGithubTrendingService(true);
 
     override fun observeTasks(): LiveData<Result<List<Task>>> {
-        return observableTasks
-    }
-
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
-        return observableTasks.map { tasks ->
-            when (tasks) {
-                is Result.Loading -> Result.Loading
-                is Error -> Error(tasks.exception)
-                is Success -> {
-                    val task = tasks.data.firstOrNull() { it.id == taskId }
-                        ?: return@map Error(Exception("Not found"))
-                    Success(task)
-                }
-            }
-        }
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun getTasks(): Result<List<Task>> {
-        // Simulate network by delaying the execution.
-        val tasks = TASKS_SERVICE_DATA.values.toList()
-        delay(SERVICE_LATENCY_IN_MILLIS)
-        return Success(tasks)
+     val result
+                = service.getTasks("user345").map {
+            mapper.mapFromModel(it)
+        }
+
+        return Success(result)
+    }
+
+    override suspend fun refreshTasks() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun getTask(taskId: String): Result<Task> {
-        // Simulate network by delaying the execution.
-        delay(SERVICE_LATENCY_IN_MILLIS)
-        TASKS_SERVICE_DATA[taskId]?.let {
-            return Success(it)
+        val result
+                = service.getTask("user345",taskId).map {
+            mapper.mapFromModel(it)
         }
-        return Error(Exception("Task not found"))
+        val task = result.get(0);
+
+        return Success(task)
     }
 
-    private fun addTask(title: String, description: String) {
-        val newTask = Task(title, description)
-        TASKS_SERVICE_DATA[newTask.id] = newTask
+    override suspend fun refreshTask(taskId: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun saveTask(task: Task) {
-        TASKS_SERVICE_DATA[task.id] = task
+       val model = TasksModel(
+               id = task.taskID,
+               user = task.userName,
+               title = task.title,
+               description = task.description,
+               completed=task.isCompleted,
+               priority = "MEDIUM"
+               )
+        val service = TodoServiceFactory.makeGithubTrendingService(true);
+        val modelList = listOf<TasksModel>(mapper.mapToModel(task))
+        val ans  = service.createOrUpdate("user345",modelList)
+
     }
 
+
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, true, task.id)
-        TASKS_SERVICE_DATA[task.id] = completedTask
+        val model = TasksModel(
+                id = task.taskID,
+                user = task.userName,
+                title = task.title,
+                description = task.description,
+                completed=true,
+                priority = task.priority
+        )
+        val service = TodoServiceFactory.makeGithubTrendingService(true);
+        val modelList = listOf<TasksModel>(model)
+        val ans  = service.createOrUpdate("user345",modelList)
+
     }
 
     override suspend fun completeTask(taskId: String) {
-        // Not required for the remote data source
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, false, task.id)
-        TASKS_SERVICE_DATA[task.id] = activeTask
+
     }
 
     override suspend fun activateTask(taskId: String) {
-        // Not required for the remote data source
+
     }
 
     override suspend fun clearCompletedTasks() {
-        TASKS_SERVICE_DATA = TASKS_SERVICE_DATA.filterValues {
-            !it.isCompleted
-        } as LinkedHashMap<String, Task>
+
     }
 
     override suspend fun deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear()
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun deleteTask(taskId: String) {
-        TASKS_SERVICE_DATA.remove(taskId)
+        TodoServiceFactory.makeGithubTrendingService(true).delete(taskId)
     }
+
 }

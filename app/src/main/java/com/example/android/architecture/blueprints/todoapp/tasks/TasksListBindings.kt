@@ -15,7 +15,9 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.drawable.GradientDrawable
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +33,7 @@ fun setItems(listView: RecyclerView, items: List<Task>?) {
     }
 }
 
+
 @BindingAdapter("app:completedTask")
 fun setStyle(textView: TextView, enabled: Boolean) {
     if (enabled) {
@@ -39,3 +42,35 @@ fun setStyle(textView: TextView, enabled: Boolean) {
         textView.paintFlags = textView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
     }
 }
+
+@BindingAdapter("app:priorityImg")
+fun priorityImg(txt: TextView, url: String) {
+
+    val gradientDrawable = (txt.background as GradientDrawable).mutate()
+    val gd = (gradientDrawable as GradientDrawable)
+    when (url) {
+        "HIGH" -> gd.setColor(Color.RED)
+        "LOW" -> gd.setColor(Color.GREEN)
+        "MEDIUM" -> gd.setColor(Color.YELLOW)
+        else -> gd.setColor(Color.LTGRAY)
+    }
+}
+
+/*
+items?.let {
+        when (sort) {
+            1 -> (listView.adapter as TasksAdapter).submitList(items)
+            2 -> {
+                items.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.title })
+                (listView.adapter as TasksAdapter).submitList(items)
+            }
+            3 -> {
+
+                items.sortedWith(Comparator<Task>{ a,b ->
+                    when {
+                        byPriority(a.priority) >  byPriority(b.priority) -> 1
+                        byPriority(b.priority) >  byPriority(a.priority) -> 1
+                        else ->0
+                    }
+                })
+ */

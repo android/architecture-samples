@@ -2,8 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-
+apply plugin: 'kotlin-android-extensions'
 android {
+
+    androidExtensions {
+        experimental = true
+    }
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -57,6 +61,8 @@ android {
         }
     }
 
+
+
     // Remove mockRelease as it's not needed.
     android.variantFilter { variant ->
         if (variant.buildType.name == 'release'
@@ -96,6 +102,8 @@ android {
  all versions in a single place. This improves readability and helps managing project complexity.
  */
 dependencies {
+
+    def remoteDependencies = rootProject.ext.remoteDependencies
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -171,4 +179,17 @@ dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+    implementation 'com.squareup.retrofit2:converter-moshi:2.6.0'
+
+
+
+    implementation remoteDependencies.javaxAnnotation
+    implementation remoteDependencies.javaxInject
+    implementation remoteDependencies.rxKotlin
+    implementation remoteDependencies.gson
+    implementation remoteDependencies.okHttp
+    implementation remoteDependencies.okHttpLogger
+    implementation remoteDependencies.retrofit
+    implementation remoteDependencies.retrofitConverter
+    implementation remoteDependencies.retrofitAdapter
 }
