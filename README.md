@@ -1,20 +1,20 @@
 # Android Architecture Blueprints - AAC + Dagger2 + Dagger-Android + Retrofit + UseCases
-This project is based on [dagger-android|(https://github.com/android/architecture-samples/tree/dagger-android)]
+This project is based on [dagger-android](https://github.com/android/architecture-samples/tree/dagger-android)
 branch which includes:
  - Retrofit 2x
  - UseCases Separation of Concern for implement Clean Architecture approach
  - Mock Flavour to be used for feature-switch (aka: feature-flag approach)
- - Added item menu to get and load Tasks from [json-placeholder-api|(https://jsonplaceholder.typicode.com/posts)]
+ - Added item menu to get and load Tasks from [json-placeholder-api](https://jsonplaceholder.typicode.com/posts)
  - Package name adjusting (to be more simple)
 
 ### References
- - [Android Architecture|(https://github.com/android/architecture-samples/tree/dagger-android)]
- - [Android References|(https://github.com/amitshekhariitbhu/awesome-android-complete-reference/blob/master/README.md)]
- - [Retrofit|(https://proandroiddev.com/mvp-architecture-with-kotlin-dagger-2-retrofit-rxandroid-and-databinding-17bffe27393d)]
- - [JSon Placeholder API|(https://jsonplaceholder.typicode.com/posts)]
- - [List filter|(https://grokonez.com/kotlin/kotlin-list-filter-methods-example)]
- - [Build variants|(https://developer.android.com/studio/build/build-variants)]
- - [Build disabled warnings|(https://stackoverflow.com/questions/34692950/how-to-disable-android-studio-code-style-warning-can-be-simplified-to)]
+ - [Android Architecture](https://github.com/android/architecture-samples/tree/dagger-android)
+ - [Android References](https://github.com/amitshekhariitbhu/awesome-android-complete-reference/blob/master/README.md)
+ - [Retrofit](https://proandroiddev.com/mvp-architecture-with-kotlin-dagger-2-retrofit-rxandroid-and-databinding-17bffe27393d)
+ - [JSon Placeholder API](https://jsonplaceholder.typicode.com/posts)
+ - [List filter](https://grokonez.com/kotlin/kotlin-list-filter-methods-example)
+ - [Build variants](https://developer.android.com/studio/build/build-variants)
+ - [Build disabled warnings](https://stackoverflow.com/questions/34692950/how-to-disable-android-studio-code-style-warning-can-be-simplified-to)
 
 ### Summary
 My intention in ths project is provides some Kotlin and Android aspects that are not trivial for beginners and intermediate
