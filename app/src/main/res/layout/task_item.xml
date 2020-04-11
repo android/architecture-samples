@@ -22,11 +22,11 @@
 
         <variable
             name="task"
-            type="com.raizen.app.todo.data.Task" />
+            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
 
         <variable
             name="viewmodel"
-            type="com.raizen.app.todo.tasks.TasksViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
     </data>
 
     <LinearLayout

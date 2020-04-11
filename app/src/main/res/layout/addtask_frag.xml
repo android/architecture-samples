@@ -23,7 +23,7 @@
 
         <variable
             name="viewmodel"
-            type="com.raizen.app.todo.addedittask.AddEditTaskViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.raizen.app.todo.ScrollChildSwipeRefreshLayout
+        <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -76,7 +76,7 @@
 
                 </LinearLayout>
             </ScrollView>
-        </com.raizen.app.todo.ScrollChildSwipeRefreshLayout>
+        </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_save_task"
