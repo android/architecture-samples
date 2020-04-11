@@ -7,13 +7,13 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.raizen.app.dagger"
+        applicationId "com.example.android.architecture.blueprints.retrofit"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner 'com.raizen.app.todoapp.CustomTestRunner'
+        testInstrumentationRunner 'com.example.android.architecture.blueprints.todoapp.CustomTestRunner'
     }
 
     android {
