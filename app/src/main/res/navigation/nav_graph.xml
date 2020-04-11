@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/taskDetailFragment"
-        android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment"
+        android:name="com.raizen.app.todo.taskdetail.TaskDetailFragment"
         android:label="Task Details">
         <action
             android:id="@+id/action_taskDetailFragment_to_addEditTaskFragment"
@@ -36,7 +36,7 @@
     </fragment>
     <fragment
         android:id="@+id/statisticsFragment"
-        android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragment"
+        android:name="com.raizen.app.todo.statistics.StatisticsFragment"
         android:label="@string/app_name">
         <action
             android:id="@+id/action_statisticsFragment_to_tasksFragment"
@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
-        android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment"
+        android:name="com.raizen.app.todo.tasks.TasksFragment"
         android:label="@string/app_name">
         <action
             android:id="@+id/action_tasksFragment_to_statisticsFragment"
@@ -63,7 +63,7 @@
     </fragment>
     <fragment
         android:id="@+id/addEditTaskFragment"
-        android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment"
+        android:name="com.raizen.app.todo.addedittask.AddEditTaskFragment"
         android:label="{title}">
         <argument
             android:name="taskId"

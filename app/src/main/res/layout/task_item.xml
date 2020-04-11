@@ -22,40 +22,40 @@
 
         <variable
             name="task"
-            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
+            type="com.raizen.app.todo.data.Task" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
+            type="com.raizen.app.todo.tasks.TasksViewModel" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> viewmodel.openTask(task.id)}"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="@dimen/list_item_padding"
         android:paddingTop="@dimen/list_item_padding"
-        android:onClick="@{() -> viewmodel.openTask(task.id)}">
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/list_item_padding">
 
         <CheckBox
             android:id="@+id/complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}"
-            android:checked="@{task.completed}" />
+            android:checked="@{task.completed}"
+            android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:text="@{task.titleForList}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             app:completedTask="@{task.completed}" />
     </LinearLayout>
 </layout>

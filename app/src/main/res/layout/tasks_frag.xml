@@ -24,7 +24,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
+            type="com.raizen.app.todo.tasks.TasksViewModel" />
 
     </data>
 
@@ -35,7 +35,7 @@
         android:layout_height="match_parent">
 
 
-        <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
+        <com.raizen.app.todo.ScrollChildSwipeRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -101,7 +101,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-        </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
+        </com.raizen.app.todo.ScrollChildSwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_task"

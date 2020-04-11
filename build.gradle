@@ -61,4 +61,8 @@ ext {
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '0.44'
+
+    rxjava_version = '2.2.13'
+    rxandroid_version = '2.1.1'
+    gson_version = '2.8.5'
 }

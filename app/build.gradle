@@ -7,13 +7,13 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.dagger"
+        applicationId "com.raizen.app.dagger"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner 'com.example.android.architecture.blueprints.todoapp.CustomTestRunner'
+        testInstrumentationRunner 'com.raizen.app.todoapp.CustomTestRunner'
     }
 
     android {
@@ -28,7 +28,28 @@ android {
         }
     }
 
+    flavorDimensions "mode"
+
+    productFlavors {
+        dev {
+            dimension "mode"
+
+            buildConfigField("boolean", "MOCK_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
+        }
+
+        mock {
+            dimension "mode"
+
+            buildConfigField("boolean", "MOCK_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
+            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+        }
+
+    }
+
+
     buildTypes {
+
         debug {
             minifyEnabled false
             testCoverageEnabled true
@@ -151,4 +172,15 @@ dependencies {
     // Using Dagger in androidTest and Robolectric too
     kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    //Retrofit 2
+    implementation "com.squareup.retrofit2:retrofit:2.6.2"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:2.6.2"
+    implementation "com.squareup.retrofit2:converter-moshi:2.3.0"
+
+    //Rx
+    implementation ("io.reactivex.rxjava2:rxandroid:$rxandroid_version")
+    implementation ("io.reactivex.rxjava2:rxjava:$rxjava_version")
+
+    implementation "com.google.code.gson:gson:$gson_version"
 }
