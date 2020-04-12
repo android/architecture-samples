@@ -219,7 +219,7 @@ class TasksViewModel @Inject constructor(
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
-        if(BuildConfig.DEV_FLAVOR_ENABLED) {
+        if(BuildConfig.RETROFIT_FLAVOR_ENABLED) {
             return
         }
         onListChange(forceUpdate)
@@ -230,7 +230,7 @@ class TasksViewModel @Inject constructor(
     }
 
     fun loadTasksFromRetrofit(forceUpdate: Boolean = true) {
-        if(BuildConfig.MOCK_FLAVOR_ENABLED) {
+        if(BuildConfig.DEV_FLAVOR_ENABLED) {
             return
         }
 

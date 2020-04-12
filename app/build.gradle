@@ -31,19 +31,20 @@ android {
     flavorDimensions "mode"
 
     productFlavors {
+        retrofit {
+            dimension "mode"
+
+            buildConfigField("boolean", "RETROFIT_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
+            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+
+        }
         dev {
             dimension "mode"
 
-            buildConfigField("boolean", "MOCK_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+            buildConfigField("boolean", "RETROFIT_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
             buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
         }
 
-        mock {
-            dimension "mode"
-
-            buildConfigField("boolean", "MOCK_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
-            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
-        }
 
     }
 
