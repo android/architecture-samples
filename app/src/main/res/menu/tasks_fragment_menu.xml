@@ -30,4 +30,8 @@
         android:id="@+id/menu_refresh"
         android:title="@string/refresh"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_load_tasks"
+        android:title="@string/load_from_retrofit"
+        app:showAsAction="never" />
 </menu>

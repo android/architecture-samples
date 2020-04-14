@@ -7,7 +7,7 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.dagger"
+        applicationId "com.example.android.architecture.blueprints.retrofit"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
@@ -28,7 +28,29 @@ android {
         }
     }
 
+    flavorDimensions "mode"
+
+    productFlavors {
+        retrofit {
+            dimension "mode"
+
+            buildConfigField("boolean", "RETROFIT_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
+            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+
+        }
+        dev {
+            dimension "mode"
+
+            buildConfigField("boolean", "RETROFIT_FLAVOR_ENABLED", "Boolean.parseBoolean(\"false\")")
+            buildConfigField("boolean", "DEV_FLAVOR_ENABLED", "Boolean.parseBoolean(\"true\")")
+        }
+
+
+    }
+
+
     buildTypes {
+
         debug {
             minifyEnabled false
             testCoverageEnabled true
@@ -151,4 +173,15 @@ dependencies {
     // Using Dagger in androidTest and Robolectric too
     kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    //Retrofit 2
+    implementation "com.squareup.retrofit2:retrofit:2.6.2"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:2.6.2"
+    implementation "com.squareup.retrofit2:converter-moshi:2.3.0"
+
+    //Rx
+    implementation ("io.reactivex.rxjava2:rxandroid:$rxandroid_version")
+    implementation ("io.reactivex.rxjava2:rxjava:$rxjava_version")
+
+    implementation "com.google.code.gson:gson:$gson_version"
 }

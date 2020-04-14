@@ -17,14 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.android.architecture.blueprints.todoapp.LiveDataTestUtil
-import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTriggered
-import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
+import com.example.android.architecture.blueprints.todoapp.*
+import com.example.android.architecture.blueprints.todoapp.data.source.FakeNetworkTasksUseCases
+import com.example.android.architecture.blueprints.todoapp.data.usecases.INetworkTasksUseCases
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -42,6 +40,7 @@ class TasksViewModelTest {
 
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
+    private lateinit var fakeNetworkTasksUseCases : INetworkTasksUseCases
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -56,12 +55,14 @@ class TasksViewModelTest {
     fun setupViewModel() {
         // We initialise the tasks to 3, with one active and two completed
         tasksRepository = FakeRepository()
+        fakeNetworkTasksUseCases = FakeNetworkTasksUseCases()
+
         val task1 = Task("Title1", "Description1")
         val task2 = Task("Title2", "Description2", true)
         val task3 = Task("Title3", "Description3", true)
         tasksRepository.addTasks(task1, task2, task3)
 
-        tasksViewModel = TasksViewModel(tasksRepository)
+        tasksViewModel = TasksViewModel(tasksRepository,fakeNetworkTasksUseCases)
     }
 
     @Test
@@ -74,7 +75,9 @@ class TasksViewModelTest {
         tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
 
         // Trigger loading of tasks
+
         tasksViewModel.loadTasks(true)
+
 
         // Then progress indicator is shown
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading)).isTrue()

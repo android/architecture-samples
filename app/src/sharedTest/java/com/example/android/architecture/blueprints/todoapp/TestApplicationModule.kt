@@ -16,8 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp
 
+import com.example.android.architecture.blueprints.todoapp.data.source.FakeNetworkTasksUseCases
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.usecases.INetworkTasksUseCases
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -31,4 +33,9 @@ class TestApplicationModule {
     @Singleton
     @Provides
     fun provideRepository(): TasksRepository = FakeRepository()
+
+    @Singleton
+    @Provides
+    fun provideNetworkTaskUseCases(): INetworkTasksUseCases = FakeNetworkTasksUseCases()
+
 }

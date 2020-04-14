@@ -20,16 +20,18 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.BuildConfig
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.usecases.INetworkTasksUseCases
 import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -37,8 +39,10 @@ import javax.inject.Inject
  * ViewModel for the task list screen.
  */
 class TasksViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository
-) : ViewModel() {
+    private val tasksRepository: TasksRepository,
+    private val networkUseCases: INetworkTasksUseCases
+) : BaseViewModel() {
+
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
     val items: LiveData<List<Task>> = _items
@@ -77,10 +81,12 @@ class TasksViewModel @Inject constructor(
         it.isEmpty()
     }
 
+
     init {
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS)
         loadTasks(true)
+        loadTasksFromRetrofit()
     }
 
     /**
@@ -132,8 +138,43 @@ class TasksViewModel @Inject constructor(
             showSnackbarMessage(R.string.completed_tasks_cleared)
             // Refresh list to show the new state
             loadTasks(false)
+
+            loadTasksFromRetrofit(false)
         }
     }
+
+    private fun onSuccess(taskModelList: List<TaskModel>?) {
+        Timber.i("onSuccess:: Retrofit")
+        Timber.i("onSuccess:: ${taskModelList.toString()}")
+        val tasksModel = taskModelList ?: arrayListOf()
+        if(tasksModel.isNotEmpty()) {
+            // after receive the tasks
+            // filter it
+            val maxItems = 50
+            val items = tasksModel
+                    .filterIndexed{ idx, _ -> idx < maxItems }
+                    .map { it.toTask() }
+
+            // save each one
+            val tasks = ArrayList(items)
+            tasks.forEach { task -> saveTask(task) }
+
+            // update fragment recycler list
+
+            isDataLoadingError.value = false
+            _items.value = tasks
+        }
+    }
+
+    private fun onError(it: Throwable?) {
+        Timber.i("onError:: Retrofit")
+        it?.printStackTrace()
+    }
+
+
+
+    private fun registerNetworkUseCases()  = networkUseCases.getTasks()
+
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
@@ -145,6 +186,7 @@ class TasksViewModel @Inject constructor(
         }
         // Refresh list to show the new state
         loadTasks(false)
+        loadTasksFromRetrofit(false)
     }
 
     /**
@@ -177,13 +219,48 @@ class TasksViewModel @Inject constructor(
      * @param forceUpdate   Pass in true to refresh the data in the [TasksDataSource]
      */
     fun loadTasks(forceUpdate: Boolean) {
+        if(BuildConfig.RETROFIT_FLAVOR_ENABLED) {
+            return
+        }
+        onListChange(forceUpdate)
+    }
+
+    fun refresh() {
+        loadTasks(true)
+    }
+
+    fun loadTasksFromRetrofit(forceUpdate: Boolean = true) {
+        if(BuildConfig.DEV_FLAVOR_ENABLED) {
+            return
+        }
+
+        if(forceUpdate){
+            onDisposable()
+        }else {
+            onListChange(forceUpdate)
+        }
+    }
+
+    private fun onDisposable() {
         _dataLoading.value = true
+        addDisposable(registerNetworkUseCases()
+                .subscribe({ onSuccess(it) }, { onError(it) }))
+        _dataLoading.value = false
+    }
 
+    private fun saveTask(task: Task){
         wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                val tasksResult = tasksRepository.saveTask(task)
+            }
+        }
+    }
 
+    private fun onListChange(forceUpdate: Boolean) {
+        _dataLoading.value = true
+        wrapEspressoIdlingResource {
             viewModelScope.launch {
                 val tasksResult = tasksRepository.getTasks(forceUpdate)
-
                 if (tasksResult is Success) {
                     val tasks = tasksResult.data
 
@@ -207,13 +284,8 @@ class TasksViewModel @Inject constructor(
                     _items.value = emptyList()
                     showSnackbarMessage(R.string.loading_tasks_error)
                 }
-
                 _dataLoading.value = false
             }
         }
-    }
-
-    fun refresh() {
-        loadTasks(true)
     }
 }

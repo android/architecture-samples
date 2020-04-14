@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.usecases.INetworkTasksUseCases
 import com.example.android.architecture.blueprints.todoapp.di.AddEditTaskModule
 import com.example.android.architecture.blueprints.todoapp.di.StatisticsModule
 import com.example.android.architecture.blueprints.todoapp.di.TaskDetailModule
@@ -47,4 +48,5 @@ interface TestApplicationComponent : AndroidInjector<TestTodoApplication> {
 
 
     val tasksRepository: TasksRepository
+    val networkTasksUseCases: INetworkTasksUseCases
 }

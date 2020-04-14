@@ -78,11 +78,20 @@ class TasksFragment : DaggerFragment() {
                 true
             }
             R.id.menu_refresh -> {
-                viewModel.loadTasks(true)
+                refreshList()
+                true
+            }
+            R.id.menu_load_tasks -> {
+                viewModel.loadTasksFromRetrofit()
                 true
             }
             else -> false
         }
+
+    private fun refreshList() {
+        viewModel.loadTasks(true)
+        viewModel.loadTasksFromRetrofit()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
