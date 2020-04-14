@@ -37,6 +37,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.example.android.architecture.blueprints.todoapp.BuildConfig
 import com.example.android.architecture.blueprints.todoapp.DaggerTestApplicationRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -47,6 +48,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
 import org.hamcrest.core.IsNot.not
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -82,10 +84,16 @@ class TasksFragmentTest {
     fun setupDaggerComponent() {
         repository = rule.component.tasksRepository
         repository.deleteAllTasksBlocking()
+
+        assumeTrue(BuildConfig.RETROFIT_FLAVOR_ENABLED);
+
     }
+
 
     @Test
     fun displayTask_whenRepositoryHasData() {
+
+
         // GIVEN - One task already in the repository
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
@@ -98,6 +106,8 @@ class TasksFragmentTest {
 
     @Test
     fun displayActiveTask() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
         launchActivity()
@@ -115,6 +125,8 @@ class TasksFragmentTest {
 
     @Test
     fun displayCompletedTask() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
         launchActivity()
@@ -132,6 +144,8 @@ class TasksFragmentTest {
 
     @Test
     fun deleteOneTask() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
         launchActivity()
@@ -150,6 +164,8 @@ class TasksFragmentTest {
 
     @Test
     fun deleteOneOfTwoTasks() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
 
@@ -171,6 +187,8 @@ class TasksFragmentTest {
 
     @Test
     fun markTaskAsComplete() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
         launchActivity()
@@ -192,6 +210,8 @@ class TasksFragmentTest {
 
     @Test
     fun markTaskAsActive() {
+
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
         launchActivity()
@@ -213,6 +233,8 @@ class TasksFragmentTest {
 
     @Test
     fun showAllTasks() {
+
+
         // Add one active task and one completed task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
@@ -228,6 +250,8 @@ class TasksFragmentTest {
 
     @Test
     fun showActiveTasks() {
+
+
         // Add 2 active tasks and one completed task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
@@ -245,6 +269,7 @@ class TasksFragmentTest {
 
     @Test
     fun showCompletedTasks() {
+
         // Add one active task and 2 completed tasks
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
@@ -262,6 +287,7 @@ class TasksFragmentTest {
 
     @Test
     fun clearCompletedTasks() {
+
         // Add one active task and one completed task
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
@@ -281,6 +307,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
+
         launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
@@ -292,6 +319,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+
         launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
@@ -303,6 +331,7 @@ class TasksFragmentTest {
 
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+
         launchActivity()
 
         onView(withId(R.id.menu_filter)).perform(click())
@@ -314,6 +343,7 @@ class TasksFragmentTest {
 
     @Test
     fun clickAddTaskButton_navigateToAddEditFragment() {
+
         // GIVEN - On the home screen
         val scenario = launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)

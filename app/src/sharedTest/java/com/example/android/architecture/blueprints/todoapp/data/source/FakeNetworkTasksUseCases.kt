@@ -6,7 +6,7 @@ import io.reactivex.Single
 
 class FakeNetworkTasksUseCases : INetworkTasksUseCases {
     override fun getTasks(): Single<List<TaskModel>> {
-        return Single.create(null)
+        return Single.just(arrayListOf())
     }
 
 }
