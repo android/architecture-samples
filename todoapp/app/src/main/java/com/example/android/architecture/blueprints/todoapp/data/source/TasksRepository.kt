@@ -27,7 +27,7 @@ import java.util.LinkedHashMap
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
  */
-class TasksRepository(
+class TasksRepository private constructor(
         val tasksRemoteDataSource: TasksDataSource,
         val tasksLocalDataSource: TasksDataSource
 ) : TasksDataSource {
