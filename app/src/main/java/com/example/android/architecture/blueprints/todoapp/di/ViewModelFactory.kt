@@ -22,7 +22,6 @@ import dagger.MapKey
 import dagger.Module
 import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 /**
