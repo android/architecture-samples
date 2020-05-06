@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.annotation.StringRes
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for the Details screen.
  */
-class TaskDetailViewModel(
+class TaskDetailViewModel @ViewModelInject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 

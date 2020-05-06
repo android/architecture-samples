@@ -17,6 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -40,9 +42,9 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for the task list screen.
  */
-class TasksViewModel(
+class TasksViewModel @ViewModelInject constructor(
     private val tasksRepository: TasksRepository,
-    private val savedStateHandle: SavedStateHandle
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _forceUpdate = MutableLiveData<Boolean>(false)
@@ -238,7 +240,7 @@ class TasksViewModel(
         _forceUpdate.value = true
     }
 
-    private fun getSavedFilterType() : TasksFilterType {
+    private fun getSavedFilterType(): TasksFilterType {
         return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
     }
 }

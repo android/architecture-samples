@@ -2,14 +2,17 @@ buildscript {
     ext.kotlinVersion = '1.3.61'
     ext.navigationVersion = '2.2.0-rc02'
     ext.ktlintVersion = '0.33.0'
+    ext.hiltVersion = "2.28-alpha"
     repositories {
         google()
         jcenter()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath 'com.android.tools.build:gradle:4.0.0-beta05'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -17,7 +20,7 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version "3.24.0"
+    id "com.diffplug.gradle.spotless" version "3.24.2"
 }
 
 allprojects {
@@ -55,14 +58,17 @@ ext {
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.2.1'
+    daggerVersion = "2.27"
     dexMakerVersion = '2.12.1'
     espressoVersion = '3.2.0'
-    fragmentVersion = '1.2.0-rc02'
-    fragmentKtxVersion = '1.1.0-rc01'
+    fragmentVersion = '1.2.0'
+    fragmentKtxVersion = '1.2.0'
     hamcrestVersion = '1.3'
+    hiltAndroidXVersion = '1.0.0-SNAPSHOT'
     junitVersion = '4.12'
     materialVersion = '1.0.0'
     mockitoVersion = '2.19.0'
+    multiDexVersion = '2.0.1'
     recyclerViewVersion = '1.1.0'
     robolectricVersion = '4.3.1'
     roomVersion = '2.2.2'

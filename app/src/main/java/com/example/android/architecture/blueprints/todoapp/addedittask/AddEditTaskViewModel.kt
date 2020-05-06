@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for the Add/Edit screen.
  */
-class AddEditTaskViewModel(
+class AddEditTaskViewModel @ViewModelInject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
