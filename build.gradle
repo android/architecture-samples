@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0-beta05'
+        classpath 'com.android.tools.build:gradle:4.0.0-rc01'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
@@ -41,8 +41,8 @@ allprojects {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    // Support library and architecture components support minSdk 14 and above.
-    minSdkVersion = 14
+    // Bumping minSdk to 21 to avoid adding multidex just for androidTests
+    minSdkVersion = 21
     targetSdkVersion = 28
     compileSdkVersion = 28
 

@@ -20,7 +20,7 @@
 
     <application>
         <activity
-            android:name=".TestHiltActivity"
+            android:name=".HiltTestActivity"
             android:exported="false"  />
     </application>
 

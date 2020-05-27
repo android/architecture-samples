@@ -22,8 +22,8 @@ import timber.log.Timber
 import timber.log.Timber.DebugTree
 
 /**
- * An application that lazily provides a repository. Note that this Service Locator pattern is
- * used to simplify the sample. Consider a Dependency Injection framework.
+ * An application with @HiltAndroidApp that triggers Hilt's code generation and
+ * adds an application-level dependency container.
  *
  * Also, sets up Timber in the DEBUG BuildConfig. Read Timber's documentation for production setups.
  */

@@ -75,6 +75,7 @@ class AppNavigationTest {
 
     @Before
     fun init() {
+        // Populate @Inject fields in test class
         hiltRule.inject()
     }
 

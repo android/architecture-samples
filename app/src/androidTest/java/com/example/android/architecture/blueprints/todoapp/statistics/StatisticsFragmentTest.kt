@@ -58,6 +58,7 @@ class StatisticsFragmentTest {
 
     @Before
     fun init() {
+        // Populate @Inject fields in test class
         hiltRule.inject()
     }
 

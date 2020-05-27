@@ -74,6 +74,7 @@ class TasksActivityTest {
 
     @Before
     fun init() {
+        // Populate @Inject fields in test class
         hiltRule.inject()
     }
 

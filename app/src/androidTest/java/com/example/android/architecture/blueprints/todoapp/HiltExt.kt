@@ -32,7 +32,7 @@ import androidx.test.core.app.ApplicationProvider
  * (i.e. [EmptyFragmentActivity]) which is not annotated with @AndroidEntryPoint.
  *
  * As a workaround, use this function that is equivalent. It requires you to add
- * [TestHiltActivity] in the debug folder and include it in the debug AndroidManifest.xml file
+ * [HiltTestActivity] in the debug folder and include it in the debug AndroidManifest.xml file
  * as can be found in this project.
  */
 inline fun <reified T : Fragment> launchFragmentInHiltContainer(
@@ -43,11 +43,11 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     val startActivityIntent = Intent.makeMainActivity(
         ComponentName(
             ApplicationProvider.getApplicationContext(),
-            TestHiltActivity::class.java
+            HiltTestActivity::class.java
         )
     ).putExtra(EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY, themeResId)
 
-    ActivityScenario.launch<TestHiltActivity>(startActivityIntent).onActivity { activity ->
+    ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
         val fragment: Fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
             Preconditions.checkNotNull(T::class.java.classLoader),
             T::class.java.name

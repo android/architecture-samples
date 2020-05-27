@@ -16,7 +16,6 @@ android {
 
         testInstrumentationRunner "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
 
-        multiDexEnabled true
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.incremental" : "true"]
@@ -105,9 +104,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
-
-    // MultiDex
-    implementation "androidx.multidex:multidex:$multiDexVersion"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"

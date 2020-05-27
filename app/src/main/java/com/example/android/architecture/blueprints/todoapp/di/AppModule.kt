@@ -35,8 +35,14 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME
 
-@InstallIn(ApplicationComponent::class)
+/**
+ * Module to tell Hilt how to provide instances of types that cannot be constructor-injected.
+ *
+ * As these types are scoped to the application lifecycle using @Singleton, they're installed
+ * in Hilt's ApplicationComponent.
+ */
 @Module
+@InstallIn(ApplicationComponent::class)
 object AppModule {
 
     @Qualifier
@@ -81,8 +87,11 @@ object AppModule {
     fun provideIoDispatcher() = Dispatchers.IO
 }
 
-@InstallIn(ApplicationComponent::class)
+/**
+ * The binding for TasksRepository is on its own module so that we can replace it easily in tests.
+ */
 @Module
+@InstallIn(ApplicationComponent::class)
 object TasksRepositoryModule {
 
     @Singleton
