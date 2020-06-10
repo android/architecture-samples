@@ -13,6 +13,9 @@ script:
 - ./gradlew test
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+before_install:
+- yes | sdkmanager "platforms;android-28"
+- yes | sdkmanager "build-tools;29.0.2"
 cache:
   directories:
   - $HOME/.m2
