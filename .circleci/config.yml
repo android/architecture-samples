@@ -1,7 +1,7 @@
 version: 2
 config_android:
   docker:
-    - image: circleci/android:api-29
+    - image: circleci/android:api-28
   working_directory: ~/project
   environment:
     JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
@@ -17,7 +17,7 @@ setup_ftl:
 jobs:
   build_and_setup:
     docker:
-      - image: circleci/android:api-29
+      - image: circleci/android:api-28
     working_directory: ~/project
     environment:
       - JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
@@ -49,7 +49,7 @@ jobs:
             - ./app/build
   run_ftl:
     docker:
-      - image: circleci/android:api-29
+      - image: circleci/android:api-28
     working_directory: ~/project
     environment:
       - JAVA_TOOL_OPTIONS: -Xmx1024m
