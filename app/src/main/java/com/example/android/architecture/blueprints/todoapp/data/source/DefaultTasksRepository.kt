@@ -38,10 +38,10 @@ class DefaultTasksRepository(
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
         // Set app as busy while this function executes.
-        wrapEspressoIdlingResource {
+        wrapEspressoIdlingResource {////
             if (forceUpdate) {
                 try {
-                    updateTasksFromRemoteDataSource()
+                    //updateTasksFromRemoteDataSource()
                 } catch (ex: Exception) {
                     return Result.Error(ex)
                 }
@@ -51,7 +51,7 @@ class DefaultTasksRepository(
     }
 
     override suspend fun refreshTasks() {
-        updateTasksFromRemoteDataSource()
+        //updateTasksFromRemoteDataSource()
     }
 
     override fun observeTasks(): LiveData<Result<List<Task>>> {
@@ -59,7 +59,7 @@ class DefaultTasksRepository(
     }
 
     override suspend fun refreshTask(taskId: String) {
-        updateTaskFromRemoteDataSource(taskId)
+     // updateTaskFromRemoteDataSource(taskId)
     }
 
     private suspend fun updateTasksFromRemoteDataSource() {
@@ -67,7 +67,7 @@ class DefaultTasksRepository(
 
         if (remoteTasks is Success) {
             // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-            tasksLocalDataSource.deleteAllTasks()
+            //tasksLocalDataSource.deleteAllTasks()
             remoteTasks.data.forEach { task ->
                 tasksLocalDataSource.saveTask(task)
             }

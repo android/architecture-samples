@@ -17,16 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
-import android.net.ConnectivityManager
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.data.source.CacheOnlyTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -37,34 +34,22 @@ object ServiceLocator {
 
     private val lock = Any()
     private var database: ToDoDatabase? = null
-    private var context: Context ?=null
     @Volatile
     var tasksRepository: TasksRepository? = null
         @VisibleForTesting set
 
     fun provideTasksRepository(context: Context): TasksRepository {
-        this.context = context
         synchronized(this) {
             return tasksRepository ?: tasksRepository ?: createTasksRepository(context)
         }
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        return if(!context.isConnectedToNetwork())
-        {
-            val newRepo =
-                    CacheOnlyTasksRepository(createTaskLocalDataSource(context))
-            tasksRepository = newRepo
-            newRepo
-        } else{
-            val newRepo =
-                    DefaultTasksRepository(TasksRemoteDataSource(), createTaskLocalDataSource(context))
-            tasksRepository = newRepo
-            newRepo
-        }
-
+        val newRepo =
+                DefaultTasksRepository(TasksRemoteDataSource, createTaskLocalDataSource(context))
+        tasksRepository = newRepo
+        return newRepo
     }
-
 
     private fun createTaskLocalDataSource(context: Context): TasksDataSource {
         val database = database ?: createDataBase(context)
@@ -73,8 +58,8 @@ object ServiceLocator {
 
     private fun createDataBase(context: Context): ToDoDatabase {
         val result = Room.databaseBuilder(
-            context.applicationContext,
-            ToDoDatabase::class.java, DB_NAME
+                context.applicationContext,
+                ToDoDatabase::class.java, DB_NAME
         ).build()
         database = result
         return result
@@ -84,7 +69,7 @@ object ServiceLocator {
     fun resetRepository() {
         synchronized(lock) {
             runBlocking {
-              //  TasksRemoteDataSource.deleteAllTasks()
+                TasksRemoteDataSource.deleteAllTasks()
             }
             // Clear all data to avoid test pollution.
             database?.apply {
@@ -94,11 +79,6 @@ object ServiceLocator {
             database = null
             tasksRepository = null
         }
-    }
-
-    fun Context.isConnectedToNetwork(): Boolean {
-        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        return connectivityManager?.activeNetworkInfo?.isConnectedOrConnecting ?: false
     }
 }
 

@@ -95,7 +95,10 @@ class TasksFragment : Fragment() {
                 true
             }
             R.id.menu_sortby_priority -> {
-                (viewDataBinding.tasksList.adapter as TasksAdapter).submitList(viewModel.priorityList)
+
+                var sortedList =  viewModel.priorityList.sortedWith(compareBy({ it.priority }))
+
+                (viewDataBinding.tasksList.adapter as TasksAdapter).submitList(sortedList)
 
                 true
             }

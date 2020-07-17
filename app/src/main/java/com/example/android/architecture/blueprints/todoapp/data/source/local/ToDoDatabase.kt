@@ -25,7 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
  *
  * Note that exportSchema should be true in production databases.
  */
-@Database(entities = [Task::class], version = 1, exportSchema = false)
+@Database(entities = [Task::class], version = 2, exportSchema = false)
 abstract class ToDoDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TasksDao
