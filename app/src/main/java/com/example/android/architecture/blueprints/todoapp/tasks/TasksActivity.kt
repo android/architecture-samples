@@ -26,6 +26,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.util.hideKeyboard
 import com.google.android.material.navigation.NavigationView
 
 /**
@@ -41,7 +42,6 @@ class TasksActivity : AppCompatActivity() {
         setContentView(R.layout.tasks_act)
         setupNavigationDrawer()
         setSupportActionBar(findViewById(R.id.toolbar))
-
         val navController: NavController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration =
             AppBarConfiguration.Builder(R.id.tasks_fragment_dest, R.id.statistics_fragment_dest)
@@ -53,6 +53,7 @@ class TasksActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        hideKeyboard()
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) ||
             super.onSupportNavigateUp()
     }
