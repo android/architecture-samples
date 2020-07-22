@@ -23,6 +23,8 @@ import androidx.annotation.StyleRes
 import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity
+import androidx.navigation.Navigation
+import androidx.navigation.NavHostController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 
