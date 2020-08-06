@@ -69,7 +69,7 @@ class AddEditTaskFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.taskUpdatedEvent.observe(this, EventObserver {
+        viewModel.taskUpdatedEvent.observe(viewLifecycleOwner, EventObserver {
             val action = AddEditTaskFragmentDirections
                 .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
