@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import java.util.UUID
 
 /**
@@ -31,10 +32,11 @@ import java.util.UUID
  */
 @Entity(tableName = "tasks")
 data class Task @JvmOverloads constructor(
-    @ColumnInfo(name = "title") var title: String = "",
-    @ColumnInfo(name = "description") var description: String = "",
-    @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
-    @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
+        @ColumnInfo(name = "title") var title: String = "",
+        @ColumnInfo(name = "description") var description: String = "",
+        @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+        @ColumnInfo(name = "priority") var priority: Priority = Priority.LOW,
+        @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 
     val titleForList: String
@@ -45,4 +47,39 @@ data class Task @JvmOverloads constructor(
 
     val isEmpty
         get() = title.isEmpty() || description.isEmpty()
+
+    val getPriority
+        get() = priority
+}
+
+enum class Priority(priority: Int) {
+    LOW(0),
+    MEDIUM(1),
+    HIGH(2)
+}
+
+class PriorityConverter {
+
+    @TypeConverter
+    fun fromPriority(value: Priority): Int {
+        return value.ordinal
+    }
+
+    @TypeConverter
+    fun toPriority(value: Int?): Priority {
+        return when (value) {
+            0 -> {
+                Priority.LOW
+            }
+            1 -> {
+                Priority.MEDIUM
+            }
+            2 -> {
+                Priority.HIGH
+            }
+            else -> {
+                Priority.LOW
+            }
+        }
+    }
 }

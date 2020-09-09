@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -106,6 +107,16 @@
                         android:layout_toRightOf="@id/task_detail_complete_checkbox"
                         android:paddingTop="1dp"
                         android:text="@{viewmodel.task.description}"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <TextView
+                        android:id="@+id/task_detail_priority_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/task_detail_description_text"
+                        android:layout_toRightOf="@id/task_detail_complete_checkbox"
+                        android:paddingTop="1dp"
+                        android:text="@{viewmodel.task.priority.toString()}"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 </RelativeLayout>

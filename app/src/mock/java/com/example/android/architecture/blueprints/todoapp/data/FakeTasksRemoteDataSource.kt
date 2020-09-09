@@ -74,7 +74,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, true, task.id)
+        val completedTask = Task(task.title, task.description, true, task.priority, task.id)
         TASKS_SERVICE_DATA[task.id] = completedTask
     }
 
@@ -83,7 +83,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, false, task.id)
+        val activeTask = Task(task.title, task.description, false, task.priority, task.id)
         TASKS_SERVICE_DATA[task.id] = activeTask
     }
 

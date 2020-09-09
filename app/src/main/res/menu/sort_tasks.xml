@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/default_sort"
+        android:title="@string/default_sort" />
+    <item
+        android:id="@+id/priority_sort"
+        android:title="@string/priority_sort" />
+    <item
+        android:id="@+id/alphabetically_sort"
+        android:title="@string/alpha_sort" />
+</menu>

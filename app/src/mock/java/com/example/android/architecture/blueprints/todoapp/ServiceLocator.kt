@@ -22,6 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteD
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.local.MIGRATION_1_2
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import kotlinx.coroutines.runBlocking
@@ -34,6 +35,7 @@ object ServiceLocator {
 
     private val lock = Any()
     private var database: ToDoDatabase? = null
+
     @Volatile
     var tasksRepository: TasksRepository? = null
         @VisibleForTesting set
@@ -55,11 +57,17 @@ object ServiceLocator {
         return TasksLocalDataSource(database.taskDao())
     }
 
+    /**
+     * This creates teh database using Room
+     * Comment back in the migration for users that need to upgrade their apps
+     */
     private fun createDataBase(context: Context): ToDoDatabase {
         val result = Room.databaseBuilder(
-            context.applicationContext,
-            ToDoDatabase::class.java, "Tasks.db"
-        ).build()
+                context.applicationContext,
+                ToDoDatabase::class.java, "Tasks.db"
+        )
+                //.addMigrations(MIGRATION_1_2)
+                .build()
         database = result
         return result
     }

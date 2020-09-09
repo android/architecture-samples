@@ -38,6 +38,14 @@
     <string name="statistics_error">Error loading statistics.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
+    <string name="task_priority">Task Priority</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="sort">Sort: </string>
+    <string name="priority_sort">Priority Sort</string>
+    <string name="alpha_sort">Alpha Sort</string>
+    <string name="default_sort">Default Sort</string>
 
     <string-array name="list_tasks_array">
         <item>@string/nav_all</item>

@@ -15,7 +15,8 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -54,25 +55,79 @@
 
                     <EditText
                         android:id="@+id/add_task_title_edit_text"
-                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@null"
                         android:hint="@string/title_hint"
                         android:imeOptions="flagNoExtractUi"
                         android:maxLines="1"
                         android:text="@={viewmodel.title}"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textStyle="bold" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/add_task_priority_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginRight="12dp"
+                            android:text="@string/task_priority"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+
+                        <RadioGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/add_task_priority_label">
+
+                            <RadioButton
+                                android:id="@+id/priority_option_low"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="@{viewmodel.priority.equals(0)}"
+                                android:onClick="@{()->viewmodel.setPriority(0)}"
+                                android:text="@string/low" />
+
+                            <RadioButton
+                                android:id="@+id/priority_option_medium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="@{viewmodel.priority.equals(1)}"
+                                android:onClick="@{()->viewmodel.setPriority(1)}"
+                                android:text="@string/medium" />
+
+                            <RadioButton
+                                android:id="@+id/priority_option_high"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="@{viewmodel.priority.equals(2)}"
+                                android:onClick="@{()->viewmodel.setPriority(2)}"
+                                android:text="@string/high" />
+                        </RadioGroup>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <EditText
                         android:id="@+id/add_task_description_edit_text"
-                        android:background="@null"
                         android:layout_width="match_parent"
                         android:layout_height="350dp"
+                        android:background="@null"
                         android:gravity="top"
                         android:hint="@string/description_hint"
                         android:imeOptions="flagNoExtractUi"
                         android:text="@={viewmodel.description}" />
+
 
                 </LinearLayout>
             </ScrollView>
@@ -83,8 +138,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_done"
             android:onClick="@{() -> viewmodel.saveTask()}"
+            android:src="@drawable/ic_done"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"
             app:layout_anchorGravity="bottom|right|end" />

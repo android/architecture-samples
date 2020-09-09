@@ -67,9 +67,10 @@ class DefaultTasksRepository(
 
         if (remoteTasks is Success) {
             // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-            tasksLocalDataSource.deleteAllTasks()
+           // tasksLocalDataSource.deleteAllTasks()
             remoteTasks.data.forEach { task ->
-                tasksLocalDataSource.saveTask(task)
+                // tasksLocalDataSource.saveTask(task)
+                // todo add saving locally if new
             }
         } else if (remoteTasks is Result.Error) {
             throw remoteTasks.exception

@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.data.PriorityConverter
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
  * ViewModel for the Add/Edit screen.
  */
 class AddEditTaskViewModel(
-    private val tasksRepository: TasksRepository
+        private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
     // Two-way databinding, exposing MutableLiveData
@@ -39,6 +40,9 @@ class AddEditTaskViewModel(
 
     // Two-way databinding, exposing MutableLiveData
     val description = MutableLiveData<String>()
+
+    //Two-way databinding, exposing MutableLiveData
+    val priority = MutableLiveData<Int>()
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -56,6 +60,8 @@ class AddEditTaskViewModel(
     private var isDataLoaded = false
 
     private var taskCompleted = false
+
+    private val priorityConverter = PriorityConverter()
 
     fun start(taskId: String?) {
         if (_dataLoading.value == true) {
@@ -90,6 +96,7 @@ class AddEditTaskViewModel(
     private fun onTaskLoaded(task: Task) {
         title.value = task.title
         description.value = task.description
+        priority.value = priorityConverter.fromPriority(task.priority)
         taskCompleted = task.isCompleted
         _dataLoading.value = false
         isDataLoaded = true
@@ -103,6 +110,7 @@ class AddEditTaskViewModel(
     fun saveTask() {
         val currentTitle = title.value
         val currentDescription = description.value
+        val currentPriority = priorityConverter.toPriority(priority.value)
 
         if (currentTitle == null || currentDescription == null) {
             _snackbarText.value = Event(R.string.empty_task_message)
@@ -115,11 +123,15 @@ class AddEditTaskViewModel(
 
         val currentTaskId = taskId
         if (isNewTask || currentTaskId == null) {
-            createTask(Task(currentTitle, currentDescription))
+            createTask(Task(currentTitle, currentDescription, priority = currentPriority))
         } else {
-            val task = Task(currentTitle, currentDescription, taskCompleted, currentTaskId)
+            val task = Task(currentTitle, currentDescription, taskCompleted, currentPriority, currentTaskId)
             updateTask(task)
         }
+    }
+
+    fun setPriority(value: Int) {
+        priority.value = value
     }
 
     private fun createTask(newTask: Task) = viewModelScope.launch {

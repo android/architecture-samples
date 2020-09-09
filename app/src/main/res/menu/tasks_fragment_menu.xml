@@ -23,6 +23,12 @@
         android:icon="@drawable/ic_filter_list"
         app:showAsAction="always" />
     <item
+        android:id="@+id/menu_sort"
+        android:title="@string/sort"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="always"
+        />
+    <item
         android:id="@+id/menu_clear"
         android:title="@string/menu_clear"
         app:showAsAction="never" />

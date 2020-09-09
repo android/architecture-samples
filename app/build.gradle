@@ -108,6 +108,7 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
     // Architecture Components

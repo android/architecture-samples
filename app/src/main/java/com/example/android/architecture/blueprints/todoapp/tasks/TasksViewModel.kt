@@ -41,8 +41,8 @@ import kotlinx.coroutines.launch
  * ViewModel for the task list screen.
  */
 class TasksViewModel(
-    private val tasksRepository: TasksRepository,
-    private val savedStateHandle: SavedStateHandle
+        private val tasksRepository: TasksRepository,
+        private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _forceUpdate = MutableLiveData<Boolean>(false)
@@ -65,6 +65,9 @@ class TasksViewModel(
 
     private val _currentFilteringLabel = MutableLiveData<Int>()
     val currentFilteringLabel: LiveData<Int> = _currentFilteringLabel
+
+    private val _currentSortLabel = MutableLiveData<String>()
+    val currentSortLabel: LiveData<String> = _currentSortLabel
 
     private val _noTasksLabel = MutableLiveData<Int>()
     val noTasksLabel: LiveData<Int> = _noTasksLabel
@@ -97,6 +100,7 @@ class TasksViewModel(
     init {
         // Set initial state
         setFiltering(getSavedFilterType())
+        setSort(getSavedSortType())
         loadTasks(true)
     }
 
@@ -114,20 +118,20 @@ class TasksViewModel(
         when (requestType) {
             ALL_TASKS -> {
                 setFilter(
-                    R.string.label_all, R.string.no_tasks_all,
-                    R.drawable.logo_no_fill, true
+                        R.string.label_all, R.string.no_tasks_all,
+                        R.drawable.logo_no_fill, true
                 )
             }
             ACTIVE_TASKS -> {
                 setFilter(
-                    R.string.label_active, R.string.no_tasks_active,
-                    R.drawable.ic_check_circle_96dp, false
+                        R.string.label_active, R.string.no_tasks_active,
+                        R.drawable.ic_check_circle_96dp, false
                 )
             }
             COMPLETED_TASKS -> {
                 setFilter(
-                    R.string.label_completed, R.string.no_tasks_completed,
-                    R.drawable.ic_verified_user_96dp, false
+                        R.string.label_completed, R.string.no_tasks_completed,
+                        R.drawable.ic_verified_user_96dp, false
                 )
             }
         }
@@ -135,11 +139,19 @@ class TasksViewModel(
         loadTasks(false)
     }
 
+    fun setSort(sortType: TasksSortType) {
+        savedStateHandle.set(TASKS_SORT_SAVED_STATE_KEY, sortType)
+        _currentSortLabel.value = sortType.value
+        // set icons and UI if necessary
+        // Refresh list
+        loadTasks(false)
+    }
+
     private fun setFilter(
-        @StringRes filteringLabelString: Int,
-        @StringRes noTasksLabelString: Int,
-        @DrawableRes noTaskIconDrawable: Int,
-        tasksAddVisible: Boolean
+            @StringRes filteringLabelString: Int,
+            @StringRes noTasksLabelString: Int,
+            @DrawableRes noTaskIconDrawable: Int,
+            tasksAddVisible: Boolean
     ) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
@@ -199,7 +211,9 @@ class TasksViewModel(
         if (tasksResult is Success) {
             isDataLoadingError.value = false
             viewModelScope.launch {
-                result.value = filterItems(tasksResult.data, getSavedFilterType())
+                val filteredList = filterItems(tasksResult.data, getSavedFilterType())
+                val sortedFilteredList = sortTasks(filteredList, getSavedSortType())
+                result.value = sortedFilteredList
             }
         } else {
             result.value = emptyList()
@@ -208,6 +222,20 @@ class TasksViewModel(
         }
 
         return result
+    }
+
+    private fun sortTasks(tasks: List<Task>, tasksSortType: TasksSortType): List<Task> {
+        return when (tasksSortType) {
+            TasksSortType.TASK_PRIORITY -> {
+                tasks.sortedBy { it.priority }
+            }
+            TasksSortType.ALPHABETICALLY -> {
+                tasks.sortedBy { it.title }
+            }
+            TasksSortType.DEFAULT -> {
+                tasks
+            }
+        }
     }
 
     /**
@@ -232,16 +260,23 @@ class TasksViewModel(
             }
         }
         return tasksToShow
-        }
+    }
 
     fun refresh() {
         _forceUpdate.value = true
     }
 
-    private fun getSavedFilterType() : TasksFilterType {
+    private fun getSavedFilterType(): TasksFilterType {
         return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
+    }
+
+    private fun getSavedSortType(): TasksSortType {
+        return savedStateHandle.get(TASKS_SORT_SAVED_STATE_KEY) ?: TasksSortType.TASK_PRIORITY
     }
 }
 
 // Used to save the current filtering in SavedStateHandle.
 const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
+
+// Used to save the current sort in SavedStateHandle.
+const val TASKS_SORT_SAVED_STATE_KEY = "TASKS_SORT_SAVED_STATE_KEY"

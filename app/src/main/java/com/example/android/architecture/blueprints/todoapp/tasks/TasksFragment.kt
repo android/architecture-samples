@@ -78,6 +78,10 @@ class TasksFragment : Fragment() {
                 viewModel.loadTasks(true)
                 true
             }
+            R.id.menu_sort -> {
+                showSortPopIpMenu()
+                true
+            }
             else -> false
         }
 
@@ -125,6 +129,26 @@ class TasksFragment : Fragment() {
                         R.id.completed -> TasksFilterType.COMPLETED_TASKS
                         else -> TasksFilterType.ALL_TASKS
                     }
+                )
+                true
+            }
+            show()
+        }
+    }
+
+    private fun showSortPopIpMenu() {
+        val view = activity?.findViewById<View>(R.id.menu_sort) ?: return
+        PopupMenu(requireContext(), view).run {
+            menuInflater.inflate(R.menu.sort_tasks, menu)
+
+            setOnMenuItemClickListener {
+                viewModel.setSort(
+                        when (it.itemId) {
+                            R.id.priority_sort -> TasksSortType.TASK_PRIORITY
+                            R.id.alphabetically_sort -> TasksSortType.ALPHABETICALLY
+                            R.id.default_sort -> TasksSortType.DEFAULT
+                            else -> TasksSortType.DEFAULT
+                        }
                 )
                 true
             }
