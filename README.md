@@ -6,7 +6,7 @@
 Clone the repository:
 
 ```
-git clone git@github.com:googlesamples/android-architecture.git
+git clone https://github.com/yihsuan-chen-s/android-sample.git
 ```
 
 Open the root directory `android-sample/` directory in Android Studio.
