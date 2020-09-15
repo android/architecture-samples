@@ -61,6 +61,10 @@ class DefaultTasksRepository @Inject constructor(
 
                 val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
 
+                if (forceUpdate && (newTasks is Error)) {
+                    return@withContext newTasks
+                }
+
                 // Refresh the cache with the new tasks
                 (newTasks as? Success)?.let { refreshCache(it.data) }
 

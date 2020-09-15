@@ -127,6 +127,10 @@ class DefaultTasksRepositoryTest {
 
     @Test
     fun getTasks_WithDirtyCache_remoteUnavailable_error() = runBlockingTest {
+
+        //first cache tasks
+        tasksRepository.getTasks()
+
         // Make remote data source unavailable
         tasksRemoteDataSource.tasks = null
 
