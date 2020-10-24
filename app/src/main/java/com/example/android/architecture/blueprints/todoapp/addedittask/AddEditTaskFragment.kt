@@ -44,9 +44,9 @@ class AddEditTaskFragment : Fragment() {
     private val viewModel by viewModels<AddEditTaskViewModel> { getViewModelFactory() }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
@@ -70,9 +70,9 @@ class AddEditTaskFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.taskUpdatedEvent.observe(this, EventObserver {
+        viewModel.taskUpdatedEvent.observe(viewLifecycleOwner, EventObserver {
             val action = AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
+                    .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
             findNavController().navigate(action)
         })
     }

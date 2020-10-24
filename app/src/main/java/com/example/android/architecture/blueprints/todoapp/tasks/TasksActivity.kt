@@ -26,7 +26,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.android.architecture.blueprints.todoapp.R
-import com.google.android.material.navigation.NavigationView
+import com.example.android.architecture.blueprints.todoapp.databinding.TasksActBinding
 
 /**
  * Main activity for the todoapp. Holds the Navigation Host Fragment and the Drawer, Toolbar, etc.
@@ -35,33 +35,35 @@ class TasksActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
+    lateinit var binding: TasksActBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.tasks_act)
+        binding = TasksActBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupNavigationDrawer()
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(binding.toolbar)
 
         val navController: NavController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration =
-            AppBarConfiguration.Builder(R.id.tasks_fragment_dest, R.id.statistics_fragment_dest)
-                .setDrawerLayout(drawerLayout)
-                .build()
+                AppBarConfiguration.Builder(R.id.tasks_fragment_dest, R.id.statistics_fragment_dest)
+                        .setDrawerLayout(drawerLayout)
+                        .build()
         setupActionBarWithNavController(navController, appBarConfiguration)
-        findViewById<NavigationView>(R.id.nav_view)
-            .setupWithNavController(navController)
+        binding.navView
+                .setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) ||
-            super.onSupportNavigateUp()
+                super.onSupportNavigateUp()
     }
 
     private fun setupNavigationDrawer() {
-        drawerLayout = (findViewById<DrawerLayout>(R.id.drawer_layout))
-            .apply {
-                setStatusBarBackground(R.color.colorPrimaryDark)
-            }
+        drawerLayout = (binding.drawerLayout)
+                .apply {
+                    setStatusBarBackground(R.color.colorPrimaryDark)
+                }
     }
 }
 
