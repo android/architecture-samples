@@ -17,12 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -98,16 +93,16 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.openTaskEvent.observe(this, EventObserver {
+        viewModel.openTaskEvent.observe(viewLifecycleOwner, EventObserver {
             openTaskDetails(it)
         })
-        viewModel.newTaskEvent.observe(this, EventObserver {
+        viewModel.newTaskEvent.observe(viewLifecycleOwner, EventObserver {
             navigateToAddNewTask()
         })
     }
 
     private fun setupSnackbar() {
-        view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
+        view?.setupSnackbar(viewLifecycleOwner, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
         arguments?.let {
             viewModel.showEditResultMessage(args.userMessage)
         }

@@ -16,12 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -54,17 +49,17 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.deleteTaskEvent.observe(this, EventObserver {
+        viewModel.deleteTaskEvent.observe(viewLifecycleOwner, EventObserver {
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
+                    .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
             findNavController().navigate(action)
         })
-        viewModel.editTaskEvent.observe(this, EventObserver {
+        viewModel.editTaskEvent.observe(viewLifecycleOwner, EventObserver {
             val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToAddEditTaskFragment(
-                    args.taskId,
-                    resources.getString(R.string.edit_task)
-                )
+                    .actionTaskDetailFragmentToAddEditTaskFragment(
+                            args.taskId,
+                            resources.getString(R.string.edit_task)
+                    )
             findNavController().navigate(action)
         })
     }
