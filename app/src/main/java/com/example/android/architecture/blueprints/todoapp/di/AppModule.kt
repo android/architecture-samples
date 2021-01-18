@@ -27,8 +27,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
@@ -42,7 +42,7 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
  * in Hilt's ApplicationComponent.
  */
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
     @Qualifier
@@ -91,7 +91,7 @@ object AppModule {
  * The binding for TasksRepository is on its own module so that we can replace it easily in tests.
  */
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object TasksRepositoryModule {
 
     @Singleton
