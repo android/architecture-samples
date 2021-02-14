@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
@@ -37,7 +38,7 @@ object ServiceLocator {
     private var database: ToDoDatabase? = null
     @Volatile
     var tasksRepository: TasksRepository? = null
-        @VisibleForTesting set
+        @VisibleForTesting(otherwise = PRIVATE) set
 
     fun provideTasksRepository(context: Context): TasksRepository {
         synchronized(this) {
@@ -46,10 +47,10 @@ object ServiceLocator {
     }
 
     private fun createTasksRepository(context: Context): TasksRepository {
-        val newRepo =
+        val newTasksRepository =
             DefaultTasksRepository(TasksRemoteDataSource, createTaskLocalDataSource(context))
-        tasksRepository = newRepo
-        return newRepo
+        tasksRepository = newTasksRepository
+        return newTasksRepository
     }
 
     private fun createTaskLocalDataSource(context: Context): TasksDataSource {
@@ -66,7 +67,7 @@ object ServiceLocator {
         return result
     }
 
-    @VisibleForTesting
+    @VisibleForTesting(otherwise = PRIVATE)
     fun resetRepository() {
         synchronized(lock) {
             runBlocking {
