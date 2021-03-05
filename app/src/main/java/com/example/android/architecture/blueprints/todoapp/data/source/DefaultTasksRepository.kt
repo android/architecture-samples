@@ -123,6 +123,27 @@ class DefaultTasksRepository(
         }
     }
 
+    override suspend fun updateTimer(task: Task, currTime: Int) {
+        withContext(ioDispatcher) {
+            tasksLocalDataSource.updateTimer(task, currTime)
+            tasksRemoteDataSource.updateTimer(task, currTime)
+        }
+    }
+
+    override suspend fun startTimer(task: Task) {
+        withContext(ioDispatcher) {
+            tasksRemoteDataSource.startTimer(task)
+            tasksLocalDataSource.startTimer(task)
+        }
+    }
+
+    override suspend fun cancelTimer(task: Task) {
+        withContext(ioDispatcher) {
+            tasksRemoteDataSource.cancelTimer(task)
+            tasksLocalDataSource.cancelTimer(task)
+        }
+    }
+
     override suspend fun activateTask(task: Task) = withContext<Unit>(ioDispatcher) {
         coroutineScope {
             launch { tasksRemoteDataSource.activateTask(task) }

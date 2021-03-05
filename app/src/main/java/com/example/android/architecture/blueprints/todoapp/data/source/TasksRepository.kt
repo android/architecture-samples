@@ -43,6 +43,12 @@ interface TasksRepository {
 
     suspend fun completeTask(taskId: String)
 
+    suspend fun startTimer(task: Task)
+
+    suspend fun updateTimer(task: Task, currTime: Int)
+
+    suspend fun cancelTimer(task: Task)
+
     suspend fun activateTask(task: Task)
 
     suspend fun activateTask(taskId: String)
