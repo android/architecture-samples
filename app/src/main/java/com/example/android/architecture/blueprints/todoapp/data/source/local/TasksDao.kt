@@ -117,7 +117,4 @@ interface TasksDao {
 
     @Query("UPDATE tasks SET showTimer= :showTimer WHERE entryid = :taskId")
     fun cancelTimer(taskId: String, showTimer: Boolean)
-
-    @Query("UPDATE tasks SET countdownTimer= :timer WHERE entryid= :taskId")
-    fun updateTimer(taskId: String, timer: Int)
 }

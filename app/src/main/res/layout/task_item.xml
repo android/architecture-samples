@@ -27,6 +27,10 @@
             type="com.example.android.architecture.blueprints.todoapp.data.Task" />
 
         <variable
+            name="timer"
+            type="Integer" />
+
+        <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
     </data>
@@ -89,7 +93,7 @@
                 android:textSize="12sp"
                 android:padding="8dp"
                 app:textVisibility="@{task.showTimer}"
-                android:text="@{String.valueOf(task.timer)}"
+                android:text="@{String.valueOf(timer)}"
                 android:textColor="@color/colorPrimaryDark" />
 
             <ImageView

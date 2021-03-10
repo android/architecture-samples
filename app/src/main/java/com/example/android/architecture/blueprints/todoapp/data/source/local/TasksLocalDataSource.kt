@@ -83,10 +83,6 @@ class TasksLocalDataSource internal constructor(
         tasksDao.startTimer(task.id, true)
     }
 
-    override suspend fun updateTimer(task: Task, currTime: Int) = withContext(ioDispatcher) {
-        tasksDao.updateTimer(task.id, currTime)
-    }
-
     override suspend fun cancelTimer(task: Task) = withContext(ioDispatcher) {
         tasksDao.cancelTimer(task.id, false)
     }

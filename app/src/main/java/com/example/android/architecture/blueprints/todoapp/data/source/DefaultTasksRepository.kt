@@ -123,13 +123,6 @@ class DefaultTasksRepository(
         }
     }
 
-    override suspend fun updateTimer(task: Task, currTime: Int) {
-        withContext(ioDispatcher) {
-            tasksLocalDataSource.updateTimer(task, currTime)
-            tasksRemoteDataSource.updateTimer(task, currTime)
-        }
-    }
-
     override suspend fun startTimer(task: Task) {
         withContext(ioDispatcher) {
             tasksRemoteDataSource.startTimer(task)

@@ -17,6 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,12 +30,22 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksAdapter.Vi
  * Adapter for the task list. Has a reference to the [TasksViewModel] to send actions back to it.
  */
 class TasksAdapter(private val viewModel: TasksViewModel) :
-    ListAdapter<Task, ViewHolder>(TaskDiffCallback()) {
+        ListAdapter<Task, ViewHolder>(TaskDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
 
+        val taskData = viewModel.hashMap[item.id]
+        if (taskData != null) {
+            taskData.countdownTimer.observe(
+                    holder.itemView.context as LifecycleOwner,
+                    Observer {
+                        holder.update(it)
+                    }
+            )
+        }
         holder.bind(viewModel, item)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,13 +53,17 @@ class TasksAdapter(private val viewModel: TasksViewModel) :
     }
 
     class ViewHolder private constructor(val binding: TaskItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+            RecyclerView.ViewHolder(binding.root) {
 
         fun bind(viewModel: TasksViewModel, item: Task) {
 
             binding.viewmodel = viewModel
             binding.task = item
             binding.executePendingBindings()
+        }
+
+        fun update(timer: Int) {
+            binding.timer = timer
         }
 
         companion object {

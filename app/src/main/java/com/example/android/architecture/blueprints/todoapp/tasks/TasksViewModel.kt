@@ -30,6 +30,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.TaskData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
@@ -65,7 +66,7 @@ class TasksViewModel(
     /**
         Key-value pair to store reference of each task with its corresponding jobs (if exists)
      */
-    private val hashMap = HashMap<String, Job>()
+    val hashMap = HashMap<String, TaskData>()
 
 
         private val _dataLoading = MutableLiveData<Boolean>()
@@ -176,14 +177,14 @@ class TasksViewModel(
         fun startTimer(task: Task) {
             viewModelScope.launch {
                 tasksRepository.startTimer(task)
-                hashMap[task.id] = startTimerJob(task)
+                hashMap[task.id] = TaskData(startTimerJob(task), MutableLiveData(COUNTDOWN_NUMBER))
             }
         }
 
         fun cancelTimer(task: Task) {
             viewModelScope.launch {
                 tasksRepository.cancelTimer(task)
-                val job = hashMap[task.id]
+                val job = hashMap[task.id]?.job
                 if (job != null && job.isActive) {
                     job.cancel()
                 }
@@ -195,7 +196,10 @@ class TasksViewModel(
                 var currTime = COUNTDOWN_NUMBER
                 while (currTime > 1) {
                     currTime -= 1
-                    tasksRepository.updateTimer(task, currTime)
+                    val taskData = hashMap[task.id]
+                    if (taskData != null) {
+                        taskData.countdownTimer.postValue(currTime)
+                    }
                     delay(1000)
                 }
                 tasksRepository.deleteTask(task.id)

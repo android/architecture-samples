@@ -35,7 +35,6 @@ data class Task @JvmOverloads constructor(
     @ColumnInfo(name = "description") var description: String = "",
     @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
     @ColumnInfo(name = "showTimer") var showTimer: Boolean = false,
-    @ColumnInfo(name = "countdownTimer") var timer: Int = 3,
     @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()
 ) {
 

@@ -78,11 +78,6 @@ object FakeTasksRemoteDataSource : TasksDataSource {
         TASKS_SERVICE_DATA[task.id] = showTimer
     }
 
-    override suspend fun updateTimer(task: Task, currTime: Int) {
-        val updateTimer = Task(task.title, task.description, isCompleted = false, showTimer = true, timer = 3, id = task.id)
-        TASKS_SERVICE_DATA[task.id] = updateTimer
-    }
-
     override suspend fun cancelTimer(task: Task) {
         val hideTimer = Task(task.title, task.description, isCompleted = false, showTimer = false, id = task.id)
         TASKS_SERVICE_DATA[task.id] = hideTimer

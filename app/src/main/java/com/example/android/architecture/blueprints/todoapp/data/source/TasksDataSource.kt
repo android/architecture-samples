@@ -40,8 +40,6 @@ interface TasksDataSource {
 
     suspend fun startTimer(task: Task)
 
-    suspend fun updateTimer(task: Task, currTime: Int)
-
     suspend fun cancelTimer(task: Task)
 
     suspend fun completeTask(task: Task)
