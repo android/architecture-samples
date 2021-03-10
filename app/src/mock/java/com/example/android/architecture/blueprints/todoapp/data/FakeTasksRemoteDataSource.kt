@@ -73,8 +73,18 @@ object FakeTasksRemoteDataSource : TasksDataSource {
         TASKS_SERVICE_DATA[task.id] = task
     }
 
+    override suspend fun startTimer(task: Task) {
+        val showTimer = Task(task.title, task.description, isCompleted = false, showTimer = true, id = task.id)
+        TASKS_SERVICE_DATA[task.id] = showTimer
+    }
+
+    override suspend fun cancelTimer(task: Task) {
+        val hideTimer = Task(task.title, task.description, isCompleted = false, showTimer = false, id = task.id)
+        TASKS_SERVICE_DATA[task.id] = hideTimer
+    }
+
     override suspend fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, true, task.id)
+        val completedTask = Task(task.title, task.description, isCompleted = true, showTimer = false, id = task.id)
         TASKS_SERVICE_DATA[task.id] = completedTask
     }
 
@@ -83,7 +93,7 @@ object FakeTasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, false, task.id)
+        val activeTask = Task(task.title, task.description, false, showTimer = false, id = task.id)
         TASKS_SERVICE_DATA[task.id] = activeTask
     }
 

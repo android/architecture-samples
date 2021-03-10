@@ -79,6 +79,14 @@ class TasksLocalDataSource internal constructor(
         tasksDao.insertTask(task)
     }
 
+    override suspend fun startTimer(task: Task) = withContext(ioDispatcher) {
+        tasksDao.startTimer(task.id, true)
+    }
+
+    override suspend fun cancelTimer(task: Task) = withContext(ioDispatcher) {
+        tasksDao.cancelTimer(task.id, false)
+    }
+
     override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
         tasksDao.updateCompleted(task.id, true)
     }

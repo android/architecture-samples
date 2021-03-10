@@ -111,4 +111,10 @@ interface TasksDao {
      */
     @Query("DELETE FROM Tasks WHERE completed = 1")
     suspend fun deleteCompletedTasks(): Int
+
+    @Query("UPDATE tasks SET showTimer= :showTimer WHERE entryid = :taskId")
+    fun startTimer(taskId: String, showTimer: Boolean)
+
+    @Query("UPDATE tasks SET showTimer= :showTimer WHERE entryid = :taskId")
+    fun cancelTimer(taskId: String, showTimer: Boolean)
 }

@@ -38,6 +38,10 @@ interface TasksDataSource {
 
     suspend fun saveTask(task: Task)
 
+    suspend fun startTimer(task: Task)
+
+    suspend fun cancelTimer(task: Task)
+
     suspend fun completeTask(task: Task)
 
     suspend fun completeTask(taskId: String)

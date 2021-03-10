@@ -18,6 +18,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <import type="android.widget.CompoundButton" />
 
         <variable
@@ -25,14 +27,17 @@
             type="com.example.android.architecture.blueprints.todoapp.data.Task" />
 
         <variable
+            name="timer"
+            type="Integer" />
+
+        <variable
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/list_item_padding"
@@ -43,19 +48,62 @@
             android:id="@+id/complete_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}"
-            android:checked="@{task.completed}" />
+            android:checked="@{task.completed}"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/title_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:text="@{task.titleForList}"
-            app:completedTask="@{task.completed}" />
-    </LinearLayout>
+            app:completedTask="@{task.completed}"
+            android:layout_toRightOf="@id/complete_checkbox"
+            android:layout_toEndOf="@id/complete_checkbox" />
+
+        <ImageView
+            android:id="@+id/delete_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_delete_icon"
+            android:onClick="@{(view) -> viewmodel.startTimer(task)}"
+            android:visibility="@{task.showTimer ? View.GONE : View.VISIBLE}"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <LinearLayout
+            android:id="@+id/undo_deletion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:visibility="@{task.showTimer ? View.VISIBLE : View.GONE}"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true">
+
+            <TextView
+                android:id="@+id/countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:padding="8dp"
+                app:textVisibility="@{task.showTimer}"
+                android:text="@{String.valueOf(timer)}"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <ImageView
+                android:id="@+id/undo_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_undo_icon"
+                android:onClick="@{(view) -> viewmodel.cancelTimer(task)}" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 </layout>
