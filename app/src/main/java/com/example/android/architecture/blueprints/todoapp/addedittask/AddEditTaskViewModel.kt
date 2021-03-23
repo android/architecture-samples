@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,7 +58,10 @@ class AddEditTaskViewModel(
 
     private var taskCompleted = false
 
-    fun start(taskId: String?) {
+    private var activity:FragmentActivity?=null
+
+    fun start(taskId: String?, activity: FragmentActivity) {
+        this.activity = activity
         if (_dataLoading.value == true) {
             return
         }
@@ -120,6 +124,7 @@ class AddEditTaskViewModel(
             val task = Task(currentTitle, currentDescription, taskCompleted, currentTaskId)
             updateTask(task)
         }
+        activity?.onBackPressed()
     }
 
     private fun createTask(newTask: Task) = viewModelScope.launch {
