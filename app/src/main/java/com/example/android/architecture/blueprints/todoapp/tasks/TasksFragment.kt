@@ -132,8 +132,9 @@ class TasksFragment : Fragment() {
         }
     }
 
+    // TODO: Move this to databinding
     private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
+        requireView().findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
             it.setOnClickListener {
                 navigateToAddNewTask()
             }
