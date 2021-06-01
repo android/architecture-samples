@@ -62,7 +62,7 @@ class AddEditTaskFragment : Fragment() {
         setupSnackbar()
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
-        viewModel.start(args.taskId)
+        viewModel.start(args.taskId,requireActivity())
     }
 
     private fun setupSnackbar() {
