@@ -2,7 +2,13 @@ name: blueprints
 
 on:
   push:
+    branches:
+      - dev-hilt
+      - hilt
   pull_request:
+    branches:
+      - dev-hilt
+      - hilt
 
 jobs:
   build:
@@ -30,7 +36,10 @@ jobs:
           key: gradle-${{ hashFiles('checksum.txt') }}
 
       - name: Build project
-        run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
+        run: ./gradlew spotlessCheck assembleDebug test --stacktrace
+
+      - name: Run unit tests
+        run: ./gradlew test --stacktrace
 
       - name: Upload build reports
         if: always()
@@ -65,7 +74,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           arch: x86
           disable-animations: true
-          script: ./gradlew app:cMDAT --stacktrace
+          script: ./gradlew app:cAT --stacktrace
 
       - name: Upload test reports
         if: always()
