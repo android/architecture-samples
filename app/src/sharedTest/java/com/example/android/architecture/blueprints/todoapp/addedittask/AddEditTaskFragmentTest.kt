@@ -17,8 +17,8 @@ package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.content.Context
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
@@ -34,7 +34,6 @@ import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -43,8 +42,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import org.robolectric.annotation.LooperMode
 import org.robolectric.annotation.TextLayoutMode
 
@@ -91,7 +88,7 @@ class AddEditTaskFragmentTest {
     @Test
     fun validTask_navigatesBack() {
         // GIVEN - On the "Add Task" screen.
-        val navController = mock(NavController::class.java)
+        val navController = TestNavHostController(getApplicationContext())
         launchFragment(navController)
 
         // WHEN - Valid title and description combination and click save
@@ -100,27 +97,13 @@ class AddEditTaskFragmentTest {
         onView(withId(R.id.save_task_fab)).perform(click())
 
         // THEN - Verify that we navigated back to the tasks screen.
-        verify(navController).navigate(
-            AddEditTaskFragmentDirections
-                .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
-        )
-    }
-
-    private fun launchFragment(navController: NavController?) {
-        val bundle = AddEditTaskFragmentArgs(
-            null,
-            getApplicationContext<Context>().getString(R.string.add_task)
-        ).toBundle()
-        val scenario = launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
+        assertEquals(navController.currentDestination?.id, R.id.tasks_fragment_dest)
     }
 
     @Test
     fun validTask_isSaved() {
         // GIVEN - On the "Add Task" screen.
-        val navController = mock(NavController::class.java)
+        val navController = TestNavHostController(getApplicationContext())
         launchFragment(navController)
 
         // WHEN - Valid title and description combination and click save
@@ -133,5 +116,18 @@ class AddEditTaskFragmentTest {
         assertEquals(tasks.size, 1)
         assertEquals(tasks[0].title, "title")
         assertEquals(tasks[0].description, "description")
+    }
+
+    private fun launchFragment(navController: TestNavHostController) {
+        val bundle = AddEditTaskFragmentArgs(
+            null,
+            getApplicationContext<Context>().getString(R.string.add_task)
+        ).toBundle()
+        val scenario = launchFragmentInContainer<AddEditTaskFragment>(bundle, R.style.AppTheme)
+        scenario.onFragment {
+            navController.setGraph(R.navigation.nav_graph)
+            navController.setCurrentDestination(R.id.add_edit_task_fragment_dest)
+            Navigation.setViewNavController(it.requireView(), navController)
+        }
     }
 }
