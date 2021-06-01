@@ -15,13 +15,10 @@
  */
 package com.example.android.architecture.blueprints.todoapp
 
-import android.app.Application
 import android.os.Bundle
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -34,15 +31,15 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  */
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
-        private val tasksRepository: TasksRepository,
-        owner: SavedStateRegistryOwner,
-        defaultArgs: Bundle? = null
+    private val tasksRepository: TasksRepository,
+    owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
 
     override fun <T : ViewModel> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle
+        key: String,
+        modelClass: Class<T>,
+        handle: SavedStateHandle
     ) = with(modelClass) {
         when {
             isAssignableFrom(StatisticsViewModel::class.java) ->
