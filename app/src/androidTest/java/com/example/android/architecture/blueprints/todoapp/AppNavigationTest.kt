@@ -44,7 +44,6 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -96,7 +95,6 @@ class AppNavigationTest {
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
-    @Ignore("TODO: Investigate why it's failing")
     @Test
     fun drawerNavigationFromTasksToStatistics() {
         // start up Tasks screen

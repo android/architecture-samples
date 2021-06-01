@@ -31,7 +31,7 @@ use Hilt to provide their test versions.
 
 This is done by creating a `CustomTestRunner` that uses an `Application` configured with Hilt. As
 per the [Hilt testing documentation](https://developer.android.com/training/dependency-injection/hilt-android),
-`@HiltAndroidTest` will automatically create the right Hilt components for each test.
+`@HiltAndroidTest` will automatically create the right Hilt components for tests.
 
 
 ### License
