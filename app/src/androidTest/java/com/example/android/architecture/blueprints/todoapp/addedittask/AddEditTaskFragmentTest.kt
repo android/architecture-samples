@@ -16,8 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import android.content.Context
-import androidx.navigation.NavController
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -34,7 +32,6 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.launchFragmentInHiltContainer
-import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -44,11 +41,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import javax.inject.Inject
-import org.robolectric.annotation.LooperMode
-import org.robolectric.annotation.TextLayoutMode
 
 /**
  * Integration test for the Add Task screen.
@@ -131,7 +124,7 @@ class AddEditTaskFragmentTest {
         launchFragmentInHiltContainer<AddEditTaskFragment>(bundle, R.style.AppTheme) {
             navController.setGraph(R.navigation.nav_graph)
             navController.setCurrentDestination(R.id.add_edit_task_fragment_dest)
-            Navigation.setViewNavController(it.requireView(), navController)
+            Navigation.setViewNavController(requireView(), navController)
         }
     }
 }

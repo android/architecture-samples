@@ -18,8 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.os.Bundle
 import android.view.View
-import androidx.navigation.NavController
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.recyclerview.widget.RecyclerView
@@ -40,7 +38,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.id
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.launchFragmentInHiltContainer
@@ -56,8 +53,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import javax.inject.Inject
 
 /**
@@ -317,7 +312,7 @@ class TasksFragmentTest {
         launchFragmentInHiltContainer<TasksFragment>(Bundle(), R.style.AppTheme) {
             navController.setGraph(R.navigation.nav_graph)
             navController.setCurrentDestination(R.id.tasks_fragment_dest)
-            Navigation.setViewNavController(it.requireView(), navController)
+            Navigation.setViewNavController(requireView(), navController)
         }
 
         // WHEN - Click on the "+" button
