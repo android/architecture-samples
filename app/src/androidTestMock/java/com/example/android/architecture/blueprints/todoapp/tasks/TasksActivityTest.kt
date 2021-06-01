@@ -33,6 +33,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
@@ -67,13 +68,19 @@ class TasksActivityTest {
 
     @Before
     fun init() {
-        repository = ServiceLocator.provideTasksRepository(getApplicationContext())
-        repository.deleteAllTasksBlocking()
+        // Run on UI thread to make sure the same instance of the SL is used.
+        runOnUiThread {
+            ServiceLocator.createDataBase(getApplicationContext(), inMemory = true)
+            repository = ServiceLocator.provideTasksRepository(getApplicationContext())
+            repository.deleteAllTasksBlocking()
+        }
     }
 
     @After
     fun reset() {
-        ServiceLocator.resetRepository()
+        runOnUiThread {
+            ServiceLocator.resetRepository()
+        }
     }
 
     /**
