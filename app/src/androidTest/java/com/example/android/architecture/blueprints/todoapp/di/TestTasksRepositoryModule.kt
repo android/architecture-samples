@@ -22,7 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
 
 /**
@@ -31,7 +32,10 @@ import javax.inject.Singleton
  * Hilt will inject a [FakeRepository] instead of a [DefaultTasksRepository].
  */
 @Module
-@InstallIn(ApplicationComponent::class)
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [TasksRepositoryModule::class]
+)
 abstract class TestTasksRepositoryModule {
     @Singleton
     @Binds

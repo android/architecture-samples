@@ -63,7 +63,7 @@ class TasksViewModelTest {
         val task3 = Task("Title3", "Description3", true)
         tasksRepository.addTasks(task1, task2, task3)
 
-        tasksViewModel = TasksViewModel(tasksRepository, SavedStateHandle())
+        tasksViewModel = TasksViewModel(SavedStateHandle(), tasksRepository)
     }
 
     @Test
