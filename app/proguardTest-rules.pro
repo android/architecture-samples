@@ -16,5 +16,3 @@
 -dontwarn org.junit.**
 -dontwarn org.hamcrest.**
 -dontwarn com.squareup.javawriter.JavaWriter
-# Uncomment this if you use Mockito
--dontwarn org.mockito.**

@@ -16,14 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ActivityScenario.launch
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
@@ -37,12 +37,14 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.R.id
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.launchFragmentInHiltContainer
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
@@ -51,8 +53,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import javax.inject.Inject
 
 /**
@@ -308,21 +308,18 @@ class TasksFragmentTest {
     @Test
     fun clickAddTaskButton_navigateToAddEditFragment() {
         // GIVEN - On the home screen
-        val navController = mock(NavController::class.java)
-
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         launchFragmentInHiltContainer<TasksFragment>(Bundle(), R.style.AppTheme) {
-            Navigation.setViewNavController(this.view!!, navController)
+            navController.setGraph(R.navigation.nav_graph)
+            navController.setCurrentDestination(R.id.tasks_fragment_dest)
+            Navigation.setViewNavController(requireView(), navController)
         }
 
         // WHEN - Click on the "+" button
         onView(withId(R.id.add_task_fab)).perform(click())
 
         // THEN - Verify that we navigate to the add screen
-        verify(navController).navigate(
-            TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
-                null, getApplicationContext<Context>().getString(R.string.add_task)
-            )
-        )
+        assertEquals(navController.currentDestination?.id, id.add_edit_task_fragment_dest)
     }
 
     private fun launchActivity(): ActivityScenario<TasksActivity>? {
