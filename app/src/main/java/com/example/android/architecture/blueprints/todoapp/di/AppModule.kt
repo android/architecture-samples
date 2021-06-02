@@ -76,7 +76,7 @@ object AppModule {
     @Provides
     fun provideDataBase(@ApplicationContext context: Context): ToDoDatabase {
         return Room.databaseBuilder(
-            context.applicationContext,
+            context,
             ToDoDatabase::class.java,
             "Tasks.db"
         ).build()
