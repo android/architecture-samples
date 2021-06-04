@@ -3,16 +3,16 @@
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/aab-logov2.png" alt="Illustration by Virginia Poltrack"/>
 </p>
 
-Android Architecture Blueprints is a project to showcase different architectural approaches to developing Android apps. In its different branches you'll find the same app (a TODO app) implemented with small differences.
+Android Architecture Blueprints is a project to showcase different architectural approaches to developing Android apps. In its different branches, you'll find the same app (a TODO app) implemented with small differences.
 
-In this branch you'll find:
+In this branch, you'll find:
 *   Kotlin **[Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html)** for background operations.
 *   A single-activity architecture, using the **[Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)** to manage fragment operations.
 *   A presentation layer that contains a fragment (View) and a **ViewModel** per screen (or feature).
 *   Reactive UIs using **LiveData** observables and **Data Binding**.
 *   A **data layer** with a repository and two data sources (local using Room and remote) that are queried with one-shot operations (no listeners or data streams).
 *   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html) (except in the Dagger branch).
-*   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device or Robolectric.
+*   A collection of the unit, integration, and e2e **tests**, including "shared" tests that can run on emulator/device or Robolectric.
 
 ## Variations
 
@@ -27,13 +27,13 @@ This project hosts each sample app in separate repository branches. For more inf
 
 ### Old samples - Kotlin and Java
 
-Blueprints v1 had a collection of samples that are not maintained anymore, but can still be useful. See [all project branches](https://github.com/googlesamples/android-architecture/branches).
+Blueprints v1 had a collection of samples that are not maintained anymore but can still be useful. See [all project branches](https://github.com/googlesamples/android-architecture/branches).
 
 ## Why a to-do app?
 
 <img align="right" src="https://github.com/googlesamples/android-architecture/wiki/images/todoapp.gif" alt="A demo illustraating the UI of the app" width="288" height="512" style="display: inline; float: right"/>
 
-The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
+This project's app aims to be simple enough to understand it quickly but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
 
 ## What is it not?
 
@@ -41,9 +41,9 @@ The app in this project aims to be simple enough that you can understand it quic
 *   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [Github Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
 *   A real production app with network access, user authentication, etc. Check out the [Google I/O app](https://github.com/google/iosched), [Santa Tracker](https://github.com/google/santa-tracker-android) or [Tivi](https://github.com/chrisbanes/tivi) for that.
 
-## Who is it for?
+## Intended audience?
 
-*   Intermediate developers and beginners looking for a way to structure their app in a testable and maintainable way.
+*   Intermediate to beginner developers looking for a way to structure their app in a testable and maintainable way.
 *   Advanced developers looking for quick reference.
 
 ## Opening a sample in Android Studio
@@ -61,9 +61,9 @@ This step checks out the master branch. If you want to change to a different sam
 git checkout usecases
 ```
 
-**Note:** To review a different sample, replace `usecases` with the name of sample you want to check out.
+**Note:** To review a different sample, replace `usecases` with the name of the sample you want to check out.
 
-Finally open the `android-architecture/` directory in Android Studio.
+Finally, open the `android-architecture/` directory in Android Studio.
 
 ### License
 
