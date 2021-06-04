@@ -1,0 +1,15 @@
+version: v1.0
+name: Android
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Gradle
+    task:
+      jobs:
+        - name: Build
+          commands:
+            - checkout
+            - sem-version java 1.8
+            - ./gradlew assembleDebug
