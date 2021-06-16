@@ -116,7 +116,7 @@ class TasksFragment : Fragment() {
     private fun showFilteringPopUpMenu() {
         val view = activity?.findViewById<View>(R.id.menu_filter) ?: return
         PopupMenu(requireContext(), view).run {
-            menuInflater.inflate(R.menu.filter_tasks, menu)
+            inflate(R.menu.filter_tasks)
 
             setOnMenuItemClickListener {
                 viewModel.setFiltering(
