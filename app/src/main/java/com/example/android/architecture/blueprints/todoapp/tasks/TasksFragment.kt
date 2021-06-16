@@ -35,7 +35,6 @@ import com.example.android.architecture.blueprints.todoapp.databinding.TasksFrag
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
@@ -94,7 +93,6 @@ class TasksFragment : Fragment() {
         setupListAdapter()
         setupRefreshLayout(viewDataBinding.refreshLayout, viewDataBinding.tasksList)
         setupNavigation()
-        setupFab()
     }
 
     private fun setupNavigation() {
@@ -129,15 +127,6 @@ class TasksFragment : Fragment() {
                 true
             }
             show()
-        }
-    }
-
-    // TODO: Move this to databinding
-    private fun setupFab() {
-        requireView().findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
-            it.setOnClickListener {
-                navigateToAddNewTask()
-            }
         }
     }
 
