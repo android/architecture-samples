@@ -165,7 +165,7 @@ class TasksViewModel(
     }
 
     /**
-     * Called by the Data Binding library and the FAB's click listener.
+     * Called by the Data Binding library.
      */
     fun addNewTask() {
         _newTaskEvent.value = Event(Unit)
