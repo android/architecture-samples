@@ -21,7 +21,7 @@ This project hosts each sample app in separate repository branches. For more inf
 ### Stable samples - Kotlin
 |     Sample     | Description |
 | ------------- | ------------- |
-| [master](https://github.com/googlesamples/android-architecture/tree/master) | The base for the rest of the branches. <br/>Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. and uses Room as source of truth, with a reactive UI. |
+| [main](https://github.com/googlesamples/android-architecture/tree/main) | The base for the rest of the branches. <br/>Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. and uses Room as source of truth, with a reactive UI. |
 | [dagger-android](https://github.com/googlesamples/android-architecture/tree/dagger-android)<br/>[[compare](https://github.com/googlesamples/android-architecture/compare/dagger-android#files_bucket)] | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
 | [usecases](https://github.com/googlesamples/android-architecture/tree/usecases)<br/>[[compare](https://github.com/googlesamples/android-architecture/compare/usecases#files_bucket)] | Adds a new domain layer that uses UseCases for business logic. |
 
@@ -38,7 +38,7 @@ The app in this project aims to be simple enough that you can understand it quic
 ## What is it not?
 
 *   A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on architecture. Check out [Plaid](https://github.com/android/plaid) instead.
-*   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [Github Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
+*   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [Github Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/main/GithubBrowserSample) instead.
 *   A real production app with network access, user authentication, etc. Check out the [Google I/O app](https://github.com/google/iosched), [Santa Tracker](https://github.com/google/santa-tracker-android) or [Tivi](https://github.com/chrisbanes/tivi) for that.
 
 ## Who is it for?
@@ -55,7 +55,7 @@ Clone the repository:
 ```
 git clone git@github.com:googlesamples/android-architecture.git
 ```
-This step checks out the master branch. If you want to change to a different sample: 
+This step checks out the main branch. If you want to change to a different sample:
 
 ```
 git checkout usecases
