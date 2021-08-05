@@ -48,7 +48,7 @@ class AddEditTaskFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val root = inflater.inflate(R.layout.addtask_frag, container, false)
         viewDataBinding = AddtaskFragBinding.bind(root).apply {
             this.viewmodel = viewModel
@@ -58,8 +58,8 @@ class AddEditTaskFragment : Fragment() {
         return viewDataBinding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupSnackbar()
         setupNavigation()
         this.setupRefreshLayout(viewDataBinding.refreshLayout)

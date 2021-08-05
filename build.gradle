@@ -1,15 +1,15 @@
 buildscript {
-    ext.kotlinVersion = '1.4.21'
-    ext.navigationVersion = '2.2.0'
-    ext.ktlintVersion = '0.33.0'
-    ext.hiltVersion = "2.36"
+    ext.kotlinVersion = '1.5.21'
+    ext.navigationVersion = '2.3.5'
+    ext.ktlintVersion = '10.1.0'
+    ext.hiltVersion = '2.38.1'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.android.tools.build:gradle:7.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
@@ -20,15 +20,12 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version "3.24.2"
+    id "com.diffplug.spotless" version "5.14.2"
 }
 
+
 allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-    apply plugin: 'com.diffplug.gradle.spotless'
+    apply plugin: "com.diffplug.spotless"
     spotless {
         kotlin {
             target "**/*.kt"
@@ -43,34 +40,34 @@ ext {
     // Sdk and tools
     // Bumping minSdk to 21 to avoid adding multidex just for androidTests
     minSdkVersion = 21
-    targetSdkVersion = 28
-    compileSdkVersion = 28
+    targetSdkVersion = 30
+    compileSdkVersion = 31
 
     // App dependencies
     androidXVersion = '1.0.0'
-    androidXTestCoreVersion = '1.3.0'
-    androidXTestExtKotlinRunnerVersion = '1.1.2'
-    androidXTestRulesVersion = '1.2.0'
-    androidXAnnotations = '1.1.0'
+    androidXTestCoreVersion = '1.4.0'
+    androidXTestExtKotlinRunnerVersion = '1.1.3'
+    androidXTestRulesVersion = '1.4.0'
+    androidXAnnotations = '1.2.0'
     androidXLegacySupport = '1.0.0'
-    appCompatVersion = '1.2.0'
-    archLifecycleVersion = '2.2.0'
+    appCompatVersion = '1.3.1'
+    archLifecycleVersion = '2.3.1'
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
-    coroutinesVersion = '1.4.2'
-    dexMakerVersion = '2.12.1'
-    espressoVersion = '3.3.0'
-    fragmentVersion = '1.3.0'
-    fragmentKtxVersion = '1.2.0'
+    coroutinesVersion = '1.5.1'
+    dexMakerVersion = '2.28.1'
+    espressoVersion = '3.4.0'
+    fragmentVersion = '1.3.6'
+    fragmentKtxVersion = '1.3.6'
     hamcrestVersion = '1.3'
-    junitVersion = '4.12'
-    materialVersion = '1.2.1'
-    mockitoVersion = '2.19.0'
+    junitVersion = '4.13.2'
+    materialVersion = '1.4.0'
+    mockitoVersion = '3.11.2'
     multiDexVersion = '2.0.1'
-    recyclerViewVersion = '1.1.0'
-    robolectricVersion = '4.3.1'
-    roomVersion = '2.2.6'
+    recyclerViewVersion = '1.2.1'
+    robolectricVersion = '4.6.1'
+    roomVersion = '2.3.0'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
-    truthVersion = '1.0.1'
+    truthVersion = '1.1.3'
 }

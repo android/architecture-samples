@@ -57,7 +57,7 @@ class TasksFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = viewModel
         }
@@ -86,8 +86,8 @@ class TasksFragment : Fragment() {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Set the lifecycle owner to the lifecycle of the view
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
@@ -134,11 +134,7 @@ class TasksFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.add_task_fab)?.let {
-            it.setOnClickListener {
-                navigateToAddNewTask()
-            }
-        }
+        viewDataBinding.addTaskFab.setOnClickListener { navigateToAddNewTask() }
     }
 
     private fun navigateToAddNewTask() {
