@@ -104,6 +104,10 @@ class AddEditTaskViewModel(
         val currentTitle = title.value
         val currentDescription = description.value
 
+        if(currentTitle.isNullOrBlank()|| currentDescription.isNullOrBlank()){
+            _snackbarText.value = Event(R.string.empty_task_message)
+            return
+        }
         if (currentTitle == null || currentDescription == null) {
             _snackbarText.value = Event(R.string.empty_task_message)
             return
