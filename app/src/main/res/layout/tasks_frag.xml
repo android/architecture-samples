@@ -26,6 +26,10 @@
             name="viewmodel"
             type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
 
+        <variable
+            name="taskFragment"
+            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment" />
+
     </data>
 
 
@@ -109,6 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{taskFragment::navigateToAddNewTask}"
             android:src="@drawable/ic_add"
             app:fabSize="normal"
             app:layout_anchor="@id/refresh_layout"

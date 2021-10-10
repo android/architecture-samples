@@ -17,14 +17,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
@@ -32,9 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.*
 import kotlinx.coroutines.launch
 
 /**
@@ -83,9 +74,6 @@ class TasksViewModel(
 
     private val _openTaskEvent = MutableLiveData<Event<String>>()
     val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
-
-    private val _newTaskEvent = MutableLiveData<Event<Unit>>()
-    val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
 
     private var resultMessageShown: Boolean = false
 
@@ -162,13 +150,6 @@ class TasksViewModel(
             tasksRepository.activateTask(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
-    }
-
-    /**
-     * Called by the Data Binding library and the FAB's click listener.
-     */
-    fun addNewTask() {
-        _newTaskEvent.value = Event(Unit)
     }
 
     /**
