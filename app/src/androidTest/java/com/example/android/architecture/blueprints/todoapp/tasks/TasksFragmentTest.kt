@@ -235,7 +235,7 @@ class TasksFragmentTest {
         onView(withText("TITLE2")).check(matches(isDisplayed()))
         onView(withText("TITLE3")).check(doesNotExist())
     }
-
+// Error
     @Test
     fun showCompletedTasks() {
         // Add one active task and 2 completed tasks
