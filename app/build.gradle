@@ -16,11 +16,11 @@ android {
 
         testInstrumentationRunner "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
 
-        javaCompileOptions {
+       /* javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.incremental" : "true"]
             }
-        }
+        }*/
     }
 
     android {
