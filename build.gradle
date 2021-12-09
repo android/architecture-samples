@@ -1,8 +1,8 @@
 buildscript {
-    ext.kotlinVersion = '1.6.0'
+    ext.kotlinVersion = '1.6.10-RC' //'1.6.0'
     ext.navigationVersion = '2.3.5'
     ext.ktlintVersion = '10.1.0'
-    ext.hiltVersion = '2.40.4'
+    ext.hiltVersion = '2.40.5'
     repositories {
         google()
         mavenCentral()
@@ -41,7 +41,8 @@ ext {
     // Bumping minSdk to 21 to avoid adding multidex just for androidTests
     minSdkVersion = 21
     targetSdkVersion = 30
-    compileSdkVersion = 31
+    compileSdkVersion = 32
+    buildToolsVersion = '32.0.0'
 
     // App dependencies
     androidXVersion = '1.0.0'
