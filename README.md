@@ -31,7 +31,7 @@ Blueprints v1 had a collection of samples that are not maintained anymore, but c
 
 ## Why a to-do app?
 
-<img align="right" src="https://github.com/googlesamples/android-architecture/wiki/images/todoapp.gif" alt="A demo illustraating the UI of the app" width="288" height="512" style="display: inline; float: right"/>
+<img align="right" src="https://github.com/googlesamples/android-architecture/wiki/images/todoapp.gif" alt="A demo illustrating the UI of the app" width="288" height="512" style="display: inline; float: right"/>
 
 The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
 
