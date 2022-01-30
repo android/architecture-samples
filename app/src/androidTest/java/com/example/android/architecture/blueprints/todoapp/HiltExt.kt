@@ -55,11 +55,15 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
             T::class.java.name
         )
         fragment.arguments = fragmentArgs
-        activity.supportFragmentManager
-            .beginTransaction()
-            .add(android.R.id.content, fragment, "")
-            .commitNow()
-
+        
+        if (fragment is DialogFragment) {
+            fragment.show(activity.supportFragmentManager, "")
+        } else {
+            activity.supportFragmentManager
+                .beginTransaction()
+                .add(android.R.id.content, fragment, "")
+                .commitNow()
+        }
         fragment.action()
     }
 }
