@@ -232,7 +232,7 @@ class TasksViewModel(
             }
         }
         return tasksToShow
-        }
+    }
 
     fun refresh() {
         _forceUpdate.value = true

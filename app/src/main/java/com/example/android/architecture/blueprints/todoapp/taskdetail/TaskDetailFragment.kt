@@ -54,19 +54,25 @@ class TaskDetailFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.deleteTaskEvent.observe(this, EventObserver {
-            val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
-            findNavController().navigate(action)
-        })
-        viewModel.editTaskEvent.observe(this, EventObserver {
-            val action = TaskDetailFragmentDirections
-                .actionTaskDetailFragmentToAddEditTaskFragment(
-                    args.taskId,
-                    resources.getString(R.string.edit_task)
-                )
-            findNavController().navigate(action)
-        })
+        viewModel.deleteTaskEvent.observe(
+            this,
+            EventObserver {
+                val action = TaskDetailFragmentDirections
+                    .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
+                findNavController().navigate(action)
+            }
+        )
+        viewModel.editTaskEvent.observe(
+            this,
+            EventObserver {
+                val action = TaskDetailFragmentDirections
+                    .actionTaskDetailFragmentToAddEditTaskFragment(
+                        args.taskId,
+                        resources.getString(R.string.edit_task)
+                    )
+                findNavController().navigate(action)
+            }
+        )
     }
 
     private fun setupFab() {
