@@ -43,6 +43,7 @@ ext {
     compileSdkVersion = 32
 
     // App dependencies
+    accompanistVersion = '0.23.0'
     activityComposeVersion = '1.4.0'
     androidXVersion = '1.0.0'
     androidXTestCoreVersion = '1.4.0'
@@ -55,7 +56,6 @@ ext {
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
     composeVersion = '1.1.0'
-    composeThemeAdapterVersion = '1.1.4'
     coroutinesVersion = '1.5.2'
     dexMakerVersion = '2.12.1'
     espressoVersion = '3.5.0-alpha04'

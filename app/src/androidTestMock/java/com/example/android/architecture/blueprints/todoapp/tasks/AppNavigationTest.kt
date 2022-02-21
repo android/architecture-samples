@@ -16,9 +16,11 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.view.Gravity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
-import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
@@ -45,15 +47,13 @@ import com.example.android.architecture.blueprints.todoapp.util.monitorActivity
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Tests for the [DrawerLayout] layout component in [TasksActivity] which manages
  * navigation within the app.
- *
- * UI tests usually use [ActivityTestRule] but there's no API to perform an action before
- * each test. The workaround is to use `ActivityScenario.launch()` and `ActivityScenario.close()`.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -63,6 +63,9 @@ class AppNavigationTest {
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<TasksActivity>()
 
     @Before
     fun init() {
@@ -96,8 +99,7 @@ class AppNavigationTest {
     @Test
     fun drawerNavigationFromTasksToStatistics() {
         // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
@@ -108,7 +110,7 @@ class AppNavigationTest {
             .perform(navigateTo(R.id.statistics_fragment_dest))
 
         // Check that statistics screen was opened.
-        onView(withId(R.id.statistics_layout)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("You have no tasks.").assertIsDisplayed()
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
@@ -120,15 +122,12 @@ class AppNavigationTest {
 
         // Check that tasks screen was opened.
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-        // When using ActivityScenario.launch, always call close()
-        activityScenario.close()
     }
 
     @Test
     fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
         // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Check that left drawer is closed at startup
         onView(withId(R.id.drawer_layout))
@@ -137,26 +136,21 @@ class AppNavigationTest {
         // Open Drawer
         onView(
             withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check if drawer is open
         onView(withId(R.id.drawer_layout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
-        // When using ActivityScenario.launch, always call close()
-        activityScenario.close()
     }
 
     @Test
     fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // When the user navigates to the stats screen
-        activityScenario.onActivity {
+        composeTestRule.activityRule.scenario.onActivity {
             it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
         }
 
@@ -167,16 +161,13 @@ class AppNavigationTest {
         // When the drawer is opened
         onView(
             withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Then check that the drawer is open
         onView(withId(R.id.drawer_layout))
             .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
-        // When using ActivityScenario.launch, always call close()
-        activityScenario.close()
     }
 
     @Test
@@ -184,9 +175,7 @@ class AppNavigationTest {
         val task = Task("UI <- button", "Description")
         tasksRepository.saveTaskBlocking(task)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Click on the task on the list
         onView(withText("UI <- button")).perform(click())
@@ -196,8 +185,7 @@ class AppNavigationTest {
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
             withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
         onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
@@ -205,13 +193,10 @@ class AppNavigationTest {
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         onView(
             withContentDescription(
-                activityScenario
-                    .getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-        // When using ActivityScenario.launch, always call close()
-        activityScenario.close()
     }
 
     @Test
@@ -219,9 +204,7 @@ class AppNavigationTest {
         val task = Task("Back button", "Description")
         tasksRepository.saveTaskBlocking(task)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
@@ -235,7 +218,5 @@ class AppNavigationTest {
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
         onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
-        // When using ActivityScenario.launch, always call close()
-        activityScenario.close()
     }
 }

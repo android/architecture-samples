@@ -16,15 +16,11 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import android.content.Context
-import android.os.Bundle
-import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.navigation.Navigation.findNavController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
@@ -32,13 +28,13 @@ import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
-import com.example.android.architecture.blueprints.todoapp.util.monitorFragment
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -49,10 +45,11 @@ import org.junit.runner.RunWith
 @MediumTest
 @ExperimentalCoroutinesApi
 class StatisticsFragmentTest {
+
     private lateinit var repository: TasksRepository
 
-    // An Idling Resource that waits for Data Binding to have no pending bindings
-    private val dataBindingIdlingResource = DataBindingIdlingResource()
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<TasksActivity>()
 
     @Before
     fun initRepository() {
@@ -65,23 +62,6 @@ class StatisticsFragmentTest {
         ServiceLocator.resetRepository()
     }
 
-    /**
-     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
-     * are not scheduled in the main Looper (for example when executed on a different thread).
-     */
-    @Before
-    fun registerIdlingResource() {
-        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
-    }
-
-    /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
-    }
-
     @Test
     fun tasks_showsNonEmptyMessage() {
         // Given some tasks
@@ -90,8 +70,9 @@ class StatisticsFragmentTest {
             saveTaskBlocking(Task("Title2", "Description2", true))
         }
 
-        val scenario = launchFragmentInContainer<StatisticsFragment>(Bundle(), R.style.AppTheme)
-        dataBindingIdlingResource.monitorFragment(scenario)
+        composeTestRule.activityRule.scenario.onActivity {
+            findNavController(it, R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
+        }
 
         val expectedActiveTaskText = getApplicationContext<Context>()
             .getString(R.string.statistics_active_tasks, 50.0f)
@@ -99,10 +80,7 @@ class StatisticsFragmentTest {
             .getString(R.string.statistics_completed_tasks, 50.0f)
 
         // check that both info boxes are displayed and contain the correct info
-        onView(withId(R.id.stats_active_text)).check(matches(isDisplayed()))
-        onView(withId(R.id.stats_active_text)).check(matches(withText(expectedActiveTaskText)))
-        onView(withId(R.id.stats_completed_text)).check(matches(isDisplayed()))
-        onView(withId(R.id.stats_completed_text))
-            .check(matches(withText(expectedCompletedTaskText)))
+        composeTestRule.onNodeWithText(expectedActiveTaskText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedCompletedTaskText).assertIsDisplayed()
     }
 }
