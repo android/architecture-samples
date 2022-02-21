@@ -1,13 +1,13 @@
 buildscript {
-    ext.kotlinVersion = '1.5.10'
-    ext.navigationVersion = '2.3.5'
-    ext.ktlintVersion = '0.33.0'
+    ext.kotlinVersion = '1.6.10'
+    ext.navigationVersion = '2.4.1'
+    ext.ktlintVersion = '0.44.0'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:7.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 
@@ -23,7 +23,7 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     apply plugin: 'com.diffplug.spotless'
     spotless {
@@ -39,32 +39,35 @@ allprojects {
 ext {
     // Sdk and tools
     minSdkVersion = 21
-    targetSdkVersion = 30
-    compileSdkVersion = 30
+    targetSdkVersion = 32
+    compileSdkVersion = 32
 
     // App dependencies
+    activityComposeVersion = '1.4.0'
     androidXVersion = '1.0.0'
-    androidXTestCoreVersion = '1.3.0'
-    androidXTestExtKotlinRunnerVersion = '1.1.2'
+    androidXTestCoreVersion = '1.4.0'
+    androidXTestExtKotlinRunnerVersion = '1.1.3'
     androidXTestRulesVersion = '1.2.0'
-    androidXAnnotations = '1.2.0'
+    androidXAnnotations = '1.3.0'
     androidXLegacySupport = '1.0.0'
-    appCompatVersion = '1.3.0'
-    archLifecycleVersion = '2.3.1'
+    appCompatVersion = '1.4.1'
+    archLifecycleVersion = '2.4.1'
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
-    coroutinesVersion = '1.5.0'
+    composeVersion = '1.1.0'
+    composeThemeAdapterVersion = '1.1.4'
+    coroutinesVersion = '1.5.2'
     dexMakerVersion = '2.12.1'
-    espressoVersion = '3.3.0'
-    fragmentVersion = '1.3.4'
-    fragmentKtxVersion = '1.3.4'
+    espressoVersion = '3.4.0'
+    fragmentVersion = '1.4.1'
+    fragmentKtxVersion = '1.4.1'
     hamcrestVersion = '1.3'
-    junitVersion = '4.13.1'
-    materialVersion = '1.3.0'
+    junitVersion = '4.13.2'
+    materialVersion = '1.5.0'
     multiDexVersion = '2.0.1'
-    recyclerViewVersion = '1.2.0'
+    recyclerViewVersion = '1.2.1'
     robolectricVersion = '4.5.1'
-    roomVersion = '2.3.0'
+    roomVersion = '2.4.1'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '1.1.2'
