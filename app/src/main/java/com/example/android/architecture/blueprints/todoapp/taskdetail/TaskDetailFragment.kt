@@ -22,86 +22,71 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.tasks.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
-import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
-import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
-import com.google.android.material.snackbar.Snackbar
+import com.google.accompanist.appcompattheme.AppCompatTheme
+import kotlinx.coroutines.launch
 
 /**
  * Main UI for the task detail screen.
  */
 class TaskDetailFragment : Fragment() {
-    private lateinit var viewDataBinding: TaskdetailFragBinding
 
     private val args: TaskDetailFragmentArgs by navArgs()
 
     private val viewModel by viewModels<TaskDetailViewModel> { getViewModelFactory() }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupFab()
-        view.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
-        setupNavigation()
-        this.setupRefreshLayout(viewDataBinding.refreshLayout)
-    }
-
-    private fun setupNavigation() {
-        viewModel.deleteTaskEvent.observe(
-            this,
-            EventObserver {
-                val action = TaskDetailFragmentDirections
-                    .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
-                findNavController().navigate(action)
-            }
-        )
-        viewModel.editTaskEvent.observe(
-            this,
-            EventObserver {
-                val action = TaskDetailFragmentDirections
-                    .actionTaskDetailFragmentToAddEditTaskFragment(
-                        args.taskId,
-                        resources.getString(R.string.edit_task)
-                    )
-                findNavController().navigate(action)
-            }
-        )
-    }
-
-    private fun setupFab() {
-        activity?.findViewById<View>(R.id.edit_task_fab)?.setOnClickListener {
-            viewModel.editTask()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
-        viewDataBinding = TaskdetailFragBinding.bind(view).apply {
-            viewmodel = viewModel
-        }
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
-
-        viewModel.start(args.taskId)
-
+    ): View {
         setHasOptionsMenu(true)
-        return view
+
+        return ComposeView(requireContext()).apply {
+            // Dispose of the Composition when the view's LifecycleOwner is destroyed
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppCompatTheme {
+                    Surface(Modifier.fillMaxSize()) {
+                        TaskDetailScreen(
+                            taskId = args.taskId,
+                            viewModel = viewModel,
+                            onEditTask = {
+                                val action = TaskDetailFragmentDirections
+                                    .actionTaskDetailFragmentToAddEditTaskFragment(
+                                        args.taskId,
+                                        resources.getString(R.string.edit_task)
+                                    )
+                                findNavController().navigate(action)
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_delete -> {
-                viewModel.deleteTask()
+                lifecycleScope.launch {
+                    viewModel.deleteTask()
+                    val action = TaskDetailFragmentDirections
+                        .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
+                    findNavController().navigate(action)
+                }
                 true
             }
             else -> false

@@ -26,6 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -139,17 +140,7 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun clickOnEditTask_SetsEvent() {
-        // When opening a new task
-        taskDetailViewModel.editTask()
-
-        // Then the event is triggered
-        val value = taskDetailViewModel.editTaskEvent.getOrAwaitValue()
-        assertThat(value.getContentIfNotHandled()).isNotNull()
-    }
-
-    @Test
-    fun deleteTask() {
+    fun deleteTask() = runBlocking {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 

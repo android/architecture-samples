@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,13 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.test.core.app.ActivityScenario
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.isToggleable
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
@@ -48,6 +54,7 @@ import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -62,6 +69,10 @@ import org.junit.runner.RunWith
 class TasksActivityTest {
 
     private lateinit var repository: TasksRepository
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    private val activity by lazy { composeTestRule.activity }
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -104,20 +115,20 @@ class TasksActivityTest {
 
     @Test
     fun editTask() {
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
-        onView(withId(R.id.task_detail_title_text)).check(matches(withText("TITLE1")))
-        onView(withId(R.id.task_detail_description_text)).check(matches(withText("DESCRIPTION")))
-        onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("DESCRIPTION").assertIsDisplayed()
+        composeTestRule.onNode(isToggleable()).assertIsOff()
 
         // Click on the edit button, edit, and save
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+            .performClick()
         onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
         onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
         onView(withId(R.id.save_task_fab)).perform(click())
@@ -126,16 +137,11 @@ class TasksActivityTest {
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
         // Verify previous task is not displayed
         onView(withText("TITLE1")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createOneTask_deleteTask() {
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Add active task
         onView(withId(R.id.add_task_fab)).perform(click())
@@ -153,18 +159,15 @@ class TasksActivityTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createTwoTasks_deleteOneTask() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Open the second task in details view
         onView(withText("TITLE2")).perform(click())
@@ -176,136 +179,120 @@ class TasksActivityTest {
         onView(withText(string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(matches(isDisplayed()))
         onView(withText("TITLE2")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 active task
         val taskTitle = "COMPLETED"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 completed task
         val taskTitle = "ACTIVE"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 active task
         val taskTitle = "ACT-COMP"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 completed task
         val taskTitle = "COMP-ACT"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createTask() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Click on the "+" button, add details, and save
         onView(withId(R.id.add_task_fab)).perform(click())
@@ -316,7 +303,5 @@ class TasksActivityTest {
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 }

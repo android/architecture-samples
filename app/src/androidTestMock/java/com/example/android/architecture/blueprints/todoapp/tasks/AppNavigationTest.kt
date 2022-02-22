@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 import android.view.Gravity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -66,6 +68,7 @@ class AppNavigationTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    private val activity by lazy { composeTestRule.activity }
 
     @Before
     fun init() {
@@ -111,6 +114,7 @@ class AppNavigationTest {
 
         // Check that statistics screen was opened.
         composeTestRule.onNodeWithText("You have no tasks.").assertIsDisplayed()
+        composeTestRule.waitForIdle()
 
         onView(withId(R.id.drawer_layout))
             .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
@@ -153,6 +157,7 @@ class AppNavigationTest {
         composeTestRule.activityRule.scenario.onActivity {
             it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
         }
+        composeTestRule.waitForIdle()
 
         // Then check that left drawer is closed at startup
         onView(withId(R.id.drawer_layout))
@@ -172,15 +177,17 @@ class AppNavigationTest {
 
     @Test
     fun taskDetailScreen_doubleUIBackButton() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         val task = Task("UI <- button", "Description")
         tasksRepository.saveTaskBlocking(task)
-
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText("UI <- button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+            .performClick()
 
         // Confirm that if we click "<-" once, we end up back at the task details page
         onView(
@@ -188,7 +195,7 @@ class AppNavigationTest {
                 composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
-        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("UI <- button").assertIsDisplayed()
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         onView(
@@ -201,19 +208,21 @@ class AppNavigationTest {
 
     @Test
     fun taskDetailScreen_doubleBackButton() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         val task = Task("Back button", "Description")
         tasksRepository.saveTaskBlocking(task)
-
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText("Back button")).perform(click())
         // Click on the edit task button
-        onView(withId(R.id.edit_task_fab)).perform(click())
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+            .performClick()
 
         // Confirm that if we click back once, we end up back at the task details page
         pressBack()
-        onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("Back button").assertIsDisplayed()
 
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
