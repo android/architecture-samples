@@ -57,11 +57,14 @@ fun View.setupSnackbar(
     timeLength: Int
 ) {
 
-    snackbarEvent.observe(lifecycleOwner, Observer { event ->
-        event.getContentIfNotHandled()?.let {
-            showSnackbar(context.getString(it), timeLength)
+    snackbarEvent.observe(
+        lifecycleOwner,
+        Observer { event ->
+            event.getContentIfNotHandled()?.let {
+                showSnackbar(context.getString(it), timeLength)
+            }
         }
-    })
+    )
 }
 
 fun Fragment.setupRefreshLayout(
