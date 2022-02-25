@@ -21,6 +21,7 @@ android {
             String sharedTestDir = 'src/sharedTest/java'
             test {
                 java.srcDirs += sharedTestDir
+                resources.srcDirs += 'src/sharedTest/resources'
             }
             androidTest {
                 java.srcDirs += sharedTestDir
