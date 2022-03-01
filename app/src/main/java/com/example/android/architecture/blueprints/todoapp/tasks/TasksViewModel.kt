@@ -81,12 +81,6 @@ class TasksViewModel(
     // Not used at the moment
     private val isDataLoadingError = MutableLiveData<Boolean>()
 
-    private val _openTaskEvent = MutableLiveData<Event<String>>()
-    val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
-
-    private val _newTaskEvent = MutableLiveData<Event<Unit>>()
-    val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
-
     private var resultMessageShown: Boolean = false
 
     // This LiveData depends on another so we can use a transformation.
@@ -162,20 +156,6 @@ class TasksViewModel(
             tasksRepository.activateTask(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
-    }
-
-    /**
-     * Called by the Data Binding library and the FAB's click listener.
-     */
-    fun addNewTask() {
-        _newTaskEvent.value = Event(Unit)
-    }
-
-    /**
-     * Called by Data Binding.
-     */
-    fun openTask(taskId: String) {
-        _openTaskEvent.value = Event(taskId)
     }
 
     fun showEditResultMessage(result: Int) {

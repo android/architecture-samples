@@ -56,8 +56,8 @@ class AddEditTaskScreenTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val activity get() = composeTestRule.activity
 
-    private val activity by lazy { composeTestRule.activity }
     private val repository = FakeRepository()
 
     @Before

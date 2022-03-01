@@ -58,7 +58,7 @@ ext {
     composeVersion = '1.1.1'
     coroutinesVersion = '1.5.2'
     dexMakerVersion = '2.12.1'
-    espressoVersion = '3.5.0-alpha04' // This breaks Robolectric which needs Espresso 3.5 alphas
+    espressoVersion = '3.4.0' // This breaks Robolectric which needs Espresso 3.5 alphas
     fragmentVersion = '1.4.1'
     fragmentKtxVersion = '1.4.1'
     hamcrestVersion = '1.3'

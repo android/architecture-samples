@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.assertLiveDataEventTriggered
 import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
@@ -151,26 +150,6 @@ class TasksViewModelTest {
             // And the snackbar updated
             assertSnackbarMessage(tasksViewModel.snackbarText, R.string.loading_tasks_error)
         }
-    }
-
-    @Test
-    fun clickOnFab_showsAddTaskUi() {
-        // When adding a new task
-        tasksViewModel.addNewTask()
-
-        // Then the event is triggered
-        val value = tasksViewModel.newTaskEvent.getOrAwaitValue()
-        assertThat(value.getContentIfNotHandled()).isNotNull()
-    }
-
-    @Test
-    fun clickOnOpenTask_setsEvent() {
-        // When opening a new task
-        val taskId = "42"
-        tasksViewModel.openTask(taskId)
-
-        // Then the event is triggered
-        assertLiveDataEventTriggered(tasksViewModel.openTaskEvent, taskId)
     }
 
     @Test

@@ -125,7 +125,7 @@ class AppNavigationTest {
             .perform(navigateTo(R.id.tasks_fragment_dest))
 
         // Check that tasks screen was opened.
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("You have no tasks!").assertIsDisplayed()
     }
 
     @Test
@@ -203,7 +203,7 @@ class AppNavigationTest {
                 composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("All tasks").assertIsDisplayed()
     }
 
     @Test
@@ -226,6 +226,6 @@ class AppNavigationTest {
 
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
-        onView(withId(R.id.tasks_container_layout)).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("All tasks").assertIsDisplayed()
     }
 }
