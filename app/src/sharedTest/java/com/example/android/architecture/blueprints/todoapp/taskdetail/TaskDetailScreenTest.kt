@@ -88,7 +88,9 @@ class TaskDetailScreenTest {
                     TaskDetailScreen(
                         viewModel = TaskDetailViewModel(repository),
                         taskId = activeTask.id,
-                        onEditTask = { /*TODO*/ }
+                        onEditTask = { /*TODO*/ },
+                        onBack = { },
+                        onDeleteTask = { },
                     )
                 }
             }

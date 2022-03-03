@@ -31,9 +31,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -44,22 +42,28 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
+import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
 fun TaskDetailScreen(
-    taskId: String?,
-    onEditTask: () -> Unit,
+    taskId: String,
+    onEditTask: (String) -> Unit,
+    onBack: () -> Unit,
+    onDeleteTask: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TaskDetailViewModel = viewModel(factory = getViewModelFactory()),
+    state: TaskDetailState = rememberTaskDetailState(taskId, viewModel, onDeleteTask)
 ) {
-    val scaffoldState = rememberScaffoldState()
     Scaffold(
-        scaffoldState = scaffoldState,
+        scaffoldState = state.scaffoldState,
         modifier = modifier.fillMaxSize(),
+        topBar = {
+            TaskDetailTopAppBar(onBack = onBack, onDelete = state::onDelete)
+        },
         floatingActionButton = {
-            FloatingActionButton(onClick = onEditTask) {
+            FloatingActionButton(onClick = { onEditTask(taskId) }) {
                 Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
             }
         }
@@ -78,23 +82,6 @@ fun TaskDetailScreen(
             onTaskCheck = viewModel::setCompleted,
             modifier = Modifier.padding(paddingValues)
         )
-
-        // Note that the code below could be simplified with a state holder
-        // similar to AddEditTaskState
-
-        // Start loading data
-        LaunchedEffect(Unit) {
-            viewModel.start(taskId)
-        }
-
-        // Process snackbar events
-        val snackbarEvent by viewModel.snackbarText.observeAsState()
-        snackbarEvent?.getContentIfNotHandled()?.let { messageId ->
-            val message = stringResource(id = messageId)
-            LaunchedEffect(message) {
-                scaffoldState.snackbarHostState.showSnackbar(message)
-            }
-        }
     }
 }
 
@@ -109,8 +96,8 @@ private fun EditTaskContent(
     modifier: Modifier = Modifier
 ) {
     val screenPadding = Modifier.padding(
-        horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
-        vertical = dimensionResource(id = R.dimen.activity_vertical_margin),
+        horizontal = dimensionResource(id = R.dimen.horizontal_margin),
+        vertical = dimensionResource(id = R.dimen.vertical_margin),
     )
     val commonModifier = modifier
         .fillMaxWidth()
@@ -133,7 +120,7 @@ private fun EditTaskContent(
                     .fillMaxWidth()
                     .then(screenPadding),
 
-                ) {
+            ) {
                 Checkbox(taskCompleted, onTaskCheck)
                 Column {
                     Text(text = task?.title ?: "", style = MaterialTheme.typography.h6)

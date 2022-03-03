@@ -15,47 +15,35 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.view.Gravity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.DrawerActions.open
-import androidx.test.espresso.contrib.DrawerMatchers.isClosed
-import androidx.test.espresso.contrib.DrawerMatchers.isOpen
-import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
+import com.example.android.architecture.blueprints.todoapp.TasksActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.DataBindingIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
-import com.example.android.architecture.blueprints.todoapp.util.monitorActivity
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the [DrawerLayout] layout component in [TasksActivity] which manages
- * navigation within the app.
+ * Tests for scenarios that requires navigating within the app.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -63,21 +51,24 @@ class AppNavigationTest {
 
     private lateinit var tasksRepository: TasksRepository
 
-    // An Idling Resource that waits for Data Binding to have no pending bindings
-    private val dataBindingIdlingResource = DataBindingIdlingResource()
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TasksActivity>()
     private val activity get() = composeTestRule.activity
 
     @Before
     fun init() {
-        tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        // Run on UI thread to make sure the same instance of the SL is used.
+        runOnUiThread {
+            ServiceLocator.createDataBase(getApplicationContext(), inMemory = true)
+            tasksRepository = ServiceLocator.provideTasksRepository(getApplicationContext())
+        }
     }
 
     @After
     fun reset() {
-        ServiceLocator.resetRepository()
+        runOnUiThread {
+            ServiceLocator.resetRepository()
+        }
     }
 
     /**
@@ -87,7 +78,6 @@ class AppNavigationTest {
     @Before
     fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
-        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
     /**
@@ -96,136 +86,113 @@ class AppNavigationTest {
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
     @Test
     fun drawerNavigationFromTasksToStatistics() {
-        // start up Tasks screen
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
-
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-            .perform(open()) // Open Drawer
-
+        openDrawer()
         // Start statistics screen.
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.statistics_fragment_dest))
-
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
         // Check that statistics screen was opened.
-        composeTestRule.onNodeWithText("You have no tasks.").assertIsDisplayed()
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_no_tasks))
+            .assertIsDisplayed()
 
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
-            .perform(open()) // Open Drawer
-
+        openDrawer()
         // Start tasks screen.
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.tasks_fragment_dest))
-
+        composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).performClick()
         // Check that tasks screen was opened.
-        composeTestRule.onNodeWithText("You have no tasks!").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.no_tasks_all))
+            .assertIsDisplayed()
     }
 
     @Test
     fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        // start up Tasks screen
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
-
         // Check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+        composeTestRule.onNodeWithText(activity.getString(R.string.list_title))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title))
+            .assertIsNotDisplayed()
 
-        // Open Drawer
-        onView(
-            withContentDescription(
-                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
+        openDrawer()
 
         // Check if drawer is open
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+        composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
-
         // When the user navigates to the stats screen
-        composeTestRule.activityRule.scenario.onActivity {
-            it.findNavController(R.id.nav_host_fragment).navigate(R.id.statistics_fragment_dest)
-        }
-        composeTestRule.waitForIdle()
+        openDrawer()
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
 
-        // Then check that left drawer is closed at startup
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
+        composeTestRule.onNodeWithText(activity.getString(R.string.list_title))
+            .assertIsNotDisplayed()
 
-        // When the drawer is opened
-        onView(
-            withContentDescription(
-                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
+        openDrawer()
 
-        // Then check that the drawer is open
-        onView(withId(R.id.drawer_layout))
-            .check(matches(isOpen(Gravity.START))) // Left drawer is open open.
+        // Check if drawer is open
+        composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).assertIsDisplayed()
+        assertTrue(
+            composeTestRule.onAllNodesWithText(activity.getString(R.string.statistics_title))
+                .fetchSemanticsNodes().isNotEmpty()
+        )
     }
 
     @Test
     fun taskDetailScreen_doubleUIBackButton() {
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
-
-        val task = Task("UI <- button", "Description")
+        val taskName = "UI <- button"
+        val task = Task(taskName, "Description")
         tasksRepository.saveTaskBlocking(task)
-        composeTestRule.waitForIdle()
 
         // Click on the task on the list
-        onView(withText("UI <- button")).perform(click())
+        composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(taskName).performClick()
+
         // Click on the edit task button
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
             .performClick()
 
         // Confirm that if we click "<-" once, we end up back at the task details page
-        onView(
-            withContentDescription(
-                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
-        composeTestRule.onNodeWithText("UI <- button").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.menu_back))
+            .performClick()
+        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
-        onView(
-            withContentDescription(
-                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
-        composeTestRule.onNodeWithText("All tasks").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.menu_back))
+            .performClick()
+        composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
     }
 
     @Test
     fun taskDetailScreen_doubleBackButton() {
-        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
-
-        val task = Task("Back button", "Description")
+        val taskName = "Back button"
+        val task = Task(taskName, "Description")
         tasksRepository.saveTaskBlocking(task)
         composeTestRule.waitForIdle()
 
         // Click on the task on the list
-        onView(withText("Back button")).perform(click())
+        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(taskName).performClick()
         // Click on the edit task button
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
             .performClick()
 
         // Confirm that if we click back once, we end up back at the task details page
         pressBack()
-        composeTestRule.onNodeWithText("Back button").assertIsDisplayed()
+        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
 
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
-        composeTestRule.onNodeWithText("All tasks").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
+    }
+
+    private fun openDrawer() {
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.open_drawer))
+            .performClick()
     }
 }

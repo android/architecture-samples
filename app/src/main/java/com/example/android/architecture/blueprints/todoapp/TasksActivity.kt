@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.util
+package com.example.android.architecture.blueprints.todoapp
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.google.accompanist.appcompattheme.AppCompatTheme
 
 /**
- * Extension functions for Fragment.
+ * Main activity for the todoapp
  */
+class TasksActivity : ComponentActivity() {
 
-import androidx.fragment.app.Fragment
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
-
-fun Fragment.getViewModelFactory(): ViewModelFactory {
-    val repository = (requireContext().applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository, this)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            AppCompatTheme {
+                JetnewsNavGraph()
+            }
+        }
+    }
 }

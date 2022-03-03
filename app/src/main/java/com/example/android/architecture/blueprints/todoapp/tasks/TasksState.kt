@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.addedittask
+package com.example.android.architecture.blueprints.todoapp.tasks
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
@@ -32,45 +31,36 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @Composable
-fun rememberAddEditTaskState(
-    taskId: String?,
-    viewModel: AddEditTaskViewModel,
-    onTaskUpdate: () -> Unit,
+fun rememberTasksState(
+    @StringRes userMessage: Int,
+    viewModel: TasksViewModel,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     context: Context = LocalContext.current,
     coroutineScope: CoroutineScope = rememberCoroutineScope()
-): AddEditTaskState {
-    val currentOnTaskUpdateState by rememberUpdatedState(onTaskUpdate)
-    return remember(taskId, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope) {
-        AddEditTaskState(
-            scaffoldState, viewModel, taskId, currentOnTaskUpdateState,
-            lifecycleOwner, context, coroutineScope
-        )
+): TasksState {
+    return remember(
+        userMessage, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope
+    ) {
+        TasksState(scaffoldState, coroutineScope, viewModel, userMessage, lifecycleOwner, context)
     }
 }
 
 /**
- * Responsible for holding state and containing UI-related logic related to [AddEditTaskScreen].
+ * Responsible for holding state and containing UI-related logic related to [TasksScreen].
  */
 @Stable
-class AddEditTaskState(
+class TasksState(
     val scaffoldState: ScaffoldState,
-    private val viewModel: AddEditTaskViewModel,
-    taskId: String?,
-    onTaskUpdate: () -> Unit,
+    private val coroutineScope: CoroutineScope,
+    viewModel: TasksViewModel,
+    @StringRes userMessage: Int,
     lifecycleOwner: LifecycleOwner,
-    context: Context,
-    coroutineScope: CoroutineScope
+    context: Context
 ) {
     private var currentSnackbarJob: Job? = null
 
     init {
-        // Listen for taskUpdated events
-        viewModel.taskUpdatedEvent.observe(lifecycleOwner) { taskUpdated ->
-            if (taskUpdated) onTaskUpdate()
-        }
-
         // Listen for snackbar messages
         viewModel.snackbarText.observe(lifecycleOwner) { snackbarMessage ->
             if (snackbarMessage != null) {
@@ -84,18 +74,8 @@ class AddEditTaskState(
         }
 
         // Start loading data
-        viewModel.start(taskId)
-    }
-
-    fun onFabClick() {
-        viewModel.saveTask()
-    }
-
-    fun onTitleChanged(newTitle: String) {
-        viewModel.title.value = newTitle
-    }
-
-    fun onDescriptionChanged(newDescription: String) {
-        viewModel.description.value = newDescription
+        if (userMessage != 0) {
+            viewModel.showEditResultMessage(userMessage)
+        }
     }
 }

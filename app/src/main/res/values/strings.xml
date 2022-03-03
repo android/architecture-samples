@@ -24,9 +24,11 @@
     <string name="loading_tasks_error">Error while loading tasks</string>
     <string name="completed_tasks_cleared">Completed tasks cleared</string>
     <string name="menu_filter">Filter</string>
+    <string name="open_drawer">Open Drawer</string>
     <string name="menu_back">Back</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_task">Delete task</string>
+    <string name="menu_more">More</string>
     <string name="navigation_view_header_title">Todo</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your task here.</string>

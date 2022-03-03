@@ -20,8 +20,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,25 +35,35 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
+import com.example.android.architecture.blueprints.todoapp.util.StatisticsTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
 fun StatisticsScreen(
-    viewModel: StatisticsViewModel = viewModel(factory = getViewModelFactory())
+    openDrawer: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: StatisticsViewModel = viewModel(factory = getViewModelFactory()),
+    scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
-    val loading by viewModel.dataLoading.observeAsState(initial = false)
-    val empty by viewModel.empty.observeAsState(initial = true)
-    val activeTasksPercent by viewModel.activeTasksPercent.observeAsState(initial = 0f)
-    val completedTasksPercent by viewModel.completedTasksPercent.observeAsState(initial = 0f)
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = { StatisticsTopAppBar(openDrawer) }
+    ) { paddingValues ->
+        val loading by viewModel.dataLoading.observeAsState(initial = false)
+        val empty by viewModel.empty.observeAsState(initial = true)
+        val activeTasksPercent by viewModel.activeTasksPercent.observeAsState(initial = 0f)
+        val completedTasksPercent by viewModel.completedTasksPercent.observeAsState(initial = 0f)
 
-    StatisticsContent(
-        loading = loading,
-        empty = empty,
-        activeTasksPercent = activeTasksPercent,
-        completedTasksPercent = completedTasksPercent,
-        onRefresh = { viewModel.refresh() }
-    )
+        StatisticsContent(
+            loading = loading,
+            empty = empty,
+            activeTasksPercent = activeTasksPercent,
+            completedTasksPercent = completedTasksPercent,
+            onRefresh = { viewModel.refresh() },
+            modifier = modifier.padding(paddingValues)
+        )
+    }
 }
 
 @Composable
@@ -64,7 +77,7 @@ private fun StatisticsContent(
 ) {
     val commonModifier = modifier
         .fillMaxWidth()
-        .padding(all = dimensionResource(id = R.dimen.activity_horizontal_margin))
+        .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
 
     LoadingContent(
         loading = loading,

@@ -33,13 +33,14 @@ import kotlinx.coroutines.runBlocking
 object ServiceLocator {
 
     private val lock = Any()
+    @Volatile
     private var database: ToDoDatabase? = null
     @Volatile
     var tasksRepository: TasksRepository? = null
         @VisibleForTesting set
 
     fun provideTasksRepository(context: Context): TasksRepository {
-        synchronized(this) {
+        synchronized(lock) {
             return tasksRepository ?: tasksRepository ?: createTasksRepository(context)
         }
     }
@@ -60,20 +61,22 @@ object ServiceLocator {
         context: Context,
         inMemory: Boolean = false
     ): ToDoDatabase {
-        val result = if (inMemory) {
-            // Use a faster in-memory database for tests
-            Room.inMemoryDatabaseBuilder(context.applicationContext, ToDoDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
-        } else {
-            // Real database using SQLite
-            Room.databaseBuilder(
-                context.applicationContext,
-                ToDoDatabase::class.java, "Tasks.db"
-            ).build()
+        synchronized(lock) {
+            val result = if (inMemory) {
+                // Use a faster in-memory database for tests
+                Room.inMemoryDatabaseBuilder(context.applicationContext, ToDoDatabase::class.java)
+                    .allowMainThreadQueries()
+                    .build()
+            } else {
+                // Real database using SQLite
+                Room.databaseBuilder(
+                    context.applicationContext,
+                    ToDoDatabase::class.java, "Tasks.db"
+                ).build()
+            }
+            database = result
+            return result
         }
-        database = result
-        return result
     }
 
     @VisibleForTesting

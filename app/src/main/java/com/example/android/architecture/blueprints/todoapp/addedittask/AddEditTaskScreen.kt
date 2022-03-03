@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,21 +44,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun AddEditTaskScreen(
+    @StringRes topBarTitle: Int,
     taskId: String?,
     onTaskUpdate: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddEditTaskViewModel = viewModel(factory = getViewModelFactory())
+    viewModel: AddEditTaskViewModel = viewModel(factory = getViewModelFactory()),
+    state: AddEditTaskState = rememberAddEditTaskState(taskId, viewModel, onTaskUpdate)
 ) {
-    val state = rememberAddEditTaskState(taskId, viewModel, onTaskUpdate)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = state.scaffoldState,
+        topBar = { AddEditTaskTopAppBar(topBarTitle, onBack) },
         floatingActionButton = {
             FloatingActionButton(onClick = state::onFabClick) {
                 Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
@@ -99,7 +104,7 @@ private fun AddEditTaskContent(
         Column(
             modifier
                 .fillMaxWidth()
-                .padding(all = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
                 .verticalScroll(rememberScrollState())
         ) {
             val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(

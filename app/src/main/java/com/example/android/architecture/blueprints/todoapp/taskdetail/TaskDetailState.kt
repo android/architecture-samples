@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.architecture.blueprints.todoapp.addedittask
+package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import android.content.Context
 import androidx.compose.material.ScaffoldState
@@ -32,45 +32,40 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @Composable
-fun rememberAddEditTaskState(
-    taskId: String?,
-    viewModel: AddEditTaskViewModel,
-    onTaskUpdate: () -> Unit,
+fun rememberTaskDetailState(
+    taskId: String,
+    viewModel: TaskDetailViewModel,
+    onDeleteTask: () -> Unit,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     context: Context = LocalContext.current,
     coroutineScope: CoroutineScope = rememberCoroutineScope()
-): AddEditTaskState {
-    val currentOnTaskUpdateState by rememberUpdatedState(onTaskUpdate)
+): TaskDetailState {
+    val onDeleteTaskUpdateState by rememberUpdatedState(onDeleteTask)
     return remember(taskId, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope) {
-        AddEditTaskState(
-            scaffoldState, viewModel, taskId, currentOnTaskUpdateState,
-            lifecycleOwner, context, coroutineScope
+        TaskDetailState(
+            scaffoldState, viewModel, coroutineScope, onDeleteTaskUpdateState, taskId,
+            lifecycleOwner, context,
         )
     }
 }
 
 /**
- * Responsible for holding state and containing UI-related logic related to [AddEditTaskScreen].
+ * Responsible for holding state and containing UI-related logic related to [TaskDetailScreen].
  */
 @Stable
-class AddEditTaskState(
+class TaskDetailState(
     val scaffoldState: ScaffoldState,
-    private val viewModel: AddEditTaskViewModel,
-    taskId: String?,
-    onTaskUpdate: () -> Unit,
+    private val viewModel: TaskDetailViewModel,
+    private val coroutineScope: CoroutineScope,
+    private val onDeleteTask: () -> Unit,
+    taskId: String,
     lifecycleOwner: LifecycleOwner,
-    context: Context,
-    coroutineScope: CoroutineScope
+    context: Context
 ) {
     private var currentSnackbarJob: Job? = null
 
     init {
-        // Listen for taskUpdated events
-        viewModel.taskUpdatedEvent.observe(lifecycleOwner) { taskUpdated ->
-            if (taskUpdated) onTaskUpdate()
-        }
-
         // Listen for snackbar messages
         viewModel.snackbarText.observe(lifecycleOwner) { snackbarMessage ->
             if (snackbarMessage != null) {
@@ -87,15 +82,8 @@ class AddEditTaskState(
         viewModel.start(taskId)
     }
 
-    fun onFabClick() {
-        viewModel.saveTask()
-    }
-
-    fun onTitleChanged(newTitle: String) {
-        viewModel.title.value = newTitle
-    }
-
-    fun onDescriptionChanged(newDescription: String) {
-        viewModel.description.value = newDescription
+    fun onDelete() {
+        coroutineScope.launch { viewModel.deleteTask() }
+        onDeleteTask()
     }
 }

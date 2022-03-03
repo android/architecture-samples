@@ -20,7 +20,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -43,11 +42,11 @@ class AddEditTaskViewModel(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarText: LiveData<Event<Int>> = _snackbarText
+    private val _snackbarText = MutableLiveData<Int?>()
+    val snackbarText: LiveData<Int?> = _snackbarText
 
-    private val _taskUpdatedEvent = MutableLiveData<Event<Unit>>()
-    val taskUpdatedEvent: LiveData<Event<Unit>> = _taskUpdatedEvent
+    private val _taskUpdatedEvent = MutableLiveData(false)
+    val taskUpdatedEvent: LiveData<Boolean> = _taskUpdatedEvent
 
     private var taskId: String? = null
 
@@ -105,11 +104,11 @@ class AddEditTaskViewModel(
         val currentDescription = description.value
 
         if (currentTitle == null || currentDescription == null) {
-            _snackbarText.value = Event(R.string.empty_task_message)
+            _snackbarText.value = R.string.empty_task_message
             return
         }
         if (Task(currentTitle, currentDescription).isEmpty) {
-            _snackbarText.value = Event(R.string.empty_task_message)
+            _snackbarText.value = R.string.empty_task_message
             return
         }
 
@@ -122,9 +121,13 @@ class AddEditTaskViewModel(
         }
     }
 
+    fun snackbarMessageShown() {
+        _snackbarText.value = null
+    }
+
     private fun createTask(newTask: Task) = viewModelScope.launch {
         tasksRepository.saveTask(newTask)
-        _taskUpdatedEvent.value = Event(Unit)
+        _taskUpdatedEvent.value = true
     }
 
     private fun updateTask(task: Task) {
@@ -133,7 +136,7 @@ class AddEditTaskViewModel(
         }
         viewModelScope.launch {
             tasksRepository.saveTask(task)
-            _taskUpdatedEvent.value = Event(Unit)
+            _taskUpdatedEvent.value = true
         }
     }
 }

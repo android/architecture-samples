@@ -34,6 +34,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -53,20 +54,37 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
+import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
 fun TasksScreen(
+    @StringRes userMessage: Int,
     onAddTask: () -> Unit,
     onTaskClick: (Task) -> Unit,
+    openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TasksViewModel = viewModel(factory = getViewModelFactory())
+    viewModel: TasksViewModel = viewModel(factory = getViewModelFactory()),
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    state: TasksState = rememberTasksState(userMessage, viewModel, scaffoldState)
 ) {
-    val scaffoldState = rememberScaffoldState()
     Scaffold(
-        scaffoldState = scaffoldState,
+        scaffoldState = state.scaffoldState,
+        topBar = {
+            TasksTopAppBar(
+                openDrawer = openDrawer,
+                onFilterAllTasks = { viewModel.setFiltering(ALL_TASKS) },
+                onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
+                onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
+                onClearCompletedTasks = { viewModel.clearCompletedTasks() },
+                onRefresh = { viewModel.refresh() }
+            )
+        },
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTask) {
@@ -112,12 +130,16 @@ private fun TasksContent(
         emptyContent = { TasksEmptyContent(noTasksLabel, noTasksIconRes, modifier) },
         onRefresh = onRefresh
     ) {
-        Column(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+        ) {
             Text(
                 text = stringResource(currentFilteringLabel),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                    vertical = dimensionResource(id = R.dimen.activity_vertical_margin)
+                    vertical = dimensionResource(id = R.dimen.vertical_margin)
                 ),
                 style = MaterialTheme.typography.h6
             )
@@ -145,7 +167,7 @@ private fun TaskItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
+                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
             .clickable { onTaskClick(task) }
@@ -158,7 +180,7 @@ private fun TaskItem(
             text = task.titleForList,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
-                start = dimensionResource(id = R.dimen.activity_horizontal_margin)
+                start = dimensionResource(id = R.dimen.horizontal_margin)
             ),
             textDecoration = if (task.isCompleted) {
                 TextDecoration.LineThrough

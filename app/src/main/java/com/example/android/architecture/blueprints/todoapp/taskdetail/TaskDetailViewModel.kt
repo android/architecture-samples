@@ -15,14 +15,12 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
@@ -49,8 +47,8 @@ class TaskDetailViewModel(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarText: LiveData<Event<Int>> = _snackbarText
+    private val _snackbarText = MutableLiveData<Int?>()
+    val snackbarText: LiveData<Int?> = _snackbarText
 
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = _task.map { input: Task? ->
@@ -74,7 +72,7 @@ class TaskDetailViewModel(
         }
     }
 
-    fun start(taskId: String?) {
+    fun start(taskId: String) {
         // If we're already loading or already loaded, return (might be a config change)
         if (_dataLoading.value == true || taskId == _taskId.value) {
             return
@@ -103,7 +101,11 @@ class TaskDetailViewModel(
         }
     }
 
-    private fun showSnackbarMessage(@StringRes message: Int) {
-        _snackbarText.value = Event(message)
+    fun snackbarMessageShown() {
+        _snackbarText.value = null
+    }
+
+    private fun showSnackbarMessage(message: Int) {
+        _snackbarText.value = message
     }
 }
