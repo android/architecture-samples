@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.1'
+        classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 
@@ -43,6 +43,8 @@ ext {
     compileSdkVersion = 32
 
     // App dependencies
+    accompanistVersion = '0.23.0'
+    activityComposeVersion = '1.4.0'
     androidXVersion = '1.0.0'
     androidXTestCoreVersion = '1.4.0'
     androidXTestExtKotlinRunnerVersion = '1.1.3'
@@ -53,9 +55,10 @@ ext {
     archLifecycleVersion = '2.4.1'
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
+    composeVersion = '1.1.1'
     coroutinesVersion = '1.5.2'
     dexMakerVersion = '2.12.1'
-    espressoVersion = '3.5.0-alpha04'
+    espressoVersion = '3.4.0' // This breaks Robolectric which needs Espresso 3.5 alphas
     fragmentVersion = '1.4.1'
     fragmentKtxVersion = '1.4.1'
     hamcrestVersion = '1.3'
