@@ -25,8 +25,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -47,11 +51,11 @@ class TaskDetailViewModelTest {
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    val mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     val task = Task("Title1", "Description1")
 
@@ -92,7 +96,7 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun activateTask() {
+    fun activateTask() = runTest {
         task.isCompleted = true
 
         // Load the ViewModel
@@ -106,17 +110,15 @@ class TaskDetailViewModelTest {
             // When the ViewModel is asked to complete the task
             taskDetailViewModel.setCompleted(false)
 
-            mainCoroutineRule.runBlockingTest {
-                // Then the task is not completed and the snackbar shows the correct message
-                val newTask = (tasksRepository.getTask(task.id) as Success).data
-                assertTrue(newTask.isActive)
-                assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
-            }
+            // Then the task is not completed and the snackbar shows the correct message
+            val newTask = (tasksRepository.getTask(task.id) as Success).data
+            assertTrue(newTask.isActive)
+            assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
         }
     }
 
     @Test
-    fun taskDetailViewModel_repositoryError() {
+    fun taskDetailViewModel_repositoryError() = runTest {
         // Given a repository that returns errors
         tasksRepository.setReturnError(true)
 
@@ -160,9 +162,9 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun loadTask_loading() {
-        // Pause dispatcher so we can verify initial values
-        mainCoroutineRule.pauseDispatcher()
+    fun loadTask_loading() = runTest {
+        // Override eagerly executing Main dispatcher for just a single test
+        Dispatchers.setMain(StandardTestDispatcher())
 
         // Load the task in the viewmodel
         taskDetailViewModel.start(task.id)
@@ -175,7 +177,7 @@ class TaskDetailViewModelTest {
             assertThat(taskDetailViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
             // Execute pending coroutines actions
-            mainCoroutineRule.resumeDispatcher()
+            advanceUntilIdle()
 
             // Then progress indicator is hidden
             assertThat(taskDetailViewModel.dataLoading.getOrAwaitValue()).isFalse()

@@ -63,7 +63,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
 /**
  * Observes a [LiveData] until the `block` is done executing.
  */
-fun <T> LiveData<T>.observeForTesting(block: () -> Unit) {
+suspend fun <T> LiveData<T>.observeForTesting(block: suspend () -> Unit) {
     val observer = Observer<T> { }
     try {
         observeForever(observer)
