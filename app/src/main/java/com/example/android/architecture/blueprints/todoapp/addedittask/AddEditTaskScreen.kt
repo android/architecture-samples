@@ -90,7 +90,8 @@ private fun AddEditTaskContent(
 ) {
     if (loading) {
         SwipeRefresh(
-            state = rememberSwipeRefreshState(loading),
+            // Show the loading spinner—`loading` is `true` in this code path
+            state = rememberSwipeRefreshState(true),
             onRefresh = { /* DO NOTHING */ },
             content = { },
         )

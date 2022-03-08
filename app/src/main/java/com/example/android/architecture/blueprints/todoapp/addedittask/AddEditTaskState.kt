@@ -41,7 +41,7 @@ fun rememberAddEditTaskState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ): AddEditTaskState {
     val currentOnTaskUpdateState by rememberUpdatedState(onTaskUpdate)
-    return remember(viewModel, scaffoldState, lifecycleOwner) {
+    return remember(scaffoldState, viewModel, taskId, lifecycleOwner, context, coroutineScope) {
         AddEditTaskState(
             scaffoldState, viewModel, taskId, currentOnTaskUpdateState,
             lifecycleOwner, context, coroutineScope
