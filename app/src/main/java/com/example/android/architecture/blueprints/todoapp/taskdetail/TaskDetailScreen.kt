@@ -144,30 +144,6 @@ private fun EditTaskContent(
     }
 }
 
-// TODO: Add back when we completely migrate the app to Compose
-//@Composable
-//private fun TaskDetailTopAppBar(
-//    onBack: () -> Unit,
-//    onDelete: () -> Unit
-//) {
-//    TopAppBar(
-//        title = {
-//            Text(text = stringResource(id = R.string.task_details))
-//        },
-//        navigationIcon = {
-//            IconButton(onClick = onBack) {
-//                Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.menu_back))
-//            }
-//        },
-//        actions = {
-//            IconButton(onClick = onDelete) {
-//                Icon(Icons.Filled.Delete, stringResource(id = R.string.menu_delete_task))
-//            }
-//        },
-//        modifier = Modifier.fillMaxWidth()
-//    )
-//}
-
 @Preview
 @Composable
 private fun EditTaskContentPreview() {
@@ -218,13 +194,3 @@ private fun EditTaskContentEmptyPreview() {
         }
     }
 }
-
-//@Preview
-//@Composable
-//private fun TaskDetailTopAppBarPreview() {
-//    AppCompatTheme {
-//        Surface {
-//            TaskDetailTopAppBar({ }, { })
-//        }
-//    }
-//}

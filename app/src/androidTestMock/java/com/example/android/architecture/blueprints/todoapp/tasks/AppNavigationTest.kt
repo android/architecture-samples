@@ -68,7 +68,7 @@ class AppNavigationTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TasksActivity>()
-    private val activity by lazy { composeTestRule.activity }
+    private val activity get() = composeTestRule.activity
 
     @Before
     fun init() {

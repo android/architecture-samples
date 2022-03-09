@@ -72,7 +72,7 @@ class TasksActivityTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TasksActivity>()
-    private val activity by lazy { composeTestRule.activity }
+    private val activity get() = composeTestRule.activity
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
