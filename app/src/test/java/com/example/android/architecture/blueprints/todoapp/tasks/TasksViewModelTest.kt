@@ -71,33 +71,32 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() =
-        runTest {
-            // Override eagerly executing Main dispatcher for just a single test
-            Dispatchers.setMain(StandardTestDispatcher())
+    fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() = runTest {
+        // Override eagerly executing Main dispatcher for just a single test
+        Dispatchers.setMain(StandardTestDispatcher())
 
-            // Given an initialized TasksViewModel with initialized tasks
-            // When loading of Tasks is requested
-            tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+        // Given an initialized TasksViewModel with initialized tasks
+        // When loading of Tasks is requested
+        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
 
-            // Trigger loading of tasks
-            tasksViewModel.loadTasks(true)
-            // Observe the items to keep LiveData emitting
-            tasksViewModel.items.observeForTesting {
+        // Trigger loading of tasks
+        tasksViewModel.loadTasks(true)
+        // Observe the items to keep LiveData emitting
+        tasksViewModel.items.observeForTesting {
 
-                // Then progress indicator is shown
-                assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isTrue()
+            // Then progress indicator is shown
+            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
-                // Execute pending coroutines actions
-                advanceUntilIdle()
+            // Execute pending coroutines actions
+            advanceUntilIdle()
 
-                // Then progress indicator is hidden
-                assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
+            // Then progress indicator is hidden
+            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
 
-                // And data correctly loaded
-                assertThat(tasksViewModel.items.getOrAwaitValue()).hasSize(3)
-            }
+            // And data correctly loaded
+            assertThat(tasksViewModel.items.getOrAwaitValue()).hasSize(3)
         }
+    }
 
     @Test
     fun loadActiveTasksFromRepositoryAndLoadIntoView() = runTest {
