@@ -102,19 +102,18 @@ class TaskDetailViewModelTest {
         // Load the ViewModel
         taskDetailViewModel.start(task.id)
         // Start observing to compute transformations
-        taskDetailViewModel.task.observeForTesting {
+        taskDetailViewModel.task.observeForTesting {}
 
-            // Verify that the task was completed initially
-            assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
+        // Verify that the task was completed initially
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
 
-            // When the ViewModel is asked to complete the task
-            taskDetailViewModel.setCompleted(false)
+        // When the ViewModel is asked to complete the task
+        taskDetailViewModel.setCompleted(false)
 
-            // Then the task is not completed and the snackbar shows the correct message
-            val newTask = (tasksRepository.getTask(task.id) as Success).data
-            assertTrue(newTask.isActive)
-            assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
-        }
+        // Then the task is not completed and the snackbar shows the correct message
+        val newTask = (tasksRepository.getTask(task.id) as Success).data
+        assertTrue(newTask.isActive)
+        assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
     }
 
     @Test
