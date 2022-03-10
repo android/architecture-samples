@@ -15,14 +15,18 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.test.core.app.ActivityScenario
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
-import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
@@ -35,7 +39,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -48,20 +51,22 @@ import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Large End-to-End test for the tasks module.
- *
- * UI tests usually use [ActivityTestRule] but there's no API to perform an action before
- * each test. The workaround is to use `ActivityScenario.launch()` and `ActivityScenario.close()`.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class TasksActivityTest {
 
     private lateinit var repository: TasksRepository
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    private val activity by lazy { composeTestRule.activity }
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -104,11 +109,10 @@ class TasksActivityTest {
 
     @Test
     fun editTask() {
-        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
@@ -118,31 +122,27 @@ class TasksActivityTest {
 
         // Click on the edit button, edit, and save
         onView(withId(R.id.edit_task_fab)).perform(click())
-        onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
-        onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        findTextField("TITLE1").performTextReplacement("NEW TITLE")
+        findTextField("DESCRIPTION").performTextReplacement("NEW DESCRIPTION")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
         // Verify previous task is not displayed
         onView(withText("TITLE1")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createOneTask_deleteTask() {
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Add active task
         onView(withId(R.id.add_task_fab)).perform(click())
-        onView(withId(R.id.add_task_title_edit_text))
-            .perform(typeText("TITLE1"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        findTextField(R.string.title_hint).performTextInput("TITLE1")
+        findTextField(R.string.description_hint).performTextInput("DESCRIPTION")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -151,20 +151,17 @@ class TasksActivityTest {
 
         // Verify it was deleted
         onView(withId(R.id.menu_filter)).perform(click())
-        onView(withText(string.nav_all)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createTwoTasks_deleteOneTask() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Open the second task in details view
         onView(withText("TITLE2")).perform(click())
@@ -173,22 +170,19 @@ class TasksActivityTest {
 
         // Verify only one task was deleted
         onView(withId(R.id.menu_filter)).perform(click())
-        onView(withText(string.nav_all)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(matches(isDisplayed()))
         onView(withText("TITLE2")).check(doesNotExist())
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 active task
         val taskTitle = "COMPLETED"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
@@ -199,26 +193,23 @@ class TasksActivityTest {
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as completed
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 completed task
         val taskTitle = "ACTIVE"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
@@ -228,26 +219,23 @@ class TasksActivityTest {
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 active task
         val taskTitle = "ACT-COMP"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
@@ -259,26 +247,23 @@ class TasksActivityTest {
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(not(isChecked())))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
+
         // Add 1 completed task
         val taskTitle = "COMP-ACT"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        composeTestRule.waitForIdle()
 
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
@@ -290,33 +275,39 @@ class TasksActivityTest {
         // Click on the navigation up button to go back to the list
         onView(
             withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
+                composeTestRule.activityRule.scenario.getToolbarNavigationContentDescription()
             )
         ).perform(click())
 
         // Check that the task is marked as active
         onView(allOf(withId(R.id.complete_checkbox), hasSibling(withText(taskTitle))))
             .check(matches(isChecked()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
     }
 
     @Test
     fun createTask() {
-        // start up Tasks screen
-        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
+        dataBindingIdlingResource.monitorActivity(composeTestRule.activityRule.scenario)
 
         // Click on the "+" button, add details, and save
         onView(withId(R.id.add_task_fab)).perform(click())
-        onView(withId(R.id.add_task_title_edit_text))
-            .perform(typeText("title"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("description"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        findTextField(R.string.title_hint).performTextInput("title")
+        findTextField(R.string.description_hint).performTextInput("description")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
-        // Make sure the activity is closed before resetting the db:
-        activityScenario.close()
+    }
+
+    private fun findTextField(textId: Int): SemanticsNodeInteraction {
+        return composeTestRule.onNode(
+            hasSetTextAction() and hasText(activity.getString(textId))
+        )
+    }
+
+    private fun findTextField(text: String): SemanticsNodeInteraction {
+        return composeTestRule.onNode(
+            hasSetTextAction() and hasText(text)
+        )
     }
 }
