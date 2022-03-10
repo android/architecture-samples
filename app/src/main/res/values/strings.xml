@@ -30,6 +30,7 @@
     <string name="navigation_view_header_title">Todo</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter your task here.</string>
+    <string name="cd_save_task">Save task</string>
     <string name="empty_task_message">Tasks cannot be empty</string>
     <string name="successfully_saved_task_message">Task saved</string>
     <string name="list_title">Task List</string>

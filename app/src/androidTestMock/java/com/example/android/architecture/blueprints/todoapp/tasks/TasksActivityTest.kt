@@ -15,20 +15,22 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
-import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
@@ -41,7 +43,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
@@ -60,9 +61,6 @@ import org.junit.runner.RunWith
 
 /**
  * Large End-to-End test for the tasks module.
- *
- * UI tests usually use [ActivityTestRule] but there's no API to perform an action before
- * each test. The workaround is to use `ActivityScenario.launch()` and `ActivityScenario.close()`.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -129,9 +127,11 @@ class TasksActivityTest {
         // Click on the edit button, edit, and save
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
             .performClick()
-        onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("NEW TITLE"))
-        onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("NEW DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        onView(withId(R.id.edit_task_fab)).perform(click())
+        findTextField("TITLE1").performTextReplacement("NEW TITLE")
+        findTextField("DESCRIPTION").performTextReplacement("NEW DESCRIPTION")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Verify task is displayed on screen in the task list.
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
@@ -145,10 +145,10 @@ class TasksActivityTest {
 
         // Add active task
         onView(withId(R.id.add_task_fab)).perform(click())
-        onView(withId(R.id.add_task_title_edit_text))
-            .perform(typeText("TITLE1"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("DESCRIPTION"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        findTextField(R.string.title_hint).performTextInput("TITLE1")
+        findTextField(R.string.description_hint).performTextInput("DESCRIPTION")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Open it in details view
         onView(withText("TITLE1")).perform(click())
@@ -157,7 +157,7 @@ class TasksActivityTest {
 
         // Verify it was deleted
         onView(withId(R.id.menu_filter)).perform(click())
-        onView(withText(string.nav_all)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(doesNotExist())
     }
 
@@ -176,7 +176,7 @@ class TasksActivityTest {
 
         // Verify only one task was deleted
         onView(withId(R.id.menu_filter)).perform(click())
-        onView(withText(string.nav_all)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
         onView(withText("TITLE1")).check(matches(isDisplayed()))
         onView(withText("TITLE2")).check(doesNotExist())
     }
@@ -296,12 +296,24 @@ class TasksActivityTest {
 
         // Click on the "+" button, add details, and save
         onView(withId(R.id.add_task_fab)).perform(click())
-        onView(withId(R.id.add_task_title_edit_text))
-            .perform(typeText("title"), closeSoftKeyboard())
-        onView(withId(R.id.add_task_description_edit_text)).perform(typeText("description"))
-        onView(withId(R.id.save_task_fab)).perform(click())
+        findTextField(R.string.title_hint).performTextInput("title")
+        findTextField(R.string.description_hint).performTextInput("description")
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+            .performClick()
 
         // Then verify task is displayed on screen
         onView(withText("title")).check(matches(isDisplayed()))
+    }
+
+    private fun findTextField(textId: Int): SemanticsNodeInteraction {
+        return composeTestRule.onNode(
+            hasSetTextAction() and hasText(activity.getString(textId))
+        )
+    }
+
+    private fun findTextField(text: String): SemanticsNodeInteraction {
+        return composeTestRule.onNode(
+            hasSetTextAction() and hasText(text)
+        )
     }
 }
