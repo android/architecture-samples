@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
@@ -66,7 +70,7 @@ class TasksActivityTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TasksActivity>()
-    private val activity by lazy { composeTestRule.activity }
+    private val activity get() = composeTestRule.activity
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -116,11 +120,13 @@ class TasksActivityTest {
 
         // Click on the task on the list and verify that all the data is correct
         onView(withText("TITLE1")).perform(click())
-        onView(withId(R.id.task_detail_title_text)).check(matches(withText("TITLE1")))
-        onView(withId(R.id.task_detail_description_text)).check(matches(withText("DESCRIPTION")))
-        onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("DESCRIPTION").assertIsDisplayed()
+        composeTestRule.onNode(isToggleable()).assertIsOff()
 
         // Click on the edit button, edit, and save
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+            .performClick()
         onView(withId(R.id.edit_task_fab)).perform(click())
         findTextField("TITLE1").performTextReplacement("NEW TITLE")
         findTextField("DESCRIPTION").performTextReplacement("NEW DESCRIPTION")
@@ -188,7 +194,7 @@ class TasksActivityTest {
         onView(withText(taskTitle)).perform(click())
 
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -214,7 +220,7 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -240,9 +246,9 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
@@ -268,9 +274,9 @@ class TasksActivityTest {
         // Click on the task on the list
         onView(withText(taskTitle)).perform(click())
         // Click on the checkbox in task details screen
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
         // Click again to restore it to original state
-        onView(withId(R.id.task_detail_complete_checkbox)).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Click on the navigation up button to go back to the list
         onView(
