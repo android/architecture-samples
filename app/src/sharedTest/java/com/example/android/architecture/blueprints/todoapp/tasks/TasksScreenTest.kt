@@ -16,42 +16,34 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import android.os.Bundle
-import android.view.View
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ActivityScenario.launch
-import androidx.test.core.app.ApplicationProvider
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isToggleable
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.hasSibling
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.R.id
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.Matcher
-import org.hamcrest.core.IsNot.not
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.LooperMode
@@ -66,9 +58,13 @@ import org.robolectric.annotation.TextLayoutMode
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 @ExperimentalCoroutinesApi
-class TasksFragmentTest {
+class TasksScreenTest {
 
     private lateinit var repository: TasksRepository
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    private val activity get() = composeTestRule.activity
 
     @Before
     fun initRepository() {
@@ -87,55 +83,55 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
         // WHEN - On startup
-        launchActivity()
+        launchScreen()
 
         // THEN - Verify task is displayed on screen
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
     }
 
     @Test
     fun displayActiveTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launchActivity()
+        launchScreen()
 
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
-        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
     }
 
     @Test
     fun displayCompletedTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
-        launchActivity()
+        launchScreen()
 
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
-        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
 
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
     }
 
     @Test
     fun deleteOneTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launchActivity()
+        launchScreen()
 
         // Open it in details view
-        onView(withText("TITLE1")).perform(click())
+        composeTestRule.onNodeWithText("TITLE1").performClick()
 
         // Click delete task in menu
         onView(withId(R.id.menu_delete)).perform(click())
@@ -143,7 +139,7 @@ class TasksFragmentTest {
         // Verify it was deleted
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
-        onView(withText("TITLE1")).check(doesNotExist())
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
     }
 
     @Test
@@ -151,10 +147,10 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
 
-        launchActivity()
+        launchScreen()
 
         // Open it in details view
-        onView(withText("TITLE1")).perform(click())
+        composeTestRule.onNodeWithText("TITLE1").performClick()
 
         // Click delete task in menu
         onView(withId(R.id.menu_delete)).perform(click())
@@ -162,51 +158,51 @@ class TasksFragmentTest {
         // Verify it was deleted
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
-        onView(withText("TITLE1")).check(doesNotExist())
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
         // but not the other one
-        onView(withText("TITLE2")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
     }
 
     @Test
     fun markTaskAsComplete() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
 
-        launchActivity()
+        launchScreen()
 
         // Mark the task as complete
-        onView(checkboxWithText("TITLE1")).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Verify task is shown as complete
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
-        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
     }
 
     @Test
     fun markTaskAsActive() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1", true))
 
-        launchActivity()
+        launchScreen()
 
         // Mark the task as active
-        onView(checkboxWithText("TITLE1")).perform(click())
+        composeTestRule.onNode(isToggleable()).performClick()
 
         // Verify task is shown as active
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
-        onView(withText("TITLE1")).check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
     }
 
     @Test
@@ -215,13 +211,13 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
 
-        launchActivity()
+        launchScreen()
 
         // Verify that both of our tasks are shown
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
-        onView(withText("TITLE2")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
     }
 
     @Test
@@ -231,14 +227,14 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2"))
         repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
 
-        launchActivity()
+        launchScreen()
 
         // Verify that the active tasks (but not the completed task) are shown
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
-        onView(withText("TITLE2")).check(matches(isDisplayed()))
-        onView(withText("TITLE3")).check(doesNotExist())
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TITLE3").assertDoesNotExist()
     }
 
     @Test
@@ -248,14 +244,14 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
         repository.saveTaskBlocking(Task("TITLE3", "DESCRIPTION3", true))
 
-        launchActivity()
+        launchScreen()
 
         // Verify that the completed tasks (but not the active task) are shown
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
-        onView(withText("TITLE1")).check(doesNotExist())
-        onView(withText("TITLE2")).check(matches(isDisplayed()))
-        onView(withText("TITLE3")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
+        composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TITLE3").assertIsDisplayed()
     }
 
     @Test
@@ -264,7 +260,7 @@ class TasksFragmentTest {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION1"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION2", true))
 
-        launchActivity()
+        launchScreen()
 
         // Click clear completed in menu
         openActionBarOverflowOrOptionsMenu(getApplicationContext())
@@ -273,71 +269,64 @@ class TasksFragmentTest {
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
         // Verify that only the active task is shown
-        onView(withText("TITLE1")).check(matches(isDisplayed()))
-        onView(withText("TITLE2")).check(doesNotExist())
+        composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TITLE2").assertDoesNotExist()
     }
 
     @Test
     fun noTasks_AllTasksFilter_AddTaskViewVisible() {
-        launchActivity()
+        launchScreen()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_all)).perform(click())
 
         // Verify the "You have no tasks!" text is shown
-        onView(withText("You have no tasks!")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithText("You have no tasks!").assertIsDisplayed()
     }
 
     @Test
     fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
-        launchActivity()
+        launchScreen()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_completed)).perform(click())
 
         // Verify the "You have no completed tasks!" text is shown
-        onView(withText("You have no completed tasks!")).check(matches((isDisplayed())))
+        composeTestRule.onNodeWithText("You have no completed tasks!").assertIsDisplayed()
     }
 
     @Test
     fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
-        launchActivity()
+        launchScreen()
 
         onView(withId(R.id.menu_filter)).perform(click())
         onView(withText(R.string.nav_active)).perform(click())
 
         // Verify the "You have no active tasks!" text is shown
-        onView(withText("You have no active tasks!")).check(matches((isDisplayed())))
+        composeTestRule.onNodeWithText("You have no active tasks!").assertIsDisplayed()
     }
 
     @Test
     fun clickAddTaskButton_navigateToAddEditFragment() {
         // GIVEN - On the home screen
-        val scenario = launchFragmentInContainer<TasksFragment>(Bundle(), R.style.AppTheme)
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        scenario.onFragment {
-            navController.setGraph(R.navigation.nav_graph)
-            navController.setCurrentDestination(R.id.tasks_fragment_dest)
-            Navigation.setViewNavController(it.requireView(), navController)
-        }
+        launchScreen()
 
         // WHEN - Click on the "+" button
-        onView(withId(R.id.add_task_fab)).perform(click())
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.add_task))
+            .performClick()
 
         // THEN - Verify that we navigate to the add screen
-        assertEquals(navController.currentDestination?.id, id.add_edit_task_fragment_dest)
+        assertEquals(
+            activity.findNavController(R.id.nav_host_fragment).currentDestination?.id,
+            R.id.add_edit_task_fragment_dest
+        )
     }
 
-    private fun launchActivity(): ActivityScenario<TasksActivity>? {
-        val activityScenario = launch(TasksActivity::class.java)
-        activityScenario.onActivity { activity ->
-            // Disable animations in RecyclerView
-            (activity.findViewById(R.id.tasks_list) as RecyclerView).itemAnimator = null
+    private fun launchScreen() {
+        composeTestRule.activityRule.scenario.onActivity {
+            findNavController(it, R.id.nav_host_fragment).apply {
+                setGraph(R.navigation.nav_graph)
+            }
         }
-        return activityScenario
-    }
-
-    private fun checkboxWithText(text: String): Matcher<View> {
-        return allOf(withId(R.id.complete_checkbox), hasSibling(withText(text)))
     }
 }
