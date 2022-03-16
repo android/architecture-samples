@@ -29,7 +29,7 @@ class TasksActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppCompatTheme {
-                JetnewsNavGraph()
+                TodoNavGraph()
             }
         }
     }

@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -24,17 +25,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.pressBack
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
-import com.example.android.architecture.blueprints.todoapp.TasksActivity
+import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import com.google.accompanist.appcompattheme.AppCompatTheme
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -52,7 +52,7 @@ class AppNavigationTest {
     private lateinit var tasksRepository: TasksRepository
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val activity get() = composeTestRule.activity
 
     @Before
@@ -71,25 +71,10 @@ class AppNavigationTest {
         }
     }
 
-    /**
-     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
-     * are not scheduled in the main Looper (for example when executed on a different thread).
-     */
-    @Before
-    fun registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
-    }
-
-    /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-    }
-
     @Test
     fun drawerNavigationFromTasksToStatistics() {
+        setContent()
+
         openDrawer()
         // Start statistics screen.
         composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
@@ -107,6 +92,8 @@ class AppNavigationTest {
 
     @Test
     fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
+        setContent()
+
         // Check that left drawer is closed at startup
         composeTestRule.onNodeWithText(activity.getString(R.string.list_title))
             .assertIsNotDisplayed()
@@ -123,6 +110,8 @@ class AppNavigationTest {
 
     @Test
     fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
+        setContent()
+
         // When the user navigates to the stats screen
         openDrawer()
         composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
@@ -145,6 +134,8 @@ class AppNavigationTest {
         val taskName = "UI <- button"
         val task = Task(taskName, "Description")
         tasksRepository.saveTaskBlocking(task)
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -173,7 +164,8 @@ class AppNavigationTest {
         val taskName = "Back button"
         val task = Task(taskName, "Description")
         tasksRepository.saveTaskBlocking(task)
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
@@ -189,6 +181,14 @@ class AppNavigationTest {
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
+    }
+
+    private fun setContent() {
+        composeTestRule.setContent {
+            AppCompatTheme {
+                TodoNavGraph()
+            }
+        }
     }
 
     private fun openDrawer() {

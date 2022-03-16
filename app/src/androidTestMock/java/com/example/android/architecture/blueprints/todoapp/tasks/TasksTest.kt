@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -29,17 +30,16 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
-import com.example.android.architecture.blueprints.todoapp.TasksActivity
+import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
+import com.google.accompanist.appcompattheme.AppCompatTheme
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -51,30 +51,13 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class TasksActivityTest {
+class TasksTest {
 
     private lateinit var repository: TasksRepository
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<TasksActivity>()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val activity get() = composeTestRule.activity
-
-    /**
-     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
-     * are not scheduled in the main Looper (for example when executed on a different thread).
-     */
-    @Before
-    fun registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
-    }
-
-    /**
-     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
-     */
-    @After
-    fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-    }
 
     @Before
     fun init() {
@@ -96,7 +79,8 @@ class TasksActivityTest {
     fun editTask() {
         val originalTaskTitle = "TITLE1"
         repository.saveTaskBlocking(Task(originalTaskTitle, "DESCRIPTION"))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list and verify that all the data is correct
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -128,6 +112,8 @@ class TasksActivityTest {
 
     @Test
     fun createOneTask_deleteTask() {
+        setContent()
+
         val taskTitle = "TITLE1"
         // Add active task
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.add_task))
@@ -158,7 +144,8 @@ class TasksActivityTest {
     fun createTwoTasks_deleteOneTask() {
         repository.saveTaskBlocking(Task("TITLE1", "DESCRIPTION"))
         repository.saveTaskBlocking(Task("TITLE2", "DESCRIPTION"))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Open the second task in details view
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -181,7 +168,8 @@ class TasksActivityTest {
         // Add 1 active task
         val taskTitle = "COMPLETED"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -205,7 +193,8 @@ class TasksActivityTest {
         // Add 1 completed task
         val taskTitle = "ACTIVE"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -229,7 +218,8 @@ class TasksActivityTest {
         // Add 1 active task
         val taskTitle = "ACT-COMP"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION"))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -255,7 +245,8 @@ class TasksActivityTest {
         // Add 1 completed task
         val taskTitle = "COMP-ACT"
         repository.saveTaskBlocking(Task(taskTitle, "DESCRIPTION", true))
-        composeTestRule.waitForIdle()
+
+        setContent()
 
         // Click on the task on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
@@ -277,6 +268,8 @@ class TasksActivityTest {
 
     @Test
     fun createTask() {
+        setContent()
+
         // Click on the "+" button, add details, and save
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.add_task))
             .performClick()
@@ -288,6 +281,14 @@ class TasksActivityTest {
         // Then verify task is displayed on screen
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
         composeTestRule.onNodeWithText("title").assertIsDisplayed()
+    }
+
+    private fun setContent() {
+        composeTestRule.setContent {
+            AppCompatTheme {
+                TodoNavGraph()
+            }
+        }
     }
 
     private fun findTextField(textId: Int): SemanticsNodeInteraction {
