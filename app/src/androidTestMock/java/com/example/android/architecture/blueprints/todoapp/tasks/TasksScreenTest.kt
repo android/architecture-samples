@@ -42,17 +42,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.LooperMode
-import org.robolectric.annotation.TextLayoutMode
 
 /**
  * Integration test for the Task List screen.
  */
-// TODO - Use FragmentScenario, see: https://github.com/android/android-test/issues/291
+// TODO - Move to the sharedTest folder when https://issuetracker.google.com/224974381 is fixed
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@LooperMode(LooperMode.Mode.PAUSED)
-@TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
+// @LooperMode(LooperMode.Mode.PAUSED)
+// @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 @ExperimentalCoroutinesApi
 class TasksScreenTest {
 
