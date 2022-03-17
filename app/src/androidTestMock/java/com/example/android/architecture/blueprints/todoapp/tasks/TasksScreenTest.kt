@@ -28,6 +28,7 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -36,7 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -62,13 +62,18 @@ class TasksScreenTest {
 
     @Before
     fun initRepository() {
-        repository = FakeRepository()
-        ServiceLocator.tasksRepository = repository
+        // Run on UI thread to make sure the same instance of the SL is used.
+        runOnUiThread {
+            repository = FakeRepository()
+            ServiceLocator.tasksRepository = repository
+        }
     }
 
     @After
-    fun cleanupDb() = runBlockingTest {
-        ServiceLocator.resetRepository()
+    fun cleanupDb() {
+        runOnUiThread {
+            ServiceLocator.resetRepository()
+        }
     }
 
     @Test

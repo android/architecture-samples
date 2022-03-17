@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.activity.ComponentActivity
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -40,6 +41,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
+import kotlinx.coroutines.Dispatchers
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -59,11 +61,16 @@ class TasksTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val activity get() = composeTestRule.activity
 
+    // Executes tasks in the Architecture Components in the same thread
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Before
     fun init() {
         // Run on UI thread to make sure the same instance of the SL is used.
         runOnUiThread {
             ServiceLocator.createDataBase(getApplicationContext(), inMemory = true)
+            ServiceLocator.ioDispatcher = Dispatchers.Unconfined
             repository = ServiceLocator.provideTasksRepository(getApplicationContext())
         }
     }
@@ -72,6 +79,7 @@ class TasksTest {
     fun reset() {
         runOnUiThread {
             ServiceLocator.resetRepository()
+            ServiceLocator.resetIODispatcher()
         }
     }
 

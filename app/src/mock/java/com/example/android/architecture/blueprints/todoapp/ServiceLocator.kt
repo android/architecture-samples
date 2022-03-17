@@ -24,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -37,6 +39,10 @@ object ServiceLocator {
     private var database: ToDoDatabase? = null
     @Volatile
     var tasksRepository: TasksRepository? = null
+        @VisibleForTesting set
+
+    @Volatile
+    var ioDispatcher: CoroutineDispatcher = Dispatchers.IO
         @VisibleForTesting set
 
     fun provideTasksRepository(context: Context): TasksRepository {
@@ -53,7 +59,7 @@ object ServiceLocator {
 
     private fun createTaskLocalDataSource(context: Context): TasksDataSource {
         val database = database ?: createDataBase(context)
-        return TasksLocalDataSource(database.taskDao())
+        return TasksLocalDataSource(database.taskDao(), ioDispatcher)
     }
 
     @VisibleForTesting
@@ -83,6 +89,7 @@ object ServiceLocator {
     fun resetRepository() {
         synchronized(lock) {
             runBlocking {
+                tasksRepository?.deleteAllTasks()
                 FakeTasksRemoteDataSource.deleteAllTasks()
             }
             // Clear all data to avoid test pollution.
@@ -93,5 +100,10 @@ object ServiceLocator {
             database = null
             tasksRepository = null
         }
+    }
+
+    @VisibleForTesting
+    fun resetIODispatcher() {
+        ioDispatcher = Dispatchers.IO
     }
 }
