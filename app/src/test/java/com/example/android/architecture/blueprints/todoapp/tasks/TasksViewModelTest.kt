@@ -72,7 +72,7 @@ class TasksViewModelTest {
 
     @Test
     fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() = runTest {
-        // Override eagerly executing Main dispatcher for just a single test
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 
         // Given an initialized TasksViewModel with initialized tasks

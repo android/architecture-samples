@@ -162,7 +162,7 @@ class TaskDetailViewModelTest {
 
     @Test
     fun loadTask_loading() = runTest {
-        // Override eagerly executing Main dispatcher for just a single test
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 
         // Load the task in the viewmodel
