@@ -27,7 +27,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.Navigation.findNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
@@ -69,7 +68,9 @@ class AddEditTaskScreenTest {
                     AddEditTaskScreen(
                         viewModel = AddEditTaskViewModel(repository),
                         taskId = null,
-                        onTaskUpdate = { }
+                        topBarTitle = R.string.add_task,
+                        onTaskUpdate = { },
+                        onBack = { },
                     )
                 }
             }

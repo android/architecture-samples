@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  */
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.R
@@ -44,6 +42,7 @@ class StatisticsScreenTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val activity get() = composeTestRule.activity
 
     @Test
     fun tasks_showsNonEmptyMessage() {
@@ -56,14 +55,16 @@ class StatisticsScreenTest {
         composeTestRule.setContent {
             AppCompatTheme {
                 Surface {
-                    StatisticsScreen(StatisticsViewModel(repository))
+                    StatisticsScreen(
+                        openDrawer = { },
+                        viewModel = StatisticsViewModel(repository)
+                    )
                 }
             }
         }
 
-        val expectedActiveTaskText = getApplicationContext<Context>()
-            .getString(R.string.statistics_active_tasks, 50.0f)
-        val expectedCompletedTaskText = getApplicationContext<Context>()
+        val expectedActiveTaskText = activity.getString(R.string.statistics_active_tasks, 50.0f)
+        val expectedCompletedTaskText = activity
             .getString(R.string.statistics_completed_tasks, 50.0f)
 
         // check that both info boxes are displayed and contain the correct info

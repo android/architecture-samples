@@ -19,7 +19,6 @@ import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -36,18 +35,14 @@ class DefaultTasksRepository(
 ) : TasksRepository {
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
-        // Set app as busy while this function executes.
-        wrapEspressoIdlingResource {
-
-            if (forceUpdate) {
-                try {
-                    updateTasksFromRemoteDataSource()
-                } catch (ex: Exception) {
-                    return Result.Error(ex)
-                }
+        if (forceUpdate) {
+            try {
+                updateTasksFromRemoteDataSource()
+            } catch (ex: Exception) {
+                return Result.Error(ex)
             }
-            return tasksLocalDataSource.getTasks()
         }
+        return tasksLocalDataSource.getTasks()
     }
 
     override suspend fun refreshTasks() {
@@ -92,13 +87,10 @@ class DefaultTasksRepository(
      * Relies on [getTasks] to fetch data and picks the task with the same ID.
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-        // Set app as busy while this function executes.
-        wrapEspressoIdlingResource {
-            if (forceUpdate) {
-                updateTaskFromRemoteDataSource(taskId)
-            }
-            return tasksLocalDataSource.getTask(taskId)
+        if (forceUpdate) {
+            updateTaskFromRemoteDataSource(taskId)
         }
+        return tasksLocalDataSource.getTask(taskId)
     }
 
     override suspend fun saveTask(task: Task) {

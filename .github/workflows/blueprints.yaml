@@ -3,10 +3,10 @@ name: blueprints
 on:
   push:
     branches:
-      - main
+      - dev-compose
   pull_request:
     branches:
-      - main
+      - dev-compose
 
 jobs:
   build:
