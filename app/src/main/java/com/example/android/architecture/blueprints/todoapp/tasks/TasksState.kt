@@ -30,6 +30,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/**
+ * Create and remember a [TasksState]
+ */
 @Composable
 fun rememberTasksState(
     @StringRes userMessage: Int,
@@ -39,6 +42,8 @@ fun rememberTasksState(
     context: Context = LocalContext.current,
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ): TasksState {
+    // If any of the parameters passed to `remember` change, a new instance of TasksState
+    // will be created, and the old one will be destroyed.
     return remember(
         userMessage, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope
     ) {

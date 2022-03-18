@@ -31,6 +31,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/**
+ * Create and remember a [TaskDetailState].
+ */
 @Composable
 fun rememberTaskDetailState(
     taskId: String,
@@ -42,6 +45,8 @@ fun rememberTaskDetailState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ): TaskDetailState {
     val onDeleteTaskUpdateState by rememberUpdatedState(onDeleteTask)
+    // If any of the parameters passed to `remember` change, a new instance of TaskDetailState
+    // will be created, and the old one will be destroyed.
     return remember(taskId, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope) {
         TaskDetailState(
             scaffoldState, viewModel, coroutineScope, onDeleteTaskUpdateState, taskId,

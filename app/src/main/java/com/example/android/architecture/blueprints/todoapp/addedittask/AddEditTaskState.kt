@@ -31,6 +31,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/**
+ * Create and remember a [AddEditTaskState].
+ */
 @Composable
 fun rememberAddEditTaskState(
     taskId: String?,
@@ -42,6 +45,8 @@ fun rememberAddEditTaskState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ): AddEditTaskState {
     val currentOnTaskUpdateState by rememberUpdatedState(onTaskUpdate)
+    // If any of the parameters passed to `remember` change, a new instance of AddEditTaskState
+    // will be created, and the old one will be destroyed.
     return remember(taskId, viewModel, scaffoldState, lifecycleOwner, context, coroutineScope) {
         AddEditTaskState(
             scaffoldState, viewModel, taskId, currentOnTaskUpdateState,
