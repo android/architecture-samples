@@ -27,6 +27,7 @@ import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding
 import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.tasks.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
@@ -73,8 +74,9 @@ class AddEditTaskFragment : Fragment() {
         viewModel.taskUpdatedEvent.observe(
             viewLifecycleOwner,
             EventObserver {
+                val resultCode = if (viewModel.isNewTask) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                 val action = AddEditTaskFragmentDirections
-                    .actionAddEditTaskFragmentToTasksFragment(ADD_EDIT_RESULT_OK)
+                    .actionAddEditTaskFragmentToTasksFragment(resultCode)
                 findNavController().navigate(action)
             }
         )

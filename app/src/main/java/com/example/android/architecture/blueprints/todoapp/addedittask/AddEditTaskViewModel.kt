@@ -51,7 +51,7 @@ class AddEditTaskViewModel(
 
     private var taskId: String? = null
 
-    private var isNewTask: Boolean = false
+    var isNewTask: Boolean = false
 
     private var isDataLoaded = false
 
