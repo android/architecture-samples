@@ -140,7 +140,7 @@ jobs:
 
       - name: Run all tests pixel 2 api 30 ATD
         working-directory: ${{ env.SAMPLE_PATH }}
-        run: ./gradlew -Pandroid.sdk.channel=3 pixel2api30atdMockDebugAndroidTest
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=2 pixel2api30atdMockDebugAndroidTest
 
       - name: Upload test reports
         if: always()
