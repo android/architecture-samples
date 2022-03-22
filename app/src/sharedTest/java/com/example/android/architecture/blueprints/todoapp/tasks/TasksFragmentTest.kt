@@ -25,8 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -265,7 +265,7 @@ class TasksFragmentTest {
         launchActivity()
 
         // Click clear completed in menu
-        Espresso.openContextualActionModeOverflowMenu()
+        openContextualActionModeOverflowMenu()
         onView(withText(R.string.menu_clear)).perform(click())
 
         onView(withId(R.id.menu_filter)).perform(click())
