@@ -96,6 +96,10 @@ jobs:
         with:
           java-version: 11
 
+      # Needed to accept licenses
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
 #      - name: Generate cache key for Gradle cache
 #        run: ./scripts/checksum.sh $SAMPLE_PATH checksum.txt
 #
