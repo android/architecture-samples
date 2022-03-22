@@ -96,16 +96,16 @@ jobs:
         with:
           java-version: 11
 
-      - name: Generate cache key for Gradle cache
-        run: ./scripts/checksum.sh $SAMPLE_PATH checksum.txt
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches/modules-*
-            ~/.gradle/caches/jars-*
-            ~/.gradle/caches/build-cache-*
-          key: gradle-${{ hashFiles('checksum.txt') }}
+#      - name: Generate cache key for Gradle cache
+#        run: ./scripts/checksum.sh $SAMPLE_PATH checksum.txt
+#
+#      - uses: actions/cache@v2
+#        with:
+#          path: |
+#            ~/.gradle/caches/modules-*
+#            ~/.gradle/caches/jars-*
+#            ~/.gradle/caches/build-cache-*
+#          key: gradle-${{ hashFiles('checksum.txt') }}
 
       - name: Cache pixel2api30 system image
         uses: actions/cache@v2
