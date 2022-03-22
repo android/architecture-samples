@@ -77,3 +77,70 @@ jobs:
         with:
           name: test-reports
           path: app/build/reports/
+
+
+  gradleManagedVirtualDevicesTest:
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Generate cache key for Gradle cache
+        run: ./scripts/checksum.sh $SAMPLE_PATH checksum.txt
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/modules-*
+            ~/.gradle/caches/jars-*
+            ~/.gradle/caches/build-cache-*
+          key: gradle-${{ hashFiles('checksum.txt') }}
+
+      - name: Cache pixel2api30 system image
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.android/gradle/avd/dev30_aosp-atd_x86_Pixel_2.avd.*
+          key: pixel2api30
+
+      - name: Cache pixel2api27 system image
+        uses: actions/cache@v2
+        with:
+          path: ~/.android/gradle/avd/dev27_aosp_x86_Pixel_2.*
+          key: pixel2api27
+
+      - name: Cache nexus9api29 system image
+        uses: actions/cache@v2
+        with:
+          path: ~/.android/gradle/avd/dev29_aosp_x86_Nexus_9.*
+          key: nexus9api29
+
+#      - name: Run all tests pixel 2 api 27 ATD
+#        working-directory: ${{ env.SAMPLE_PATH }}
+#        run: ./gradlew pixel2api27atdMockDebugAndroidTest
+#
+#      - name: Run all tests nexus 9 api 29 ATD
+#        working-directory: ${{ env.SAMPLE_PATH }}
+#        run: ./gradlew nexus9api29atdMockDebugAndroidTest
+
+      - name: Run all tests pixel 2 api 30 ATD
+        working-directory: ${{ env.SAMPLE_PATH }}
+        run: ./gradlew pixel2api30atdMockDebugAndroidTest
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-reports
+          path: ${{ env.SAMPLE_PATH }}/app/build/reports/androidTests/managedDevice/

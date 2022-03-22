@@ -102,6 +102,31 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "$composeVersion"
     }
+
+    testOptions {
+        devices {
+            pixel2api30atd(com.android.build.api.dsl.ManagedVirtualDevice) {
+                // Use device profiles you typically see in Android Studio
+                device = "Pixel 2"
+                apiLevel = 30
+                // You can also specify "google" if you require Google Play Services.
+                systemImageSource = "aosp-atd"
+                abi = "x86"
+            }
+            pixel2api27atd(com.android.build.api.dsl.ManagedVirtualDevice) {
+                device = "Pixel 2"
+                apiLevel = 27
+                systemImageSource = "aosp-atd"
+                abi = "x86"
+            }
+            nexus9api29atd(com.android.build.api.dsl.ManagedVirtualDevice) {
+                device = "Nexus 9"
+                apiLevel = 29
+                systemImageSource = "aosp-atd"
+                abi = "x86"
+            }
+        }
+    }
 }
 
 /*
