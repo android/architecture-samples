@@ -88,7 +88,7 @@ class AddEditTaskViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
 
         // Load the task in the viewmodel
-        addEditTaskViewModel.start(task.id)
+//        addEditTaskViewModel.start(task.id)
 
         // Then progress indicator is shown
         assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isTrue()
@@ -106,7 +106,7 @@ class AddEditTaskViewModelTest {
         tasksRepository.addTasks(task)
 
         // Load the task with the viewmodel
-        addEditTaskViewModel.start(task.id)
+//        addEditTaskViewModel.start(task.id)
 
         // Verify a task is loaded
         assertThat(addEditTaskViewModel.title.getOrAwaitValue()).isEqualTo(task.title)
