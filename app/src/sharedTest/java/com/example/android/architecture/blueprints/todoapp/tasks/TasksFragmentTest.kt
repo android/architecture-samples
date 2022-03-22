@@ -25,9 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -46,7 +45,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
 import org.hamcrest.core.IsNot.not
@@ -77,7 +75,7 @@ class TasksFragmentTest {
     }
 
     @After
-    fun cleanupDb() = runBlockingTest {
+    fun cleanupDb() {
         ServiceLocator.resetRepository()
     }
 
@@ -267,7 +265,7 @@ class TasksFragmentTest {
         launchActivity()
 
         // Click clear completed in menu
-        openActionBarOverflowOrOptionsMenu(getApplicationContext())
+        openContextualActionModeOverflowMenu()
         onView(withText(R.string.menu_clear)).perform(click())
 
         onView(withId(R.id.menu_filter)).perform(click())

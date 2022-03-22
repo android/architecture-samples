@@ -36,7 +36,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -63,7 +62,7 @@ class AddEditTaskFragmentTest {
     }
 
     @After
-    fun cleanupDb() = runBlockingTest {
+    fun cleanupDb() {
         ServiceLocator.resetRepository()
     }
 

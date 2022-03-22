@@ -31,7 +31,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Before
@@ -55,7 +54,7 @@ class TaskDetailFragmentTest {
     }
 
     @After
-    fun cleanupDb() = runBlockingTest {
+    fun cleanupDb() {
         ServiceLocator.resetRepository()
     }
 
