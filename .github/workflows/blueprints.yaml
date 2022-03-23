@@ -144,16 +144,16 @@ jobs:
           name: build-reports
           path: app/build/reports/
 
-      - name: Upload emulator logs
+      - name: Upload all outputs
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: emulator-logs
-          path: ./app/build/outputs/androidTest-results/managedDevice/**
+          name: outputs
+          path: app/build/outputs/
 
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-reports
-          path: ./app/build/reports/androidTests/managedDevice/
+#      - name: Upload test reports
+#        if: always()
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: test-reports
+#          path: ./app/build/reports/androidTests/managedDevice/
