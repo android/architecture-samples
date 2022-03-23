@@ -36,12 +36,7 @@ jobs:
       - name: Build project
         run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
 
-      - name: Upload build reports
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-reports
-          path: app/build/reports/
+
 
 #  test:
 #    needs: build
@@ -141,6 +136,13 @@ jobs:
       - name: Run all tests pixel 2 api 30 ATD
         working-directory: .
         run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=2 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
+
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-reports
+          path: app/build/reports/
 
       - name: Upload emulator logs
         if: failure()
