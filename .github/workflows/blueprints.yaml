@@ -147,12 +147,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: emulator-logs
-          path: |
-            app/build/outputs/androidTest-results/managedDevice/**
+          path: ./app/build/outputs/androidTest-results/managedDevice/**
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: test-reports
-          path: app/build/reports/androidTests/managedDevice/
+          path: ./app/build/reports/androidTests/managedDevice/
