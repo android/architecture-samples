@@ -157,6 +157,7 @@ jobs:
 #        with:
 #          name: test-reports
 #          path: ./app/build/reports/androidTests/managedDevice/
+
       - name: Upload emulator logs
         if: failure()
         uses: actions/upload-artifact@v2
