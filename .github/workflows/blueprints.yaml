@@ -139,7 +139,7 @@ jobs:
 #        run: ./gradlew nexus9api29atdMockDebugAndroidTest
 
       - name: Run all tests pixel 2 api 30 ATD
-        working-directory: ${{ env.SAMPLE_PATH }}
+        working-directory: .
         run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=2 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
 
       - name: Upload emulator logs
@@ -148,13 +148,11 @@ jobs:
         with:
           name: emulator-logs
           path: |
-            ${{ env.SAMPLE_PATH }}/app/build/outputs/androidTest-results/managedDevice/**
-            !${{ env.SAMPLE_PATH }}/**/*:*.xml
-            !${{ env.SAMPLE_PATH }}/**/*|*
+            app/build/outputs/androidTest-results/managedDevice/**
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: test-reports
-          path: ${{ env.SAMPLE_PATH }}/app/build/reports/androidTests/managedDevice/
+          path: app/build/reports/androidTests/managedDevice/
