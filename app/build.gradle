@@ -113,6 +113,14 @@ android {
                 systemImageSource = "aosp-atd"
                 abi = "x86"
             }
+            pixel2api30(com.android.build.api.dsl.ManagedVirtualDevice) {
+                // Use device profiles you typically see in Android Studio
+                device = "Pixel 2"
+                apiLevel = 30
+                // You can also specify "google" if you require Google Play Services.
+                systemImageSource = "aosp"
+                abi = "x86"
+            }
             pixel2api27atd(com.android.build.api.dsl.ManagedVirtualDevice) {
                 device = "Pixel 2"
                 apiLevel = 27
