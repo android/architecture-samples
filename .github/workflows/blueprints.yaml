@@ -68,13 +68,7 @@ jobs:
 #        with:
 #          java-version: 11
 #
-#      - name: Run instrumentation tests
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: ${{ matrix.api-level }}
-#          arch: x86
-#          disable-animations: true
-#          script: ./gradlew app:cMDAT --stacktrace
+
 #
 #      - name: Upload test reports
 #        if: always()
@@ -146,6 +140,14 @@ jobs:
       - name: Run all tests pixel 2 api 30 ATD
         working-directory: .
         run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
+
+      - name: Run instrumentation tests API 30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86
+          disable-animations: true
+          script: ./gradlew app:cMDAT --stacktrace
 
       - name: Upload build reports
         if: always()
