@@ -33,10 +33,20 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Build project
+      - name: Build project Mock
+        run: ./gradlew assembleMockDebug assembleProdDebug
+
+      - name: Spotless
+        run: ./gradlew spotlessCheck
+
+      - name: Robolectric Mock
+        run: ./gradlew testMockDebugUnitTest
+
+      - name: Build project Prod
+        run: ./gradlew assembleMockDebug assembleProdDebug
+
+      - name: Robolectric Prod
         run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
-
-
 
 #  test:
 #    needs: build
@@ -106,24 +116,24 @@ jobs:
 #            ~/.gradle/caches/build-cache-*
 #          key: gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Cache pixel2api30 system image
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.android/gradle/avd/dev30_aosp-atd_x86_Pixel_2.avd.*
-          key: pixel2api30
-
-      - name: Cache pixel2api27 system image
-        uses: actions/cache@v2
-        with:
-          path: ~/.android/gradle/avd/dev27_aosp_x86_Pixel_2.*
-          key: pixel2api27
-
-      - name: Cache nexus9api29 system image
-        uses: actions/cache@v2
-        with:
-          path: ~/.android/gradle/avd/dev29_aosp_x86_Nexus_9.*
-          key: nexus9api29
+#      - name: Cache pixel2api30 system image
+#        uses: actions/cache@v2
+#        with:
+#          path: |
+#            ~/.android/gradle/avd/dev30_aosp-atd_x86_Pixel_2.avd.*
+#          key: pixel2api30
+#
+#      - name: Cache pixel2api27 system image
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.android/gradle/avd/dev27_aosp_x86_Pixel_2.*
+#          key: pixel2api27
+#
+#      - name: Cache nexus9api29 system image
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.android/gradle/avd/dev29_aosp_x86_Nexus_9.*
+#          key: nexus9api29
 
 #      - name: Run all tests pixel 2 api 27 ATD
 #        working-directory: ${{ env.SAMPLE_PATH }}
