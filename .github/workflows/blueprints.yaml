@@ -33,8 +33,8 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Build project Mock
-        run: ./gradlew assembleMockDebug assembleProdDebug
+      - name: Build project Mock and UnitTest
+        run: ./gradlew assembleMockDebug assembleProdDebug compileMockDebugUnitTestKotlin
 
       - name: Spotless
         run: ./gradlew spotlessCheck
@@ -42,8 +42,8 @@ jobs:
       - name: Robolectric Mock
         run: ./gradlew testMockDebugUnitTest
 
-      - name: Build project Prod
-        run: ./gradlew assembleMockDebug assembleProdDebug
+      - name: Build project Prod and UnitTest
+        run: ./gradlew assembleMockDebug assembleProdDebug compileProdDebugUnitTestKotlin
 
       - name: Robolectric Prod
         run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
