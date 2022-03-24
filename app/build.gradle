@@ -121,16 +121,16 @@ android {
                 systemImageSource = "aosp"
                 abi = "x86"
             }
-            pixel2api27atd(com.android.build.api.dsl.ManagedVirtualDevice) {
+            pixel2api27(com.android.build.api.dsl.ManagedVirtualDevice) {
                 device = "Pixel 2"
                 apiLevel = 27
-                systemImageSource = "aosp-atd"
+                systemImageSource = "aosp"
                 abi = "x86"
             }
-            nexus9api29atd(com.android.build.api.dsl.ManagedVirtualDevice) {
+            nexus9api29(com.android.build.api.dsl.ManagedVirtualDevice) {
                 device = "Nexus 9"
                 apiLevel = 29
-                systemImageSource = "aosp-atd"
+                systemImageSource = "aosp"
                 abi = "x86"
             }
         }
