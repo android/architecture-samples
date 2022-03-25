@@ -144,6 +144,18 @@ jobs:
         working-directory: .
         run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
 
+      - name: Run all tests pixel 2 api 30 ATD again
+        working-directory: .
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
+
+      - name: Run all tests pixel 2 api 30 non-atd
+        working-directory: .
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30MockDebugAndroidTest
+
+      - name: Run all tests pixel 2 api 30 non-atd again
+        working-directory: .
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30MockDebugAndroidTest
+
       - name: Run instrumentation tests API 30
         uses: reactivecircus/android-emulator-runner@v2
         with:
