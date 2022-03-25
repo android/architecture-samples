@@ -164,6 +164,16 @@ jobs:
           disable-animations: true
           script: ./gradlew app:cMDAT --stacktrace
 
+      - name: Run instrumentation tests API 30 ATD
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86
+          channel: canary
+          target: aosp_atd
+          disable-animations: true
+          script: ./gradlew app:cMDAT --stacktrace
+
       - name: Upload build reports
         if: always()
         uses: actions/upload-artifact@v2
