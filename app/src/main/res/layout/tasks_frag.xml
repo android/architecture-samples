@@ -109,6 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{() -> viewmodel.addNewTask()}"
             android:src="@drawable/ic_add"
             android:visibility="@{viewmodel.tasksAddViewVisible ? View.VISIBLE : View.GONE}"
             app:fabSize="normal"
