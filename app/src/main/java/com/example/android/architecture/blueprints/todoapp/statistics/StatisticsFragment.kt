@@ -51,7 +51,7 @@ class StatisticsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewDataBinding.viewmodel = viewModel
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
-        this.setupRefreshLayout(viewDataBinding.refreshLayout)
+        viewDataBinding.lifecycleOwner = viewLifecycleOwner
+        setupRefreshLayout(viewDataBinding.refreshLayout)
     }
 }

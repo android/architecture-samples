@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
+import java.util.*
 
 /**
  * Immutable model class for a Task. In order to compile with Room, we can't use @JvmOverloads to
@@ -38,7 +38,7 @@ data class Task @JvmOverloads constructor(
 ) {
 
     val titleForList: String
-        get() = if (title.isNotEmpty()) title else description
+        get() = title.ifEmpty { description }
 
     val isActive
         get() = !isCompleted

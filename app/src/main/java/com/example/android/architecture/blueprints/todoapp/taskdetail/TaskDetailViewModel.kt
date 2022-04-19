@@ -16,12 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Result
@@ -42,21 +37,26 @@ class TaskDetailViewModel(
     private val _task = _taskId.switchMap { taskId ->
         tasksRepository.observeTask(taskId).map { computeResult(it) }
     }
-    val task: LiveData<Task?> = _task
+    val task: LiveData<Task?>
+        get() = _task
 
     val isDataAvailable: LiveData<Boolean> = _task.map { it != null }
 
     private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    val dataLoading: LiveData<Boolean>
+        get() = _dataLoading
 
     private val _editTaskEvent = MutableLiveData<Event<Unit>>()
-    val editTaskEvent: LiveData<Event<Unit>> = _editTaskEvent
+    val editTaskEvent: LiveData<Event<Unit>>
+        get() = _editTaskEvent
 
     private val _deleteTaskEvent = MutableLiveData<Event<Unit>>()
-    val deleteTaskEvent: LiveData<Event<Unit>> = _deleteTaskEvent
+    val deleteTaskEvent: LiveData<Event<Unit>>
+        get() = _deleteTaskEvent
 
     private val _snackbarText = MutableLiveData<Event<Int>>()
-    val snackbarText: LiveData<Event<Int>> = _snackbarText
+    val snackbarText: LiveData<Event<Int>>
+        get() = _snackbarText
 
     // This LiveData depends on another so we can use a transformation.
     val completed: LiveData<Boolean> = _task.map { input: Task? ->
@@ -91,7 +91,9 @@ class TaskDetailViewModel(
             return
         }
         // Trigger the load
-        _taskId.value = taskId
+        taskId?.let {
+            _taskId.value = it
+        }
     }
 
     private fun computeResult(taskResult: Result<Task>): Task? {

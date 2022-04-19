@@ -53,7 +53,7 @@ class AddEditTaskFragment : Fragment() {
             this.viewmodel = viewModel
         }
         // Set the lifecycle owner to the lifecycle of the view
-        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        viewDataBinding.lifecycleOwner = viewLifecycleOwner
         return viewDataBinding.root
     }
 
@@ -66,7 +66,7 @@ class AddEditTaskFragment : Fragment() {
     }
 
     private fun setupSnackbar() {
-        view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
+        viewDataBinding.root.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
     }
 
     private fun setupNavigation() {
