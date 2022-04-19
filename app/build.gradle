@@ -173,6 +173,5 @@ dependencies {
     androidTestImplementation "com.google.android.material:material:$materialVersion"
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 }
