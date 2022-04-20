@@ -55,7 +55,7 @@ class TaskDetailFragment : Fragment() {
 
     private fun setupNavigation() {
         viewModel.deleteTaskEvent.observe(
-            this,
+            viewLifecycleOwner,
             EventObserver {
                 val action = TaskDetailFragmentDirections
                     .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
@@ -63,7 +63,7 @@ class TaskDetailFragment : Fragment() {
             }
         )
         viewModel.editTaskEvent.observe(
-            this,
+            viewLifecycleOwner,
             EventObserver {
                 val action = TaskDetailFragmentDirections
                     .actionTaskDetailFragmentToAddEditTaskFragment(
