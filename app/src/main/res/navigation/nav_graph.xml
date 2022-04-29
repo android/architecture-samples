@@ -18,12 +18,14 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
+    xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/tasks_fragment_dest">
 
     <fragment
         android:id="@+id/task_detail_fragment_dest"
         android:name="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailFragment"
-        android:label="Task Details">
+        android:label="Task Details"
+        tools:layout="@layout/taskdetail_frag">
         <action
             android:id="@+id/action_taskDetailFragment_to_addEditTaskFragment"
             app:destination="@id/add_edit_task_fragment_dest" />
@@ -37,7 +39,8 @@
     <fragment
         android:id="@+id/statistics_fragment_dest"
         android:name="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsFragment"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        tools:layout="@layout/statistics_frag">
         <action
             android:id="@+id/action_statisticsFragment_to_tasksFragment"
             app:destination="@id/tasks_fragment_dest"
@@ -46,7 +49,8 @@
     <fragment
         android:id="@+id/tasks_fragment_dest"
         android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        tools:layout="@layout/tasks_frag">
         <action
             android:id="@+id/action_tasksFragment_to_statisticsFragment"
             app:destination="@id/statistics_fragment_dest" />
@@ -64,7 +68,8 @@
     <fragment
         android:id="@+id/add_edit_task_fragment_dest"
         android:name="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment"
-        android:label="{title}">
+        android:label="{title}"
+        tools:layout="@layout/addtask_frag">
         <argument
             android:name="taskId"
             app:argType="string"
