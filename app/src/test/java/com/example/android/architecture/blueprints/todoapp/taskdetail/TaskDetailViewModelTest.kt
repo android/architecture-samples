@@ -140,17 +140,7 @@ class TaskDetailViewModelTest {
     }
 
     @Test
-    fun clickOnEditTask_SetsEvent() {
-        // When opening a new task
-        taskDetailViewModel.editTask()
-
-        // Then the event is triggered
-        val value = taskDetailViewModel.editTaskEvent.getOrAwaitValue()
-        assertThat(value.getContentIfNotHandled()).isNotNull()
-    }
-
-    @Test
-    fun deleteTask() {
+    fun deleteTask() = runTest {
         assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
         taskDetailViewModel.start(task.id)
 

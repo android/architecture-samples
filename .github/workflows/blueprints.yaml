@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - views
   pull_request:
     branches:
       - main
+      - views
 
 jobs:
   build:

@@ -30,7 +30,3 @@ fun TasksRepository.saveTaskBlocking(task: Task) = runBlocking {
 fun TasksRepository.getTasksBlocking(forceUpdate: Boolean) = runBlocking {
     this@getTasksBlocking.getTasks(forceUpdate)
 }
-
-fun TasksRepository.deleteAllTasksBlocking() = runBlocking {
-    this@deleteAllTasksBlocking.deleteAllTasks()
-}

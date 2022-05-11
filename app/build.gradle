@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -77,6 +76,10 @@ android {
         }
     }
 
+    buildFeatures {
+        compose true
+    }
+
     dataBinding {
         enabled = true
         enabledForTests = true
@@ -95,6 +98,10 @@ android {
         exclude 'META-INF/AL2.0'
         exclude 'META-INF/LGPL2.1'
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "$composeVersion"
+    }
 }
 
 /*
@@ -104,14 +111,9 @@ android {
 dependencies {
 
     // App dependencies
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.cardview:cardview:$cardVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.annotation:annotation:$androidXAnnotations"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
-    implementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
@@ -122,8 +124,19 @@ dependencies {
     implementation "androidx.room:room-ktx:$roomVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$archLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
+
+    // Jetpack Compose
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.compose.animation:animation:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
+    implementation "androidx.navigation:navigation-compose:$navigationVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$archLifecycleVersion"
+    implementation "com.google.accompanist:accompanist-appcompat-theme:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$junitVersion"
@@ -137,19 +150,18 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
+    testImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 
     // Dependencies for Android unit tests
     androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 
     // AndroidX Test - JVM testing
     testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
     testImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
     testImplementation "androidx.test:rules:$androidXTestRulesVersion"
-    // Once https://issuetracker.google.com/127986458 is fixed this can be testImplementation
-    debugImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
     implementation "androidx.test:core:$androidXTestCoreVersion"
-    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
 
     // AndroidX Test - Instrumented testing
     androidTestImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
@@ -165,14 +177,6 @@ dependencies {
     androidTestImplementation "org.robolectric:annotations:$robolectricVersion"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
 
-    // Resolve conflicts between main and test APK:
-    androidTestImplementation "androidx.annotation:annotation:$androidXAnnotations"
-    androidTestImplementation "androidx.legacy:legacy-support-v4:$androidXLegacySupport"
-    androidTestImplementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    androidTestImplementation "androidx.appcompat:appcompat:$appCompatVersion"
-    androidTestImplementation "com.google.android.material:material:$materialVersion"
-
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 }
