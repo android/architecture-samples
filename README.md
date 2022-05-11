@@ -7,7 +7,7 @@ Android Architecture Blueprints is a project to showcase different architectural
 
 In this branch you'll find:
 *   User Interface built with **[Jetpack Compose](https://developer.android.com/jetpack/compose)** 
-*   A single-activity architecture, using the **[Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)**.
+*   A single-activity architecture, using **[Navigation Compose](https://developer.android.com/jetpack/compose/navigation)**.
 *   A presentation layer that contains a Compose screen (View) and a **ViewModel** per screen (or feature).
 *   Reactive UIs using **[LiveData](https://developer.android.com/topic/libraries/architecture/livedata)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
 *   A **data layer** with a repository and two data sources (local using Room and a fake remote).
