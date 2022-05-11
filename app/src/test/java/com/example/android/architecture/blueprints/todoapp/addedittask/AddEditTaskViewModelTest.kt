@@ -23,7 +23,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,11 +48,11 @@ class AddEditTaskViewModelTest {
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    val mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     private val task = Task("Title1", "Description1")
 
@@ -78,9 +83,9 @@ class AddEditTaskViewModelTest {
     }
 
     @Test
-    fun loadTasks_loading() {
-        // Pause dispatcher so we can verify initial values
-        mainCoroutineRule.pauseDispatcher()
+    fun loadTasks_loading() = runTest {
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
+        Dispatchers.setMain(StandardTestDispatcher())
 
         // Load the task in the viewmodel
         addEditTaskViewModel.start(task.id)
@@ -89,7 +94,7 @@ class AddEditTaskViewModelTest {
         assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
         // Execute pending coroutines actions
-        mainCoroutineRule.resumeDispatcher()
+        advanceUntilIdle()
 
         // Then progress indicator is hidden
         assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()

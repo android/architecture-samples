@@ -3,10 +3,12 @@ name: blueprints
 on:
   push:
     branches:
-      - dev-compose
+      - main
+      - views
   pull_request:
     branches:
-      - dev-compose
+      - main
+      - views
 
 jobs:
   build:
@@ -49,7 +51,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        api-level: [23, 29]
+        api-level: [24, 29]
 
     steps:
       - name: Checkout

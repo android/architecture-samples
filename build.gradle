@@ -53,7 +53,7 @@ ext {
     archLifecycleVersion = '2.4.1'
     archTestingVersion = '2.1.0'
     composeVersion = '1.1.1'
-    coroutinesVersion = '1.5.2'
+    coroutinesVersion = '1.6.0'
     dexMakerVersion = '2.12.1'
     espressoVersion = '3.5.0-alpha04'
     hamcrestVersion = '1.3'

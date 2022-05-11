@@ -25,7 +25,10 @@ import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +41,7 @@ class StatisticsViewModelTest {
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     // Subject under test
     private lateinit var statisticsViewModel: StatisticsViewModel
@@ -49,7 +52,7 @@ class StatisticsViewModelTest {
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    val mainCoroutineRule = MainCoroutineRule()
 
     @Before
     fun setupStatisticsViewModel() {
@@ -59,7 +62,7 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadEmptyTasksFromRepository_EmptyResults() = mainCoroutineRule.runBlockingTest {
+    fun loadEmptyTasksFromRepository_EmptyResults() = runTest {
         // Given an initialized StatisticsViewModel with no tasks
 
         // Then the results are empty
@@ -85,7 +88,7 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
+    fun loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() = runTest {
         val errorViewModel = StatisticsViewModel(
             DefaultTasksRepository(
                 FakeFailingTasksRemoteDataSource,
@@ -100,9 +103,9 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadTasks_loading() {
-        // Pause dispatcher so we can verify initial values
-        mainCoroutineRule.pauseDispatcher()
+    fun loadTasks_loading() = runTest {
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
+        Dispatchers.setMain(StandardTestDispatcher())
 
         // Load the task in the viewmodel
         statisticsViewModel.refresh()
@@ -111,7 +114,7 @@ class StatisticsViewModelTest {
         assertThat(statisticsViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
         // Execute pending coroutines actions
-        mainCoroutineRule.resumeDispatcher()
+        advanceUntilIdle()
 
         // Then progress indicator is hidden
         assertThat(statisticsViewModel.dataLoading.getOrAwaitValue()).isFalse()
