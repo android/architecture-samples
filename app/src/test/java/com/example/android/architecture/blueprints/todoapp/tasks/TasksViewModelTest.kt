@@ -29,8 +29,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepos
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,11 +54,11 @@ class TasksViewModelTest {
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    val mainCoroutineRule = MainCoroutineRule()
 
     // Executes each task synchronously using Architecture Components.
     @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setupViewModel() {
@@ -69,9 +73,9 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() {
-        // Pause dispatcher so we can verify initial values
-        mainCoroutineRule.pauseDispatcher()
+    fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() = runTest {
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
+        Dispatchers.setMain(StandardTestDispatcher())
 
         // Given an initialized TasksViewModel with initialized tasks
         // When loading of Tasks is requested
@@ -86,7 +90,7 @@ class TasksViewModelTest {
             assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isTrue()
 
             // Execute pending coroutines actions
-            mainCoroutineRule.resumeDispatcher()
+            advanceUntilIdle()
 
             // Then progress indicator is hidden
             assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
@@ -97,7 +101,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadActiveTasksFromRepositoryAndLoadIntoView() {
+    fun loadActiveTasksFromRepositoryAndLoadIntoView() = runTest {
         // Given an initialized TasksViewModel with initialized tasks
         // When loading of Tasks is requested
         tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
@@ -106,7 +110,6 @@ class TasksViewModelTest {
         tasksViewModel.loadTasks(true)
         // Observe the items to keep LiveData emitting
         tasksViewModel.items.observeForTesting {
-
             // Then progress indicator is hidden
             assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
 
@@ -116,7 +119,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadCompletedTasksFromRepositoryAndLoadIntoView() {
+    fun loadCompletedTasksFromRepositoryAndLoadIntoView() = runTest {
         // Given an initialized TasksViewModel with initialized tasks
         // When loading of Tasks is requested
         tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
@@ -135,7 +138,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadTasks_error() {
+    fun loadTasks_error() = runTest {
         // Make the repository return errors
         tasksRepository.setReturnError(true)
 
@@ -156,7 +159,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clearCompletedTasks_clearsTasks() = mainCoroutineRule.runBlockingTest {
+    fun clearCompletedTasks_clearsTasks() = runTest {
         // When completed tasks are cleared
         tasksViewModel.clearCompletedTasks()
 
@@ -207,7 +210,10 @@ class TasksViewModelTest {
         tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         // The snackbar is updated
-        assertSnackbarMessage(tasksViewModel.snackbarText, R.string.successfully_deleted_task_message)
+        assertSnackbarMessage(
+            tasksViewModel.snackbarText,
+            R.string.successfully_deleted_task_message
+        )
     }
 
     @Test
