@@ -1,4 +1,4 @@
-# Android Architecture Blueprints v2
+# Android Architecture Blueprints
 <p align="center">
 <img src="https://github.com/googlesamples/android-architecture/wiki/images/aab-logov2.png" alt="Illustration by Virginia Poltrack"/>
 </p>
@@ -6,13 +6,14 @@
 Android Architecture Blueprints is a project to showcase different architectural approaches to developing Android apps. In its different branches you'll find the same app (a TODO app) implemented with small differences.
 
 In this branch you'll find:
-*   Kotlin **[Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html)** for background operations.
-*   A single-activity architecture, using the **[Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)** to manage fragment operations.
-*   A presentation layer that contains a fragment (View) and a **ViewModel** per screen (or feature).
-*   Reactive UIs using **LiveData** observables and **Data Binding**.
-*   A **data layer** with a repository and two data sources (local using Room and remote) that are queried with one-shot operations (no listeners or data streams).
-*   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html) (except in the Dagger branch).
+*   User Interface built with **[Jetpack Compose](https://developer.android.com/jetpack/compose)** 
+*   A single-activity architecture, using the **[Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)**.
+*   A presentation layer that contains a Compose screen (View) and a **ViewModel** per screen (or feature).
+*   Reactive UIs using **[Kotlin Flows](https://kotlinlang.org/docs/flow.html)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
+*   A **data layer** with a repository and two data sources (local using Room and a fake remote).
+*   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 *   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device or Robolectric.
+*   A simple service locator for inversion of control.
 
 ## Variations
 
@@ -21,13 +22,10 @@ This project hosts each sample app in separate repository branches. For more inf
 ### Stable samples - Kotlin
 |     Sample     | Description |
 | ------------- | ------------- |
-| [master](https://github.com/googlesamples/android-architecture/tree/master) | The base for the rest of the branches. <br/>Uses Kotlin, Architecture Components, coroutines, Data Binding, etc. and uses Room as source of truth, with a reactive UI. |
-| [dagger-android](https://github.com/googlesamples/android-architecture/tree/dagger-android)<br/>[[compare](https://github.com/googlesamples/android-architecture/compare/dagger-android#files_bucket)] | A simple Dagger setup that uses `dagger-android` and removes the two flavors. |
-| [usecases](https://github.com/googlesamples/android-architecture/tree/usecases)<br/>[[compare](https://github.com/googlesamples/android-architecture/compare/usecases#files_bucket)] | Adds a new domain layer that uses UseCases for business logic. |
-
-### Old samples - Kotlin and Java
-
-Blueprints v1 had a collection of samples that are not maintained anymore, but can still be useful. See [all project branches](https://github.com/googlesamples/android-architecture/branches).
+| [main](https://github.com/googlesamples/android-architecture/tree/main) | This branch |
+| [hilt](https://github.com/googlesamples/android-architecture/tree/hilt) | A simple Hilt setup that removes the two flavors and service locator (not using Compose yet) |
+| [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
+| [views](https://github.com/googlesamples/android-architecture/tree/views) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
 
 ## Why a to-do app?
 
@@ -37,9 +35,9 @@ The app in this project aims to be simple enough that you can understand it quic
 
 ## What is it not?
 
-*   A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on architecture. Check out [Plaid](https://github.com/android/plaid) instead.
-*   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [Github Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
-*   A real production app with network access, user authentication, etc. Check out the [Google I/O app](https://github.com/google/iosched), [Santa Tracker](https://github.com/google/santa-tracker-android) or [Tivi](https://github.com/chrisbanes/tivi) for that.
+*   A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on architecture. Check out the [Compose Samples](https://github.com/android/compose-samples) instead.
+*   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [GitHub Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
+*   A real production app with network access, user authentication, etc. Check out the [Google I/O app](https://github.com/google/iosched) instead.
 
 ## Who is it for?
 
@@ -53,7 +51,7 @@ To open one of the samples in Android Studio, begin by checking out one of the s
 Clone the repository:
 
 ```
-git clone git@github.com:googlesamples/android-architecture.git
+git clone git@github.com:android/architecture-samples.git
 ```
 This step checks out the master branch. If you want to change to a different sample: 
 
@@ -63,13 +61,13 @@ git checkout usecases
 
 **Note:** To review a different sample, replace `usecases` with the name of sample you want to check out.
 
-Finally open the `android-architecture/` directory in Android Studio.
+Finally open the `architecture-samples/` directory in Android Studio.
 
 ### License
 
 
 ```
-Copyright 2019 Google, Inc.
+Copyright 2022 Google, Inc.
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements. See the NOTICE file distributed with this work for
