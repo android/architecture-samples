@@ -136,7 +136,7 @@ private fun EditTaskContent(
                     .fillMaxWidth()
                     .then(screenPadding),
 
-                ) {
+            ) {
                 Checkbox(task?.isCompleted ?: false, onTaskCheck)
                 Column {
                     Text(text = task?.title ?: "", style = MaterialTheme.typography.h6)
