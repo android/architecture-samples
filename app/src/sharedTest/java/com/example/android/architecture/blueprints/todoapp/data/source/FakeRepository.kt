@@ -16,15 +16,14 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import java.util.LinkedHashMap
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -35,7 +34,7 @@ class FakeRepository : TasksRepository {
 
     private var shouldReturnError = false
 
-    private val observableTasks = MutableLiveData<Result<List<Task>>>()
+    private val observableTasks = MutableStateFlow(runBlocking { getTasks() })
 
     fun setReturnError(value: Boolean) {
         shouldReturnError = value
@@ -49,19 +48,19 @@ class FakeRepository : TasksRepository {
         refreshTasks()
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<Result<List<Task>>> {
         runBlocking { refreshTasks() }
         return observableTasks
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
         runBlocking { refreshTasks() }
         return observableTasks.map { tasks ->
             when (tasks) {
                 is Result.Loading -> Result.Loading
                 is Error -> Error(tasks.exception)
                 is Success -> {
-                    val task = tasks.data.firstOrNull() { it.id == taskId }
+                    val task = tasks.data.firstOrNull { it.id == taskId }
                         ?: return@map Error(Exception("Not found"))
                     Success(task)
                 }

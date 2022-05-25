@@ -16,21 +16,18 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
-import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -56,10 +53,6 @@ class TasksViewModelTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
-    // Executes each task synchronously using Architecture Components.
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
-
     @Before
     fun setupViewModel() {
         // We initialise the tasks to 3, with one active and two completed
@@ -82,22 +75,19 @@ class TasksViewModelTest {
         tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
 
         // Trigger loading of tasks
-        tasksViewModel.loadTasks(true)
-        // Observe the items to keep LiveData emitting
-        tasksViewModel.items.observeForTesting {
+        tasksViewModel.refresh()
 
-            // Then progress indicator is shown
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isTrue()
+        // Then progress indicator is shown
+        assertThat(tasksViewModel.uiState.first().isLoading).isTrue()
 
-            // Execute pending coroutines actions
-            advanceUntilIdle()
+        // Execute pending coroutines actions
+        advanceUntilIdle()
 
-            // Then progress indicator is hidden
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        // Then progress indicator is hidden
+        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-            // And data correctly loaded
-            assertThat(tasksViewModel.items.getOrAwaitValue()).hasSize(3)
-        }
+        // And data correctly loaded
+        assertThat(tasksViewModel.uiState.first().items).hasSize(3)
     }
 
     @Test
@@ -107,15 +97,13 @@ class TasksViewModelTest {
         tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
 
         // Load tasks
-        tasksViewModel.loadTasks(true)
-        // Observe the items to keep LiveData emitting
-        tasksViewModel.items.observeForTesting {
-            // Then progress indicator is hidden
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        tasksViewModel.refresh()
 
-            // And data correctly loaded
-            assertThat(tasksViewModel.items.getOrAwaitValue()).hasSize(1)
-        }
+        // Then progress indicator is hidden
+        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+
+        // And data correctly loaded
+        assertThat(tasksViewModel.uiState.first().items).hasSize(1)
     }
 
     @Test
@@ -125,16 +113,13 @@ class TasksViewModelTest {
         tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
 
         // Load tasks
-        tasksViewModel.loadTasks(true)
-        // Observe the items to keep LiveData emitting
-        tasksViewModel.items.observeForTesting {
+        tasksViewModel.refresh()
 
-            // Then progress indicator is hidden
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        // Then progress indicator is hidden
+        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-            // And data correctly loaded
-            assertThat(tasksViewModel.items.getOrAwaitValue()).hasSize(2)
-        }
+        // And data correctly loaded
+        assertThat(tasksViewModel.uiState.first().items).hasSize(2)
     }
 
     @Test
@@ -143,19 +128,14 @@ class TasksViewModelTest {
         tasksRepository.setReturnError(true)
 
         // Load tasks
-        tasksViewModel.loadTasks(true)
-        // Observe the items to keep LiveData emitting
-        tasksViewModel.items.observeForTesting {
+        tasksViewModel.refresh()
 
-            // Then progress indicator is hidden
-            assertThat(tasksViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        // Then progress indicator is hidden
+        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-            // And the list of items is empty
-            assertThat(tasksViewModel.items.getOrAwaitValue()).isEmpty()
-
-            // And the snackbar updated
-            assertSnackbarMessage(tasksViewModel.snackbarText, R.string.loading_tasks_error)
-        }
+        // And the list of items is empty
+        assertThat(tasksViewModel.uiState.first().items).isEmpty()
+        assertThat(tasksViewModel.uiState.first().userMessage).isEqualTo(R.string.loading_tasks_error)
     }
 
     @Test
@@ -164,10 +144,10 @@ class TasksViewModelTest {
         tasksViewModel.clearCompletedTasks()
 
         // Fetch tasks
-        tasksViewModel.loadTasks(true)
+        tasksViewModel.refresh()
 
         // Fetch tasks
-        val allTasks = tasksViewModel.items.getOrAwaitValue()
+        val allTasks = tasksViewModel.uiState.first().items
         val completedTasks = allTasks.filter { it.isCompleted }
 
         // Verify there are no completed tasks left
@@ -177,47 +157,42 @@ class TasksViewModelTest {
         assertThat(allTasks).hasSize(1)
 
         // Verify snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.completed_tasks_cleared
-        )
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.completed_tasks_cleared)
     }
 
     @Test
-    fun showEditResultMessages_editOk_snackbarUpdated() {
+    fun showEditResultMessages_editOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
         tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
 
         // The snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.successfully_saved_task_message
-        )
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_saved_task_message)
     }
 
     @Test
-    fun showEditResultMessages_addOk_snackbarUpdated() {
+    fun showEditResultMessages_addOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
         tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
 
         // The snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.successfully_added_task_message
-        )
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_added_task_message)
     }
 
     @Test
-    fun showEditResultMessages_deleteOk_snackbarUpdated() {
+    fun showEditResultMessages_deleteOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
         tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         // The snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText,
-            R.string.successfully_deleted_task_message
-        )
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_deleted_task_message)
     }
 
     @Test
-    fun completeTask_dataAndSnackbarUpdated() {
+    fun completeTask_dataAndSnackbarUpdated() = runTest {
         // With a repository that has an active task
         val task = Task("Title", "Description")
         tasksRepository.addTasks(task)
@@ -229,13 +204,12 @@ class TasksViewModelTest {
         assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
 
         // The snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.task_marked_complete
-        )
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.task_marked_complete)
     }
 
     @Test
-    fun activateTask_dataAndSnackbarUpdated() {
+    fun activateTask_dataAndSnackbarUpdated() = runTest {
         // With a repository that has a completed task
         val task = Task("Title", "Description", true)
         tasksRepository.addTasks(task)
@@ -247,17 +221,7 @@ class TasksViewModelTest {
         assertThat(tasksRepository.tasksServiceData[task.id]?.isActive).isTrue()
 
         // The snackbar is updated
-        assertSnackbarMessage(
-            tasksViewModel.snackbarText, R.string.task_marked_active
-        )
-    }
-
-    @Test
-    fun getTasksAddViewVisible() {
-        // When the filter type is ALL_TASKS
-        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
-
-        // Then the "Add task" action is visible
-        assertThat(tasksViewModel.tasksAddViewVisible.getOrAwaitValue()).isTrue()
+        assertThat(tasksViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.task_marked_active)
     }
 }

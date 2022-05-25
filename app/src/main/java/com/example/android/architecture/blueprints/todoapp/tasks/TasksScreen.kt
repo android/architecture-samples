@@ -41,8 +41,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -59,6 +59,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
@@ -70,11 +71,10 @@ fun TasksScreen(
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = viewModel(factory = getViewModelFactory()),
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    state: TasksState = rememberTasksState(userMessage, viewModel, scaffoldState)
+    scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
-        scaffoldState = state.scaffoldState,
+        scaffoldState = scaffoldState,
         topBar = {
             TasksTopAppBar(
                 openDrawer = openDrawer,
@@ -92,23 +92,35 @@ fun TasksScreen(
             }
         }
     ) { paddingValues ->
-        val loading by viewModel.dataLoading.observeAsState(initial = false)
-        val items by viewModel.items.observeAsState(initial = emptyList())
-        val filteringLabel by viewModel.currentFilteringLabel.observeAsState(R.string.label_all)
-        val noTasksLabel by viewModel.noTasksLabel.observeAsState(initial = R.string.no_tasks_all)
-        val noTasksIconRes by viewModel.noTaskIconRes.observeAsState(R.drawable.logo_no_fill)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         TasksContent(
-            loading = loading,
-            tasks = items,
-            currentFilteringLabel = filteringLabel,
-            noTasksLabel = noTasksLabel,
-            noTasksIconRes = noTasksIconRes,
+            loading = uiState.isLoading,
+            tasks = uiState.items,
+            currentFilteringLabel = uiState.filteringUiInfo.currentFilteringLabel,
+            noTasksLabel = uiState.filteringUiInfo.noTasksLabel,
+            noTasksIconRes = uiState.filteringUiInfo.noTaskIconRes,
             onRefresh = viewModel::refresh,
             onTaskClick = onTaskClick,
             onTaskCheckedChange = viewModel::completeTask,
             modifier = Modifier.padding(paddingValues)
         )
+
+        // Check for user messages to display on the screen
+        uiState.userMessage?.let { message ->
+            val snackbarText = stringResource(message)
+            LaunchedEffect(scaffoldState, viewModel, message, snackbarText) {
+                scaffoldState.snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
+
+        // Check if there's a userMessage to show to the user
+        LaunchedEffect(userMessage) {
+            if (userMessage != 0) {
+                viewModel.showEditResultMessage(userMessage)
+            }
+        }
     }
 }
 

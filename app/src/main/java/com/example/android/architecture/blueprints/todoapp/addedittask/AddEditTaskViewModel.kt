@@ -16,127 +16,133 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+/**
+ * UiState for the Add/Edit screen
+ */
+data class AddEditTaskUiState(
+    val title: String = "",
+    val description: String = "",
+    val isTaskCompleted: Boolean = false,
+    val isLoading: Boolean = false,
+    val userMessage: Int? = null,
+    val isTaskSaved: Boolean = false
+)
 
 /**
  * ViewModel for the Add/Edit screen.
  */
 class AddEditTaskViewModel(
-    private val tasksRepository: TasksRepository
+    private val tasksRepository: TasksRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // Two-way databinding, exposing MutableLiveData
-    val title = MutableLiveData<String>()
+    private val taskId: String? = savedStateHandle.get(TodoDestinationsArgs.TASK_ID_ARG)
 
-    // Two-way databinding, exposing MutableLiveData
-    val description = MutableLiveData<String>()
+    private val _uiState = MutableStateFlow(AddEditTaskUiState())
+    val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
-
-    private val _snackbarText = MutableLiveData<Int?>()
-    val snackbarText: LiveData<Int?> = _snackbarText
-
-    private val _taskUpdatedEvent = MutableLiveData(false)
-    val taskUpdatedEvent: LiveData<Boolean> = _taskUpdatedEvent
-
-    private var taskId: String? = null
-
-    private var isNewTask: Boolean = false
-
-    private var isDataLoaded = false
-
-    private var taskCompleted = false
-
-    fun start(taskId: String?) {
-        if (_dataLoading.value == true) {
-            return
+    init {
+        if (taskId != null) {
+            loadTask(taskId)
         }
-
-        this.taskId = taskId
-        if (taskId == null) {
-            // No need to populate, it's a new task
-            isNewTask = true
-            return
-        }
-        if (isDataLoaded) {
-            // No need to populate, already have data.
-            return
-        }
-
-        isNewTask = false
-        _dataLoading.value = true
-
-        viewModelScope.launch {
-            tasksRepository.getTask(taskId).let { result ->
-                if (result is Success) {
-                    onTaskLoaded(result.data)
-                } else {
-                    onDataNotAvailable()
-                }
-            }
-        }
-    }
-
-    private fun onTaskLoaded(task: Task) {
-        title.value = task.title
-        description.value = task.description
-        taskCompleted = task.isCompleted
-        _dataLoading.value = false
-        isDataLoaded = true
-    }
-
-    private fun onDataNotAvailable() {
-        _dataLoading.value = false
     }
 
     // Called when clicking on fab.
     fun saveTask() {
-        val currentTitle = title.value
-        val currentDescription = description.value
-
-        if (currentTitle == null || currentDescription == null) {
-            _snackbarText.value = R.string.empty_task_message
-            return
-        }
-        if (Task(currentTitle, currentDescription).isEmpty) {
-            _snackbarText.value = R.string.empty_task_message
+        if (uiState.value.title.isEmpty() || uiState.value.description.isEmpty()) {
+            _uiState.update {
+                it.copy(userMessage = R.string.empty_task_message)
+            }
             return
         }
 
-        val currentTaskId = taskId
-        if (isNewTask || currentTaskId == null) {
-            createTask(Task(currentTitle, currentDescription))
+        if (taskId == null) {
+            createNewTask()
         } else {
-            val task = Task(currentTitle, currentDescription, taskCompleted, currentTaskId)
-            updateTask(task)
+            updateTask()
         }
     }
 
     fun snackbarMessageShown() {
-        _snackbarText.value = null
+        _uiState.update {
+            it.copy(userMessage = null)
+        }
     }
 
-    private fun createTask(newTask: Task) = viewModelScope.launch {
+    fun updateTitle(newTitle: String) {
+        _uiState.update {
+            it.copy(title = newTitle)
+        }
+    }
+
+    fun updateDescription(newDescription: String) {
+        _uiState.update {
+            it.copy(description = newDescription)
+        }
+    }
+
+    private fun createNewTask() = viewModelScope.launch {
+        val newTask = Task(uiState.value.title, uiState.value.description)
         tasksRepository.saveTask(newTask)
-        _taskUpdatedEvent.value = true
+        _uiState.update {
+            it.copy(isTaskSaved = true)
+        }
     }
 
-    private fun updateTask(task: Task) {
-        if (isNewTask) {
+    private fun updateTask() {
+        if (taskId == null) {
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            tasksRepository.saveTask(task)
-            _taskUpdatedEvent.value = true
+            val updatedTask = Task(
+                title = uiState.value.title,
+                description = uiState.value.description,
+                isCompleted = uiState.value.isTaskCompleted,
+                id = taskId
+            )
+            tasksRepository.saveTask(updatedTask)
+            _uiState.update {
+                it.copy(isTaskSaved = true)
+            }
+        }
+    }
+
+    private fun loadTask(taskId: String) {
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch {
+            tasksRepository.getTask(taskId).let { result ->
+                if (result is Success) {
+                    val task = result.data
+                    _uiState.update {
+                        it.copy(
+                            title = task.title,
+                            description = task.description,
+                            isTaskCompleted = task.isCompleted,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(isLoading = false)
+                    }
+                }
+            }
         }
     }
 }

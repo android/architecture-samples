@@ -15,13 +15,13 @@
  */
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
-import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,34 +44,33 @@ class AddEditTaskViewModelTest {
 
     // Use a fake repository to be injected into the viewmodel
     private lateinit var tasksRepository: FakeRepository
+    private val task = Task(title = "Title1", description = "Description1", id = "0")
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
-    // Executes each task synchronously using Architecture Components.
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
-
-    private val task = Task("Title1", "Description1")
-
     @Before
     fun setupViewModel() {
         // We initialise the repository with no tasks
-        tasksRepository = FakeRepository()
-
-        // Create class under test
-        addEditTaskViewModel = AddEditTaskViewModel(tasksRepository)
+        tasksRepository = FakeRepository().apply {
+            addTasks(task)
+        }
     }
 
     @Test
     fun saveNewTaskToRepository_showsSuccessMessageUi() {
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
+
         val newTitle = "New Task Title"
         val newDescription = "Some Task Description"
-        (addEditTaskViewModel).apply {
-            title.value = newTitle
-            description.value = newDescription
+        addEditTaskViewModel.apply {
+            updateTitle(newTitle)
+            updateDescription(newDescription)
         }
         addEditTaskViewModel.saveTask()
 
@@ -87,73 +86,79 @@ class AddEditTaskViewModelTest {
         // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 
-        // Load the task in the viewmodel
-        addEditTaskViewModel.start(task.id)
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
 
         // Then progress indicator is shown
-        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isTrue()
+        assertThat(addEditTaskViewModel.uiState.value.isLoading).isTrue()
 
         // Execute pending coroutines actions
         advanceUntilIdle()
 
         // Then progress indicator is hidden
-        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        assertThat(addEditTaskViewModel.uiState.value.isLoading).isFalse()
     }
 
     @Test
     fun loadTasks_taskShown() {
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
+
         // Add task to repository
         tasksRepository.addTasks(task)
 
-        // Load the task with the viewmodel
-        addEditTaskViewModel.start(task.id)
-
         // Verify a task is loaded
-        assertThat(addEditTaskViewModel.title.getOrAwaitValue()).isEqualTo(task.title)
-        assertThat(addEditTaskViewModel.description.getOrAwaitValue()).isEqualTo(task.description)
-        assertThat(addEditTaskViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        val uiState = addEditTaskViewModel.uiState.value
+        assertThat(uiState.title).isEqualTo(task.title)
+        assertThat(uiState.description).isEqualTo(task.description)
+        assertThat(uiState.isLoading).isFalse()
     }
 
     @Test
     fun saveNewTaskToRepository_emptyTitle_error() {
-        saveTaskAndAssertSnackbarError("", "Some Task Description")
-    }
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
 
-    @Test
-    fun saveNewTaskToRepository_nullTitle_error() {
-        saveTaskAndAssertSnackbarError(null, "Some Task Description")
+        saveTaskAndAssertUserMessage("", "Some Task Description")
     }
 
     @Test
     fun saveNewTaskToRepository_emptyDescription_error() {
-        saveTaskAndAssertSnackbarError("Title", "")
-    }
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
 
-    @Test
-    fun saveNewTaskToRepository_nullDescription_error() {
-        saveTaskAndAssertSnackbarError("Title", null)
-    }
-
-    @Test
-    fun saveNewTaskToRepository_nullDescriptionNullTitle_error() {
-        saveTaskAndAssertSnackbarError(null, null)
+        saveTaskAndAssertUserMessage("Title", "")
     }
 
     @Test
     fun saveNewTaskToRepository_emptyDescriptionEmptyTitle_error() {
-        saveTaskAndAssertSnackbarError("", "")
+        addEditTaskViewModel = AddEditTaskViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
+
+        saveTaskAndAssertUserMessage("", "")
     }
 
-    private fun saveTaskAndAssertSnackbarError(title: String?, description: String?) {
-        (addEditTaskViewModel).apply {
-            this.title.value = title
-            this.description.value = description
+    private fun saveTaskAndAssertUserMessage(title: String, description: String) {
+        addEditTaskViewModel.apply {
+            updateTitle(title)
+            updateDescription(description)
         }
 
         // When saving an incomplete task
         addEditTaskViewModel.saveTask()
 
-        // Then the snackbar shows an error
-        assertSnackbarMessage(addEditTaskViewModel.snackbarText, string.empty_task_message)
+        assertThat(
+            addEditTaskViewModel.uiState.value.userMessage
+        ).isEqualTo(string.empty_task_message)
     }
 }

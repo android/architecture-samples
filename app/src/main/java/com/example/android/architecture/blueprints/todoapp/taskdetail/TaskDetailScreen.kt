@@ -27,61 +27,78 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
-import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
+import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.google.accompanist.appcompattheme.AppCompatTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun TaskDetailScreen(
-    taskId: String,
+    viewModel: TaskDetailViewModel,
     onEditTask: (String) -> Unit,
     onBack: () -> Unit,
     onDeleteTask: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskDetailViewModel = viewModel(factory = getViewModelFactory()),
-    state: TaskDetailState = rememberTaskDetailState(taskId, viewModel, onDeleteTask)
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
     Scaffold(
-        scaffoldState = state.scaffoldState,
+        scaffoldState = scaffoldState,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TaskDetailTopAppBar(onBack = onBack, onDelete = state::onDelete)
+            TaskDetailTopAppBar(
+                onBack = onBack,
+                onDelete = {
+                    coroutineScope.launch {
+                        viewModel.deleteTask()
+                        onDeleteTask()
+                    }
+                }
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEditTask(taskId) }) {
+            FloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
                 Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
             }
         }
     ) { paddingValues ->
-        val loading by viewModel.dataLoading.observeAsState(initial = false)
-        val dataAvailable by viewModel.isDataAvailable.observeAsState(initial = true)
-        val completed by viewModel.completed.observeAsState(initial = false)
-        val task by viewModel.task.observeAsState()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         EditTaskContent(
-            loading = loading,
-            empty = !dataAvailable,
-            task = task,
-            taskCompleted = completed,
+            loading = uiState.isLoading,
+            empty = uiState.task == null,
+            task = uiState.task,
             onRefresh = viewModel::refresh,
             onTaskCheck = viewModel::setCompleted,
             modifier = Modifier.padding(paddingValues)
         )
+
+        // Check for user messages to display on the screen
+        uiState.userMessage?.let { userMessage ->
+            val snackbarText = stringResource(userMessage)
+            LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
+                scaffoldState.snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
     }
 }
 
@@ -90,7 +107,6 @@ private fun EditTaskContent(
     loading: Boolean,
     empty: Boolean,
     task: Task?,
-    taskCompleted: Boolean,
     onTaskCheck: (Boolean) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -120,8 +136,8 @@ private fun EditTaskContent(
                     .fillMaxWidth()
                     .then(screenPadding),
 
-            ) {
-                Checkbox(taskCompleted, onTaskCheck)
+                ) {
+                Checkbox(task?.isCompleted ?: false, onTaskCheck)
                 Column {
                     Text(text = task?.title ?: "", style = MaterialTheme.typography.h6)
                     Text(text = task?.description ?: "", style = MaterialTheme.typography.body1)
@@ -139,8 +155,7 @@ private fun EditTaskContentPreview() {
             EditTaskContent(
                 loading = false,
                 empty = false,
-                Task("Title", "Description"),
-                taskCompleted = false,
+                Task("Title", "Description", isCompleted = false),
                 onTaskCheck = { },
                 onRefresh = { }
             )
@@ -156,8 +171,7 @@ private fun EditTaskContentTaskCompletedPreview() {
             EditTaskContent(
                 loading = false,
                 empty = false,
-                Task("Title", "Description"),
-                taskCompleted = true,
+                Task("Title", "Description", isCompleted = true),
                 onTaskCheck = { },
                 onRefresh = { }
             )
@@ -173,8 +187,7 @@ private fun EditTaskContentEmptyPreview() {
             EditTaskContent(
                 loading = false,
                 empty = true,
-                Task("Title", "Description"),
-                taskCompleted = false,
+                Task("Title", "Description", isCompleted = false),
                 onTaskCheck = { },
                 onRefresh = { }
             )

@@ -45,9 +45,9 @@ class ViewModelFactory constructor(
             isAssignableFrom(StatisticsViewModel::class.java) ->
                 StatisticsViewModel(tasksRepository)
             isAssignableFrom(TaskDetailViewModel::class.java) ->
-                TaskDetailViewModel(tasksRepository)
+                TaskDetailViewModel(tasksRepository, handle)
             isAssignableFrom(AddEditTaskViewModel::class.java) ->
-                AddEditTaskViewModel(tasksRepository)
+                AddEditTaskViewModel(tasksRepository, handle)
             isAssignableFrom(TasksViewModel::class.java) ->
                 TasksViewModel(tasksRepository, handle)
             else ->

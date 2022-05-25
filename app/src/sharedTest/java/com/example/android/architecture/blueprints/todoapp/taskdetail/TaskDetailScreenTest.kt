@@ -23,6 +23,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -86,8 +87,10 @@ class TaskDetailScreenTest {
             AppCompatTheme {
                 Surface {
                     TaskDetailScreen(
-                        viewModel = TaskDetailViewModel(repository),
-                        taskId = activeTask.id,
+                        viewModel = TaskDetailViewModel(
+                            repository,
+                            SavedStateHandle(mapOf("taskId" to activeTask.id))
+                        ),
                         onEditTask = { /*TODO*/ },
                         onBack = { },
                         onDeleteTask = { },

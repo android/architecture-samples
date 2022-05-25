@@ -15,13 +15,12 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import java.util.LinkedHashMap
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -30,21 +29,23 @@ object FakeTasksRemoteDataSource : TasksDataSource {
 
     private var TASKS_SERVICE_DATA: LinkedHashMap<String, Task> = LinkedHashMap()
 
-    private val observableTasks = MutableLiveData<Result<List<Task>>>()
+    private val observableTasks = MutableStateFlow<Result<List<Task>>>(
+        Success(TASKS_SERVICE_DATA.values.toList())
+    )
 
     override suspend fun refreshTasks() {
-        observableTasks.postValue(getTasks())
+        observableTasks.value = getTasks()
     }
 
     override suspend fun refreshTask(taskId: String) {
         refreshTasks()
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<Result<List<Task>>> {
         return observableTasks
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
         return observableTasks.map { tasks ->
             when (tasks) {
                 is Result.Loading -> Result.Loading

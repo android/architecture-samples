@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -36,10 +37,13 @@ import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TITLE_ARG
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.USER_MESSAGE_ARG
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsScreen
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailScreen
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksScreen
 import com.example.android.architecture.blueprints.todoapp.util.AppModalDrawer
+import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -90,20 +94,26 @@ fun TodoNavGraph(
             )
         ) { entry ->
             val taskId = entry.arguments?.getString(TASK_ID_ARG)
+            val viewModel: AddEditTaskViewModel = viewModel(
+                factory = getViewModelFactory(entry.arguments)
+            )
             AddEditTaskScreen(
+                viewModel = viewModel,
                 topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
-                taskId = taskId,
                 onTaskUpdate = {
                     navActions.navigateToTasks(
                         if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                     )
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
             )
         }
         composable(TodoDestinations.TASK_DETAIL_ROUTE) { entry ->
+            val viewModel: TaskDetailViewModel = viewModel(
+                factory = getViewModelFactory(entry.arguments)
+            )
             TaskDetailScreen(
-                taskId = entry.arguments?.getString(TASK_ID_ARG)!!,
+                viewModel = viewModel,
                 onEditTask = { taskId ->
                     navActions.navigateToAddEditTask(R.string.edit_task, taskId)
                 },
