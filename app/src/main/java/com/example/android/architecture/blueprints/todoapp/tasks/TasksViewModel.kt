@@ -69,7 +69,7 @@ class TasksViewModel(
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
-            .onStart<Async<List<Task>>> { Async.Loading }
+            .onStart<Async<List<Task>>> { emit(Async.Loading) }
 
     val uiState: StateFlow<TasksUiState> = combine(
         _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync

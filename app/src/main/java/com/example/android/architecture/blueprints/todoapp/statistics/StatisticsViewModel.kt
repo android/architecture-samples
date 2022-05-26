@@ -50,7 +50,7 @@ class StatisticsViewModel(
     val uiState: StateFlow<StatisticsUiState> =
         tasksRepository.getTasksStream()
             .map { Async.Success(it) }
-            .onStart<Async<Result<List<Task>>>> { Async.Loading }
+            .onStart<Async<Result<List<Task>>>> { emit(Async.Loading) }
             .map { taskAsync -> produceStatisticsUiState(taskAsync) }
             .stateIn(
                 scope = viewModelScope,

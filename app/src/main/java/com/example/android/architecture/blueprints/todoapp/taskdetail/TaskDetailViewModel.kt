@@ -59,7 +59,7 @@ class TaskDetailViewModel(
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = tasksRepository.getTaskStream(taskId)
         .map { handleResult(it) }
-        .onStart { Async.Loading }
+        .onStart { emit(Async.Loading) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         _userMessage, _isLoading, _isTaskDeleted, _taskAsync
