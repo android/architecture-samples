@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -57,26 +56,19 @@ class TasksViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _filterType = MutableStateFlow(getSavedFilterType())
-    private val filterType = _filterType
-        .onEach {
-            savedStateHandle.set(TASKS_FILTER_SAVED_STATE_KEY, it)
-            refresh()
-        }
+    private val _savedFilterType =
+        savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
 
+    private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val filteredTasks =
-        combine(tasksRepository.getTasksStream(), filterType) { tasks, type ->
+    private val _filteredTasks =
+        combine(tasksRepository.getTasksStream(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
-            .distinctUntilChanged()
 
     val uiState: StateFlow<TasksUiState> = combine(
-        filterType.map { getFilterUiInfo(it) }.distinctUntilChanged(),
-        _isLoading,
-        _userMessage,
-        filteredTasks
+        _filterUiInfo, _isLoading, _userMessage, _filteredTasks
     ) { filterUiInfo, isLoading, userMessage, tasks ->
         TasksUiState(
             items = tasks,
@@ -91,15 +83,8 @@ class TasksViewModel(
             initialValue = TasksUiState(isLoading = true)
         )
 
-    /**
-     * Sets the current task filtering type.
-     *
-     * @param requestType Can be [TasksFilterType.ALL_TASKS],
-     * [TasksFilterType.COMPLETED_TASKS], or
-     * [TasksFilterType.ACTIVE_TASKS]
-     */
     fun setFiltering(requestType: TasksFilterType) {
-        _filterType.value = requestType
+        savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
     fun clearCompletedTasks() {
@@ -169,10 +154,6 @@ class TasksViewModel(
             }
         }
         return tasksToShow
-    }
-
-    private fun getSavedFilterType(): TasksFilterType {
-        return savedStateHandle.get(TASKS_FILTER_SAVED_STATE_KEY) ?: ALL_TASKS
     }
 
     private fun getFilterUiInfo(requestType: TasksFilterType): FilteringUiInfo =

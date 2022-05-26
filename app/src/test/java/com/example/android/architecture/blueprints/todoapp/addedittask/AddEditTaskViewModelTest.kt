@@ -73,7 +73,7 @@ class AddEditTaskViewModelTest {
         }
         addEditTaskViewModel.saveTask()
 
-        val newTask = tasksRepository.tasksServiceData.values.first()
+        val newTask = tasksRepository.savedTasks.value.values.first()
 
         // Then a task is saved in the repository and the view updated
         assertThat(newTask.title).isEqualTo(newTitle)

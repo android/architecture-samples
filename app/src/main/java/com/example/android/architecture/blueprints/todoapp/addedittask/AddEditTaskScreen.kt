@@ -38,7 +38,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
@@ -82,10 +81,9 @@ fun AddEditTaskScreen(
         )
 
         // Check if the task is saved and call onTaskUpdate event
-        val currentOnTaskUpdate by rememberUpdatedState(onTaskUpdate)
         LaunchedEffect(uiState.isTaskSaved) {
             if (uiState.isTaskSaved) {
-                currentOnTaskUpdate()
+                onTaskUpdate()
             }
         }
 

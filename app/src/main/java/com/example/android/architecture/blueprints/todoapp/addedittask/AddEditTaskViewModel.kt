@@ -50,8 +50,11 @@ class AddEditTaskViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val taskId: String? = savedStateHandle.get(TodoDestinationsArgs.TASK_ID_ARG)
+    private val taskId: String? = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]
 
+    // A MutableStateFlow needs to be created in this ViewModel. The source of truth of the current
+    // editable Task is the ViewModel, we need to mutate the UI state directly in methods such as
+    // `updateTitle` or `updateDescription`
     private val _uiState = MutableStateFlow(AddEditTaskUiState())
     val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
 

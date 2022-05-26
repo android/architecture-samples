@@ -59,7 +59,7 @@ ext {
     androidXTestExtKotlinRunnerVersion = '1.1.4-alpha06'
     androidXTestRulesVersion = '1.4.1-alpha04'
     androidXAnnotations = '1.3.0'
-    archLifecycleVersion = '2.4.1'
+    archLifecycleVersion = '2.5.0-rc01'
     archTestingVersion = '2.1.0'
     composeVersion = '1.1.1'
     coroutinesVersion = '1.6.1'

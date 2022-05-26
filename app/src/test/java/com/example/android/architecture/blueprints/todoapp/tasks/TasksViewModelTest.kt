@@ -201,7 +201,7 @@ class TasksViewModelTest {
         tasksViewModel.completeTask(task, true)
 
         // Verify the task is completed
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
 
         // The snackbar is updated
         assertThat(tasksViewModel.uiState.first().userMessage)
@@ -218,7 +218,7 @@ class TasksViewModelTest {
         tasksViewModel.completeTask(task, false)
 
         // Verify the task is active
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isActive).isTrue()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
 
         // The snackbar is updated
         assertThat(tasksViewModel.uiState.first().userMessage)

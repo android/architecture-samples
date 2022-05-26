@@ -71,14 +71,14 @@ class TaskDetailViewModelTest {
     @Test
     fun completeTask() = runTest {
         // Verify that the task was active initially
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isFalse()
 
         // When the ViewModel is asked to complete the task
         assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
         taskDetailViewModel.setCompleted(true)
 
         // Then the task is completed and the snackbar shows the correct message
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
         assertThat(taskDetailViewModel.uiState.first().userMessage)
             .isEqualTo(R.string.task_marked_complete)
     }
@@ -88,7 +88,7 @@ class TaskDetailViewModelTest {
         task.isCompleted = true
 
         // Verify that the task was completed initially
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
 
         // When the ViewModel is asked to complete the task
         assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
@@ -111,11 +111,11 @@ class TaskDetailViewModelTest {
 
     @Test
     fun deleteTask() = runTest {
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
+        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isTrue()
 
         // When the deletion of a task is requested
         taskDetailViewModel.deleteTask()
 
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
+        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
     }
 }

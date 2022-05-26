@@ -50,17 +50,15 @@ class TaskDetailViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val taskId: String = savedStateHandle.get(TodoDestinationsArgs.TASK_ID_ARG)!!
+    val taskId: String = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]!!
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
+    private val _task = tasksRepository.getTaskStream(taskId).map { handleResult(it) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage,
-        _isLoading,
-        _isTaskDeleted,
-        tasksRepository.getTaskStream(taskId).map { handleResult(it) }
+        _userMessage, _isLoading, _isTaskDeleted, _task
     ) { userMessage, isLoading, isTaskDeleted, task ->
         TaskDetailUiState(
             task = task,
@@ -74,10 +72,6 @@ class TaskDetailViewModel(
             started = WhileUiSubscribed,
             initialValue = TaskDetailUiState()
         )
-
-    init {
-        refresh()
-    }
 
     fun deleteTask() = viewModelScope.launch {
         tasksRepository.deleteTask(taskId)
