@@ -38,7 +38,8 @@ import kotlinx.coroutines.launch
 data class TaskDetailUiState(
     val task: Task? = null,
     val isLoading: Boolean = false,
-    val userMessage: Int? = null
+    val userMessage: Int? = null,
+    val isTaskDeleted: Boolean = false
 )
 
 /**
@@ -53,16 +54,19 @@ class TaskDetailViewModel(
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
+    private val _isTaskDeleted = MutableStateFlow(false)
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         _userMessage,
         _isLoading,
+        _isTaskDeleted,
         tasksRepository.getTaskStream(taskId).map { handleResult(it) }
-    ) { userMessage, isLoading, task ->
+    ) { userMessage, isLoading, isTaskDeleted, task ->
         TaskDetailUiState(
             task = task,
             isLoading = isLoading,
-            userMessage = userMessage
+            userMessage = userMessage,
+            isTaskDeleted = isTaskDeleted
         )
     }
         .stateIn(
@@ -75,8 +79,9 @@ class TaskDetailViewModel(
         refresh()
     }
 
-    suspend fun deleteTask() {
+    fun deleteTask() = viewModelScope.launch {
         tasksRepository.deleteTask(taskId)
+        _isTaskDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {

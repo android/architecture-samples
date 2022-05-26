@@ -36,7 +36,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -47,8 +47,6 @@ import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.google.accompanist.appcompattheme.AppCompatTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun TaskDetailScreen(
@@ -57,22 +55,13 @@ fun TaskDetailScreen(
     onBack: () -> Unit,
     onDeleteTask: () -> Unit,
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
+    scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TaskDetailTopAppBar(
-                onBack = onBack,
-                onDelete = {
-                    coroutineScope.launch {
-                        viewModel.deleteTask()
-                        onDeleteTask()
-                    }
-                }
-            )
+            TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask)
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
@@ -97,6 +86,14 @@ fun TaskDetailScreen(
             LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
                 scaffoldState.snackbarHostState.showSnackbar(snackbarText)
                 viewModel.snackbarMessageShown()
+            }
+        }
+
+        // Check if the task is deleted
+        val currentOnDeleteTask by rememberUpdatedState(onDeleteTask)
+        LaunchedEffect(uiState.isTaskDeleted) {
+            if (uiState.isTaskDeleted) {
+                currentOnDeleteTask()
             }
         }
     }
