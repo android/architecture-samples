@@ -49,7 +49,6 @@ object TasksRemoteDataSource : TasksDataSource {
     override fun getTaskStream(taskId: String): Flow<Result<Task>> {
         return observableTasks.map { tasks ->
             when (tasks) {
-                is Result.Loading -> Result.Loading
                 is Error -> Error(tasks.exception)
                 is Success -> {
                     val task = tasks.data.firstOrNull() { it.id == taskId }
