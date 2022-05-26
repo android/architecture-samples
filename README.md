@@ -24,6 +24,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | ------------- | ------------- |
 | [main](https://github.com/googlesamples/android-architecture/tree/main) | This branch |
 | [hilt](https://github.com/googlesamples/android-architecture/tree/hilt) | A simple Hilt setup that removes the two flavors and service locator (not using Compose yet) |
+| [livedata](https://github.com/googlesamples/android-architecture/tree/livedata) | Uses LiveData instead of StateFlow as the data stream solution |
 | [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
 | [views](https://github.com/googlesamples/android-architecture/tree/views) | Uses Views instead of Jetpack Compose to render UI elements on the screen |
 
