@@ -20,11 +20,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
+import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -46,21 +48,10 @@ class StatisticsViewModel(
 ) : ViewModel() {
 
     val uiState: StateFlow<StatisticsUiState> =
-        tasksRepository.getTasksStream().distinctUntilChanged().map { result ->
-            when (result) {
-                is Success -> {
-                    val stats = getActiveAndCompletedStats(result.data)
-                    StatisticsUiState(
-                        isEmpty = result.data.isEmpty(),
-                        activeTasksPercent = stats.activeTasksPercent,
-                        completedTasksPercent = stats.completedTasksPercent,
-                        isLoading = false
-                    )
-                }
-                is Result.Loading -> StatisticsUiState(isLoading = true)
-                else -> StatisticsUiState(isLoading = false)
-            }
-        }
+        tasksRepository.getTasksStream()
+            .map { Async.Success(it) }
+            .onStart<Async<Result<List<Task>>>> { Async.Loading }
+            .map { taskAsync -> produceStatisticsUiState(taskAsync) }
             .stateIn(
                 scope = viewModelScope,
                 started = WhileUiSubscribed,
@@ -72,4 +63,25 @@ class StatisticsViewModel(
             tasksRepository.refreshTasks()
         }
     }
+
+    private fun produceStatisticsUiState(taskLoad: Async<Result<List<Task>>>) =
+        when (taskLoad) {
+            Async.Loading -> {
+                StatisticsUiState(isLoading = true, isEmpty = true)
+            }
+            is Async.Success -> {
+                when (val result = taskLoad.data) {
+                    is Success -> {
+                        val stats = getActiveAndCompletedStats(result.data)
+                        StatisticsUiState(
+                            isEmpty = result.data.isEmpty(),
+                            activeTasksPercent = stats.activeTasksPercent,
+                            completedTasksPercent = stats.completedTasksPercent,
+                            isLoading = false
+                        )
+                    }
+                    else -> StatisticsUiState(isLoading = false)
+                }
+            }
+        }
 }

@@ -43,6 +43,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -68,6 +69,7 @@ fun TasksScreen(
     @StringRes userMessage: Int,
     onAddTask: () -> Unit,
     onTaskClick: (Task) -> Unit,
+    onUserMessageDisplayed: () -> Unit,
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = viewModel(factory = getViewModelFactory()),
@@ -116,9 +118,11 @@ fun TasksScreen(
         }
 
         // Check if there's a userMessage to show to the user
+        val currentOnUserMessageDisplayed by rememberUpdatedState(onUserMessageDisplayed)
         LaunchedEffect(userMessage) {
             if (userMessage != 0) {
                 viewModel.showEditResultMessage(userMessage)
+                currentOnUserMessageDisplayed()
             }
         }
     }
@@ -138,7 +142,7 @@ private fun TasksContent(
 ) {
     LoadingContent(
         loading = loading,
-        empty = tasks.isEmpty(),
+        empty = tasks.isEmpty() && !loading,
         emptyContent = { TasksEmptyContent(noTasksLabel, noTasksIconRes, modifier) },
         onRefresh = onRefresh
     ) {

@@ -23,9 +23,14 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -117,5 +122,28 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.deleteTask()
 
         assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
+    }
+
+    @Test
+    fun loadTask_loading() = runTest {
+        // Set Main dispatcher to not run coroutines eagerly, for just this one test
+        Dispatchers.setMain(StandardTestDispatcher())
+
+        var isLoading: Boolean? = true
+        val job = launch {
+            taskDetailViewModel.uiState.collect {
+                isLoading = it.isLoading
+            }
+        }
+
+        // Then progress indicator is shown
+        assertThat(isLoading).isTrue()
+
+        // Execute pending coroutines actions
+        advanceUntilIdle()
+
+        // Then progress indicator is hidden
+        assertThat(isLoading).isFalse()
+        job.cancel()
     }
 }

@@ -24,11 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -55,22 +57,31 @@ class TaskDetailViewModel(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
-    private val _task = tasksRepository.getTaskStream(taskId).map { handleResult(it) }
+    private val _taskAsync = tasksRepository.getTaskStream(taskId)
+        .map { handleResult(it) }
+        .onStart { Async.Loading }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _task
-    ) { userMessage, isLoading, isTaskDeleted, task ->
-        TaskDetailUiState(
-            task = task,
-            isLoading = isLoading,
-            userMessage = userMessage,
-            isTaskDeleted = isTaskDeleted
-        )
+        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
+    ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
+        when (taskAsync) {
+            Async.Loading -> {
+                TaskDetailUiState(isLoading = true)
+            }
+            is Async.Success -> {
+                TaskDetailUiState(
+                    task = taskAsync.data,
+                    isLoading = isLoading,
+                    userMessage = userMessage,
+                    isTaskDeleted = isTaskDeleted
+                )
+            }
+        }
     }
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = TaskDetailUiState()
+            initialValue = TaskDetailUiState(isLoading = true)
         )
 
     fun deleteTask() = viewModelScope.launch {
@@ -105,11 +116,11 @@ class TaskDetailViewModel(
         _userMessage.value = message
     }
 
-    private fun handleResult(tasksResult: Result<Task>): Task? =
+    private fun handleResult(tasksResult: Result<Task>): Async<Task?> =
         if (tasksResult is Success) {
-            tasksResult.data
+            Async.Success(tasksResult.data)
         } else {
             showSnackbarMessage(R.string.loading_tasks_error)
-            null
+            Async.Success(null)
         }
 }

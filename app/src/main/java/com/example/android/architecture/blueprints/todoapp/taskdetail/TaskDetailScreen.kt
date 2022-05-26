@@ -72,7 +72,7 @@ fun TaskDetailScreen(
 
         EditTaskContent(
             loading = uiState.isLoading,
-            empty = uiState.task == null,
+            empty = uiState.task == null && !uiState.isLoading,
             task = uiState.task,
             onRefresh = viewModel::refresh,
             onTaskCheck = viewModel::setCompleted,
@@ -132,10 +132,12 @@ private fun EditTaskContent(
                     .then(screenPadding),
 
             ) {
-                Checkbox(task?.isCompleted ?: false, onTaskCheck)
-                Column {
-                    Text(text = task?.title ?: "", style = MaterialTheme.typography.h6)
-                    Text(text = task?.description ?: "", style = MaterialTheme.typography.body1)
+                if (task != null) {
+                    Checkbox(task.isCompleted, onTaskCheck)
+                    Column {
+                        Text(text = task.title, style = MaterialTheme.typography.h6)
+                        Text(text = task.description, style = MaterialTheme.typography.body1)
+                    }
                 }
             }
         }

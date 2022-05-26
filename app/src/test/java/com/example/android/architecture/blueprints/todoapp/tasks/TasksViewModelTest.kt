@@ -148,7 +148,7 @@ class TasksViewModelTest {
 
         // Fetch tasks
         val allTasks = tasksViewModel.uiState.first().items
-        val completedTasks = allTasks.filter { it.isCompleted }
+        val completedTasks = allTasks?.filter { it.isCompleted }
 
         // Verify there are no completed tasks left
         assertThat(completedTasks).isEmpty()

@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -89,10 +90,12 @@ private fun StatisticsContent(
         }
     ) {
         Column(
-            commonModifier.verticalScroll(rememberScrollState())
+            commonModifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
-            Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
-            Text(stringResource(id = R.string.statistics_completed_tasks, completedTasksPercent))
+            if (!loading) {
+                Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
+                Text(stringResource(id = R.string.statistics_completed_tasks, completedTasksPercent))
+            }
         }
     }
 }

@@ -29,12 +29,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -62,20 +64,29 @@ class TasksViewModel(
     private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasks =
+    private val _filteredTasksAsync =
         combine(tasksRepository.getTasksStream(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
+            .map { Async.Success(it) }
+            .onStart<Async<List<Task>>> { Async.Loading }
 
     val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasks
-    ) { filterUiInfo, isLoading, userMessage, tasks ->
-        TasksUiState(
-            items = tasks,
-            filteringUiInfo = filterUiInfo,
-            isLoading = isLoading,
-            userMessage = userMessage
-        )
+        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
+    ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
+        when (tasksAsync) {
+            Async.Loading -> {
+                TasksUiState(isLoading = true)
+            }
+            is Async.Success -> {
+                TasksUiState(
+                    items = tasksAsync.data,
+                    filteringUiInfo = filterUiInfo,
+                    isLoading = isLoading,
+                    userMessage = userMessage
+                )
+            }
+        }
     }
         .stateIn(
             scope = viewModelScope,
