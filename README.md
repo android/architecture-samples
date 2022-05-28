@@ -37,7 +37,7 @@ The app in this project aims to be simple enough that you can understand it quic
 
 *   A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on architecture. Check out the [Compose Samples](https://github.com/android/compose-samples) instead.
 *   A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [GitHub Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
-*   A real production app with network access, user authentication, etc. Check out the [Google I/O app](https://github.com/google/iosched) instead.
+*   A real production app with network access, user authentication, etc. Check out the [Now in Android app](https://github.com/android/nowinandroid) instead.
 
 ## Who is it for?
 
