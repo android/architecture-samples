@@ -31,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * UiState for the task list screen.
@@ -53,7 +55,8 @@ data class TasksUiState(
 /**
  * ViewModel for the task list screen.
  */
-class TasksViewModel(
+@HiltViewModel
+class TasksViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {

@@ -24,11 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * UiState for the Add/Edit screen
@@ -45,7 +47,8 @@ data class AddEditTaskUiState(
 /**
  * ViewModel for the Add/Edit screen.
  */
-class AddEditTaskViewModel(
+@HiltViewModel
+class AddEditTaskViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {

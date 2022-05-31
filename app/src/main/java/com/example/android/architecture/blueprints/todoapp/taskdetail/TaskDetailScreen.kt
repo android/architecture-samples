@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
@@ -49,11 +50,11 @@ import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
 fun TaskDetailScreen(
-    viewModel: TaskDetailViewModel,
     onEditTask: (String) -> Unit,
     onBack: () -> Unit,
     onDeleteTask: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TaskDetailViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(

@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
@@ -28,20 +27,19 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
+import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.After
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Integration test for the Task List screen.
@@ -51,29 +49,22 @@ import org.junit.runner.RunWith
 @MediumTest
 // @LooperMode(LooperMode.Mode.PAUSED)
 // @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
-@ExperimentalCoroutinesApi
+@HiltAndroidTest
 class TasksScreenTest {
 
-    private lateinit var repository: TasksRepository
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
 
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
     private val activity get() = composeTestRule.activity
 
-    @Before
-    fun initRepository() {
-        // Run on UI thread to make sure the same instance of the SL is used.
-        runOnUiThread {
-            repository = FakeRepository()
-            ServiceLocator.tasksRepository = repository
-        }
-    }
+    @Inject
+    lateinit var repository: TasksRepository
 
-    @After
-    fun cleanupDb() {
-        runOnUiThread {
-            ServiceLocator.resetRepository()
-        }
+    @Before
+    fun init() {
+        hiltRule.inject()
     }
 
     @Test

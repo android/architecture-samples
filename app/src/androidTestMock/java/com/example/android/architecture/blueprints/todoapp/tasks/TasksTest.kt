@@ -15,7 +15,6 @@
  */
 package com.example.android.architecture.blueprints.todoapp.tasks
 
-import androidx.activity.ComponentActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -30,57 +29,48 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
+import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.ServiceLocator
 import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
-import kotlinx.coroutines.Dispatchers
-import org.junit.After
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Large End-to-End test for the tasks module.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@HiltAndroidTest
 class TasksTest {
 
-    private lateinit var repository: TasksRepository
-
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-    private val activity get() = composeTestRule.activity
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
 
     // Executes tasks in the Architecture Components in the same thread
-    @get:Rule
+    @get:Rule(order = 1)
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
+    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+    private val activity get() = composeTestRule.activity
+
+    @Inject
+    lateinit var repository: TasksRepository
 
     @Before
     fun init() {
-        // Run on UI thread to make sure the same instance of the SL is used.
-        runOnUiThread {
-            ServiceLocator.createDataBase(getApplicationContext(), inMemory = true)
-            ServiceLocator.ioDispatcher = Dispatchers.Unconfined
-            repository = ServiceLocator.provideTasksRepository(getApplicationContext())
-        }
-    }
-
-    @After
-    fun reset() {
-        runOnUiThread {
-            ServiceLocator.resetRepository()
-            ServiceLocator.resetIODispatcher()
-        }
+        hiltRule.inject()
     }
 
     @Test
