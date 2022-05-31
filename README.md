@@ -9,7 +9,7 @@ In this branch you'll find:
 *   User Interface built with **[Jetpack Compose](https://developer.android.com/jetpack/compose)** 
 *   A single-activity architecture, using **[Navigation Compose](https://developer.android.com/jetpack/compose/navigation)**.
 *   A presentation layer that contains a Compose screen (View) and a **ViewModel** per screen (or feature).
-*   Reactive UIs using **[LiveData](https://developer.android.com/topic/libraries/architecture/livedata)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
+*   Reactive UIs using **[Flow](https://developer.android.com/kotlin/flow)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
 *   A **data layer** with a repository and two data sources (local using Room and a fake remote).
 *   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 *   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device or Robolectric.
@@ -24,6 +24,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | ------------- | ------------- |
 | [main](https://github.com/googlesamples/android-architecture/tree/main) | This branch |
 | [hilt](https://github.com/googlesamples/android-architecture/tree/hilt) | A simple Hilt setup that removes the two flavors and service locator (not using Compose yet) |
+| [livedata](https://github.com/googlesamples/android-architecture/tree/livedata) | Uses LiveData instead of StateFlow as the data stream solution |
 | [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
 | [views](https://github.com/googlesamples/android-architecture/tree/views) | Uses Views instead of Jetpack Compose to render UI elements on the screen |
 

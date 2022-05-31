@@ -16,11 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Error
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import kotlinx.coroutines.flow.Flow
 
 class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDataSource {
     override suspend fun getTasks(): Result<List<Task>> {
@@ -69,7 +69,7 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         tasks?.removeIf { it.id == taskId }
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<Result<List<Task>>> {
         TODO("not implemented")
     }
 
@@ -77,7 +77,7 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         TODO("not implemented")
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
         TODO("not implemented")
     }
 

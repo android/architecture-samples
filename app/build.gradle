@@ -80,11 +80,6 @@ android {
         compose true
     }
 
-    dataBinding {
-        enabled = true
-        enabledForTests = true
-    }
-
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -111,7 +106,6 @@ android {
                 apiLevel = 30
                 // You can also specify "google" if you require Google Play Services.
                 systemImageSource = "aosp-atd"
-                abi = "x86"
             }
             pixel2api30(com.android.build.api.dsl.ManagedVirtualDevice) {
                 // Use device profiles you typically see in Android Studio
@@ -119,19 +113,16 @@ android {
                 apiLevel = 30
                 // You can also specify "google" if you require Google Play Services.
                 systemImageSource = "aosp"
-                abi = "x86"
             }
             pixel2api27(com.android.build.api.dsl.ManagedVirtualDevice) {
                 device = "Pixel 2"
                 apiLevel = 27
                 systemImageSource = "aosp"
-                abi = "x86"
             }
             nexus9api29(com.android.build.api.dsl.ManagedVirtualDevice) {
                 device = "Nexus 9"
                 apiLevel = 29
                 systemImageSource = "aosp"
-                abi = "x86"
             }
         }
     }
@@ -155,15 +146,14 @@ dependencies {
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-ktx:$roomVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$archLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$archLifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"
 
     // Jetpack Compose
     implementation "androidx.activity:activity-compose:$activityComposeVersion"
     implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.compose.animation:animation:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
-    implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
     implementation "androidx.navigation:navigation-compose:$navigationVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$archLifecycleVersion"
     implementation "com.google.accompanist:accompanist-appcompat-theme:$accompanistVersion"

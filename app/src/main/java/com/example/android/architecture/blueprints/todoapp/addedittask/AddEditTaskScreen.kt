@@ -29,58 +29,72 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
-import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
+import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun AddEditTaskScreen(
+    viewModel: AddEditTaskViewModel,
     @StringRes topBarTitle: Int,
-    taskId: String?,
     onTaskUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddEditTaskViewModel = viewModel(factory = getViewModelFactory()),
-    state: AddEditTaskState = rememberAddEditTaskState(taskId, viewModel, onTaskUpdate)
+    scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        scaffoldState = state.scaffoldState,
+        scaffoldState = scaffoldState,
         topBar = { AddEditTaskTopAppBar(topBarTitle, onBack) },
         floatingActionButton = {
-            FloatingActionButton(onClick = state::onFabClick) {
+            FloatingActionButton(onClick = viewModel::saveTask) {
                 Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
             }
         }
     ) { paddingValues ->
-        val loading by viewModel.dataLoading.observeAsState(initial = false)
-        val title by viewModel.title.observeAsState(initial = "")
-        val description by viewModel.description.observeAsState(initial = "")
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         AddEditTaskContent(
-            loading = loading,
-            title = title,
-            description = description,
-            onTitleChanged = state::onTitleChanged,
-            onDescriptionChanged = state::onDescriptionChanged,
+            loading = uiState.isLoading,
+            title = uiState.title,
+            description = uiState.description,
+            onTitleChanged = viewModel::updateTitle,
+            onDescriptionChanged = viewModel::updateDescription,
             modifier = Modifier.padding(paddingValues)
         )
+
+        // Check if the task is saved and call onTaskUpdate event
+        LaunchedEffect(uiState.isTaskSaved) {
+            if (uiState.isTaskSaved) {
+                onTaskUpdate()
+            }
+        }
+
+        // Check for user messages to display on the screen
+        uiState.userMessage?.let { userMessage ->
+            val snackbarText = stringResource(userMessage)
+            LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
+                scaffoldState.snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
     }
 }
 

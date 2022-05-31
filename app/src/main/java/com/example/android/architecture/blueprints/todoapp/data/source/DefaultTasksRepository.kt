@@ -15,13 +15,13 @@
  */
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import androidx.lifecycle.LiveData
 import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -49,8 +49,8 @@ class DefaultTasksRepository(
         updateTasksFromRemoteDataSource()
     }
 
-    override fun observeTasks(): LiveData<Result<List<Task>>> {
-        return tasksLocalDataSource.observeTasks()
+    override fun getTasksStream(): Flow<Result<List<Task>>> {
+        return tasksLocalDataSource.getTasksStream()
     }
 
     override suspend fun refreshTask(taskId: String) {
@@ -71,8 +71,8 @@ class DefaultTasksRepository(
         }
     }
 
-    override fun observeTask(taskId: String): LiveData<Result<Task>> {
-        return tasksLocalDataSource.observeTask(taskId)
+    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+        return tasksLocalDataSource.getTaskStream(taskId)
     }
 
     private suspend fun updateTaskFromRemoteDataSource(taskId: String) {

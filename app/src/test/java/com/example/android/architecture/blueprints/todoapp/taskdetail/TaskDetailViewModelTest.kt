@@ -15,18 +15,18 @@
  */
 package com.example.android.architecture.blueprints.todoapp.taskdetail
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.assertSnackbarMessage
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
-import com.example.android.architecture.blueprints.todoapp.observeForTesting
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -42,78 +42,68 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class TaskDetailViewModelTest {
 
-    // Subject under test
-    private lateinit var taskDetailViewModel: TaskDetailViewModel
-
-    // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeRepository
-
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
-    // Executes each task synchronously using Architecture Components.
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+    // Subject under test
+    private lateinit var taskDetailViewModel: TaskDetailViewModel
 
-    val task = Task("Title1", "Description1")
+    // Use a fake repository to be injected into the viewmodel
+    private lateinit var tasksRepository: FakeRepository
+    private val task = Task(title = "Title1", description = "Description1", id = "0")
 
     @Before
     fun setupViewModel() {
         tasksRepository = FakeRepository()
         tasksRepository.addTasks(task)
 
-        taskDetailViewModel = TaskDetailViewModel(tasksRepository)
+        taskDetailViewModel = TaskDetailViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "0"))
+        )
     }
 
     @Test
-    fun getActiveTaskFromRepositoryAndLoadIntoView() {
-        taskDetailViewModel.start(task.id)
-
+    fun getActiveTaskFromRepositoryAndLoadIntoView() = runTest {
+        val uiState = taskDetailViewModel.uiState.first()
         // Then verify that the view was notified
-        assertThat(taskDetailViewModel.task.getOrAwaitValue()?.title).isEqualTo(task.title)
-        assertThat(taskDetailViewModel.task.getOrAwaitValue()?.description)
-            .isEqualTo(task.description)
+        assertThat(uiState.task?.title).isEqualTo(task.title)
+        assertThat(uiState.task?.description).isEqualTo(task.description)
     }
 
     @Test
-    fun completeTask() {
-        // Load the ViewModel
-        taskDetailViewModel.start(task.id)
-        // Start observing to compute transformations
-        taskDetailViewModel.task.getOrAwaitValue()
-
+    fun completeTask() = runTest {
         // Verify that the task was active initially
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isFalse()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isFalse()
 
         // When the ViewModel is asked to complete the task
+        assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
         taskDetailViewModel.setCompleted(true)
 
         // Then the task is completed and the snackbar shows the correct message
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
-        assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_complete)
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+        assertThat(taskDetailViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.task_marked_complete)
     }
 
     @Test
     fun activateTask() = runTest {
         task.isCompleted = true
 
-        // Load the ViewModel
-        taskDetailViewModel.start(task.id)
-        // Start observing to compute transformations
-        taskDetailViewModel.task.observeForTesting {}
-
         // Verify that the task was completed initially
-        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted).isTrue()
+        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
 
         // When the ViewModel is asked to complete the task
+        assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
         taskDetailViewModel.setCompleted(false)
 
         // Then the task is not completed and the snackbar shows the correct message
         val newTask = (tasksRepository.getTask(task.id) as Success).data
         assertTrue(newTask.isActive)
-        assertSnackbarMessage(taskDetailViewModel.snackbarText, R.string.task_marked_active)
+        assertThat(taskDetailViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.task_marked_active)
     }
 
     @Test
@@ -121,33 +111,17 @@ class TaskDetailViewModelTest {
         // Given a repository that returns errors
         tasksRepository.setReturnError(true)
 
-        // Given an initialized ViewModel with an active task
-        taskDetailViewModel.start(task.id)
-        // Get the computed LiveData value
-        taskDetailViewModel.task.observeForTesting {
-            // Then verify that data is not available
-            assertThat(taskDetailViewModel.isDataAvailable.getOrAwaitValue()).isFalse()
-        }
-    }
-
-    @Test
-    fun updateSnackbar_nullValue() {
-        // Before setting the Snackbar text, get its current value
-        val snackbarText = taskDetailViewModel.snackbarText.value
-
-        // Check that the value is null
-        assertThat(snackbarText).isNull()
+        assertThat(taskDetailViewModel.uiState.value.task).isNull()
     }
 
     @Test
     fun deleteTask() = runTest {
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isTrue()
-        taskDetailViewModel.start(task.id)
+        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isTrue()
 
         // When the deletion of a task is requested
         taskDetailViewModel.deleteTask()
 
-        assertThat(tasksRepository.tasksServiceData.containsValue(task)).isFalse()
+        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
     }
 
     @Test
@@ -155,21 +129,21 @@ class TaskDetailViewModelTest {
         // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 
-        // Load the task in the viewmodel
-        taskDetailViewModel.start(task.id)
-        // Start observing to compute transformations
-        taskDetailViewModel.task.observeForTesting {
-            // Force a refresh to show the loading indicator
-            taskDetailViewModel.refresh()
-
-            // Then progress indicator is shown
-            assertThat(taskDetailViewModel.dataLoading.getOrAwaitValue()).isTrue()
-
-            // Execute pending coroutines actions
-            advanceUntilIdle()
-
-            // Then progress indicator is hidden
-            assertThat(taskDetailViewModel.dataLoading.getOrAwaitValue()).isFalse()
+        var isLoading: Boolean? = true
+        val job = launch {
+            taskDetailViewModel.uiState.collect {
+                isLoading = it.isLoading
+            }
         }
+
+        // Then progress indicator is shown
+        assertThat(isLoading).isTrue()
+
+        // Execute pending coroutines actions
+        advanceUntilIdle()
+
+        // Then progress indicator is hidden
+        assertThat(isLoading).isFalse()
+        job.cancel()
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.example.android.architecture.blueprints.todoapp.util
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,9 +32,9 @@ val primaryDarkColor: Color = Color(0xFF263238)
  * Obtain the [ViewModelFactory] for ViewModels in this app
  */
 @Composable
-fun getViewModelFactory(): ViewModelFactory {
+fun getViewModelFactory(defaultArgs: Bundle? = null): ViewModelFactory {
     val repository = (LocalContext.current.applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository, LocalSavedStateRegistryOwner.current)
+    return ViewModelFactory(repository, LocalSavedStateRegistryOwner.current, defaultArgs)
 }
 
 /**

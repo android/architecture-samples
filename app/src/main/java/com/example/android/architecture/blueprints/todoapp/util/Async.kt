@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp
+package com.example.android.architecture.blueprints.todoapp.util
 
-import androidx.lifecycle.LiveData
-import org.junit.Assert.assertEquals
+import com.example.android.architecture.blueprints.todoapp.data.Result
 
-fun assertSnackbarMessage(snackbarLiveData: LiveData<Int?>, messageId: Int) {
-    val value: Int? = snackbarLiveData.getOrAwaitValue()
-    assertEquals(value, messageId)
+/**
+ * A generic class that holds a loading signal or a [Result].
+ */
+sealed class Async<out T> {
+    object Loading : Async<Nothing>()
+    data class Success<out T>(val data: T) : Async<T>()
 }

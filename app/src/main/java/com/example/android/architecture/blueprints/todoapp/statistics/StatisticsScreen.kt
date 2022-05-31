@@ -16,6 +16,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +28,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -36,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.StatisticsTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
@@ -50,16 +51,13 @@ fun StatisticsScreen(
         scaffoldState = scaffoldState,
         topBar = { StatisticsTopAppBar(openDrawer) }
     ) { paddingValues ->
-        val loading by viewModel.dataLoading.observeAsState(initial = false)
-        val empty by viewModel.empty.observeAsState(initial = true)
-        val activeTasksPercent by viewModel.activeTasksPercent.observeAsState(initial = 0f)
-        val completedTasksPercent by viewModel.completedTasksPercent.observeAsState(initial = 0f)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         StatisticsContent(
-            loading = loading,
-            empty = empty,
-            activeTasksPercent = activeTasksPercent,
-            completedTasksPercent = completedTasksPercent,
+            loading = uiState.isLoading,
+            empty = uiState.isEmpty,
+            activeTasksPercent = uiState.activeTasksPercent,
+            completedTasksPercent = uiState.completedTasksPercent,
             onRefresh = { viewModel.refresh() },
             modifier = modifier.padding(paddingValues)
         )
@@ -92,10 +90,12 @@ private fun StatisticsContent(
         }
     ) {
         Column(
-            commonModifier.verticalScroll(rememberScrollState())
+            commonModifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
-            Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
-            Text(stringResource(id = R.string.statistics_completed_tasks, completedTasksPercent))
+            if (!loading) {
+                Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
+                Text(stringResource(id = R.string.statistics_completed_tasks, completedTasksPercent))
+            }
         }
     }
 }
