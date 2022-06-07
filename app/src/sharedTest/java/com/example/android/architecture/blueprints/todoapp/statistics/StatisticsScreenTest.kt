@@ -15,39 +15,53 @@
  */
 package com.example.android.architecture.blueprints.todoapp.statistics
 
-import androidx.activity.ComponentActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Integration test for the statistics screen.
  */
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@ExperimentalCoroutinesApi
+@HiltAndroidTest
 class StatisticsScreenTest {
 
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
     private val activity get() = composeTestRule.activity
+
+    @Inject
+    lateinit var repository: TasksRepository
+
+    @Before
+    fun setup() {
+        hiltRule.inject()
+    }
 
     @Test
     fun tasks_showsNonEmptyMessage() {
         // Given some tasks
-        val repository = FakeRepository().apply {
+        repository.apply {
             saveTaskBlocking(Task("Title1", "Description1", false))
             saveTaskBlocking(Task("Title2", "Description2", true))
         }

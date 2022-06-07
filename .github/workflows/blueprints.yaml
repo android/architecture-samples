@@ -35,35 +35,29 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Build project Mock and UnitTest
-        run: ./gradlew assembleMockDebug assembleProdDebug compileMockDebugUnitTestKotlin
+      - name: Build project and UnitTest
+        run: ./gradlew assembleDebug compileDebugUnitTestKotlin
 
       - name: Spotless
         run: ./gradlew spotlessCheck
 
-      - name: Robolectric Mock
-        run: ./gradlew testMockDebugUnitTest
-
-      - name: Build project Prod and UnitTest
-        run: ./gradlew assembleMockDebug assembleProdDebug compileProdDebugUnitTestKotlin
-
-      - name: Robolectric Prod
-        run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
+      - name: Robolectric
+        run: ./gradlew testDebugUnitTest
 
       # Needed to accept licenses
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Compile AndroidTests Mock
-        run: ./gradlew compileMockDebugAndroidTestKotlin
+      - name: Compile AndroidTests
+        run: ./gradlew compileDebugAndroidTestKotlin
 
       - name: Run all tests pixel 2 api 30 ATD
         working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdDebugAndroidTest
 
       - name: Run all tests pixel 2 api 30 non-ATD
         working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30MockDebugAndroidTest
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30DebugAndroidTest
 
       - name: Upload build reports
         if: always()

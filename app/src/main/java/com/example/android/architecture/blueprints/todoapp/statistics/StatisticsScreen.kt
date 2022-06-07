@@ -32,19 +32,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.StatisticsTopAppBar
 import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
-import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
 fun StatisticsScreen(
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: StatisticsViewModel = viewModel(factory = getViewModelFactory()),
+    viewModel: StatisticsViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
@@ -90,7 +89,9 @@ private fun StatisticsContent(
         }
     ) {
         Column(
-            commonModifier.fillMaxSize().verticalScroll(rememberScrollState())
+            commonModifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             if (!loading) {
                 Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))

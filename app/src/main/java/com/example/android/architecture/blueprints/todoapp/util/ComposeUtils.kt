@@ -15,27 +15,13 @@
  */
 package com.example.android.architecture.blueprints.todoapp.util
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import com.example.android.architecture.blueprints.todoapp.TodoApplication
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 val primaryDarkColor: Color = Color(0xFF263238)
-
-/**
- * Obtain the [ViewModelFactory] for ViewModels in this app
- */
-@Composable
-fun getViewModelFactory(defaultArgs: Bundle? = null): ViewModelFactory {
-    val repository = (LocalContext.current.applicationContext as TodoApplication).taskRepository
-    return ViewModelFactory(repository, LocalSavedStateRegistryOwner.current, defaultArgs)
-}
 
 /**
  * Display an initial empty state or swipe to refresh content.
