@@ -27,6 +27,7 @@ This project hosts each sample app in separate repository branches. For more inf
 | [livedata](https://github.com/googlesamples/android-architecture/tree/livedata) | Uses LiveData instead of StateFlow as the data stream solution |
 | [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
 | [views](https://github.com/googlesamples/android-architecture/tree/views) | Uses Views instead of Jetpack Compose to render UI elements on the screen |
+| [views-hilt](https://github.com/googlesamples/android-architecture/tree/views-hilt) | Uses Views and Hilt instead together |
 
 ## Why a to-do app?
 
