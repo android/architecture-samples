@@ -24,15 +24,18 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
-import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -44,7 +47,7 @@ import timber.log.Timber
  */
 class TasksFragment : Fragment() {
 
-    private val viewModel by viewModels<TasksViewModel> { getViewModelFactory() }
+    private val viewModel by viewModels<TasksViewModel> { TodoViewModelFactory }
 
     private val args: TasksFragmentArgs by navArgs()
 
@@ -60,29 +63,8 @@ class TasksFragment : Fragment() {
         viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
             viewmodel = viewModel
         }
-        setHasOptionsMenu(true)
+        setupMenuProvider()
         return viewDataBinding.root
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) =
-        when (item.itemId) {
-            R.id.menu_clear -> {
-                viewModel.clearCompletedTasks()
-                true
-            }
-            R.id.menu_filter -> {
-                showFilteringPopUpMenu()
-                true
-            }
-            R.id.menu_refresh -> {
-                viewModel.loadTasks(true)
-                true
-            }
-            else -> false
-        }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -169,5 +151,35 @@ class TasksFragment : Fragment() {
         } else {
             Timber.w("ViewModel not initialized when attempting to set up adapter.")
         }
+    }
+
+    private fun setupMenuProvider() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.tasks_fragment_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_clear -> {
+                            viewModel.clearCompletedTasks()
+                            true
+                        }
+                        R.id.menu_filter -> {
+                            showFilteringPopUpMenu()
+                            true
+                        }
+                        R.id.menu_refresh -> {
+                            viewModel.loadTasks(true)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner, Lifecycle.State.RESUMED
+        )
     }
 }

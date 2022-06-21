@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package com.example.android.architecture.blueprints.todoapp
 
-import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
@@ -30,28 +29,24 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
  * Factory for all ViewModels.
  */
 @Suppress("UNCHECKED_CAST")
-class ViewModelFactory constructor(
-    private val tasksRepository: TasksRepository,
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle? = null
-) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-
-    override fun <T : ViewModel> create(
-        key: String,
-        modelClass: Class<T>,
-        handle: SavedStateHandle
-    ) = with(modelClass) {
-        when {
-            isAssignableFrom(StatisticsViewModel::class.java) ->
-                StatisticsViewModel(tasksRepository)
-            isAssignableFrom(TaskDetailViewModel::class.java) ->
-                TaskDetailViewModel(tasksRepository)
-            isAssignableFrom(AddEditTaskViewModel::class.java) ->
-                AddEditTaskViewModel(tasksRepository)
-            isAssignableFrom(TasksViewModel::class.java) ->
-                TasksViewModel(tasksRepository, handle)
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
+val TodoViewModelFactory = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
+        with(modelClass) {
+            val application = checkNotNull(extras[APPLICATION_KEY]) as TodoApplication
+            val tasksRepository = application.taskRepository
+            when {
+                isAssignableFrom(StatisticsViewModel::class.java) ->
+                    StatisticsViewModel(tasksRepository)
+                isAssignableFrom(TaskDetailViewModel::class.java) ->
+                    TaskDetailViewModel(tasksRepository)
+                isAssignableFrom(AddEditTaskViewModel::class.java) ->
+                    AddEditTaskViewModel(tasksRepository)
+                isAssignableFrom(TasksViewModel::class.java) -> {
+                    val handle = extras.createSavedStateHandle()
+                    TasksViewModel(tasksRepository, handle)
+                }
+                else ->
+                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }
+        } as T
 }
