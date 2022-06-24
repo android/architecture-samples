@@ -30,7 +30,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.produceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -74,8 +73,9 @@ class TasksViewModel @Inject constructor(
             .map { Async.Success(it) }
             .onStart<Async<List<Task>>> { emit(Async.Loading) }
 
-    val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
+    val uiState: StateFlow<TasksUiState> = produceUiState(
+        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync,
+        initialValue = TasksUiState(isLoading = true)
     ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
         when (tasksAsync) {
             Async.Loading -> {
@@ -91,11 +91,6 @@ class TasksViewModel @Inject constructor(
             }
         }
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = TasksUiState(isLoading = true)
-        )
 
     fun setFiltering(requestType: TasksFilterType) {
         savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType

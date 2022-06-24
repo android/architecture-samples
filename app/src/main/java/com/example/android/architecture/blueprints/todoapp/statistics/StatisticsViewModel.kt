@@ -23,12 +23,11 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.produceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -50,16 +49,14 @@ class StatisticsViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<StatisticsUiState> =
+    val uiState: StateFlow<StatisticsUiState> = produceUiState(
         tasksRepository.getTasksStream()
             .map { Async.Success(it) }
-            .onStart<Async<Result<List<Task>>>> { emit(Async.Loading) }
-            .map { taskAsync -> produceStatisticsUiState(taskAsync) }
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileUiSubscribed,
-                initialValue = StatisticsUiState(isLoading = true)
-            )
+            .onStart<Async<Result<List<Task>>>> { emit(Async.Loading) },
+        initialValue = StatisticsUiState(isLoading = true)
+    ) { taskAsync ->
+        produceStatisticsUiState(taskAsync)
+    }
 
     fun refresh() {
         viewModelScope.launch {

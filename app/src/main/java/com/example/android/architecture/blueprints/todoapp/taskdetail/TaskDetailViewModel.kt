@@ -25,14 +25,12 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.produceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -64,8 +62,9 @@ class TaskDetailViewModel @Inject constructor(
         .map { handleResult(it) }
         .onStart { emit(Async.Loading) }
 
-    val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
+    val uiState: StateFlow<TaskDetailUiState> = produceUiState(
+        _userMessage, _isLoading, _isTaskDeleted, _taskAsync,
+        initialValue = TaskDetailUiState(isLoading = true)
     ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
         when (taskAsync) {
             Async.Loading -> {
@@ -81,11 +80,6 @@ class TaskDetailViewModel @Inject constructor(
             }
         }
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = TaskDetailUiState(isLoading = true)
-        )
 
     fun deleteTask() = viewModelScope.launch {
         tasksRepository.deleteTask(taskId)
