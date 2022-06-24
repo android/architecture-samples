@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.util
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,11 +46,12 @@ private val WhileUiSubscribed: SharingStarted = SharingStarted.WhileSubscribed(S
 fun <T, R> ViewModel.produceUiState(
     flow: Flow<T>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T) -> R
 ): StateFlow<R> = flow.map(uiStateProducerBlock)
     .stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = started,
         initialValue = initialValue
     )
@@ -58,11 +60,12 @@ fun <T1, T2, R> ViewModel.produceUiState(
     flow: Flow<T1>,
     flow2: Flow<T2>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2) -> R
 ): StateFlow<R> = combine(flow, flow2, uiStateProducerBlock)
     .stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = started,
         initialValue = initialValue
     )
@@ -72,11 +75,12 @@ fun <T1, T2, T3, R> ViewModel.produceUiState(
     flow2: Flow<T2>,
     flow3: Flow<T3>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3) -> R
 ): StateFlow<R> = combine(flow, flow2, flow3, uiStateProducerBlock)
     .stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = started,
         initialValue = initialValue
     )
@@ -87,11 +91,12 @@ fun <T1, T2, T3, T4, R> ViewModel.produceUiState(
     flow3: Flow<T3>,
     flow4: Flow<T4>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4) -> R
 ): StateFlow<R> = combine(flow, flow2, flow3, flow4, uiStateProducerBlock)
     .stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = started,
         initialValue = initialValue
     )
@@ -103,11 +108,12 @@ fun <T1, T2, T3, T4, T5, R> ViewModel.produceUiState(
     flow4: Flow<T4>,
     flow5: Flow<T5>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5) -> R
 ): StateFlow<R> = combine(flow, flow2, flow3, flow4, flow5, uiStateProducerBlock)
     .stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = started,
         initialValue = initialValue
     )
@@ -120,6 +126,7 @@ fun <T1, T2, T3, T4, T5, T6, R> ViewModel.produceUiState(
     flow5: Flow<T5>,
     flow6: Flow<T6>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6) -> R
 ): StateFlow<R> =
@@ -133,7 +140,7 @@ fun <T1, T2, T3, T4, T5, T6, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -147,6 +154,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, R> ViewModel.produceUiState(
     flow6: Flow<T6>,
     flow7: Flow<T7>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7) -> R
 ): StateFlow<R> =
@@ -162,7 +170,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -177,6 +185,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> ViewModel.produceUiState(
     flow7: Flow<T7>,
     flow8: Flow<T8>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7, T8) -> R
 ): StateFlow<R> =
@@ -192,7 +201,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -208,6 +217,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> ViewModel.produceUiState(
     flow8: Flow<T8>,
     flow9: Flow<T9>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7, T8, T9) -> R
 ): StateFlow<R> =
@@ -223,7 +233,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -240,6 +250,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> ViewModel.produceUiState(
     flow9: Flow<T9>,
     flow10: Flow<T10>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> R
 ): StateFlow<R> =
@@ -257,7 +268,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -275,6 +286,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> ViewModel.produceUiState(
     flow10: Flow<T10>,
     flow11: Flow<T11>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R
 ): StateFlow<R> =
@@ -292,7 +304,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> ViewModel.produceUiState(
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
@@ -311,6 +323,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> ViewModel.produceUiSt
     flow11: Flow<T11>,
     flow12: Flow<T12>,
     initialValue: R,
+    scope: CoroutineScope = viewModelScope,
     started: SharingStarted = WhileUiSubscribed,
     uiStateProducerBlock: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R
 ): StateFlow<R> =
@@ -328,7 +341,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> ViewModel.produceUiSt
         )
     }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = started,
             initialValue = initialValue
         )
