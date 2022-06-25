@@ -138,6 +138,7 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
     testImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
 
     // JVM tests - Hilt
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"

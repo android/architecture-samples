@@ -30,16 +30,18 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.Mutation
+import com.example.android.architecture.blueprints.todoapp.util.Mutations
+import com.example.android.architecture.blueprints.todoapp.util.StateProducer
+import com.example.android.architecture.blueprints.todoapp.util.mutation
+import com.example.android.architecture.blueprints.todoapp.util.plus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -61,114 +63,98 @@ class TasksViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _savedFilterType =
-        savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
+    private val savedFilterType = savedStateHandle.getStateFlow(
+        key = TASKS_FILTER_SAVED_STATE_KEY,
+        initialValue = ALL_TASKS
+    )
 
-    private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
-    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
-    private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasksAsync =
-        combine(tasksRepository.getTasksStream(), _savedFilterType) { tasks, type ->
-            filterTasks(tasks, type)
-        }
-            .map { Async.Success(it) }
-            .onStart<Async<List<Task>>> { emit(Async.Loading) }
+    private val filterStateChanges = savedFilterType
+        .map(::getFilterUiInfo)
+        .distinctUntilChanged()
+        .map(FilteringUiInfo::asStateChange)
 
-    val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
-    ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
-        when (tasksAsync) {
-            Async.Loading -> {
-                TasksUiState(isLoading = true)
-            }
-            is Async.Success -> {
-                TasksUiState(
-                    items = tasksAsync.data,
-                    filteringUiInfo = filterUiInfo,
-                    isLoading = isLoading,
-                    userMessage = userMessage
-                )
-            }
-        }
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = TasksUiState(isLoading = true)
+    private val loadStateChanges = combine(
+        flow = tasksRepository.getTasksStream(),
+        flow2 = savedFilterType,
+        transform = ::filterTasks
+    )
+        .map { Async.Success(it) }
+        .onStart<Async<List<Task>?>> { emit(Async.Loading) }
+        .loadStateChanges()
+
+    private val stateProducer = StateProducer(
+        scope = viewModelScope,
+        initial = TasksUiState(isLoading = true),
+        mutationFlows = listOf(
+            loadStateChanges,
+            filterStateChanges,
         )
+    )
+
+    val uiState = stateProducer.state
 
     fun setFiltering(requestType: TasksFilterType) {
         savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
-    fun clearCompletedTasks() {
-        viewModelScope.launch {
-            tasksRepository.clearCompletedTasks()
-            showSnackbarMessage(R.string.completed_tasks_cleared)
-            refresh()
-        }
+    fun clearCompletedTasks() = stateProducer.launch {
+        tasksRepository.clearCompletedTasks()
+        setState(showSnackbarStateChange(R.string.completed_tasks_cleared))
+        refresh()
     }
 
-    fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
+    fun completeTask(task: Task, completed: Boolean) = stateProducer.launch {
         if (completed) {
             tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
+            setState(showSnackbarStateChange(R.string.task_marked_complete))
         } else {
             tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+            setState(showSnackbarStateChange(R.string.task_marked_active))
         }
     }
 
-    fun showEditResultMessage(result: Int) {
-        when (result) {
-            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
-            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
-            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
-        }
+    fun showEditResultMessage(result: Int) = stateProducer.launch {
+        setState(
+            when (result) {
+                EDIT_RESULT_OK -> showSnackbarStateChange(R.string.successfully_saved_task_message)
+                ADD_EDIT_RESULT_OK -> showSnackbarStateChange(R.string.successfully_added_task_message)
+                DELETE_RESULT_OK -> showSnackbarStateChange(R.string.successfully_deleted_task_message)
+                else -> Mutations.identity()
+            }
+        )
     }
 
-    fun snackbarMessageShown() {
-        _userMessage.value = null
+    fun snackbarMessageShown() = stateProducer.launch {
+        setState { copy(userMessage = null) }
     }
 
-    private fun showSnackbarMessage(message: Int) {
-        _userMessage.value = message
+    private fun showSnackbarStateChange(message: Int) = mutation<TasksUiState> {
+        copy(userMessage = message)
     }
 
-    fun refresh() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            tasksRepository.refreshTasks()
-            _isLoading.value = false
-        }
+    fun refresh() = stateProducer.launch {
+        setState { copy(isLoading = true) }
+        tasksRepository.refreshTasks()
+        setState { copy(isLoading = false) }
     }
 
     private fun filterTasks(
         tasksResult: Result<List<Task>>,
         filteringType: TasksFilterType
-    ): List<Task> = if (tasksResult is Success) {
+    ): List<Task>? = if (tasksResult is Success) {
         filterItems(tasksResult.data, filteringType)
     } else {
-        showSnackbarMessage(R.string.loading_tasks_error)
-        emptyList()
+        null
     }
 
-    private fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
-        val tasksToShow = ArrayList<Task>()
-        // We filter the tasks based on the requestType
-        for (task in tasks) {
+    private fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> =
+        tasks.filter { task ->
             when (filteringType) {
-                ALL_TASKS -> tasksToShow.add(task)
-                ACTIVE_TASKS -> if (task.isActive) {
-                    tasksToShow.add(task)
-                }
-                COMPLETED_TASKS -> if (task.isCompleted) {
-                    tasksToShow.add(task)
-                }
+                ALL_TASKS -> true
+                ACTIVE_TASKS -> task.isActive
+                COMPLETED_TASKS -> task.isCompleted
             }
         }
-        return tasksToShow
-    }
 
     private fun getFilterUiInfo(requestType: TasksFilterType): FilteringUiInfo =
         when (requestType) {
@@ -191,6 +177,23 @@ class TasksViewModel @Inject constructor(
                 )
             }
         }
+
+    private fun Flow<Async<List<Task>?>>.loadStateChanges(): Flow<Mutation<TasksUiState>> =
+        mapLatest { tasksResult: Async<List<Task>?> ->
+            when (tasksResult) {
+                Async.Loading -> mutation {
+                    copy(isLoading = true)
+                }
+                is Async.Success -> when (val tasks = tasksResult.data) {
+                    null -> showSnackbarStateChange(R.string.loading_tasks_error) + mutation {
+                        copy(items = emptyList(), isLoading = false)
+                    }
+                    else -> mutation {
+                        copy(items = tasks, isLoading = false)
+                    }
+                }
+            }
+        }
 }
 
 // Used to save the current filtering in SavedStateHandle.
@@ -201,3 +204,7 @@ data class FilteringUiInfo(
     val noTasksLabel: Int = R.string.no_tasks_all,
     val noTaskIconRes: Int = R.drawable.logo_no_fill,
 )
+
+private fun FilteringUiInfo.asStateChange() = mutation<TasksUiState> {
+    copy(filteringUiInfo = this@asStateChange)
+}

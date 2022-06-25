@@ -17,6 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.FlowTurbine
+import app.cash.turbine.test
 import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
@@ -28,10 +30,14 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -140,55 +146,86 @@ class TasksViewModelTest {
 
     @Test
     fun clearCompletedTasks_clearsTasks() = runTest {
-        // When completed tasks are cleared
-        tasksViewModel.clearCompletedTasks()
+        tasksViewModel.uiState.test {
+            // Await initial state
+            awaitItem()
 
-        // Fetch tasks
-        tasksViewModel.refresh()
+            // When completed tasks are cleared
+            tasksViewModel.clearCompletedTasks()
+            // Await the 3 state changes
+            states().take(3).last()
 
-        // Fetch tasks
-        val allTasks = tasksViewModel.uiState.first().items
-        val completedTasks = allTasks?.filter { it.isCompleted }
+            // Fetch tasks
+            tasksViewModel.refresh()
+            // Await the 2 state changes
+            val uiState = states().take(2).last()
 
-        // Verify there are no completed tasks left
-        assertThat(completedTasks).isEmpty()
+            // Fetch tasks
+            val allTasks = uiState.items
+            val completedTasks = allTasks?.filter { it.isCompleted }
 
-        // Verify active task is not cleared
-        assertThat(allTasks).hasSize(1)
+            // Verify there are no completed tasks left
+            assertThat(completedTasks).isEmpty()
 
-        // Verify snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.completed_tasks_cleared)
+            // Verify active task is not cleared
+            assertThat(allTasks).hasSize(1)
+
+            // Verify snackbar is updated
+            assertThat(uiState.userMessage)
+                .isEqualTo(R.string.completed_tasks_cleared)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
     fun showEditResultMessages_editOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
+        tasksViewModel.uiState.test {
+            assertNull(awaitItem().userMessage)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_saved_task_message)
+            tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
+
+            // The snackbar is updated
+            assertThat(awaitItem().userMessage)
+                .isEqualTo(R.string.successfully_saved_task_message)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
     fun showEditResultMessages_addOk_snackbarUpdated() = runTest {
-        // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
+        tasksViewModel.uiState.test {
+            // Await initial state
+            awaitItem()
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_added_task_message)
+            // When the viewmodel receives a result from another destination
+            tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
+
+            // The snackbar is updated
+            assertThat(awaitItem().userMessage)
+                .isEqualTo(R.string.successfully_added_task_message)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
     fun showEditResultMessages_deleteOk_snackbarUpdated() = runTest {
-        // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
+        tasksViewModel.uiState.test {
+            // Await initial state
+            awaitItem()
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_deleted_task_message)
+            // When the viewmodel receives a result from another destination
+            tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
+
+            // The snackbar is updated
+            assertThat(awaitItem().userMessage)
+                .isEqualTo(R.string.successfully_deleted_task_message)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -197,15 +234,22 @@ class TasksViewModelTest {
         val task = Task("Title", "Description")
         tasksRepository.addTasks(task)
 
-        // Complete task
-        tasksViewModel.completeTask(task, true)
+        tasksViewModel.uiState.test {
+            // Await initial state
+            awaitItem()
 
-        // Verify the task is completed
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+            // Complete task
+            tasksViewModel.completeTask(task, true)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_complete)
+            // Verify the task is completed
+            assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+
+            // The snackbar is updated
+            assertThat(awaitItem().userMessage)
+                .isEqualTo(R.string.task_marked_complete)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -214,14 +258,24 @@ class TasksViewModelTest {
         val task = Task("Title", "Description", true)
         tasksRepository.addTasks(task)
 
-        // Activate task
-        tasksViewModel.completeTask(task, false)
+        tasksViewModel.uiState.test {
+            // Await initial state
+            awaitItem()
 
-        // Verify the task is active
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
+            // Activate task
+            tasksViewModel.completeTask(task, false)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_active)
+            // Verify the task is active
+            assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
+
+            // The snackbar is updated
+            assertThat(awaitItem().userMessage)
+                .isEqualTo(R.string.task_marked_active)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
+
+private fun FlowTurbine<TasksUiState>.states() =
+    flow { while (true) emit(awaitItem()) }

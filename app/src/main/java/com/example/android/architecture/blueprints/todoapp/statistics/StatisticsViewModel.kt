@@ -23,13 +23,14 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.Mutation
+import com.example.android.architecture.blueprints.todoapp.util.StateProducer
+import com.example.android.architecture.blueprints.todoapp.util.mutation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -50,40 +51,46 @@ class StatisticsViewModel @Inject constructor(
     private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<StatisticsUiState> =
-        tasksRepository.getTasksStream()
-            .map { Async.Success(it) }
-            .onStart<Async<Result<List<Task>>>> { emit(Async.Loading) }
-            .map { taskAsync -> produceStatisticsUiState(taskAsync) }
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileUiSubscribed,
-                initialValue = StatisticsUiState(isLoading = true)
-            )
+    private val loadStateChanges = tasksRepository.getTasksStream()
+        .map { Async.Success(it) }
+        .onStart<Async<Result<List<Task>>>> { emit(Async.Loading) }
+        .loadStateChanges()
 
-    fun refresh() {
-        viewModelScope.launch {
-            tasksRepository.refreshTasks()
-        }
+    private val stateProducer = StateProducer(
+        scope = viewModelScope,
+        initial = StatisticsUiState(isLoading = true),
+        mutationFlows = listOf(
+            loadStateChanges
+        )
+    )
+
+    val uiState = stateProducer.state
+
+    fun refresh() = stateProducer.launch {
+        tasksRepository.refreshTasks()
     }
 
-    private fun produceStatisticsUiState(taskLoad: Async<Result<List<Task>>>) =
-        when (taskLoad) {
-            Async.Loading -> {
-                StatisticsUiState(isLoading = true, isEmpty = true)
-            }
-            is Async.Success -> {
-                when (val result = taskLoad.data) {
-                    is Success -> {
-                        val stats = getActiveAndCompletedStats(result.data)
-                        StatisticsUiState(
-                            isEmpty = result.data.isEmpty(),
-                            activeTasksPercent = stats.activeTasksPercent,
-                            completedTasksPercent = stats.completedTasksPercent,
-                            isLoading = false
-                        )
+    private fun Flow<Async<Result<List<Task>>>>.loadStateChanges(): Flow<Mutation<StatisticsUiState>> =
+        mapLatest { taskLoad ->
+            mutation {
+                when (taskLoad) {
+                    Async.Loading -> {
+                        copy(isLoading = true, isEmpty = true)
                     }
-                    else -> StatisticsUiState(isLoading = false)
+                    is Async.Success -> {
+                        when (val result = taskLoad.data) {
+                            is Success -> {
+                                val stats = getActiveAndCompletedStats(result.data)
+                                copy(
+                                    isEmpty = result.data.isEmpty(),
+                                    activeTasksPercent = stats.activeTasksPercent,
+                                    completedTasksPercent = stats.completedTasksPercent,
+                                    isLoading = false
+                                )
+                            }
+                            else -> copy(isLoading = false)
+                        }
+                    }
                 }
             }
         }
