@@ -25,15 +25,15 @@ import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
-import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
+import com.example.android.architecture.blueprints.todoapp.util.Mutation
+import com.example.android.architecture.blueprints.todoapp.util.StateProducer
+import com.example.android.architecture.blueprints.todoapp.util.mutation
+import com.example.android.architecture.blueprints.todoapp.util.plus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -57,73 +57,72 @@ class TaskDetailViewModel @Inject constructor(
 
     val taskId: String = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]!!
 
-    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
-    private val _isLoading = MutableStateFlow(false)
-    private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = tasksRepository.getTaskStream(taskId)
+    private val loadStateChanges = tasksRepository.getTaskStream(taskId)
         .map { handleResult(it) }
         .onStart { emit(Async.Loading) }
+        .loadStateChanges()
 
-    val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
-    ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
-        when (taskAsync) {
-            Async.Loading -> {
-                TaskDetailUiState(isLoading = true)
-            }
-            is Async.Success -> {
-                TaskDetailUiState(
-                    task = taskAsync.data,
-                    isLoading = isLoading,
-                    userMessage = userMessage,
-                    isTaskDeleted = isTaskDeleted
-                )
-            }
-        }
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = TaskDetailUiState(isLoading = true)
+    private val stateProducer = StateProducer(
+        scope = viewModelScope,
+        initial = TaskDetailUiState(isLoading = true),
+        mutationFlows = listOf(
+            loadStateChanges,
         )
+    )
 
-    fun deleteTask() = viewModelScope.launch {
+    val uiState = stateProducer.state
+
+    fun deleteTask() = stateProducer.launch {
         tasksRepository.deleteTask(taskId)
-        _isTaskDeleted.value = true
+        setState { copy(isTaskDeleted = true) }
     }
 
-    fun setCompleted(completed: Boolean) = viewModelScope.launch {
+    fun setCompleted(completed: Boolean) = stateProducer.launch {
         val task = uiState.value.task ?: return@launch
         if (completed) {
             tasksRepository.completeTask(task)
-            showSnackbarMessage(R.string.task_marked_complete)
+            setState(snackBarMutation(R.string.task_marked_complete))
         } else {
             tasksRepository.activateTask(task)
-            showSnackbarMessage(R.string.task_marked_active)
+            setState(snackBarMutation(R.string.task_marked_active))
         }
     }
 
-    fun refresh() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            tasksRepository.refreshTask(taskId)
-            _isLoading.value = false
-        }
+    fun refresh() = stateProducer.launch {
+        setState { copy(isLoading = true) }
+        tasksRepository.refreshTask(taskId)
+        setState { copy(isLoading = false) }
     }
 
-    fun snackbarMessageShown() {
-        _userMessage.value = null
+    fun snackbarMessageShown() = stateProducer.launch {
+        setState { copy(isLoading = false) }
     }
 
-    private fun showSnackbarMessage(message: Int) {
-        _userMessage.value = message
+    private fun snackBarMutation(message: Int) = mutation<TaskDetailUiState> {
+        copy(userMessage = message)
     }
 
     private fun handleResult(tasksResult: Result<Task>): Async<Task?> =
         if (tasksResult is Success) {
             Async.Success(tasksResult.data)
         } else {
-            showSnackbarMessage(R.string.loading_tasks_error)
             Async.Success(null)
+        }
+
+    private fun Flow<Async<Task?>>.loadStateChanges(): Flow<Mutation<TaskDetailUiState>> =
+        mapLatest { tasksResult: Async<Task?> ->
+            when (tasksResult) {
+                Async.Loading -> mutation {
+                    copy(isLoading = true)
+                }
+                is Async.Success -> when (val task = tasksResult.data) {
+                    null -> snackBarMutation(R.string.loading_tasks_error) + mutation {
+                        copy(task = null, isLoading = false)
+                    }
+                    else -> mutation {
+                        copy(task = task, isLoading = false)
+                    }
+                }
+            }
         }
 }

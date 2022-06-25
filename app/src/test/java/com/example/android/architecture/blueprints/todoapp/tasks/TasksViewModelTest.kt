@@ -24,6 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.util.whileSubscribed
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,57 +70,62 @@ class TasksViewModelTest {
     fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() = runTest {
         // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
+        tasksViewModel.uiState.whileSubscribed {
+            // Given an initialized TasksViewModel with initialized tasks
+            // When loading of Tasks is requested
+            tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
 
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+            // Trigger loading of tasks
+            tasksViewModel.refresh()
 
-        // Trigger loading of tasks
-        tasksViewModel.refresh()
+            // Then progress indicator is shown
+            assertThat(tasksViewModel.uiState.first().isLoading).isTrue()
 
-        // Then progress indicator is shown
-        assertThat(tasksViewModel.uiState.first().isLoading).isTrue()
+            // Execute pending coroutines actions
+            advanceUntilIdle()
 
-        // Execute pending coroutines actions
-        advanceUntilIdle()
+            // Then progress indicator is hidden
+            assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-        // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
-
-        // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(3)
+            // And data correctly loaded
+            assertThat(tasksViewModel.uiState.first().items).hasSize(3)
+        }
     }
 
     @Test
     fun loadActiveTasksFromRepositoryAndLoadIntoView() = runTest {
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
+        tasksViewModel.uiState.whileSubscribed {
+            // Given an initialized TasksViewModel with initialized tasks
+            // When loading of Tasks is requested
+            tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
 
-        // Load tasks
-        tasksViewModel.refresh()
+            // Load tasks
+            tasksViewModel.refresh()
 
-        // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+            // Then progress indicator is hidden
+            assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-        // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(1)
+            // And data correctly loaded
+            assertThat(tasksViewModel.uiState.first().items).hasSize(1)
+        }
     }
 
     @Test
     fun loadCompletedTasksFromRepositoryAndLoadIntoView() = runTest {
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
+        tasksViewModel.uiState.whileSubscribed {
+            // Given an initialized TasksViewModel with initialized tasks
+            // When loading of Tasks is requested
+            tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
 
-        // Load tasks
-        tasksViewModel.refresh()
+            // Load tasks
+            tasksViewModel.refresh()
 
-        // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+            // Then progress indicator is hidden
+            assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-        // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(2)
+            // And data correctly loaded
+            assertThat(tasksViewModel.uiState.first().items).hasSize(2)
+        }
     }
 
     @Test
@@ -127,101 +133,116 @@ class TasksViewModelTest {
         // Make the repository return errors
         tasksRepository.setReturnError(true)
 
-        // Load tasks
-        tasksViewModel.refresh()
+        tasksViewModel.uiState.whileSubscribed {
+            // Load tasks
+            tasksViewModel.refresh()
 
-        // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+            // Then progress indicator is hidden
+            assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
 
-        // And the list of items is empty
-        assertThat(tasksViewModel.uiState.first().items).isEmpty()
-        assertThat(tasksViewModel.uiState.first().userMessage).isEqualTo(R.string.loading_tasks_error)
+            // And the list of items is empty
+            assertThat(tasksViewModel.uiState.first().items).isEmpty()
+            assertThat(tasksViewModel.uiState.first().userMessage).isEqualTo(R.string.loading_tasks_error)
+        }
     }
 
     @Test
     fun clearCompletedTasks_clearsTasks() = runTest {
-        // When completed tasks are cleared
-        tasksViewModel.clearCompletedTasks()
+        tasksViewModel.uiState.whileSubscribed {
+            // When completed tasks are cleared
+            tasksViewModel.clearCompletedTasks()
 
-        // Fetch tasks
-        tasksViewModel.refresh()
+            // Fetch tasks
+            tasksViewModel.refresh()
 
-        // Fetch tasks
-        val allTasks = tasksViewModel.uiState.first().items
-        val completedTasks = allTasks?.filter { it.isCompleted }
+            // Fetch tasks
+            val allTasks = tasksViewModel.uiState.first().items
+            val completedTasks = allTasks?.filter { it.isCompleted }
 
-        // Verify there are no completed tasks left
-        assertThat(completedTasks).isEmpty()
+            // Verify there are no completed tasks left
+            assertThat(completedTasks).isEmpty()
 
-        // Verify active task is not cleared
-        assertThat(allTasks).hasSize(1)
+            // Verify active task is not cleared
+            assertThat(allTasks).hasSize(1)
 
-        // Verify snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.completed_tasks_cleared)
+            // Verify snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.completed_tasks_cleared)
+        }
     }
 
     @Test
     fun showEditResultMessages_editOk_snackbarUpdated() = runTest {
-        // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
+        tasksViewModel.uiState.whileSubscribed {
+            // When the viewmodel receives a result from another destination
+            tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_saved_task_message)
+            // The snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.successfully_saved_task_message)
+        }
     }
 
     @Test
     fun showEditResultMessages_addOk_snackbarUpdated() = runTest {
-        // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
+        tasksViewModel.uiState.whileSubscribed {
+            // When the viewmodel receives a result from another destination
+            tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_added_task_message)
+            // The snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.successfully_added_task_message)
+        }
     }
 
     @Test
     fun showEditResultMessages_deleteOk_snackbarUpdated() = runTest {
-        // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
+        tasksViewModel.uiState.whileSubscribed {
+            // When the viewmodel receives a result from another destination
+            tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_deleted_task_message)
+            // The snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.successfully_deleted_task_message)
+        }
     }
 
     @Test
     fun completeTask_dataAndSnackbarUpdated() = runTest {
-        // With a repository that has an active task
-        val task = Task("Title", "Description")
-        tasksRepository.addTasks(task)
 
-        // Complete task
-        tasksViewModel.completeTask(task, true)
+        tasksViewModel.uiState.whileSubscribed {
+            // With a repository that has an active task
+            val task = Task("Title", "Description")
+            tasksRepository.addTasks(task)
 
-        // Verify the task is completed
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+            // Complete task
+            tasksViewModel.completeTask(task, true)
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_complete)
+            // Verify the task is completed
+            assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+
+            // The snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.task_marked_complete)
+        }
     }
 
     @Test
     fun activateTask_dataAndSnackbarUpdated() = runTest {
-        // With a repository that has a completed task
-        val task = Task("Title", "Description", true)
-        tasksRepository.addTasks(task)
+        tasksViewModel.uiState.whileSubscribed {
+            // With a repository that has a completed task
+            val task = Task("Title", "Description", true)
+            tasksRepository.addTasks(task)
 
-        // Activate task
-        tasksViewModel.completeTask(task, false)
+            // Activate task
+            tasksViewModel.completeTask(task, false)
 
-        // Verify the task is active
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
+            // Verify the task is active
+            assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
 
-        // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_active)
+            // The snackbar is updated
+            assertThat(tasksViewModel.uiState.first().userMessage)
+                .isEqualTo(R.string.task_marked_active)
+        }
     }
 }

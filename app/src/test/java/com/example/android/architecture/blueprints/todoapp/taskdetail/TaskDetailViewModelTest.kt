@@ -22,6 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.util.whileSubscribed
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -116,12 +117,14 @@ class TaskDetailViewModelTest {
 
     @Test
     fun deleteTask() = runTest {
-        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isTrue()
+        taskDetailViewModel.uiState.whileSubscribed {
+            assertThat(tasksRepository.savedTasks.value.containsValue(task)).isTrue()
 
-        // When the deletion of a task is requested
-        taskDetailViewModel.deleteTask()
+            // When the deletion of a task is requested
+            taskDetailViewModel.deleteTask()
 
-        assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
+            assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
+        }
     }
 
     @Test
