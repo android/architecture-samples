@@ -22,15 +22,18 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.tasks.DELETE_RESULT_OK
-import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
@@ -43,7 +46,7 @@ class TaskDetailFragment : Fragment() {
 
     private val args: TaskDetailFragmentArgs by navArgs()
 
-    private val viewModel by viewModels<TaskDetailViewModel> { getViewModelFactory() }
+    private val viewModel by viewModels<TaskDetailViewModel> { TodoViewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +58,7 @@ class TaskDetailFragment : Fragment() {
 
     private fun setupNavigation() {
         viewModel.deleteTaskEvent.observe(
-            this,
+            viewLifecycleOwner,
             EventObserver {
                 val action = TaskDetailFragmentDirections
                     .actionTaskDetailFragmentToTasksFragment(DELETE_RESULT_OK)
@@ -63,7 +66,7 @@ class TaskDetailFragment : Fragment() {
             }
         )
         viewModel.editTaskEvent.observe(
-            this,
+            viewLifecycleOwner,
             EventObserver {
                 val action = TaskDetailFragmentDirections
                     .actionTaskDetailFragmentToAddEditTaskFragment(
@@ -94,21 +97,30 @@ class TaskDetailFragment : Fragment() {
 
         viewModel.start(args.taskId)
 
-        setHasOptionsMenu(true)
+        setupMenuProvider()
+
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> {
-                viewModel.deleteTask()
-                true
-            }
-            else -> false
-        }
-    }
+    private fun setupMenuProvider() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.taskdetail_fragment_menu, menu)
+                }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_delete -> {
+                            viewModel.deleteTask()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner, Lifecycle.State.RESUMED
+        )
     }
 }
