@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlinVersion = '1.6.20'
-    ext.navigationVersion = '2.5.0-rc02'
+    ext.navigationVersion = '2.5.0'
     ext.ktlintVersion = '0.44.0'
     repositories {
         google()
@@ -50,7 +50,7 @@ ext {
     androidXAnnotations = '1.3.0'
     androidXLegacySupport = '1.0.0'
     appCompatVersion = '1.4.1'
-    archLifecycleVersion = '2.5.0-rc02'
+    archLifecycleVersion = '2.5.0'
     archTestingVersion = '2.1.0'
     cardVersion = '1.0.0'
     coroutinesVersion = '1.6.0'
