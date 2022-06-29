@@ -81,7 +81,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "$composeVersion"
+        kotlinCompilerExtensionVersion "$composeCompilerVersion"
     }
 
     testOptions {
@@ -142,10 +142,12 @@ dependencies {
 
     // Jetpack Compose
     implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.compose.animation:animation:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
     implementation "androidx.navigation:navigation-compose:$navigationVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$archLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$archLifecycleVersion"
     implementation "com.google.accompanist:accompanist-appcompat-theme:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"

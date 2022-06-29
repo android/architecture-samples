@@ -33,12 +33,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.StatisticsTopAppBar
-import com.example.android.architecture.blueprints.todoapp.util.collectAsStateWithLifecycle
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun StatisticsScreen(
     openDrawer: () -> Unit,
@@ -95,7 +97,12 @@ private fun StatisticsContent(
         ) {
             if (!loading) {
                 Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
-                Text(stringResource(id = R.string.statistics_completed_tasks, completedTasksPercent))
+                Text(
+                    stringResource(
+                        id = R.string.statistics_completed_tasks,
+                        completedTasksPercent
+                    )
+                )
             }
         }
     }
