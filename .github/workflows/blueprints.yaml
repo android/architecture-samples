@@ -51,13 +51,15 @@ jobs:
       - name: Compile AndroidTests
         run: ./gradlew compileDebugAndroidTestKotlin
 
-      - name: Run all tests pixel 2 api 31 ATD
-        working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api31atdDebugAndroidTest
-
-      - name: Run all tests pixel 2 api 31 non-ATD
-        working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api31DebugAndroidTest
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          disable-animations: true
+          disk-size: 2000M
+          heap-size: 600M
+          script: ./gradlew connectedDebugAndroidTest
 
       - name: Upload build reports
         if: always()
