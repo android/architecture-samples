@@ -51,13 +51,13 @@ jobs:
       - name: Compile AndroidTests
         run: ./gradlew compileDebugAndroidTestKotlin
 
-      - name: Run all tests pixel 2 api 30 ATD
+      - name: Run all tests pixel 2 api 31 ATD
         working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdDebugAndroidTest
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api31atdDebugAndroidTest
 
-      - name: Run all tests pixel 2 api 30 non-ATD
+      - name: Run all tests pixel 2 api 31 non-ATD
         working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30DebugAndroidTest
+        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api31DebugAndroidTest
 
       - name: Upload build reports
         if: always()
