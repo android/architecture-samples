@@ -73,10 +73,10 @@ class TasksViewModelTest {
         tasksViewModel.uiState.whileSubscribed {
             // Given an initialized TasksViewModel with initialized tasks
             // When loading of Tasks is requested
-            tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+            tasksViewModel.process(Action.SetFilter(TasksFilterType.ALL_TASKS))
 
             // Trigger loading of tasks
-            tasksViewModel.refresh()
+            tasksViewModel.process(Action.Refresh)
 
             // Then progress indicator is shown
             assertThat(tasksViewModel.uiState.first().isLoading).isTrue()
@@ -97,10 +97,10 @@ class TasksViewModelTest {
         tasksViewModel.uiState.whileSubscribed {
             // Given an initialized TasksViewModel with initialized tasks
             // When loading of Tasks is requested
-            tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
+            tasksViewModel.process(Action.SetFilter(TasksFilterType.ACTIVE_TASKS))
 
             // Load tasks
-            tasksViewModel.refresh()
+            tasksViewModel.process(Action.Refresh)
 
             // Then progress indicator is hidden
             assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
@@ -115,10 +115,10 @@ class TasksViewModelTest {
         tasksViewModel.uiState.whileSubscribed {
             // Given an initialized TasksViewModel with initialized tasks
             // When loading of Tasks is requested
-            tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
+            tasksViewModel.process(Action.SetFilter(TasksFilterType.COMPLETED_TASKS))
 
             // Load tasks
-            tasksViewModel.refresh()
+            tasksViewModel.process(Action.Refresh)
 
             // Then progress indicator is hidden
             assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
@@ -135,7 +135,7 @@ class TasksViewModelTest {
 
         tasksViewModel.uiState.whileSubscribed {
             // Load tasks
-            tasksViewModel.refresh()
+            tasksViewModel.process(Action.Refresh)
 
             // Then progress indicator is hidden
             assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
@@ -150,10 +150,10 @@ class TasksViewModelTest {
     fun clearCompletedTasks_clearsTasks() = runTest {
         tasksViewModel.uiState.whileSubscribed {
             // When completed tasks are cleared
-            tasksViewModel.clearCompletedTasks()
+            tasksViewModel.process(Action.ClearCompletedTasks)
 
             // Fetch tasks
-            tasksViewModel.refresh()
+            tasksViewModel.process(Action.Refresh)
 
             // Fetch tasks
             val allTasks = tasksViewModel.uiState.first().items
@@ -175,7 +175,7 @@ class TasksViewModelTest {
     fun showEditResultMessages_editOk_snackbarUpdated() = runTest {
         tasksViewModel.uiState.whileSubscribed {
             // When the viewmodel receives a result from another destination
-            tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
+            tasksViewModel.process(Action.ShowEditResultMessage(EDIT_RESULT_OK))
 
             // The snackbar is updated
             assertThat(tasksViewModel.uiState.first().userMessage)
@@ -187,7 +187,7 @@ class TasksViewModelTest {
     fun showEditResultMessages_addOk_snackbarUpdated() = runTest {
         tasksViewModel.uiState.whileSubscribed {
             // When the viewmodel receives a result from another destination
-            tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
+            tasksViewModel.process(Action.ShowEditResultMessage(ADD_EDIT_RESULT_OK))
 
             // The snackbar is updated
             assertThat(tasksViewModel.uiState.first().userMessage)
@@ -199,7 +199,7 @@ class TasksViewModelTest {
     fun showEditResultMessages_deleteOk_snackbarUpdated() = runTest {
         tasksViewModel.uiState.whileSubscribed {
             // When the viewmodel receives a result from another destination
-            tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
+            tasksViewModel.process(Action.ShowEditResultMessage(DELETE_RESULT_OK))
 
             // The snackbar is updated
             assertThat(tasksViewModel.uiState.first().userMessage)
@@ -216,7 +216,7 @@ class TasksViewModelTest {
             tasksRepository.addTasks(task)
 
             // Complete task
-            tasksViewModel.completeTask(task, true)
+            tasksViewModel.process(Action.SetTaskCompletion(task = task, completed = true))
 
             // Verify the task is completed
             assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
@@ -235,7 +235,7 @@ class TasksViewModelTest {
             tasksRepository.addTasks(task)
 
             // Activate task
-            tasksViewModel.completeTask(task, false)
+            tasksViewModel.process(Action.SetTaskCompletion(task = task, completed = false))
 
             // Verify the task is active
             assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()

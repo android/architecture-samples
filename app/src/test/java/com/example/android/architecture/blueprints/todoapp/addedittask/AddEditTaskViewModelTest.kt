@@ -70,10 +70,18 @@ class AddEditTaskViewModelTest {
             val newTitle = "New Task Title"
             val newDescription = "Some Task Description"
             addEditTaskViewModel.apply {
-                updateTitle(newTitle)
-                updateDescription(newDescription)
+                process(Action.UpdateTitle(newTitle))
+                process(Action.UpdateDescription(newDescription))
             }
-            addEditTaskViewModel.saveTask()
+            val uiState = addEditTaskViewModel.uiState.value
+            addEditTaskViewModel.process(
+                Action.Save(
+                    taskId = uiState.taskId,
+                    title = uiState.title,
+                    description = uiState.description,
+                    taskCompleted = uiState.isTaskCompleted,
+                )
+            )
 
             val newTask = tasksRepository.savedTasks.value.values.first()
 
@@ -162,14 +170,21 @@ class AddEditTaskViewModelTest {
 
     private fun saveTaskAndAssertUserMessage(title: String, description: String) = runTest {
         addEditTaskViewModel.apply {
-            updateTitle(title)
-            updateDescription(description)
+            process(Action.UpdateTitle(title))
+            process(Action.UpdateDescription(description))
         }
 
         addEditTaskViewModel.uiState.whileSubscribed {
             // When saving an incomplete task
-            addEditTaskViewModel.saveTask()
-
+            val uiState = addEditTaskViewModel.uiState.value
+            addEditTaskViewModel.process(
+                Action.Save(
+                    taskId = uiState.taskId,
+                    title = uiState.title,
+                    description = uiState.description,
+                    taskCompleted = uiState.isTaskCompleted,
+                )
+            )
             assertThat(
                 addEditTaskViewModel.uiState.value.userMessage
             ).isEqualTo(string.empty_task_message)

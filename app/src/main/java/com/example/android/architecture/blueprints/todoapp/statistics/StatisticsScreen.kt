@@ -59,7 +59,7 @@ fun StatisticsScreen(
             empty = uiState.isEmpty,
             activeTasksPercent = uiState.activeTasksPercent,
             completedTasksPercent = uiState.completedTasksPercent,
-            onRefresh = { viewModel.refresh() },
+            onRefresh = { viewModel.process(Action.Refresh) },
             modifier = modifier.padding(paddingValues)
         )
     }

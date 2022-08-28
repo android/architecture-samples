@@ -63,10 +63,15 @@ fun TaskDetailScreen(
         scaffoldState = scaffoldState,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask)
+            TaskDetailTopAppBar(
+                onBack = onBack,
+                onDelete = {
+                    viewModel.process(Action.Delete)
+                }
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
+            FloatingActionButton(onClick = { onEditTask(viewModel.uiState.value.taskId) }) {
                 Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
             }
         }
@@ -77,8 +82,17 @@ fun TaskDetailScreen(
             loading = uiState.isLoading,
             empty = uiState.task == null && !uiState.isLoading,
             task = uiState.task,
-            onRefresh = viewModel::refresh,
-            onTaskCheck = viewModel::setCompleted,
+            onRefresh = {
+                viewModel.process(Action.Refresh)
+            },
+            onTaskCheck = {
+                viewModel.process(
+                    Action.SetCompleted(
+                        task = viewModel.uiState.value.task,
+                        completed = it
+                    )
+                )
+            },
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -87,7 +101,7 @@ fun TaskDetailScreen(
             val snackbarText = stringResource(userMessage)
             LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
                 scaffoldState.snackbarHostState.showSnackbar(snackbarText)
-                viewModel.snackbarMessageShown()
+                viewModel.process(Action.SnackBarMessageShown)
             }
         }
 

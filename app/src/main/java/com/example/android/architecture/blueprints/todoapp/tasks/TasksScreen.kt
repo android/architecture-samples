@@ -81,11 +81,11 @@ fun TasksScreen(
         topBar = {
             TasksTopAppBar(
                 openDrawer = openDrawer,
-                onFilterAllTasks = { viewModel.setFiltering(ALL_TASKS) },
-                onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
-                onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
-                onClearCompletedTasks = { viewModel.clearCompletedTasks() },
-                onRefresh = { viewModel.refresh() }
+                onFilterAllTasks = { viewModel.process(Action.SetFilter(ALL_TASKS)) },
+                onFilterActiveTasks = { viewModel.process(Action.SetFilter(ACTIVE_TASKS)) },
+                onFilterCompletedTasks = { viewModel.process(Action.SetFilter(COMPLETED_TASKS)) },
+                onClearCompletedTasks = { viewModel.process(Action.ClearCompletedTasks) },
+                onRefresh = { viewModel.process(Action.Refresh) }
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -103,9 +103,16 @@ fun TasksScreen(
             currentFilteringLabel = uiState.filteringUiInfo.currentFilteringLabel,
             noTasksLabel = uiState.filteringUiInfo.noTasksLabel,
             noTasksIconRes = uiState.filteringUiInfo.noTaskIconRes,
-            onRefresh = viewModel::refresh,
+            onRefresh = { viewModel.process(Action.Refresh) },
             onTaskClick = onTaskClick,
-            onTaskCheckedChange = viewModel::completeTask,
+            onTaskCheckedChange = { task, isCompleted ->
+                viewModel.process(
+                    Action.SetTaskCompletion(
+                        task = task,
+                        completed = isCompleted
+                    )
+                )
+            },
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -114,7 +121,7 @@ fun TasksScreen(
             val snackbarText = stringResource(message)
             LaunchedEffect(scaffoldState, viewModel, message, snackbarText) {
                 scaffoldState.snackbarHostState.showSnackbar(snackbarText)
-                viewModel.snackbarMessageShown()
+                viewModel.process(Action.SnackBarMessageShown)
             }
         }
 
@@ -122,7 +129,7 @@ fun TasksScreen(
         val currentOnUserMessageDisplayed by rememberUpdatedState(onUserMessageDisplayed)
         LaunchedEffect(userMessage) {
             if (userMessage != 0) {
-                viewModel.showEditResultMessage(userMessage)
+                viewModel.process(Action.ShowEditResultMessage(userMessage))
                 currentOnUserMessageDisplayed()
             }
         }

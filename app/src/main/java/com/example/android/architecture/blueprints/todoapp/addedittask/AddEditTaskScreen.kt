@@ -67,9 +67,22 @@ fun AddEditTaskScreen(
         scaffoldState = scaffoldState,
         topBar = { AddEditTaskTopAppBar(topBarTitle, onBack) },
         floatingActionButton = {
-            FloatingActionButton(onClick = viewModel::saveTask) {
-                Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
-            }
+            FloatingActionButton(
+                onClick = {
+                    val uiState = viewModel.uiState.value
+                    viewModel.process(
+                        Action.Save(
+                            taskId = uiState.taskId,
+                            title = uiState.title,
+                            description = uiState.description,
+                            taskCompleted = uiState.isTaskCompleted
+                        )
+                    )
+                },
+                content = {
+                    Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
+                }
+            )
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,8 +91,12 @@ fun AddEditTaskScreen(
             loading = uiState.isLoading,
             title = uiState.title,
             description = uiState.description,
-            onTitleChanged = viewModel::updateTitle,
-            onDescriptionChanged = viewModel::updateDescription,
+            onTitleChanged = {
+                viewModel.process(Action.UpdateTitle(title = it))
+            },
+            onDescriptionChanged = {
+                viewModel.process(Action.UpdateDescription(description = it))
+            },
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -95,7 +112,7 @@ fun AddEditTaskScreen(
             val snackbarText = stringResource(userMessage)
             LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
                 scaffoldState.snackbarHostState.showSnackbar(snackbarText)
-                viewModel.snackbarMessageShown()
+                viewModel.process(Action.SnackBarMessageShown)
             }
         }
     }

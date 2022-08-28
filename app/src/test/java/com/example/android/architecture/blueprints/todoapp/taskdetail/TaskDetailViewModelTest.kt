@@ -81,7 +81,7 @@ class TaskDetailViewModelTest {
 
         // When the ViewModel is asked to complete the task
         assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
-        taskDetailViewModel.setCompleted(true)
+        taskDetailViewModel.process(Action.SetCompleted(task = task, completed = true))
 
         // Then the task is completed and the snackbar shows the correct message
         assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
@@ -98,7 +98,7 @@ class TaskDetailViewModelTest {
 
         // When the ViewModel is asked to complete the task
         assertThat(taskDetailViewModel.uiState.first().task?.id).isEqualTo("0")
-        taskDetailViewModel.setCompleted(false)
+        taskDetailViewModel.process(Action.SetCompleted(task = task, completed = false))
 
         // Then the task is not completed and the snackbar shows the correct message
         val newTask = (tasksRepository.getTask(task.id) as Success).data
@@ -121,7 +121,7 @@ class TaskDetailViewModelTest {
             assertThat(tasksRepository.savedTasks.value.containsValue(task)).isTrue()
 
             // When the deletion of a task is requested
-            taskDetailViewModel.deleteTask()
+            taskDetailViewModel.process(Action.Delete)
 
             assertThat(tasksRepository.savedTasks.value.containsValue(task)).isFalse()
         }
