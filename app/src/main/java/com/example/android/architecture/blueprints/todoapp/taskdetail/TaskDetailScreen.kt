@@ -36,6 +36,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -92,9 +93,10 @@ fun TaskDetailScreen(
         }
 
         // Check if the task is deleted and call onDeleteTask
-        LaunchedEffect(uiState.isTaskDeleted) {
-            if (uiState.isTaskDeleted) {
-                onDeleteTask()
+        if (uiState.isTaskDeleted) {
+            val currentOnDeleteTask by rememberUpdatedState(onDeleteTask)
+            LaunchedEffect(Unit) {
+                currentOnDeleteTask()
             }
         }
     }
