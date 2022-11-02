@@ -32,7 +32,7 @@ This project hosts each sample app in separate repository branches. For more inf
 
 ## Screenshots
 
-<img src="screenshots/todoapp.gif" alt="Screenshot">
+<img src="screenshots/screenshots.png" alt="Screenshot">
 
 ## Why a to-do app?
 
