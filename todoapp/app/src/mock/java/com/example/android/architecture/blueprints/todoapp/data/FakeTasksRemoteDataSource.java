@@ -16,8 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
@@ -37,7 +37,8 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
 
     // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {}
+    private FakeTasksRemoteDataSource() {
+    }
 
     public static FakeTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {

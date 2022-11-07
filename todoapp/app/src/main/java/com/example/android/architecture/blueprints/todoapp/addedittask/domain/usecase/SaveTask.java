@@ -16,13 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase;
 
-import android.support.annotation.NonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 /**
  * Updates or creates a new {@link Task} in the {@link TasksRepository}.

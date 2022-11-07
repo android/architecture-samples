@@ -1,16 +1,16 @@
 package com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase;
 
-import android.support.annotation.NonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
-import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.model.Statistics;
+import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Calculate statistics of active and completed Tasks {@link Task} in the {@link TasksRepository}.

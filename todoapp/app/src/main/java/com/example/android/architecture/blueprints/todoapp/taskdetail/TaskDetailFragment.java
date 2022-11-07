@@ -16,14 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,12 +31,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Preconditions;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Main UI for the task detail screen.
@@ -76,8 +77,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
         setHasOptionsMenu(true);
         mDetailTitle = (TextView) root.findViewById(R.id.task_detail_title);
@@ -85,8 +85,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         mDetailCompleteStatus = (CheckBox) root.findViewById(R.id.task_detail_complete);
 
         // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,17 +146,16 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         Preconditions.checkNotNull(mDetailCompleteStatus);
 
         mDetailCompleteStatus.setChecked(complete);
-        mDetailCompleteStatus.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            mPresenter.completeTask();
-                        } else {
-                            mPresenter.activateTask();
-                        }
-                    }
-                });
+        mDetailCompleteStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPresenter.completeTask();
+                } else {
+                    mPresenter.activateTask();
+                }
+            }
+        });
     }
 
     @Override
@@ -173,14 +171,12 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     public void showTaskMarkedComplete() {
-        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
-                .show();
+        Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void showTaskMarkedActive() {
-        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
-                .show();
+        Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG).show();
     }
 
     @Override

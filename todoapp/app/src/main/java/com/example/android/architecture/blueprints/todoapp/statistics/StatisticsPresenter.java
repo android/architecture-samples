@@ -18,12 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.UseCaseHandler;
-import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 import com.example.android.architecture.blueprints.todoapp.statistics.domain.model.Statistics;
+import com.example.android.architecture.blueprints.todoapp.statistics.domain.usecase.GetStatistics;
 
 /**
  * Listens to user actions from the UI ({@link StatisticsFragment}), retrieves the data and updates
@@ -35,13 +35,10 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private final UseCaseHandler mUseCaseHandler;
     private final GetStatistics mGetStatistics;
 
-    public StatisticsPresenter(
-            @NonNull UseCaseHandler useCaseHandler,
-            @NonNull StatisticsContract.View statisticsView,
-            @NonNull GetStatistics getStatistics) {
+    public StatisticsPresenter(@NonNull UseCaseHandler useCaseHandler, @NonNull StatisticsContract.View statisticsView, @NonNull GetStatistics getStatistics) {
         mUseCaseHandler = checkNotNull(useCaseHandler, "useCaseHandler cannot be null!");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
-        mGetStatistics = checkNotNull(getStatistics,"getStatistics cannot be null!");
+        mGetStatistics = checkNotNull(getStatistics, "getStatistics cannot be null!");
 
         mStatisticsView.setPresenter(this);
     }
@@ -54,8 +51,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(),
-                new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
+        mUseCaseHandler.execute(mGetStatistics, new GetStatistics.RequestValues(), new UseCase.UseCaseCallback<GetStatistics.ResponseValue>() {
             @Override
             public void onSuccess(GetStatistics.ResponseValue response) {
                 Statistics statistics = response.getStatistics();

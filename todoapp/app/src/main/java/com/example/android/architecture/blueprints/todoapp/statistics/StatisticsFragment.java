@@ -16,18 +16,19 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.example.android.architecture.blueprints.todoapp.R;
 
 /**
  * Main UI for the statistics screen.
@@ -49,8 +50,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = (TextView) root.findViewById(R.id.statistics);
         return root;
@@ -76,9 +76,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
         if (numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
             mStatisticsTV.setText(getResources().getString(R.string.statistics_no_tasks));
         } else {
-            String displayString = getResources().getString(R.string.statistics_active_tasks) + " "
-                    + numberOfIncompleteTasks + "\n" + getResources().getString(
-                    R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
+            String displayString = getResources().getString(R.string.statistics_active_tasks) + " " + numberOfIncompleteTasks + "\n" + getResources().getString(R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
             mStatisticsTV.setText(displayString);
         }
     }

@@ -16,12 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.util;
 
-import android.support.annotation.NonNull;
-import android.support.test.espresso.IdlingResource;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import androidx.annotation.NonNull;
+import androidx.test.espresso.IdlingResource;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An simple counter implementation of {@link IdlingResource} that determines idleness by
@@ -74,7 +75,7 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
 
     /**
      * Decrements the count of in-flight transactions to the resource being monitored.
-     *
+     * <p>
      * If this operation results in the counter falling below 0 - an exception is raised.
      *
      * @throws IllegalStateException if the counter is below 0.

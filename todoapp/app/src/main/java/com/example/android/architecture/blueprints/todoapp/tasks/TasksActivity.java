@@ -18,21 +18,22 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.NavigationView;
-import android.support.test.espresso.IdlingResource;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.test.espresso.IdlingResource;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.google.android.material.navigation.NavigationView;
 
 public class TasksActivity extends AppCompatActivity {
 
@@ -62,29 +63,19 @@ public class TasksActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        TasksFragment tasksFragment =
-                (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        TasksFragment tasksFragment = (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (tasksFragment == null) {
             // Create the fragment
             tasksFragment = TasksFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
         }
 
         // Create the presenter
-        mTasksPresenter = new TasksPresenter(
-                Injection.provideUseCaseHandler(),
-                tasksFragment,
-                Injection.provideGetTasks(getApplicationContext()),
-                Injection.provideCompleteTasks(getApplicationContext()),
-                Injection.provideActivateTask(getApplicationContext()),
-                Injection.provideClearCompleteTasks(getApplicationContext())
-                );
+        mTasksPresenter = new TasksPresenter(Injection.provideUseCaseHandler(), tasksFragment, Injection.provideGetTasks(getApplicationContext()), Injection.provideCompleteTasks(getApplicationContext()), Injection.provideActivateTask(getApplicationContext()), Injection.provideClearCompleteTasks(getApplicationContext()));
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
-            TasksFilterType currentFiltering =
-                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            TasksFilterType currentFiltering = (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             mTasksPresenter.setFiltering(currentFiltering);
         }
     }
@@ -108,28 +99,26 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.list_navigation_menu_item:
-                                // Do nothing, we're already on that screen
-                                break;
-                            case R.id.statistics_navigation_menu_item:
-                                Intent intent =
-                                        new Intent(TasksActivity.this, StatisticsActivity.class);
-                                startActivity(intent);
-                                break;
-                            default:
-                                break;
-                        }
-                        // Close the navigation drawer when an item is selected.
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
-                });
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.list_navigation_menu_item:
+                        // Do nothing, we're already on that screen
+                        break;
+                    case R.id.statistics_navigation_menu_item:
+                        Intent intent = new Intent(TasksActivity.this, StatisticsActivity.class);
+                        startActivity(intent);
+                        break;
+                    default:
+                        break;
+                }
+                // Close the navigation drawer when an item is selected.
+                menuItem.setChecked(true);
+                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
     }
 
     @VisibleForTesting

@@ -16,8 +16,11 @@
 
 package com.example.android.architecture.blueprints.todoapp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.DeleteTask;
 import com.example.android.architecture.blueprints.todoapp.addedittask.domain.usecase.GetTask;
@@ -34,8 +37,6 @@ import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.CompleteTask;
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase.GetTasks;
 import com.example.android.architecture.blueprints.todoapp.util.AppExecutors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of mock implementations for

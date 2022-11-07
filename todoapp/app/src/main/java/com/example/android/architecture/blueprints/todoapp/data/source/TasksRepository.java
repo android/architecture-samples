@@ -16,8 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.tasks.domain.model.Task;
 
@@ -26,8 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
@@ -56,8 +56,7 @@ public class TasksRepository implements TasksDataSource {
     boolean mCacheIsDirty = false;
 
     // Prevent direct instantiation.
-    private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource) {
+    private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource, @NonNull TasksDataSource tasksLocalDataSource) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
     }
@@ -69,8 +68,7 @@ public class TasksRepository implements TasksDataSource {
      * @param tasksLocalDataSource  the device storage data source
      * @return the {@link TasksRepository} instance
      */
-    public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource,
-                                              TasksDataSource tasksLocalDataSource) {
+    public static TasksRepository getInstance(TasksDataSource tasksRemoteDataSource, TasksDataSource tasksLocalDataSource) {
         if (INSTANCE == null) {
             INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource);
         }

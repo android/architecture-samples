@@ -17,12 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.test.espresso.IdlingResource;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -54,8 +55,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setDisplayShowHomeEnabled(true);
 
-        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.contentFrame);
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         String taskId = getIntent().getStringExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
 
@@ -70,8 +70,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 addEditTaskFragment.setArguments(bundle);
             }
 
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    addEditTaskFragment, R.id.contentFrame);
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), addEditTaskFragment, R.id.contentFrame);
         }
 
         boolean shouldLoadDataFromRepo = true;
@@ -83,16 +82,11 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        mAddEditTaskPresenter = new AddEditTaskPresenter(Injection.provideUseCaseHandler(),
-                taskId,
-                addEditTaskFragment,
-                Injection.provideGetTask(getApplicationContext()),
-                Injection.provideSaveTask(getApplicationContext()),
-                shouldLoadDataFromRepo);
+        mAddEditTaskPresenter = new AddEditTaskPresenter(Injection.provideUseCaseHandler(), taskId, addEditTaskFragment, Injection.provideGetTask(getApplicationContext()), Injection.provideSaveTask(getApplicationContext()), shouldLoadDataFromRepo);
     }
 
     private void setToolbarTitle(@Nullable String taskId) {
-        if(taskId == null) {
+        if (taskId == null) {
             mActionBar.setTitle(R.string.add_task);
         } else {
             mActionBar.setTitle(R.string.edit_task);

@@ -16,12 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks.domain.usecase;
 
-import android.support.annotation.NonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import androidx.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.UseCase;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Marks a task as active (not completed yet).
@@ -54,5 +54,6 @@ public class ActivateTask extends UseCase<ActivateTask.RequestValues, ActivateTa
         }
     }
 
-    public static final class ResponseValue implements UseCase.ResponseValue { }
+    public static final class ResponseValue implements UseCase.ResponseValue {
+    }
 }

@@ -18,8 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.util;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -48,8 +49,7 @@ public class AppExecutors {
     }
 
     public AppExecutors() {
-        this(new DiskIOThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
-                new MainThreadExecutor());
+        this(new DiskIOThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT), new MainThreadExecutor());
     }
 
     public Executor diskIO() {
