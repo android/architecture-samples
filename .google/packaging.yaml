@@ -26,6 +26,7 @@ categories:
   - AndroidArchitectureDataLayer
   - AndroidArchitectureStateProduction
   - AndroidArchitectureStateHolder
+  - AndroidArchitectureUIEvents
   - JetpackComposeTesting
   - JetpackComposeArchitectureAndState
   - JetpackComposeNavigation
