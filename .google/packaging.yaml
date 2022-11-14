@@ -18,14 +18,26 @@
 # End users may safely ignore this file. It has no relevance to other systems.
 ---
 status:       PUBLISHED
-technologies: [Android]
+technologies: [Android, JetpackCompose, Coroutines]
 categories:
   - AndroidTesting
   - AndroidArchitecture
   - AndroidArchitectureUILayer
   - AndroidArchitectureDataLayer
+  - AndroidArchitectureStateProduction
+  - AndroidArchitectureStateHolder
+  - AndroidArchitectureUIEvents
+  - JetpackComposeTesting
+  - JetpackComposeArchitectureAndState
+  - JetpackComposeNavigation
 languages:    [Kotlin]
-solutions:    [Mobile]
+solutions:
+  - Mobile
+  - Flow
+  - JetpackHilt
+  - JetpackRoom
+  - JetpackNavigation
+  - JetpackLifecycle
 github:       android/architecture-samples
 level:        INTERMEDIATE
 license: apache2
