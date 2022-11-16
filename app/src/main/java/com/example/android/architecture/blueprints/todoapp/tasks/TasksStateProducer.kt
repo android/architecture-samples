@@ -40,7 +40,7 @@ fun tasksStateProducer(
     scope: CoroutineScope,
     tasksRepository: TasksRepository,
     savedStateHandle: SavedStateHandle
-) = actionStateProducer<Action, TasksUiState>(
+) = actionStateProducer(
     scope = scope,
     initialState = TasksUiState(isLoading = true),
     mutationFlows = listOf(

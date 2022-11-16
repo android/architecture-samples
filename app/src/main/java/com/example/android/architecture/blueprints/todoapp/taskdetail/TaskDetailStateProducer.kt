@@ -34,7 +34,7 @@ fun taskDetailStateProducer(
     scope: CoroutineScope,
     tasksRepository: TasksRepository,
     savedStateHandle: SavedStateHandle
-) = actionStateProducer<Action, TaskDetailUiState>(
+) = actionStateProducer(
     scope = scope,
     initialState = TaskDetailUiState(
         isLoading = true,

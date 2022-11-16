@@ -5,12 +5,12 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ActionTransformBuilder<Action : Any, State: Any> {
-    val actionHandlers = ArrayList<(Flow<Action>) -> Flow<Mutation<State>>>()
+    val actionTransformers = mutableListOf<(Flow<Action>) -> Flow<Mutation<State>>>()
 
     inline fun <reified T: Action> onAction(
         noinline block: TransformationContext<T>.() -> Flow<Mutation<State>>
     ) {
-        actionHandlers += { action ->
+        actionTransformers += { action ->
             action.filterIsInstance<T>().toMutationStream(transform = block)
         }
     }
@@ -58,7 +58,7 @@ fun <Action : Any, State : Any> actionStateProducer(
     override val state: StateFlow<State> = scope.produceState(
         initial = initialState,
         started = started,
-        mutationFlows = mutationFlows + builder.actionHandlers.map { it(actions) }
+        mutationFlows = mutationFlows + builder.actionTransformers.map { it(actions) }
     )
 
     override val process: (Action) -> Unit = { action ->
