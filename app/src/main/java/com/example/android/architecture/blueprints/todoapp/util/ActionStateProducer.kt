@@ -1,13 +1,20 @@
 package com.example.android.architecture.blueprints.todoapp.util
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+class ActionTransformBuilder<Action : Any, State: Any> {
+    val actionHandlers = ArrayList<(Flow<Action>) -> Flow<Mutation<State>>>()
+
+    inline fun <reified T: Action> onAction(
+        noinline block: TransformationContext<T>.() -> Flow<Mutation<State>>
+    ) {
+        actionHandlers += { action ->
+            action.filterIsInstance<T>().toMutationStream(transform = block)
+        }
+    }
+}
 
 /**
  * Interface for a type that produces a [StateFlow] of [State] by processing [Action]
@@ -39,14 +46,19 @@ fun <Action : Any, State : Any> actionStateProducer(
     initialState: State,
     started: SharingStarted = WhileUiSubscribed,
     mutationFlows: List<Flow<Mutation<State>>> = listOf(),
-    actionTransform: (Flow<Action>) -> Flow<Mutation<State>>
+    actionTransform: ActionTransformBuilder<Action, State>.() -> Unit
 ): ActionStateProducer<Action, State> = object : ActionStateProducer<Action, State> {
     val actions = MutableSharedFlow<Action>()
+    val builder = ActionTransformBuilder<Action, State>()
+
+    init {
+        actionTransform(builder)
+    }
 
     override val state: StateFlow<State> = scope.produceState(
         initial = initialState,
         started = started,
-        mutationFlows = mutationFlows + actionTransform(actions)
+        mutationFlows = mutationFlows + builder.actionHandlers.map { it(actions) }
     )
 
     override val process: (Action) -> Unit = { action ->

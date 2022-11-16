@@ -12,15 +12,8 @@ import com.example.android.architecture.blueprints.todoapp.util.Mutation
 import com.example.android.architecture.blueprints.todoapp.util.Mutations
 import com.example.android.architecture.blueprints.todoapp.util.actionStateProducer
 import com.example.android.architecture.blueprints.todoapp.util.mutation
-import com.example.android.architecture.blueprints.todoapp.util.toMutationStream
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 
 sealed class Action {
     object Refresh : Action()
@@ -56,25 +49,25 @@ fun tasksStateProducer(
             savedStateHandle = savedStateHandle
         )
     ),
-    actionTransform = { actionStream ->
-        actionStream.toMutationStream {
-            when (val type = type()) {
-                is Action.ClearCompletedTasks -> type.flow.clearCompletedTasksMutations(
-                    tasksRepository = tasksRepository
-                )
-                is Action.Refresh -> type.flow.flatMapLatest {
-                    refreshMutations(tasksRepository = tasksRepository)
-                }
-                is Action.SetFilter -> type.flow.filterChangeMutations(
-                    savedStateHandle = savedStateHandle
-                )
-                is Action.SetTaskCompletion -> type.flow.taskCompletionMutations(
-                    tasksRepository = tasksRepository
-                )
-                is Action.ShowEditResultMessage -> type.flow.editResultMessageMutations()
-                is Action.SnackBarMessageShown -> type.flow.snackbarMessageMutations()
-            }
-        }
+    actionTransform = {
+		onAction<Action.ClearCompletedTasks> {
+			flow.clearCompletedTasksMutations(tasksRepository)
+		}
+        onAction<Action.Refresh> {
+			flow.flatMapLatest { refreshMutations(tasksRepository) }
+		}
+		onAction<Action.SetFilter> {
+			flow.filterChangeMutations(savedStateHandle)
+		}
+		onAction<Action.SetTaskCompletion> {
+			flow.taskCompletionMutations(tasksRepository)
+		}
+		onAction<Action.ShowEditResultMessage> {
+			flow.editResultMessageMutations()
+		}
+		onAction<Action.SnackBarMessageShown> {
+			flow.snackbarMessageMutations()
+		}
     }
 )
 

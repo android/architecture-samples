@@ -28,13 +28,9 @@ fun statisticsStateProducer(
     mutationFlows = listOf(
         loadMutations(tasksRepository)
     ),
-    actionTransform = { actionStream ->
-        actionStream.toMutationStream {
-            when (val type = type()) {
-                is Action.Refresh -> type.flow.refreshMutations(
-                    tasksRepository = tasksRepository
-                )
-            }
+    actionTransform = {
+        onAction<Action.Refresh> {
+            flow.refreshMutations(tasksRepository)
         }
     }
 )

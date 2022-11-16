@@ -35,7 +35,7 @@ fun addEditStateProducer(
     scope: CoroutineScope,
     tasksRepository: TasksRepository,
     savedStateHandle: SavedStateHandle
-) = actionStateProducer<Action, AddEditTaskUiState>(
+) = actionStateProducer(
     scope = scope,
     initialState = AddEditTaskUiState(
         taskId = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG],
@@ -47,16 +47,18 @@ fun addEditStateProducer(
             tasksRepository = tasksRepository
         )
     ),
-    actionTransform = { actionStream ->
-        actionStream.toMutationStream {
-            when (val type = type()) {
-                is Action.Save -> type.flow.saveMutations(
-                    tasksRepository = tasksRepository
-                )
-                is Action.UpdateDescription -> type.flow.descriptionMutations()
-                is Action.UpdateTitle -> type.flow.titleMutations()
-                is Action.SnackBarMessageShown -> type.flow.snackbarMessageMutations()
-            }
+    actionTransform = {
+        onAction<Action.Save> {
+            flow.saveMutations(tasksRepository)
+        }
+        onAction<Action.UpdateDescription> {
+            flow.descriptionMutations()
+        }
+        onAction<Action.UpdateTitle> {
+            flow.titleMutations()
+        }
+        onAction<Action.SnackBarMessageShown> {
+            flow.snackbarMessageMutations()
         }
     }
 )

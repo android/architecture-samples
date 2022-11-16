@@ -46,24 +46,25 @@ fun taskDetailStateProducer(
             tasksRepository = tasksRepository
         )
     ),
-    actionTransform = { actionStream ->
+    actionTransform = {
         val taskId: String = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]!!
-        actionStream.toMutationStream {
-            when (val type = type()) {
-                is Action.Refresh -> type.flow.refreshMutations(
-                    taskId = taskId,
-                    tasksRepository = tasksRepository
-                )
-                is Action.Delete -> type.flow.deleteMutations(
-                    taskId = taskId,
-                    tasksRepository = tasksRepository
-                )
-                is Action.SetCompleted -> type.flow.completionMutations(
-                    taskId = taskId,
-                    tasksRepository = tasksRepository
-                )
-                is Action.SnackBarMessageShown -> type.flow.snackbarMessageMutations()
-            }
+        onAction<Action.Refresh> {
+            flow.refreshMutations(
+                taskId, tasksRepository
+            )
+        }
+        onAction<Action.Delete> {
+            flow.deleteMutations(
+                taskId, tasksRepository
+            )
+        }
+        onAction<Action.SetCompleted> {
+            flow.completionMutations(
+                taskId, tasksRepository
+            )
+        }
+        onAction<Action.SnackBarMessageShown> {
+            flow.snackbarMessageMutations()
         }
     }
 )

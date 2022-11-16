@@ -11,27 +11,10 @@ import kotlinx.coroutines.flow.scan
 /**
  * Class holding the context of the [Action] emitted that is being split out into
  * a [Mutation] [Flow].
- *
- * Use typically involves invoking [type] to identify the [Action] stream being transformed, and
- * subsequently invoking [flow] to perform a custom transformation on the split out [Flow].
  */
 data class TransformationContext<Action : Any>(
-    private val type: Action,
-    val backing: Flow<Action>
-) {
-
-    /**
-     * A convenience for the backing [Flow] of the [Action] subtype  from the parent [Flow]
-     */
-    @Suppress("unused", "UNCHECKED_CAST")
-    inline val <reified Subtype : Action> Subtype.flow: Flow<Subtype>
-        get() = backing as Flow<Subtype>
-
-    /**
-     * the first [Action] of the specified type emitted from the parent [Flow]
-     */
-    fun type() = type
-}
+    val flow: Flow<Action>
+)
 
 /**
  * Transforms a [Flow] of [Action] to a [Flow] of [Mutation] of [State], allowing for finer grained
@@ -86,7 +69,7 @@ fun <Input : Any, Selector : Any, Output : Any> Flow<Input>.splitByType(
                     null -> {
                         val holder = FlowHolder(selected)
                         keysToFlowHolders[flowKey] = holder
-                        val context = TransformationContext(selected, holder.exposedFlow)
+                        val context = TransformationContext(holder.exposedFlow)
                         val mutationFlow = transform(context)
                         channel.send(mutationFlow)
                     }
