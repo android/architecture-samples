@@ -1,15 +1,11 @@
 buildscript {
-    ext.kotlinVersion = '1.7.0'
-    ext.navigationVersion = '2.5.0'
+    ext.kotlinVersion = '1.7.20'
+    ext.navigationVersion = '2.5.3'
     ext.ktlintVersion = '0.44.0'
-    ext.hiltVersion = '2.42'
+    ext.hiltVersion = '2.44.2'
 
-    repositories {
-        google()
-        mavenCentral()
-    }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.android.tools.build:gradle:7.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
@@ -24,10 +20,6 @@ plugins {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
     apply plugin: 'com.diffplug.spotless'
     spotless {
         kotlin {
@@ -55,26 +47,26 @@ ext {
     compileSdkVersion = 32
 
     // App dependencies
-    accompanistVersion = '0.23.0'
-    activityComposeVersion = '1.4.0'
+    accompanistVersion = '0.25.1'
+    activityComposeVersion = '1.5.1'
     androidXVersion = '1.0.0'
-    androidXTestCoreVersion = '1.4.1-alpha06'
-    androidXTestExtKotlinRunnerVersion = '1.1.4-alpha06'
-    androidXTestRulesVersion = '1.4.1-alpha06'
-    androidXAnnotations = '1.3.0'
+    androidXTestCoreVersion = '1.5.0'
+    androidXTestExtKotlinRunnerVersion = '1.1.4'
+    androidXTestRulesVersion = '1.5.0'
+    androidXAnnotations = '1.5.0'
     archLifecycleVersion = '2.6.0-alpha01'
     archTestingVersion = '2.1.0'
     composeVersion = '1.2.0'
-    composeCompilerVersion = '1.2.0'
-    coroutinesVersion = '1.6.1'
+    composeCompilerVersion = '1.3.2'
+    coroutinesVersion = '1.6.4'
     dexMakerVersion = '2.12.1'
-    espressoVersion = '3.5.0-alpha06'
+    espressoVersion = '3.5.0'
     hamcrestVersion = '1.3'
     hiltAndroidXVersion = '1.0.0'
     junitVersion = '4.13.2'
     multiDexVersion = '2.0.1'
-    robolectricVersion = '4.8.1'
-    roomVersion = '2.4.2'
+    robolectricVersion = '4.9'
+    roomVersion = '2.4.3'
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '1.1.2'
