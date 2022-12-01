@@ -4,10 +4,6 @@ buildscript {
     ext.ktlintVersion = '0.44.0'
     ext.hiltVersion = '2.44.2'
 
-    repositories {
-        google()
-        mavenCentral()
-    }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -24,10 +20,6 @@ plugins {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
     apply plugin: 'com.diffplug.spotless'
     spotless {
         kotlin {
