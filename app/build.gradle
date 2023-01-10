@@ -114,7 +114,7 @@ dependencies {
     // Jetpack Compose
     implementation "androidx.activity:activity-compose:$activityComposeVersion"
     implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
-    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.compose.material:material:$composeMaterialVersion"
     implementation "androidx.compose.animation:animation:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
     implementation "androidx.navigation:navigation-compose:$navigationVersion"
