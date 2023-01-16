@@ -16,10 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.util
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-
 /**
- * A generic class that holds a loading signal or a [Result].
+ * A generic class that holds a loading signal or the result of an async operation.
  */
 sealed class Async<out T> {
     object Loading : Async<Nothing>()
