@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew assembleDebug compileDebugUnitTestKotlin
 
       - name: Spotless
-        run: ./gradlew spotlessCheck
+        run: ./gradlew spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache
 
       - name: Robolectric
         run: ./gradlew testDebugUnitTest

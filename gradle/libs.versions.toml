@@ -43,7 +43,6 @@ kotlinxCoroutines = "1.6.4"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.4.1"
 ksp = "1.7.21-1.0.8"
-ktLint = '0.44.0'
 lint = "30.3.1"
 # @keep
 minSdk = "21"
@@ -156,4 +155,3 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

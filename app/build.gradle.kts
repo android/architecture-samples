@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.spotless)
 }
 
 android {
@@ -211,12 +210,4 @@ dependencies {
     // AndroidX Test - Hilt testing
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
-}
-
-spotless {
-    kotlin {
-        target("**/*.kt")
-        targetExclude(".idea/")
-        ktlint(libs.versions.ktLint.get())
-    }
 }
