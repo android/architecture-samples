@@ -39,6 +39,8 @@ jobs:
         run: ./gradlew assembleDebug compileDebugUnitTestKotlin
 
       - name: Spotless
+        # Spotless is not gradle configuration cache compliant. To allow the rest of the build
+        # comply, run spotless with a gradle init script and disable the cache.
         run: ./gradlew spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache
 
       - name: Robolectric
