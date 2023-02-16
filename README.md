@@ -13,7 +13,7 @@ In this branch you'll find:
 *   A **data layer** with a repository and two data sources (local using Room and a fake remote).
 *   Two **product flavors**, `mock` and `prod`, [to ease development and testing](https://android-developers.googleblog.com/2015/12/leveraging-product-flavors-in-android.html).
 *   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device or Robolectric.
-*   A simple service locator for inversion of control.
+*   Dependency injection using [Hilt](https://developer.android.com/training/dependency-injection/hilt-android).
 
 ## Variations
 
@@ -23,14 +23,18 @@ This project hosts each sample app in separate repository branches. For more inf
 |     Sample     | Description |
 | ------------- | ------------- |
 | [main](https://github.com/googlesamples/android-architecture/tree/main) | This branch |
-| [hilt](https://github.com/googlesamples/android-architecture/tree/hilt) | A simple Hilt setup that removes the two flavors and service locator (not using Compose yet) |
+| [service-locator](https://github.com/googlesamples/android-architecture/tree/service-locator) | A simple setup that removes Hilt in favor of a service locator |
 | [livedata](https://github.com/googlesamples/android-architecture/tree/livedata) | Uses LiveData instead of StateFlow as the data stream solution |
 | [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
 | [views](https://github.com/googlesamples/android-architecture/tree/views) | Uses Views instead of Jetpack Compose to render UI elements on the screen |
+| [views-hilt](https://github.com/googlesamples/android-architecture/tree/views-hilt) | Uses Views and Hilt instead together |
+
+
+## Screenshots
+
+<img src="screenshots/screenshots.png" alt="Screenshot">
 
 ## Why a to-do app?
-
-<img align="right" src="https://github.com/googlesamples/android-architecture/wiki/images/todoapp.gif" alt="A demo illustraating the UI of the app" width="288" height="512" style="display: inline; float: right"/>
 
 The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).
 

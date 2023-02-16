@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2022 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.util
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-
 /**
- * A generic class that holds a loading signal or a [Result].
+ * A generic class that holds a loading signal or the result of an async operation.
  */
 sealed class Async<out T> {
     object Loading : Async<Nothing>()

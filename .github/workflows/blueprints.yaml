@@ -35,35 +35,33 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Build project Mock and UnitTest
-        run: ./gradlew assembleMockDebug assembleProdDebug compileMockDebugUnitTestKotlin
+      - name: Build project and UnitTest
+        run: ./gradlew assembleDebug compileDebugUnitTestKotlin
 
       - name: Spotless
-        run: ./gradlew spotlessCheck
+        # Spotless is not gradle configuration cache compliant. To allow the rest of the build
+        # comply, run spotless with a gradle init script and disable the cache.
+        run: ./gradlew spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache
 
-      - name: Robolectric Mock
-        run: ./gradlew testMockDebugUnitTest
-
-      - name: Build project Prod and UnitTest
-        run: ./gradlew assembleMockDebug assembleProdDebug compileProdDebugUnitTestKotlin
-
-      - name: Robolectric Prod
-        run: ./gradlew spotlessCheck assembleMockDebug assembleProdDebug testMockDebugUnitTest testProdDebugUnitTest --stacktrace
+      - name: Robolectric
+        run: ./gradlew testDebugUnitTest
 
       # Needed to accept licenses
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Compile AndroidTests Mock
-        run: ./gradlew compileMockDebugAndroidTestKotlin
+      - name: Compile AndroidTests
+        run: ./gradlew compileDebugAndroidTestKotlin
 
-      - name: Run all tests pixel 2 api 30 ATD
-        working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30atdMockDebugAndroidTest
-
-      - name: Run all tests pixel 2 api 30 non-ATD
-        working-directory: .
-        run: ./gradlew -Pandroid.sdk.channel=3 -Pandroid.experimental.androidTest.numManagedDeviceShards=1 -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" pixel2api30MockDebugAndroidTest
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          disable-animations: true
+          disk-size: 2000M
+          heap-size: 600M
+          script: ./gradlew connectedDebugAndroidTest
 
       - name: Upload build reports
         if: always()
