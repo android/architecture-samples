@@ -124,8 +124,8 @@ class TasksViewModelTest {
 
     @Test
     fun loadTasks_error() = runTest {
-        // Make the repository return errors
-        tasksRepository.setReturnError(true)
+        // Make the repository throw errors
+        tasksRepository.setShouldThrowError(true)
 
         // Load tasks
         tasksViewModel.refresh()

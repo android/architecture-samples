@@ -32,7 +32,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
@@ -109,7 +108,7 @@ class AddEditTaskScreenTest {
             .performClick()
 
         // THEN - Verify that the repository saved the task
-        val tasks = (repository.getTasksBlocking(true) as Result.Success).data
+        val tasks = repository.getTasksBlocking(true)
         assertEquals(tasks.size, 1)
         assertEquals(tasks[0].title, "title")
         assertEquals(tasks[0].description, "description")

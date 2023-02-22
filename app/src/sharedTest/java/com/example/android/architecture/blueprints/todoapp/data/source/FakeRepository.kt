@@ -17,9 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import androidx.annotation.VisibleForTesting
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Error
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,21 +31,21 @@ import kotlinx.coroutines.flow.update
  */
 class FakeRepository : TasksRepository {
 
-    private var shouldReturnError = false
+    private var shouldThrowError = false
 
     private val _savedTasks = MutableStateFlow(LinkedHashMap<String, Task>())
     val savedTasks: StateFlow<LinkedHashMap<String, Task>> = _savedTasks.asStateFlow()
 
-    private val observableTasks: Flow<Result<List<Task>>> = savedTasks.map {
-        if (shouldReturnError) {
-            Error(Exception())
+    private val observableTasks: Flow<List<Task>> = savedTasks.map {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
         } else {
-            Success(it.values.toList())
+            it.values.toList()
         }
     }
 
-    fun setReturnError(value: Boolean) {
-        shouldReturnError = value
+    fun setShouldThrowError(value: Boolean) {
+        shouldThrowError = value
     }
 
     override suspend fun refreshTasks() {
@@ -59,34 +56,24 @@ class FakeRepository : TasksRepository {
         refreshTasks()
     }
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> = observableTasks
+    override fun getTasksStream(): Flow<List<Task>> = observableTasks
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Task?> {
         return observableTasks.map { tasks ->
-            when (tasks) {
-                is Error -> Error(tasks.exception)
-                is Success -> {
-                    val task = tasks.data.firstOrNull { it.id == taskId }
-                        ?: return@map Error(Exception("Not found"))
-                    Success(task)
-                }
-            }
+            return@map tasks.firstOrNull { it.id == taskId }
         }
     }
 
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-        if (shouldReturnError) {
-            return Error(Exception("Test exception"))
+    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
         }
-        savedTasks.value[taskId]?.let {
-            return Success(it)
-        }
-        return Error(Exception("Could not find task"))
+        return savedTasks.value[taskId]
     }
 
-    override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
-        if (shouldReturnError) {
-            return Error(Exception("Test exception"))
+    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
+        if (shouldThrowError) {
+            throw Exception("Test exception")
         }
         return observableTasks.first()
     }

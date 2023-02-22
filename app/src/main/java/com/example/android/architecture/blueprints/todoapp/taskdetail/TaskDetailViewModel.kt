@@ -21,8 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
@@ -31,6 +29,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -63,6 +62,10 @@ class TaskDetailViewModel @Inject constructor(
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = tasksRepository.getTaskStream(taskId)
         .map { handleResult(it) }
+        .catch {
+            showSnackbarMessage(R.string.loading_task_error) // TODO: Move to separate function?
+            emit(Async.Success(null))
+        }
         .onStart { emit(Async.Loading) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
@@ -120,11 +123,11 @@ class TaskDetailViewModel @Inject constructor(
         _userMessage.value = message
     }
 
-    private fun handleResult(tasksResult: Result<Task>): Async<Task?> =
-        if (tasksResult is Success) {
-            Async.Success(tasksResult.data)
+    private fun handleResult(tasksResult: Task?): Async<Task?> =
+        if (tasksResult != null) {
+            Async.Success(tasksResult)
         } else {
-            showSnackbarMessage(R.string.loading_tasks_error)
+            showSnackbarMessage(R.string.task_not_found)
             Async.Success(null)
         }
 }
