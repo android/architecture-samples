@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
@@ -25,8 +26,8 @@ import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -51,7 +52,7 @@ class StatisticsViewModel @Inject constructor(
     val uiState: StateFlow<StatisticsUiState> =
         tasksRepository.getTasksStream()
             .map { Async.Success(it) }
-            .onStart<Async<List<Task>>> { emit(Async.Loading) }
+            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
             .map { taskAsync -> produceStatisticsUiState(taskAsync) }
             .stateIn(
                 scope = viewModelScope,
@@ -69,6 +70,10 @@ class StatisticsViewModel @Inject constructor(
         when (taskLoad) {
             Async.Loading -> {
                 StatisticsUiState(isLoading = true, isEmpty = true)
+            }
+            is Async.Error -> {
+                // TODO: Show error message?
+                StatisticsUiState(isEmpty = true, isLoading = false)
             }
             is Async.Success -> {
                 val stats = getActiveAndCompletedStats(taskLoad.data)

@@ -106,7 +106,7 @@ class DefaultTasksRepository(
 
     override suspend fun completeTask(taskId: String) {
         withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.run { completeTask(this) }
+            getTaskWithId(taskId)?.let { completeTask(it) }
         }
     }
 
@@ -119,7 +119,7 @@ class DefaultTasksRepository(
 
     override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.run { activateTask(this) }
+            getTaskWithId(taskId)?.let { activateTask(it) }
         }
     }
 

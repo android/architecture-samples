@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -71,12 +70,8 @@ class TasksViewModel @Inject constructor(
         combine(tasksRepository.getTasksStream(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
-            .catch {
-                showSnackbarMessage(R.string.loading_tasks_error)
-                emit(emptyList())
-            }
             .map { Async.Success(it) }
-            .onStart<Async<List<Task>>> { emit(Async.Loading) }
+            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
 
     val uiState: StateFlow<TasksUiState> = combine(
         _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
@@ -84,6 +79,9 @@ class TasksViewModel @Inject constructor(
         when (tasksAsync) {
             Async.Loading -> {
                 TasksUiState(isLoading = true)
+            }
+            is Async.Error -> {
+                TasksUiState(userMessage = tasksAsync.errorMessage)
             }
             is Async.Success -> {
                 TasksUiState(

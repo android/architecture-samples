@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -62,11 +61,7 @@ class TaskDetailViewModel @Inject constructor(
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = tasksRepository.getTaskStream(taskId)
         .map { handleResult(it) }
-        .catch {
-            showSnackbarMessage(R.string.loading_task_error) // TODO: Move to separate function?
-            emit(Async.Success(null))
-        }
-        .onStart { emit(Async.Loading) }
+        .catch { emit(Async.Error(R.string.loading_task_error)) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         _userMessage, _isLoading, _isTaskDeleted, _taskAsync
@@ -74,6 +69,9 @@ class TaskDetailViewModel @Inject constructor(
         when (taskAsync) {
             Async.Loading -> {
                 TaskDetailUiState(isLoading = true)
+            }
+            is Async.Error -> {
+                TaskDetailUiState(userMessage = taskAsync.errorMessage)
             }
             is Async.Success -> {
                 TaskDetailUiState(
