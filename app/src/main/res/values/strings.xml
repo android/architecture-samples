@@ -22,6 +22,8 @@
     <string name="task_marked_complete">Task marked complete</string>
     <string name="task_marked_active">Task marked active</string>
     <string name="loading_tasks_error">Error while loading tasks</string>
+    <string name="loading_task_error">Error while loading task</string>
+    <string name="task_not_found">Task not found</string>
     <string name="completed_tasks_cleared">Completed tasks cleared</string>
     <string name="menu_filter">Filter</string>
     <string name="open_drawer">Open Drawer</string>

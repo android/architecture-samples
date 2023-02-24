@@ -16,9 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Error
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import kotlinx.coroutines.delay
@@ -47,16 +44,9 @@ object TasksRemoteDataSource : TasksDataSource {
         observableTasks.value = getTasks()
     }
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Task?> {
         return observableTasks.map { tasks ->
-            when (tasks) {
-                is Error -> Error(tasks.exception)
-                is Success -> {
-                    val task = tasks.data.firstOrNull() { it.id == taskId }
-                        ?: return@map Error(Exception("Not found"))
-                    Success(task)
-                }
-            }
+            tasks.firstOrNull { it.id == taskId }
         }
     }
 
@@ -64,24 +54,21 @@ object TasksRemoteDataSource : TasksDataSource {
         refreshTasks()
     }
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<List<Task>> {
         return observableTasks
     }
 
-    override suspend fun getTasks(): Result<List<Task>> {
+    override suspend fun getTasks(): List<Task> {
         // Simulate network by delaying the execution.
         val tasks = TASKS_SERVICE_DATA.values.toList()
         delay(SERVICE_LATENCY_IN_MILLIS)
-        return Success(tasks)
+        return tasks
     }
 
-    override suspend fun getTask(taskId: String): Result<Task> {
+    override suspend fun getTask(taskId: String): Task? {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_IN_MILLIS)
-        TASKS_SERVICE_DATA[taskId]?.let {
-            return Success(it)
-        }
-        return Error(Exception("Task not found"))
+        return TASKS_SERVICE_DATA[taskId]
     }
 
     private fun addTask(title: String, description: String) {

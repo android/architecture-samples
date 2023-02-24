@@ -16,26 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Error
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.flow.Flow
 
 class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDataSource {
-    override suspend fun getTasks(): Result<List<Task>> {
-        tasks?.let { return Success(ArrayList(it)) }
-        return Error(
-            Exception("Tasks not found")
-        )
-    }
+    override suspend fun getTasks() = tasks ?: throw Exception("Task list is null")
 
-    override suspend fun getTask(taskId: String): Result<Task> {
-        tasks?.firstOrNull { it.id == taskId }?.let { return Success(it) }
-        return Error(
-            Exception("Task not found")
-        )
-    }
+    override suspend fun getTask(taskId: String) = tasks?.firstOrNull { it.id == taskId }
 
     override suspend fun saveTask(task: Task) {
         tasks?.add(task)
@@ -69,7 +56,7 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         tasks?.removeIf { it.id == taskId }
     }
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<List<Task>> {
         TODO("not implemented")
     }
 
@@ -77,7 +64,7 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         TODO("not implemented")
     }
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Task> {
         TODO("not implemented")
     }
 

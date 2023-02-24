@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -35,13 +33,9 @@ class DefaultTasksRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksRepository {
 
-    override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
+    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
-            try {
-                updateTasksFromRemoteDataSource()
-            } catch (ex: Exception) {
-                return Result.Error(ex)
-            }
+            updateTasksFromRemoteDataSource()
         }
         return tasksLocalDataSource.getTasks()
     }
@@ -50,7 +44,7 @@ class DefaultTasksRepository(
         updateTasksFromRemoteDataSource()
     }
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<List<Task>> {
         return tasksLocalDataSource.getTasksStream()
     }
 
@@ -61,33 +55,35 @@ class DefaultTasksRepository(
     private suspend fun updateTasksFromRemoteDataSource() {
         val remoteTasks = tasksRemoteDataSource.getTasks()
 
-        if (remoteTasks is Success) {
-            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-            tasksLocalDataSource.deleteAllTasks()
-            remoteTasks.data.forEach { task ->
-                tasksLocalDataSource.saveTask(task)
-            }
-        } else if (remoteTasks is Result.Error) {
-            throw remoteTasks.exception
+        // Real apps might want to do a proper sync, deleting, modifying or adding each task.
+        tasksLocalDataSource.deleteAllTasks()
+        remoteTasks.forEach { task ->
+            tasksLocalDataSource.saveTask(task)
         }
     }
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Task?> {
         return tasksLocalDataSource.getTaskStream(taskId)
     }
 
     private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
         val remoteTask = tasksRemoteDataSource.getTask(taskId)
 
-        if (remoteTask is Success) {
-            tasksLocalDataSource.saveTask(remoteTask.data)
+        if (remoteTask == null) {
+            tasksLocalDataSource.deleteTask(taskId)
+        } else {
+            tasksLocalDataSource.saveTask(remoteTask)
         }
     }
 
     /**
-     * Relies on [getTasks] to fetch data and picks the task with the same ID.
+     * Relies on [getTasks] to fetch data and picks the task with the same ID. Will return a null
+     * Task if the task cannot be found.
+     *
+     * @param taskId - The ID of the task
+     * @param forceUpdate - true if the task should be updated from the remote data source.
      */
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
+    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
         if (forceUpdate) {
             updateTaskFromRemoteDataSource(taskId)
         }
@@ -110,9 +106,7 @@ class DefaultTasksRepository(
 
     override suspend fun completeTask(taskId: String) {
         withContext(ioDispatcher) {
-            (getTaskWithId(taskId) as? Success)?.let { it ->
-                completeTask(it.data)
-            }
+            getTaskWithId(taskId)?.let { completeTask(it) }
         }
     }
 
@@ -125,9 +119,7 @@ class DefaultTasksRepository(
 
     override suspend fun activateTask(taskId: String) {
         withContext(ioDispatcher) {
-            (getTaskWithId(taskId) as? Success)?.let { it ->
-                activateTask(it.data)
-            }
+            getTaskWithId(taskId)?.let { activateTask(it) }
         }
     }
 
@@ -154,7 +146,7 @@ class DefaultTasksRepository(
         }
     }
 
-    private suspend fun getTaskWithId(id: String): Result<Task> {
+    private suspend fun getTaskWithId(id: String): Task? {
         return tasksLocalDataSource.getTask(id)
     }
 }

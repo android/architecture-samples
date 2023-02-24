@@ -20,7 +20,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
@@ -101,18 +100,35 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.setCompleted(false)
 
         // Then the task is not completed and the snackbar shows the correct message
-        val newTask = (tasksRepository.getTask(task.id) as Success).data
-        assertTrue(newTask.isActive)
+        val newTask = tasksRepository.getTask(task.id)
+        assertTrue((newTask?.isActive) ?: false)
         assertThat(taskDetailViewModel.uiState.first().userMessage)
             .isEqualTo(R.string.task_marked_active)
     }
 
     @Test
     fun taskDetailViewModel_repositoryError() = runTest {
-        // Given a repository that returns errors
-        tasksRepository.setReturnError(true)
+        // Given a repository that throws errors
+        tasksRepository.setShouldThrowError(true)
 
+        // Then the task is null and the snackbar shows a loading error message
         assertThat(taskDetailViewModel.uiState.value.task).isNull()
+        assertThat(taskDetailViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.loading_task_error)
+    }
+
+    @Test
+    fun taskDetailViewModel_taskNotFound() = runTest {
+        // Given an ID for a non existent task
+        taskDetailViewModel = TaskDetailViewModel(
+            tasksRepository,
+            SavedStateHandle(mapOf(TodoDestinationsArgs.TASK_ID_ARG to "nonexistent_id"))
+        )
+
+        // The task is null and the snackbar shows a "not found" error message
+        assertThat(taskDetailViewModel.uiState.value.task).isNull()
+        assertThat(taskDetailViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.task_not_found)
     }
 
     @Test

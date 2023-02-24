@@ -21,8 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
@@ -31,9 +29,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -62,8 +60,8 @@ class TaskDetailViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = tasksRepository.getTaskStream(taskId)
-        .map { handleResult(it) }
-        .onStart { emit(Async.Loading) }
+        .map { handleTask(it) }
+        .catch { emit(Async.Error(R.string.loading_task_error)) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         _userMessage, _isLoading, _isTaskDeleted, _taskAsync
@@ -71,6 +69,12 @@ class TaskDetailViewModel @Inject constructor(
         when (taskAsync) {
             Async.Loading -> {
                 TaskDetailUiState(isLoading = true)
+            }
+            is Async.Error -> {
+                TaskDetailUiState(
+                    userMessage = taskAsync.errorMessage,
+                    isTaskDeleted = isTaskDeleted
+                )
             }
             is Async.Success -> {
                 TaskDetailUiState(
@@ -120,11 +124,10 @@ class TaskDetailViewModel @Inject constructor(
         _userMessage.value = message
     }
 
-    private fun handleResult(tasksResult: Result<Task>): Async<Task?> =
-        if (tasksResult is Success) {
-            Async.Success(tasksResult.data)
-        } else {
-            showSnackbarMessage(R.string.loading_tasks_error)
-            Async.Success(null)
+    private fun handleTask(task: Task?): Async<Task?> {
+        if (task == null) {
+            return Async.Error(R.string.task_not_found)
         }
+        return Async.Success(task)
+    }
 }

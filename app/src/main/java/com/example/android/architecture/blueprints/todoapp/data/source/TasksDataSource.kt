@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.flow.Flow
 
@@ -25,15 +24,15 @@ import kotlinx.coroutines.flow.Flow
  */
 interface TasksDataSource {
 
-    fun getTasksStream(): Flow<Result<List<Task>>>
+    fun getTasksStream(): Flow<List<Task>>
 
-    suspend fun getTasks(): Result<List<Task>>
+    suspend fun getTasks(): List<Task>
 
     suspend fun refreshTasks()
 
-    fun getTaskStream(taskId: String): Flow<Result<Task>>
+    fun getTaskStream(taskId: String): Flow<Task?>
 
-    suspend fun getTask(taskId: String): Result<Task>
+    suspend fun getTask(taskId: String): Task?
 
     suspend fun refreshTask(taskId: String)
 

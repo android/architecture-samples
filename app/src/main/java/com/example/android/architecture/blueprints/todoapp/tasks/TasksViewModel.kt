@@ -23,8 +23,6 @@ import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
@@ -36,10 +34,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -73,7 +71,7 @@ class TasksViewModel @Inject constructor(
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
-            .onStart<Async<List<Task>>> { emit(Async.Loading) }
+            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
 
     val uiState: StateFlow<TasksUiState> = combine(
         _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
@@ -81,6 +79,9 @@ class TasksViewModel @Inject constructor(
         when (tasksAsync) {
             Async.Loading -> {
                 TasksUiState(isLoading = true)
+            }
+            is Async.Error -> {
+                TasksUiState(userMessage = tasksAsync.errorMessage)
             }
             is Async.Success -> {
                 TasksUiState(
@@ -144,17 +145,7 @@ class TasksViewModel @Inject constructor(
         }
     }
 
-    private fun filterTasks(
-        tasksResult: Result<List<Task>>,
-        filteringType: TasksFilterType
-    ): List<Task> = if (tasksResult is Success) {
-        filterItems(tasksResult.data, filteringType)
-    } else {
-        showSnackbarMessage(R.string.loading_tasks_error)
-        emptyList()
-    }
-
-    private fun filterItems(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
+    private fun filterTasks(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
         val tasksToShow = ArrayList<Task>()
         // We filter the tasks based on the requestType
         for (task in tasks) {

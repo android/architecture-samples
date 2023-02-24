@@ -16,22 +16,21 @@
 
 package com.example.android.architecture.blueprints.todoapp
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 object FakeFailingTasksRemoteDataSource : TasksDataSource {
-    override suspend fun getTasks(): Result<List<Task>> {
-        return Result.Error(Exception("Test"))
+    override suspend fun getTasks(): List<Task> {
+        throw Exception("Test")
     }
 
-    override suspend fun getTask(taskId: String): Result<Task> {
-        return Result.Error(Exception("Test"))
+    override suspend fun getTask(taskId: String): Task? {
+        throw Exception("Test")
     }
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> {
+    override fun getTasksStream(): Flow<List<Task>> {
         return flow { emit(getTasks()) }
     }
 
@@ -39,7 +38,7 @@ object FakeFailingTasksRemoteDataSource : TasksDataSource {
         TODO("not implemented")
     }
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
+    override fun getTaskStream(taskId: String): Flow<Task?> {
         return flow { emit(getTask(taskId)) }
     }
 

@@ -16,15 +16,10 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import com.example.android.architecture.blueprints.todoapp.data.Result
-import com.example.android.architecture.blueprints.todoapp.data.Result.Error
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 /**
@@ -35,17 +30,9 @@ class TasksLocalDataSource internal constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksDataSource {
 
-    override fun getTasksStream(): Flow<Result<List<Task>>> {
-        return tasksDao.observeTasks().map {
-            Success(it)
-        }
-    }
+    override fun getTasksStream() = tasksDao.observeTasks()
 
-    override fun getTaskStream(taskId: String): Flow<Result<Task>> {
-        return tasksDao.observeTaskById(taskId).map {
-            Success(it)
-        }
-    }
+    override fun getTaskStream(taskId: String) = tasksDao.observeTaskById(taskId)
 
     override suspend fun refreshTask(taskId: String) {
         // NO-OP
@@ -55,25 +42,12 @@ class TasksLocalDataSource internal constructor(
         // NO-OP
     }
 
-    override suspend fun getTasks(): Result<List<Task>> = withContext(ioDispatcher) {
-        return@withContext try {
-            Success(tasksDao.getTasks())
-        } catch (e: Exception) {
-            Error(e)
-        }
+    override suspend fun getTasks(): List<Task> = withContext(ioDispatcher) {
+        return@withContext tasksDao.getTasks()
     }
 
-    override suspend fun getTask(taskId: String): Result<Task> = withContext(ioDispatcher) {
-        try {
-            val task = tasksDao.getTaskById(taskId)
-            if (task != null) {
-                return@withContext Success(task)
-            } else {
-                return@withContext Error(Exception("Task not found!"))
-            }
-        } catch (e: Exception) {
-            return@withContext Error(e)
-        }
+    override suspend fun getTask(taskId: String): Task? = withContext(ioDispatcher) {
+        return@withContext tasksDao.getTaskById(taskId)
     }
 
     override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {

@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -132,9 +131,8 @@ class AddEditTaskViewModel @Inject constructor(
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            tasksRepository.getTask(taskId).let { result ->
-                if (result is Success) {
-                    val task = result.data
+            tasksRepository.getTask(taskId).let { task ->
+                if (task != null) {
                     _uiState.update {
                         it.copy(
                             title = task.title,
