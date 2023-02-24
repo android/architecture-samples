@@ -60,7 +60,7 @@ class TaskDetailViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = tasksRepository.getTaskStream(taskId)
-        .map { handleResult(it) }
+        .map { handleTask(it) }
         .catch { emit(Async.Error(R.string.loading_task_error)) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
@@ -124,10 +124,10 @@ class TaskDetailViewModel @Inject constructor(
         _userMessage.value = message
     }
 
-    private fun handleResult(tasksResult: Task?): Async<Task?> =
-        if (tasksResult != null) {
-            Async.Success(tasksResult)
-        } else {
+    private fun handleTask(task: Task?): Async<Task?> =
+        if (task == null) {
             Async.Error(R.string.task_not_found)
+        } else {
+            Async.Success(task)
         }
 }
