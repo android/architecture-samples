@@ -126,9 +126,8 @@ class TaskDetailViewModel @Inject constructor(
 
     private fun handleTask(task: Task?): Async<Task?> {
         if (task == null) {
-             return Async.Error(R.string.task_not_found)
+            return Async.Error(R.string.task_not_found)
         }
         return Async.Success(task)
     }
-
 }
