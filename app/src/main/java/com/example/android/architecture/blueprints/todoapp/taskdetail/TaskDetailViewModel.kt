@@ -71,7 +71,10 @@ class TaskDetailViewModel @Inject constructor(
                 TaskDetailUiState(isLoading = true)
             }
             is Async.Error -> {
-                TaskDetailUiState(userMessage = taskAsync.errorMessage)
+                TaskDetailUiState(
+                    userMessage = taskAsync.errorMessage,
+                    isTaskDeleted = isTaskDeleted
+                )
             }
             is Async.Success -> {
                 TaskDetailUiState(
@@ -125,7 +128,6 @@ class TaskDetailViewModel @Inject constructor(
         if (tasksResult != null) {
             Async.Success(tasksResult)
         } else {
-            showSnackbarMessage(R.string.task_not_found)
-            Async.Success(null)
+            Async.Error(R.string.task_not_found)
         }
 }
