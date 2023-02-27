@@ -50,15 +50,7 @@ object FakeFailingTasksRemoteDataSource : TasksDataSource {
         TODO("not implemented")
     }
 
-    override suspend fun completeTask(task: Task) {
-        TODO("not implemented")
-    }
-
     override suspend fun completeTask(taskId: String) {
-        TODO("not implemented")
-    }
-
-    override suspend fun activateTask(task: Task) {
         TODO("not implemented")
     }
 

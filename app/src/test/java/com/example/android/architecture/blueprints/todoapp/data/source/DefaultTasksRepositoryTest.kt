@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -57,7 +56,7 @@ class DefaultTasksRepositoryTest {
         tasksLocalDataSource = FakeDataSource(localTasks.toMutableList())
         // Get a reference to the class under test
         tasksRepository = DefaultTasksRepository(
-            tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Main
+            tasksRemoteDataSource, tasksLocalDataSource
         )
     }
 
@@ -66,7 +65,7 @@ class DefaultTasksRepositoryTest {
     fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
         val emptySource = FakeDataSource()
         val tasksRepository = DefaultTasksRepository(
-            emptySource, emptySource, Dispatchers.Main
+            emptySource, emptySource
         )
 
         assertThat(tasksRepository.getTasks().size).isEqualTo(0)

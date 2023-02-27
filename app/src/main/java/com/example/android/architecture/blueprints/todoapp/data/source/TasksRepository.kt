@@ -38,11 +38,7 @@ interface TasksRepository {
 
     suspend fun saveTask(task: Task)
 
-    suspend fun completeTask(task: Task)
-
     suspend fun completeTask(taskId: String)
-
-    suspend fun activateTask(task: Task)
 
     suspend fun activateTask(taskId: String)
 

@@ -100,10 +100,10 @@ class TaskDetailViewModel @Inject constructor(
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = uiState.value.task ?: return@launch
         if (completed) {
-            tasksRepository.completeTask(task)
+            tasksRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task)
+            tasksRepository.activateTask(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
