@@ -17,8 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskEntity
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.asExternalModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -26,14 +30,14 @@ import kotlinx.coroutines.launch
  */
 class DefaultTasksRepository(
     private val tasksRemoteDataSource: TasksDataSource,
-    private val tasksLocalDataSource: TasksDataSource,
+    private val tasksDao: TasksDao,
 ) : TasksRepository {
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
             updateTasksFromRemoteDataSource()
         }
-        return tasksLocalDataSource.getTasks()
+        return tasksDao.getTasks().map { it.asExternalModel() }
     }
 
     override suspend fun refreshTasks() {
@@ -41,7 +45,11 @@ class DefaultTasksRepository(
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
-        return tasksLocalDataSource.getTasksStream()
+        return tasksDao.observeTasks().map { tasks ->
+            tasks.map { task ->
+                task.asExternalModel()
+            }
+        }
     }
 
     override suspend fun refreshTask(taskId: String) {
@@ -52,23 +60,37 @@ class DefaultTasksRepository(
         val remoteTasks = tasksRemoteDataSource.getTasks()
 
         // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-        tasksLocalDataSource.deleteAllTasks()
+        tasksDao.deleteTasks()
         remoteTasks.forEach { task ->
-            tasksLocalDataSource.saveTask(task)
+            // TODO: Move into mapping function (remote to local)
+            tasksDao.insertTask(TaskEntity(
+                id = task.id,
+                title = task.title,
+                description = task.description,
+                isCompleted = task.isCompleted
+            ))
         }
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return tasksLocalDataSource.getTaskStream(taskId)
+        return tasksDao.observeTaskById(taskId).map { it.asExternalModel() }
     }
 
     private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
         val remoteTask = tasksRemoteDataSource.getTask(taskId)
 
         if (remoteTask == null) {
-            tasksLocalDataSource.deleteTask(taskId)
+            tasksDao.deleteTaskById(taskId)
         } else {
-            tasksLocalDataSource.saveTask(remoteTask)
+            // TODO: Move into mapping function (remote to local)
+            tasksDao.insertTask(
+                TaskEntity(
+                    id = remoteTask.id,
+                    title = remoteTask.title,
+                    description = remoteTask.description,
+                    isCompleted = remoteTask.isCompleted
+                ) 
+            )
         }
     }
 
@@ -83,48 +105,60 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             updateTaskFromRemoteDataSource(taskId)
         }
-        return tasksLocalDataSource.getTask(taskId)
+        return tasksDao.getTaskById(taskId)?.asExternalModel()
     }
 
     override suspend fun saveTask(task: Task) {
         coroutineScope {
             launch { tasksRemoteDataSource.saveTask(task) }
-            launch { tasksLocalDataSource.saveTask(task) }
+            launch {
+            // TODO: Move to mapping function (external to internal)
+                tasksDao.insertTask(
+                    TaskEntity(
+                        id = task.id,
+                        title = task.title,
+                        description = task.description,
+                        isCompleted = task.isCompleted
+                    )
+                )
+            }
         }
     }
 
     override suspend fun completeTask(taskId: String) {
         coroutineScope {
             launch { tasksRemoteDataSource.completeTask(taskId) }
-            launch { tasksLocalDataSource.completeTask(taskId) }
+            launch { tasksDao.updateCompleted(taskId = taskId, completed = true) }
         }
     }
 
     override suspend fun activateTask(taskId: String) {
         coroutineScope {
             launch { tasksRemoteDataSource.activateTask(taskId) }
-            launch { tasksLocalDataSource.activateTask(taskId) }
+            launch { tasksDao.updateCompleted(taskId = taskId, completed = false) }
         }
     }
 
     override suspend fun clearCompletedTasks() {
         coroutineScope {
             launch { tasksRemoteDataSource.clearCompletedTasks() }
-            launch { tasksLocalDataSource.clearCompletedTasks() }
+            launch { tasksDao.deleteCompletedTasks() }
         }
     }
 
     override suspend fun deleteAllTasks() {
         coroutineScope {
             launch { tasksRemoteDataSource.deleteAllTasks() }
-            launch { tasksLocalDataSource.deleteAllTasks() }
+            launch { tasksDao.deleteTasks() }
         }
     }
 
     override suspend fun deleteTask(taskId: String) {
         coroutineScope {
             launch { tasksRemoteDataSource.deleteTask(taskId) }
-            launch { tasksLocalDataSource.deleteTask(taskId) }
+            launch { tasksDao.deleteTaskById(taskId) }
         }
     }
 }
+
+fun List<TaskEntity>.asExternalModels() = map { it.asExternalModel() }

@@ -21,7 +21,7 @@ import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
 import dagger.Module
@@ -36,10 +36,6 @@ import javax.inject.Singleton
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RemoteTasksDataSource
 
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class LocalTasksDataSource
-
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
@@ -48,9 +44,9 @@ object RepositoryModule {
     @Provides
     fun provideTasksRepository(
         @RemoteTasksDataSource remoteDataSource: TasksDataSource,
-        @LocalTasksDataSource localDataSource: TasksDataSource,
+        database: ToDoDatabase,
     ): TasksRepository {
-        return DefaultTasksRepository(remoteDataSource, localDataSource)
+        return DefaultTasksRepository(remoteDataSource, database.taskDao())
     }
 }
 
@@ -62,15 +58,6 @@ object DataSourceModule {
     @RemoteTasksDataSource
     @Provides
     fun provideTasksRemoteDataSource(): TasksDataSource = TasksRemoteDataSource
-
-    @Singleton
-    @LocalTasksDataSource
-    @Provides
-    fun provideTasksLocalDataSource(
-        database: ToDoDatabase
-    ): TasksDataSource {
-        return TasksLocalDataSource(database.taskDao())
-    }
 }
 
 @Module
