@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Main entry point for accessing tasks data.
  */
-interface TasksDataSource {
+interface NetworkDataSource {
 
     fun getTasksStream(): Flow<List<Task>>
 

@@ -20,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskEntity
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.source.local.asExternalModel
+import com.example.android.architecture.blueprints.todoapp.data.source.local.asLocalModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,7 +30,7 @@ import kotlinx.coroutines.launch
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  */
 class DefaultTasksRepository(
-    private val tasksRemoteDataSource: TasksDataSource,
+    private val tasksRemoteDataSource: NetworkDataSource,
     private val tasksDao: TasksDao,
 ) : TasksRepository {
 
@@ -112,15 +113,7 @@ class DefaultTasksRepository(
         coroutineScope {
             launch { tasksRemoteDataSource.saveTask(task) }
             launch {
-            // TODO: Move to mapping function (external to internal)
-                tasksDao.insertTask(
-                    TaskEntity(
-                        id = task.id,
-                        title = task.title,
-                        description = task.description,
-                        isCompleted = task.isCompleted
-                    )
-                )
+                tasksDao.insertTask(task.asLocalModel())
             }
         }
     }

@@ -45,7 +45,7 @@ class DefaultTasksRepositoryTest {
     private val remoteTasks = listOf(task1Remote, task2Remote).sortedBy { it.id }
     private val localTasks = listOf(task3Local).sortedBy { it.id }
     private val newTasksRemote = listOf(newTaskRemote).sortedBy { it.id }
-    private lateinit var tasksRemoteDataSource: FakeDataSource
+    private lateinit var tasksRemoteDataSource: FakeNetworkDataSource
     private lateinit var tasksLocalDataSource: FakeTasksDao
 
     // Class under test
@@ -59,7 +59,7 @@ class DefaultTasksRepositoryTest {
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
-        tasksRemoteDataSource = FakeDataSource(remoteTasks.toMutableList())
+        tasksRemoteDataSource = FakeNetworkDataSource(remoteTasks.toMutableList())
         tasksLocalDataSource = FakeTasksDao(localTasks.toMutableList())
         // Get a reference to the class under test
         tasksRepository = DefaultTasksRepository(
@@ -70,7 +70,7 @@ class DefaultTasksRepositoryTest {
     @ExperimentalCoroutinesApi
     @Test
     fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
-        val emptyRemoteSource = FakeDataSource()
+        val emptyRemoteSource = FakeNetworkDataSource()
         val emptyLocalSource = FakeTasksDao()
 
         val tasksRepository = DefaultTasksRepository(

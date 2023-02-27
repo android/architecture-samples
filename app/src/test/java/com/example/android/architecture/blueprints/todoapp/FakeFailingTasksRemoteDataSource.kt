@@ -17,11 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-object FakeFailingTasksRemoteDataSource : TasksDataSource {
+object FakeFailingTasksRemoteDataSource : NetworkDataSource {
     override suspend fun getTasks(): List<Task> {
         throw Exception("Test")
     }

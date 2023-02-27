@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.flow.Flow
 
-class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDataSource {
+class FakeNetworkDataSource(var tasks: MutableList<Task>? = mutableListOf()) : NetworkDataSource {
     override suspend fun getTasks() = tasks ?: throw Exception("Task list is null")
 
     override suspend fun getTask(taskId: String) = tasks?.firstOrNull { it.id == taskId }

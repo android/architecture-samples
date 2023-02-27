@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,7 @@ import kotlinx.coroutines.runBlocking
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-object TasksRemoteDataSource : TasksDataSource {
+object TasksRemoteDataSource : NetworkDataSource {
 
     private const val SERVICE_LATENCY_IN_MILLIS = 2000L
 

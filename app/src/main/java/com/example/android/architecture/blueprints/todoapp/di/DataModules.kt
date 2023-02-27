@@ -19,9 +19,8 @@ package com.example.android.architecture.blueprints.todoapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
 import dagger.Module
@@ -43,7 +42,7 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideTasksRepository(
-        @RemoteTasksDataSource remoteDataSource: TasksDataSource,
+        @RemoteTasksDataSource remoteDataSource: NetworkDataSource,
         database: ToDoDatabase,
     ): TasksRepository {
         return DefaultTasksRepository(remoteDataSource, database.taskDao())
@@ -57,7 +56,7 @@ object DataSourceModule {
     @Singleton
     @RemoteTasksDataSource
     @Provides
-    fun provideTasksRemoteDataSource(): TasksDataSource = TasksRemoteDataSource
+    fun provideTasksRemoteDataSource(): NetworkDataSource = TasksRemoteDataSource
 }
 
 @Module

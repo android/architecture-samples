@@ -10,15 +10,24 @@ import java.util.UUID
     tableName = "tasks"
 )
 data class TaskEntity (
-    // TODO: Can these be `val` without a lot of test refactoring?
-    @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString(),
+    @PrimaryKey @ColumnInfo(name = "entryid") val id: String = UUID.randomUUID().toString(),
     var title: String = "",
     var description: String = "",
     @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
 )
 
+// Mapping functions to and from the external model.
 fun TaskEntity.asExternalModel() : Task {
     return Task(
+        id = id,
+        title = title,
+        description = description,
+        isCompleted = isCompleted,
+    )
+}
+
+fun Task.asLocalModel() : TaskEntity {
+    return TaskEntity(
         id = id,
         title = title,
         description = description,
