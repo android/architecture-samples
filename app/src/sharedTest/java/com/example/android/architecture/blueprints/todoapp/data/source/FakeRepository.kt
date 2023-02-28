@@ -87,18 +87,14 @@ class FakeRepository : TasksRepository {
     }
 
     override suspend fun completeTask(taskId: String) {
-        _savedTasks.update { tasks ->
-            val newTasks = LinkedHashMap<String, Task>(tasks)
-            newTasks[taskId]?.apply { isCompleted = true }
-            newTasks
+        _savedTasks.value[taskId]?.let {
+            saveTask(it.copy(isCompleted = true))
         }
     }
 
     override suspend fun activateTask(taskId: String) {
-        _savedTasks.update { tasks ->
-            val newTasks = LinkedHashMap<String, Task>(tasks)
-            newTasks[taskId]?.apply { isCompleted = false }
-            newTasks
+        _savedTasks.value[taskId]?.let {
+            saveTask(it.copy(isCompleted = false))
         }
     }
 

@@ -81,14 +81,14 @@ object TasksRemoteDataSource : TasksDataSource {
     }
 
     override suspend fun completeTask(taskId: String) {
-        TASKS_SERVICE_DATA[taskId]?.apply {
-            isCompleted = true
+        TASKS_SERVICE_DATA[taskId]?.let {
+            saveTask(it.copy(isCompleted = true))
         }
     }
 
     override suspend fun activateTask(taskId: String) {
-        TASKS_SERVICE_DATA[taskId]?.apply {
-            isCompleted = false
+        TASKS_SERVICE_DATA[taskId]?.let {
+            saveTask(it.copy(isCompleted = true))
         }
     }
 

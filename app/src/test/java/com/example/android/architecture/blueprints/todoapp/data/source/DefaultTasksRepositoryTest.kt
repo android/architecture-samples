@@ -240,7 +240,7 @@ class DefaultTasksRepositoryTest {
 
     @Test
     fun clearCompletedTasks() = runTest {
-        val completedTask = task1.copy().apply { isCompleted = true }
+        val completedTask = task1.copy(isCompleted = true)
         tasksRemoteDataSource.tasks = mutableListOf(completedTask, task2)
         tasksRepository.clearCompletedTasks()
 

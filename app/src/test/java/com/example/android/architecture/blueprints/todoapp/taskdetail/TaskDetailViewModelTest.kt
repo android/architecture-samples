@@ -90,7 +90,8 @@ class TaskDetailViewModelTest {
 
     @Test
     fun activateTask() = runTest {
-        task.isCompleted = true
+        tasksRepository.deleteAllTasks()
+        tasksRepository.addTasks(task.copy(isCompleted = true))
 
         // Verify that the task was completed initially
         assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
