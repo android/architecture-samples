@@ -17,12 +17,9 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
@@ -30,7 +27,6 @@ import kotlinx.coroutines.withContext
 class DefaultTasksRepository(
     private val tasksRemoteDataSource: TasksDataSource,
     private val tasksLocalDataSource: TasksDataSource,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksRepository {
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
@@ -97,29 +93,17 @@ class DefaultTasksRepository(
         }
     }
 
-    override suspend fun completeTask(task: Task) {
-        coroutineScope {
-            launch { tasksRemoteDataSource.completeTask(task) }
-            launch { tasksLocalDataSource.completeTask(task) }
-        }
-    }
-
     override suspend fun completeTask(taskId: String) {
-        withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.let { completeTask(it) }
-        }
-    }
-
-    override suspend fun activateTask(task: Task) = withContext<Unit>(ioDispatcher) {
         coroutineScope {
-            launch { tasksRemoteDataSource.activateTask(task) }
-            launch { tasksLocalDataSource.activateTask(task) }
+            launch { tasksRemoteDataSource.completeTask(taskId) }
+            launch { tasksLocalDataSource.completeTask(taskId) }
         }
     }
 
     override suspend fun activateTask(taskId: String) {
-        withContext(ioDispatcher) {
-            getTaskWithId(taskId)?.let { activateTask(it) }
+        coroutineScope {
+            launch { tasksRemoteDataSource.activateTask(taskId) }
+            launch { tasksLocalDataSource.activateTask(taskId) }
         }
     }
 
@@ -131,11 +115,9 @@ class DefaultTasksRepository(
     }
 
     override suspend fun deleteAllTasks() {
-        withContext(ioDispatcher) {
-            coroutineScope {
-                launch { tasksRemoteDataSource.deleteAllTasks() }
-                launch { tasksLocalDataSource.deleteAllTasks() }
-            }
+        coroutineScope {
+            launch { tasksRemoteDataSource.deleteAllTasks() }
+            launch { tasksLocalDataSource.deleteAllTasks() }
         }
     }
 
@@ -144,9 +126,5 @@ class DefaultTasksRepository(
             launch { tasksRemoteDataSource.deleteTask(taskId) }
             launch { tasksLocalDataSource.deleteTask(taskId) }
         }
-    }
-
-    private suspend fun getTaskWithId(id: String): Task? {
-        return tasksLocalDataSource.getTask(id)
     }
 }

@@ -24,7 +24,6 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -66,7 +65,7 @@ class TasksLocalDataSourceTest {
             .allowMainThreadQueries()
             .build()
 
-        localDataSource = TasksLocalDataSource(database.taskDao(), Dispatchers.Main)
+        localDataSource = TasksLocalDataSource(database.taskDao())
     }
 
     @After
@@ -96,7 +95,7 @@ class TasksLocalDataSourceTest {
         localDataSource.saveTask(newTask)
 
         // When completed in the persistent repository
-        localDataSource.completeTask(newTask)
+        localDataSource.completeTask(newTask.id)
         val task = localDataSource.getTask(newTask.id)
 
         // Then the task can be retrieved from the persistent repository and is complete
@@ -110,7 +109,7 @@ class TasksLocalDataSourceTest {
         val newTask = Task("Some title", "Some description", true)
         localDataSource.saveTask(newTask)
 
-        localDataSource.activateTask(newTask)
+        localDataSource.activateTask(newTask.id)
 
         // Then the task can be retrieved from the persistent repository and is active
         val task = localDataSource.getTask(newTask.id)
@@ -126,9 +125,9 @@ class TasksLocalDataSourceTest {
         val newTask2 = Task("title2")
         val newTask3 = Task("title3")
         localDataSource.saveTask(newTask1)
-        localDataSource.completeTask(newTask1)
+        localDataSource.completeTask(newTask1.id)
         localDataSource.saveTask(newTask2)
-        localDataSource.completeTask(newTask2)
+        localDataSource.completeTask(newTask2.id)
         localDataSource.saveTask(newTask3)
         // When completed tasks are cleared in the repository
         localDataSource.clearCompletedTasks()

@@ -18,16 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * Concrete implementation of a data source as a db.
  */
 class TasksLocalDataSource internal constructor(
-    private val tasksDao: TasksDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val tasksDao: TasksDao
 ) : TasksDataSource {
 
     override fun getTasksStream() = tasksDao.observeTasks()
@@ -42,43 +38,25 @@ class TasksLocalDataSource internal constructor(
         // NO-OP
     }
 
-    override suspend fun getTasks(): List<Task> = withContext(ioDispatcher) {
-        return@withContext tasksDao.getTasks()
-    }
+    override suspend fun getTasks(): List<Task> = tasksDao.getTasks()
 
-    override suspend fun getTask(taskId: String): Task? = withContext(ioDispatcher) {
-        return@withContext tasksDao.getTaskById(taskId)
-    }
+    override suspend fun getTask(taskId: String): Task? = tasksDao.getTaskById(taskId)
 
-    override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
-        tasksDao.insertTask(task)
-    }
+    override suspend fun saveTask(task: Task) = tasksDao.insertTask(task)
 
-    override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
-        tasksDao.updateCompleted(task.id, true)
-    }
-
-    override suspend fun completeTask(taskId: String) {
+    override suspend fun completeTask(taskId: String) =
         tasksDao.updateCompleted(taskId, true)
-    }
 
-    override suspend fun activateTask(task: Task) = withContext(ioDispatcher) {
-        tasksDao.updateCompleted(task.id, false)
-    }
-
-    override suspend fun activateTask(taskId: String) {
+    override suspend fun activateTask(taskId: String) =
         tasksDao.updateCompleted(taskId, false)
-    }
 
-    override suspend fun clearCompletedTasks() = withContext<Unit>(ioDispatcher) {
+    override suspend fun clearCompletedTasks() {
         tasksDao.deleteCompletedTasks()
     }
 
-    override suspend fun deleteAllTasks() = withContext(ioDispatcher) {
-        tasksDao.deleteTasks()
-    }
+    override suspend fun deleteAllTasks() = tasksDao.deleteTasks()
 
-    override suspend fun deleteTask(taskId: String) = withContext<Unit>(ioDispatcher) {
+    override suspend fun deleteTask(taskId: String) {
         tasksDao.deleteTaskById(taskId)
     }
 }

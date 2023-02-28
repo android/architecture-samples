@@ -31,7 +31,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineDispatcher
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -50,9 +49,8 @@ object RepositoryModule {
     fun provideTasksRepository(
         @RemoteTasksDataSource remoteDataSource: TasksDataSource,
         @LocalTasksDataSource localDataSource: TasksDataSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): TasksRepository {
-        return DefaultTasksRepository(remoteDataSource, localDataSource, ioDispatcher)
+        return DefaultTasksRepository(remoteDataSource, localDataSource)
     }
 }
 
@@ -69,10 +67,9 @@ object DataSourceModule {
     @LocalTasksDataSource
     @Provides
     fun provideTasksLocalDataSource(
-        database: ToDoDatabase,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        database: ToDoDatabase
     ): TasksDataSource {
-        return TasksLocalDataSource(database.taskDao(), ioDispatcher)
+        return TasksLocalDataSource(database.taskDao())
     }
 }
 

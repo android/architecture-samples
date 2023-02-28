@@ -113,10 +113,10 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            tasksRepository.completeTask(task)
+            tasksRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task)
+            tasksRepository.activateTask(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }

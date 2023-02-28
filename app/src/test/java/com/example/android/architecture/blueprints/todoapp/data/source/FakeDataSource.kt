@@ -28,20 +28,18 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         tasks?.add(task)
     }
 
-    override suspend fun completeTask(task: Task) {
-        tasks?.firstOrNull { it.id == task.id }?.let { it.isCompleted = true }
-    }
-
     override suspend fun completeTask(taskId: String) {
-        tasks?.firstOrNull { it.id == taskId }?.let { it.isCompleted = true }
-    }
-
-    override suspend fun activateTask(task: Task) {
-        tasks?.firstOrNull { it.id == task.id }?.let { it.isCompleted = false }
+        tasks?.firstOrNull { it.id == taskId }?.let {
+            deleteTask(it.id)
+            saveTask(it.copy(isCompleted = true))
+        }
     }
 
     override suspend fun activateTask(taskId: String) {
-        tasks?.firstOrNull { it.id == taskId }?.let { it.isCompleted = false }
+        tasks?.firstOrNull { it.id == taskId }?.let {
+            deleteTask(it.id)
+            saveTask(it.copy(isCompleted = false))
+        }
     }
 
     override suspend fun clearCompletedTasks() {
