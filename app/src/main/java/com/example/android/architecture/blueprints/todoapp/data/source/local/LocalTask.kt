@@ -19,13 +19,19 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
 
+/**
+ * Internal model used to represent a task stored locally in a Room database. This is used inside
+ * the data layer only.
+ *
+ * See ModelMappingExt.kt for mapping functions used to convert this model to other
+ * models.
+ */
 @Entity(
     tableName = "tasks"
 )
-data class TaskEntity(
-    @PrimaryKey @ColumnInfo(name = "entryid") val id: String = UUID.randomUUID().toString(),
+data class LocalTask(
+    @PrimaryKey @ColumnInfo(name = "entryid") val id: String,
     var title: String = "",
     var description: String = "",
     @ColumnInfo(name = "completed") var isCompleted: Boolean = false,

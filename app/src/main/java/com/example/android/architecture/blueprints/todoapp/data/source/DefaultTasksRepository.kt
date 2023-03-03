@@ -35,21 +35,6 @@ class DefaultTasksRepository(
     private val tasksDao: TasksDao,
 ) : TasksRepository {
 
-    // TODO: Figure out where to put this seed data. It can't go here because tests will break.
-//    init {
-//        // Create some demo data.
-//        runBlocking {
-//            createTask(
-//                "Build tower in Pisa",
-//                "Ground looks good, no foundation work required."
-//            )
-//            createTask(
-//                "Finish bridge in Tacoma",
-//                "Found awesome girders at half the cost!"
-//            )
-//        }
-//    }
-
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)
 

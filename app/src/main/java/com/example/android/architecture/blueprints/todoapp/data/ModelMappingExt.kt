@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskEntity
+import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TaskStatus
 
@@ -29,14 +29,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
  * - NetworkTask: Internal model used to represent a task from the network. Obtained using
  * `asNetworkModel`.
  *
- * - TaskEntity: Internal model used to represent a task stored locally in a database. Obtained
+ * - LocalTask: Internal model used to represent a task stored locally in a database. Obtained
  * using `asLocalModel`.
  *
  */
 
 // External to local
-fun Task.asLocalModel(): TaskEntity {
-    return TaskEntity(
+fun Task.asLocalModel(): LocalTask {
+    return LocalTask(
         id = id,
         title = title,
         description = description,
@@ -47,7 +47,7 @@ fun Task.asLocalModel(): TaskEntity {
 fun List<Task>.asLocalModels() = map { it.asLocalModel() }
 
 // Local to External
-fun TaskEntity.asExternalModel(): Task {
+fun LocalTask.asExternalModel(): Task {
     return Task(
         id = id,
         title = title,
@@ -57,11 +57,11 @@ fun TaskEntity.asExternalModel(): Task {
 }
 
 @JvmName("taskEntitiesAsExternalModels")
-fun List<TaskEntity>.asExternalModels() = map { it.asExternalModel() }
+fun List<LocalTask>.asExternalModels() = map { it.asExternalModel() }
 
 // Network to Local
-fun NetworkTask.asTaskEntity(): TaskEntity {
-    return TaskEntity(
+fun NetworkTask.asTaskEntity(): LocalTask {
+    return LocalTask(
         id = id,
         title = title,
         description = shortDescription,
@@ -73,7 +73,7 @@ fun NetworkTask.asTaskEntity(): TaskEntity {
 fun List<NetworkTask>.asTaskEntities() = map { it.asTaskEntity() }
 
 // Local to Network
-fun TaskEntity.asNetworkModel(): NetworkTask {
+fun LocalTask.asNetworkModel(): NetworkTask {
     return NetworkTask(
         id = id,
         title = title,

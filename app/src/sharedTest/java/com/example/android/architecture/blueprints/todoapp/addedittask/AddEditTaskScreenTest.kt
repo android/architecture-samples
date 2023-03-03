@@ -36,9 +36,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import javax.inject.Inject
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule

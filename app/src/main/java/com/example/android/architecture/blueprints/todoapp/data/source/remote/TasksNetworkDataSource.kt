@@ -29,6 +29,19 @@ object TasksNetworkDataSource : NetworkDataSource {
 
     private var TASKS_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
 
+    init {
+        addTask(
+            id = "PISA",
+            title = "Build tower in Pisa",
+            shortDescription = "Ground looks good, no foundation work required."
+        )
+        addTask(
+            id = "TACOMA",
+            title = "Finish bridge in Tacoma",
+            shortDescription = "Found awesome girders at half the cost!"
+        )
+    }
+
     override suspend fun loadTasks(): List<NetworkTask> {
         // Simulate network by delaying the execution.
         val tasks = TASKS_SERVICE_DATA.values.toList()
@@ -37,7 +50,14 @@ object TasksNetworkDataSource : NetworkDataSource {
     }
 
     override suspend fun getTask(taskId: String): NetworkTask? {
-        TODO("Not implemented")
+        // Simulate network by delaying the execution.
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        return TASKS_SERVICE_DATA[taskId]
+    }
+
+    private fun addTask(id: String, title: String, shortDescription: String) {
+        val newTask = NetworkTask(id = id, title = title, shortDescription = shortDescription)
+        TASKS_SERVICE_DATA[newTask.id] = newTask
     }
 
     override suspend fun saveTask(task: NetworkTask) {

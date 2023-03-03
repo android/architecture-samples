@@ -39,10 +39,9 @@ class DefaultTasksRepositoryTest {
     private val task2 = Task(title = "Title2", description = "Description2")
     private val task3 = Task(title = "Title3", description = "Description3")
     private val newTask = Task(title = "Title new", description = "Description new")
-
     private val networkTasks = listOf(task1, task2).asNetworkModels().sortedBy { it.id }
-
     private val localTasks = listOf(task3.asLocalModel()).sortedBy { it.id }
+
     private val newTasks = listOf(newTask).sortedBy { it.id }
     private lateinit var tasksNetworkDataSource: FakeNetworkDataSource
     private lateinit var tasksLocalDataSource: FakeTasksDao

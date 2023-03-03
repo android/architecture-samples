@@ -35,7 +35,7 @@ interface TasksDao {
      * @return all tasks.
      */
     @Query("SELECT * FROM Tasks")
-    fun observeTasks(): Flow<List<TaskEntity>>
+    fun observeTasks(): Flow<List<LocalTask>>
 
     /**
      * Observes a single task.
@@ -44,7 +44,7 @@ interface TasksDao {
      * @return the task with taskId.
      */
     @Query("SELECT * FROM Tasks WHERE entryid = :taskId")
-    fun observeTaskById(taskId: String): Flow<TaskEntity>
+    fun observeTaskById(taskId: String): Flow<LocalTask>
 
     /**
      * Select all tasks from the tasks table.
@@ -52,7 +52,7 @@ interface TasksDao {
      * @return all tasks.
      */
     @Query("SELECT * FROM Tasks")
-    suspend fun getTasks(): List<TaskEntity>
+    suspend fun getTasks(): List<LocalTask>
 
     /**
      * Select a task by id.
@@ -61,7 +61,7 @@ interface TasksDao {
      * @return the task with taskId.
      */
     @Query("SELECT * FROM Tasks WHERE entryid = :taskId")
-    suspend fun getTaskById(taskId: String): TaskEntity?
+    suspend fun getTaskById(taskId: String): LocalTask?
 
     /**
      * Insert a task in the database. If the task already exists, replace it.
@@ -69,7 +69,7 @@ interface TasksDao {
      * @param task the task to be inserted.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: TaskEntity)
+    suspend fun insertTask(task: LocalTask)
 
     /**
      * Update a task.
@@ -78,7 +78,7 @@ interface TasksDao {
      * @return the number of tasks updated. This should always be 1.
      */
     @Update
-    suspend fun updateTask(task: TaskEntity): Int
+    suspend fun updateTask(task: LocalTask): Int
 
     /**
      * Update the complete status of a task

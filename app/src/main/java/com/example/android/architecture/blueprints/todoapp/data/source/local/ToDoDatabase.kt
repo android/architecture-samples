@@ -24,7 +24,7 @@ import androidx.room.RoomDatabase
  *
  * Note that exportSchema should be true in production databases.
  */
-@Database(entities = [TaskEntity::class], version = 1, exportSchema = false)
+@Database(entities = [LocalTask::class], version = 1, exportSchema = false)
 abstract class ToDoDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TasksDao

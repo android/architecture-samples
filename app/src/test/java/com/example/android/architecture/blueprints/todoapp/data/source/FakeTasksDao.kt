@@ -16,22 +16,22 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskEntity
+import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import kotlinx.coroutines.flow.Flow
 
-class FakeTasksDao(var tasks: MutableList<TaskEntity>? = mutableListOf()) : TasksDao {
+class FakeTasksDao(var tasks: MutableList<LocalTask>? = mutableListOf()) : TasksDao {
 
     override suspend fun getTasks() = tasks ?: throw Exception("Task list is null")
 
-    override suspend fun getTaskById(taskId: String): TaskEntity? =
+    override suspend fun getTaskById(taskId: String): LocalTask? =
         tasks?.firstOrNull { it.id == taskId }
 
-    override suspend fun insertTask(task: TaskEntity) {
+    override suspend fun insertTask(task: LocalTask) {
         tasks?.add(task)
     }
 
-    override suspend fun updateTask(task: TaskEntity): Int {
+    override suspend fun updateTask(task: LocalTask): Int {
         tasks?.apply {
             val didTaskExist = removeIf { it.id == task.id }
             if (didTaskExist) {
@@ -66,11 +66,11 @@ class FakeTasksDao(var tasks: MutableList<TaskEntity>? = mutableListOf()) : Task
         return 0
     }
 
-    override fun observeTasks(): Flow<List<TaskEntity>> {
+    override fun observeTasks(): Flow<List<LocalTask>> {
         TODO("Not implemented")
     }
 
-    override fun observeTaskById(taskId: String): Flow<TaskEntity> {
+    override fun observeTaskById(taskId: String): Flow<LocalTask> {
         TODO("Not implemented")
     }
 }
