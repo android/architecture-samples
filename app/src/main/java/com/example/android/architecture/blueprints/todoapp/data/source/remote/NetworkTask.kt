@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source.local
+package com.example.android.architecture.blueprints.todoapp.data.source.remote
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import java.util.UUID
 
-/**
- * The Room Database that contains the Task table.
- *
- * Note that exportSchema should be true in production databases.
- */
-@Database(entities = [TaskEntity::class], version = 1, exportSchema = false)
-abstract class ToDoDatabase : RoomDatabase() {
+data class NetworkTask(
+    val id: String = UUID.randomUUID().toString(),
+    val title: String,
+    val shortDescription: String,
+    val priority: Int? = null,
+    val status: TaskStatus = TaskStatus.ACTIVE
+)
 
-    abstract fun taskDao(): TasksDao
+enum class TaskStatus {
+    ACTIVE,
+    COMPLETE
 }

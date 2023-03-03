@@ -56,6 +56,12 @@ class FakeRepository : TasksRepository {
         refreshTasks()
     }
 
+    override suspend fun createTask(title: String, description: String): Task {
+        return Task(title = title, description = description).also {
+            saveTask(it)
+        }
+    }
+
     override fun getTasksStream(): Flow<List<Task>> = observableTasks
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
@@ -78,7 +84,16 @@ class FakeRepository : TasksRepository {
         return observableTasks.first()
     }
 
-    override suspend fun saveTask(task: Task) {
+    override suspend fun updateTask(taskId: String, title: String, description: String) {
+        val updatedTask = _savedTasks.value[taskId]?.copy(
+            title = title,
+            description = description
+        ) ?: throw Exception("Task (id $taskId) not found")
+
+        saveTask(updatedTask)
+    }
+
+    private fun saveTask(task: Task) {
         _savedTasks.update { tasks ->
             val newTasks = LinkedHashMap<String, Task>(tasks)
             newTasks[task.id] = task

@@ -22,7 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTa
 import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksNetworkDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -56,7 +56,7 @@ object DataSourceModule {
     @Singleton
     @RemoteTasksDataSource
     @Provides
-    fun provideTasksRemoteDataSource(): NetworkDataSource = TasksRemoteDataSource
+    fun provideTasksRemoteDataSource(): NetworkDataSource = TasksNetworkDataSource
 }
 
 @Module

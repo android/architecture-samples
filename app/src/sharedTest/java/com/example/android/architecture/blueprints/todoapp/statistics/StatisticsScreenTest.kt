@@ -24,13 +24,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,6 +42,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @HiltAndroidTest
+@ExperimentalCoroutinesApi
 class StatisticsScreenTest {
 
     @get:Rule(order = 0)
@@ -60,11 +61,13 @@ class StatisticsScreenTest {
     }
 
     @Test
-    fun tasks_showsNonEmptyMessage() {
+    fun tasks_showsNonEmptyMessage() = runTest {
         // Given some tasks
         repository.apply {
-            saveTaskBlocking(Task("Title1", "Description1", false))
-            saveTaskBlocking(Task("Title2", "Description2", true))
+            createTask("Title1", "Description1")
+            createTask("Title2", "Description2").also {
+                completeTask(it.id)
+            }
         }
 
         composeTestRule.setContent {

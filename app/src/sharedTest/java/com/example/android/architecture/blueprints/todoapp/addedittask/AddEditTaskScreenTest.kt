@@ -33,10 +33,11 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.getTasksBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import javax.inject.Inject
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -54,6 +55,7 @@ import org.robolectric.annotation.TextLayoutMode
 @LooperMode(LooperMode.Mode.PAUSED)
 @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 @HiltAndroidTest
+@ExperimentalCoroutinesApi
 class AddEditTaskScreenTest {
 
     @get:Rule(order = 0)
@@ -100,7 +102,7 @@ class AddEditTaskScreenTest {
     }
 
     @Test
-    fun validTask_isSaved() {
+    fun validTask_isSaved() = runTest {
         // WHEN - Valid title and description combination and click save
         findTextField(R.string.title_hint).performTextInput("title")
         findTextField(R.string.description_hint).performTextInput("description")
@@ -108,7 +110,7 @@ class AddEditTaskScreenTest {
             .performClick()
 
         // THEN - Verify that the repository saved the task
-        val tasks = repository.getTasksBlocking(true)
+        val tasks = repository.getTasks(true)
         assertEquals(tasks.size, 1)
         assertEquals(tasks[0].title, "title")
         assertEquals(tasks[0].description, "description")

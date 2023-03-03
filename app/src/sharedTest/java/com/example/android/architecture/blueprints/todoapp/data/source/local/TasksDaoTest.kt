@@ -130,7 +130,8 @@ class TasksDaoTest {
             title = "new title",
             description = "new description",
             isCompleted = true,
-            id = originalTask.id)
+            id = originalTask.id
+        )
         database.taskDao().updateTask(updatedTask)
 
         // THEN - The loaded data contains the expected values
@@ -147,7 +148,8 @@ class TasksDaoTest {
         val task = TaskEntity(
             title = "title",
             description = "description",
-            isCompleted = true)
+            isCompleted = true
+        )
         database.taskDao().insertTask(task)
 
         // When the task is updated
@@ -197,7 +199,8 @@ class TasksDaoTest {
     fun deleteCompletedTasksAndGettingTasks() = runTest {
         // Given a completed task inserted
         database.taskDao().insertTask(
-            TaskEntity(title = "completed", description = "task", isCompleted = true))
+            TaskEntity(title = "completed", description = "task", isCompleted = true)
+        )
 
         // When deleting completed tasks
         database.taskDao().deleteCompletedTasks()

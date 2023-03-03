@@ -35,7 +35,7 @@ class FakeTasksDao(var tasks: MutableList<TaskEntity>? = mutableListOf()) : Task
         tasks?.apply {
             val didTaskExist = removeIf { it.id == task.id }
             if (didTaskExist) {
-                if (add(task)){
+                if (add(task)) {
                     return 1
                 }
             }
@@ -59,7 +59,7 @@ class FakeTasksDao(var tasks: MutableList<TaskEntity>? = mutableListOf()) : Task
     override suspend fun deleteCompletedTasks(): Int {
         tasks?.apply {
             val originalSize = size
-            if (removeIf { it.isCompleted }){
+            if (removeIf { it.isCompleted }) {
                 return originalSize - size
             }
         }
@@ -73,5 +73,4 @@ class FakeTasksDao(var tasks: MutableList<TaskEntity>? = mutableListOf()) : Task
     override fun observeTaskById(taskId: String): Flow<TaskEntity> {
         TODO("Not implemented")
     }
-
 }
