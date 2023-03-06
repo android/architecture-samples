@@ -36,21 +36,21 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.Ta
 
 // External to local
 fun Task.asLocalModel() = LocalTask(
-        id = id,
-        title = title,
-        description = description,
-        isCompleted = isCompleted,
-    )
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted,
+)
 
 fun List<Task>.asLocalModels() = map(Task::asLocalModel)
 
 // Local to External
 fun LocalTask.asExternalModel() = Task(
-        id = id,
-        title = title,
-        description = description,
-        isCompleted = isCompleted,
-    )
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted,
+)
 
 // Note: JvmName is used to provide a unique name for each extension function with the same name.
 // Without this, type erasure will cause compiler errors because these methods will have the same
@@ -60,22 +60,22 @@ fun List<LocalTask>.asExternalModels() = map(LocalTask::asExternalModel)
 
 // Network to Local
 fun NetworkTask.asTaskEntity() = LocalTask(
-        id = id,
-        title = title,
-        description = shortDescription,
-        isCompleted = (status == TaskStatus.COMPLETE),
-    )
+    id = id,
+    title = title,
+    description = shortDescription,
+    isCompleted = (status == TaskStatus.COMPLETE),
+)
 
 @JvmName("networkTasksAsTaskEntities")
 fun List<NetworkTask>.asTaskEntities() = map(NetworkTask::asTaskEntity)
 
 // Local to Network
 fun LocalTask.asNetworkModel() = NetworkTask(
-        id = id,
-        title = title,
-        shortDescription = description,
-        status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
-    )
+    id = id,
+    title = title,
+    shortDescription = description,
+    status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
+)
 
 // External to Network
 fun Task.asNetworkModel() = asLocalModel().asNetworkModel()
