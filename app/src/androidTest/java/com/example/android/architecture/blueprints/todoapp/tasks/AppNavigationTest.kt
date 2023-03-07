@@ -30,13 +30,12 @@ import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -129,10 +128,9 @@ class AppNavigationTest {
     }
 
     @Test
-    fun taskDetailScreen_doubleUIBackButton() {
+    fun taskDetailScreen_doubleUIBackButton() = runTest {
         val taskName = "UI <- button"
-        val task = Task(taskName, "Description")
-        tasksRepository.saveTaskBlocking(task)
+        tasksRepository.createTask(taskName, "Description")
 
         setContent()
 
@@ -159,10 +157,9 @@ class AppNavigationTest {
     }
 
     @Test
-    fun taskDetailScreen_doubleBackButton() {
+    fun taskDetailScreen_doubleBackButton() = runTest {
         val taskName = "Back button"
-        val task = Task(taskName, "Description")
-        tasksRepository.saveTaskBlocking(task)
+        tasksRepository.createTask(taskName, "Description")
 
         setContent()
 

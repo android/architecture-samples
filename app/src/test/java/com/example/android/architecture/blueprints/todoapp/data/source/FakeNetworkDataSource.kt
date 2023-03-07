@@ -16,34 +16,36 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.flow.Flow
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TaskStatus
 
-class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDataSource {
-    override suspend fun getTasks() = tasks ?: throw Exception("Task list is null")
+class FakeNetworkDataSource(
+    var tasks: MutableList<NetworkTask>? = mutableListOf()
+) : NetworkDataSource {
+    override suspend fun loadTasks() = tasks ?: throw Exception("Task list is null")
 
     override suspend fun getTask(taskId: String) = tasks?.firstOrNull { it.id == taskId }
 
-    override suspend fun saveTask(task: Task) {
+    override suspend fun saveTask(task: NetworkTask) {
         tasks?.add(task)
     }
 
     override suspend fun completeTask(taskId: String) {
         tasks?.firstOrNull { it.id == taskId }?.let {
             deleteTask(it.id)
-            saveTask(it.copy(isCompleted = true))
+            saveTask(it.copy(status = TaskStatus.COMPLETE))
         }
     }
 
     override suspend fun activateTask(taskId: String) {
         tasks?.firstOrNull { it.id == taskId }?.let {
             deleteTask(it.id)
-            saveTask(it.copy(isCompleted = false))
+            saveTask(it.copy(status = TaskStatus.ACTIVE))
         }
     }
 
     override suspend fun clearCompletedTasks() {
-        tasks?.removeIf { it.isCompleted }
+        tasks?.removeIf { it.status == TaskStatus.COMPLETE }
     }
 
     override suspend fun deleteAllTasks() {
@@ -52,21 +54,5 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
 
     override suspend fun deleteTask(taskId: String) {
         tasks?.removeIf { it.id == taskId }
-    }
-
-    override fun getTasksStream(): Flow<List<Task>> {
-        TODO("not implemented")
-    }
-
-    override suspend fun refreshTasks() {
-        TODO("not implemented")
-    }
-
-    override fun getTaskStream(taskId: String): Flow<Task> {
-        TODO("not implemented")
-    }
-
-    override suspend fun refreshTask(taskId: String) {
-        TODO("not implemented")
     }
 }

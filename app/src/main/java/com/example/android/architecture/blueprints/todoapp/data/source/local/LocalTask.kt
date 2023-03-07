@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,23 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 /**
- * The Room Database that contains the Task table.
+ * Internal model used to represent a task stored locally in a Room database. This is used inside
+ * the data layer only.
  *
- * Note that exportSchema should be true in production databases.
+ * See ModelMappingExt.kt for mapping functions used to convert this model to other
+ * models.
  */
-@Database(entities = [LocalTask::class], version = 1, exportSchema = false)
-abstract class ToDoDatabase : RoomDatabase() {
-
-    abstract fun taskDao(): TasksDao
-}
+@Entity(
+    tableName = "tasks"
+)
+data class LocalTask(
+    @PrimaryKey @ColumnInfo(name = "entryid") val id: String,
+    var title: String = "",
+    var description: String = "",
+    @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+)

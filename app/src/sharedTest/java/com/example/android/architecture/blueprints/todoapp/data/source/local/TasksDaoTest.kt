@@ -22,7 +22,6 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -66,14 +65,14 @@ class TasksDaoTest {
     @Test
     fun insertTaskAndGetById() = runTest {
         // GIVEN - insert a task
-        val task = Task("title", "description")
+        val task = LocalTask(title = "title", description = "description", id = "id")
         database.taskDao().insertTask(task)
 
         // WHEN - Get the task by id from the database
         val loaded = database.taskDao().getTaskById(task.id)
 
         // THEN - The loaded data contains the expected values
-        assertThat<Task>(loaded as Task, notNullValue())
+        assertThat<LocalTask>(loaded as LocalTask, notNullValue())
         assertThat(loaded.id, `is`(task.id))
         assertThat(loaded.title, `is`(task.title))
         assertThat(loaded.description, `is`(task.description))
@@ -83,11 +82,16 @@ class TasksDaoTest {
     @Test
     fun insertTaskReplacesOnConflict() = runTest {
         // Given that a task is inserted
-        val task = Task("title", "description")
+        val task = LocalTask(title = "title", description = "description", id = "id")
         database.taskDao().insertTask(task)
 
         // When a task with the same id is inserted
-        val newTask = Task("title2", "description2", true, task.id)
+        val newTask = LocalTask(
+            title = "title2",
+            description = "description2",
+            isCompleted = true,
+            id = task.id
+        )
         database.taskDao().insertTask(newTask)
 
         // THEN - The loaded data contains the expected values
@@ -101,7 +105,7 @@ class TasksDaoTest {
     @Test
     fun insertTaskAndGetTasks() = runTest {
         // GIVEN - insert a task
-        val task = Task("title", "description")
+        val task = LocalTask(title = "title", description = "description", id = "id")
         database.taskDao().insertTask(task)
 
         // WHEN - Get tasks from the database
@@ -118,11 +122,16 @@ class TasksDaoTest {
     @Test
     fun updateTaskAndGetById() = runTest {
         // When inserting a task
-        val originalTask = Task("title", "description")
+        val originalTask = LocalTask(title = "title", description = "description", id = "id")
         database.taskDao().insertTask(originalTask)
 
         // When the task is updated
-        val updatedTask = Task("new title", "new description", true, originalTask.id)
+        val updatedTask = LocalTask(
+            title = "new title",
+            description = "new description",
+            isCompleted = true,
+            id = originalTask.id
+        )
         database.taskDao().updateTask(updatedTask)
 
         // THEN - The loaded data contains the expected values
@@ -136,7 +145,12 @@ class TasksDaoTest {
     @Test
     fun updateCompletedAndGetById() = runTest {
         // When inserting a task
-        val task = Task("title", "description", true)
+        val task = LocalTask(
+            title = "title",
+            description = "description",
+            id = "id",
+            isCompleted = true
+        )
         database.taskDao().insertTask(task)
 
         // When the task is updated
@@ -153,7 +167,7 @@ class TasksDaoTest {
     @Test
     fun deleteTaskByIdAndGettingTasks() = runTest {
         // Given a task inserted
-        val task = Task("title", "description")
+        val task = LocalTask(title = "title", description = "description", id = "id")
         database.taskDao().insertTask(task)
 
         // When deleting a task by id
@@ -167,7 +181,13 @@ class TasksDaoTest {
     @Test
     fun deleteTasksAndGettingTasks() = runTest {
         // Given a task inserted
-        database.taskDao().insertTask(Task("title", "description"))
+        database.taskDao().insertTask(
+            LocalTask(
+                title = "title",
+                description = "description",
+                id = "id"
+            )
+        )
 
         // When deleting all tasks
         database.taskDao().deleteTasks()
@@ -180,7 +200,9 @@ class TasksDaoTest {
     @Test
     fun deleteCompletedTasksAndGettingTasks() = runTest {
         // Given a completed task inserted
-        database.taskDao().insertTask(Task("completed", "task", true))
+        database.taskDao().insertTask(
+            LocalTask(title = "completed", description = "task", id = "id", isCompleted = true)
+        )
 
         // When deleting completed tasks
         database.taskDao().deleteCompletedTasks()

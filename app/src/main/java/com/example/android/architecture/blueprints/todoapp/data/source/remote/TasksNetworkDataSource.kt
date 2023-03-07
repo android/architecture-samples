@@ -16,86 +16,70 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.remote
 
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 
 /**
  * Implementation of the data source that adds a latency simulating network.
+ *
  */
-object TasksRemoteDataSource : TasksDataSource {
+object TasksNetworkDataSource : NetworkDataSource {
 
     private const val SERVICE_LATENCY_IN_MILLIS = 2000L
 
-    private var TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(2)
+    private var TASKS_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
 
     init {
-        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.")
-        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
+        addTask(
+            id = "PISA",
+            title = "Build tower in Pisa",
+            shortDescription = "Ground looks good, no foundation work required."
+        )
+        addTask(
+            id = "TACOMA",
+            title = "Finish bridge in Tacoma",
+            shortDescription = "Found awesome girders at half the cost!"
+        )
     }
 
-    private val observableTasks = MutableStateFlow(runBlocking { getTasks() })
-
-    override suspend fun refreshTasks() {
-        observableTasks.value = getTasks()
-    }
-
-    override fun getTaskStream(taskId: String): Flow<Task?> {
-        return observableTasks.map { tasks ->
-            tasks.firstOrNull { it.id == taskId }
-        }
-    }
-
-    override suspend fun refreshTask(taskId: String) {
-        refreshTasks()
-    }
-
-    override fun getTasksStream(): Flow<List<Task>> {
-        return observableTasks
-    }
-
-    override suspend fun getTasks(): List<Task> {
+    override suspend fun loadTasks(): List<NetworkTask> {
         // Simulate network by delaying the execution.
         val tasks = TASKS_SERVICE_DATA.values.toList()
         delay(SERVICE_LATENCY_IN_MILLIS)
         return tasks
     }
 
-    override suspend fun getTask(taskId: String): Task? {
+    override suspend fun getTask(taskId: String): NetworkTask? {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_IN_MILLIS)
         return TASKS_SERVICE_DATA[taskId]
     }
 
-    private fun addTask(title: String, description: String) {
-        val newTask = Task(title, description)
+    private fun addTask(id: String, title: String, shortDescription: String) {
+        val newTask = NetworkTask(id = id, title = title, shortDescription = shortDescription)
         TASKS_SERVICE_DATA[newTask.id] = newTask
     }
 
-    override suspend fun saveTask(task: Task) {
+    override suspend fun saveTask(task: NetworkTask) {
         TASKS_SERVICE_DATA[task.id] = task
     }
 
     override suspend fun completeTask(taskId: String) {
         TASKS_SERVICE_DATA[taskId]?.let {
-            saveTask(it.copy(isCompleted = true))
+            saveTask(it.copy(status = TaskStatus.COMPLETE))
         }
     }
 
     override suspend fun activateTask(taskId: String) {
         TASKS_SERVICE_DATA[taskId]?.let {
-            saveTask(it.copy(isCompleted = true))
+            saveTask(it.copy(status = TaskStatus.ACTIVE))
         }
     }
 
     override suspend fun clearCompletedTasks() {
         TASKS_SERVICE_DATA = TASKS_SERVICE_DATA.filterValues {
-            !it.isCompleted
-        } as LinkedHashMap<String, Task>
+            it.status == TaskStatus.COMPLETE
+        } as LinkedHashMap<String, NetworkTask>
     }
 
     override suspend fun deleteAllTasks() {

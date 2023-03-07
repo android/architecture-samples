@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -101,8 +100,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun createNewTask() = viewModelScope.launch {
-        val newTask = Task(uiState.value.title, uiState.value.description)
-        tasksRepository.saveTask(newTask)
+        tasksRepository.createTask(uiState.value.title, uiState.value.description)
         _uiState.update {
             it.copy(isTaskSaved = true)
         }
@@ -113,13 +111,11 @@ class AddEditTaskViewModel @Inject constructor(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            val updatedTask = Task(
+            tasksRepository.updateTask(
+                taskId,
                 title = uiState.value.title,
                 description = uiState.value.description,
-                isCompleted = uiState.value.isTaskCompleted,
-                id = taskId
             )
-            tasksRepository.saveTask(updatedTask)
             _uiState.update {
                 it.copy(isTaskSaved = true)
             }

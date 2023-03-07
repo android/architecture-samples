@@ -19,11 +19,10 @@ package com.example.android.architecture.blueprints.todoapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksNetworkDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,10 +35,6 @@ import javax.inject.Singleton
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RemoteTasksDataSource
 
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class LocalTasksDataSource
-
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
@@ -47,10 +42,10 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideTasksRepository(
-        @RemoteTasksDataSource remoteDataSource: TasksDataSource,
-        @LocalTasksDataSource localDataSource: TasksDataSource,
+        @RemoteTasksDataSource remoteDataSource: NetworkDataSource,
+        database: ToDoDatabase,
     ): TasksRepository {
-        return DefaultTasksRepository(remoteDataSource, localDataSource)
+        return DefaultTasksRepository(remoteDataSource, database.taskDao())
     }
 }
 
@@ -61,16 +56,7 @@ object DataSourceModule {
     @Singleton
     @RemoteTasksDataSource
     @Provides
-    fun provideTasksRemoteDataSource(): TasksDataSource = TasksRemoteDataSource
-
-    @Singleton
-    @LocalTasksDataSource
-    @Provides
-    fun provideTasksLocalDataSource(
-        database: ToDoDatabase
-    ): TasksDataSource {
-        return TasksLocalDataSource(database.taskDao())
-    }
+    fun provideTasksRemoteDataSource(): NetworkDataSource = TasksNetworkDataSource
 }
 
 @Module

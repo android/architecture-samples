@@ -18,6 +18,10 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.toExternalModels
+import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
+import com.example.android.architecture.blueprints.todoapp.data.toNetworkModel
+import com.example.android.architecture.blueprints.todoapp.data.toNetworkModels
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -31,15 +35,16 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class DefaultTasksRepositoryTest {
 
-    private val task1 = Task("Title1", "Description1")
-    private val task2 = Task("Title2", "Description2")
-    private val task3 = Task("Title3", "Description3")
-    private val newTask = Task("Title new", "Description new")
-    private val remoteTasks = listOf(task1, task2).sortedBy { it.id }
-    private val localTasks = listOf(task3).sortedBy { it.id }
+    private val task1 = Task(title = "Title1", description = "Description1")
+    private val task2 = Task(title = "Title2", description = "Description2")
+    private val task3 = Task(title = "Title3", description = "Description3")
+    private val newTask = Task(title = "Title new", description = "Description new")
+    private val networkTasks = listOf(task1, task2).toNetworkModels().sortedBy { it.id }
+    private val localTasks = listOf(task3.toLocalModel()).sortedBy { it.id }
+
     private val newTasks = listOf(newTask).sortedBy { it.id }
-    private lateinit var tasksRemoteDataSource: FakeDataSource
-    private lateinit var tasksLocalDataSource: FakeDataSource
+    private lateinit var tasksNetworkDataSource: FakeNetworkDataSource
+    private lateinit var tasksLocalDataSource: FakeTasksDao
 
     // Class under test
     private lateinit var tasksRepository: DefaultTasksRepository
@@ -52,20 +57,22 @@ class DefaultTasksRepositoryTest {
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
-        tasksRemoteDataSource = FakeDataSource(remoteTasks.toMutableList())
-        tasksLocalDataSource = FakeDataSource(localTasks.toMutableList())
+        tasksNetworkDataSource = FakeNetworkDataSource(networkTasks.toMutableList())
+        tasksLocalDataSource = FakeTasksDao(localTasks.toMutableList())
         // Get a reference to the class under test
         tasksRepository = DefaultTasksRepository(
-            tasksRemoteDataSource, tasksLocalDataSource
+            tasksNetworkDataSource, tasksLocalDataSource
         )
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
-        val emptySource = FakeDataSource()
+        val emptyRemoteSource = FakeNetworkDataSource()
+        val emptyLocalSource = FakeTasksDao()
+
         val tasksRepository = DefaultTasksRepository(
-            emptySource, emptySource
+            emptyRemoteSource, emptyLocalSource
         )
 
         assertThat(tasksRepository.getTasks().size).isEqualTo(0)
@@ -77,7 +84,7 @@ class DefaultTasksRepositoryTest {
         val initial = tasksRepository.getTasks(forceUpdate = true)
 
         // Change the remote data source
-        tasksRemoteDataSource.tasks = newTasks.toMutableList()
+        tasksNetworkDataSource.tasks = newTasks.toNetworkModels().toMutableList()
 
         // Load the tasks again without forcing a refresh
         val second = tasksRepository.getTasks()
@@ -93,21 +100,21 @@ class DefaultTasksRepositoryTest {
         val tasks = tasksRepository.getTasks(true)
 
         // Then tasks are loaded from the remote data source
-        assertThat(tasks).isEqualTo(remoteTasks)
+        assertThat(tasks).isEqualTo(networkTasks.toExternalModels())
     }
 
     @Test
     fun saveTask_savesToLocalAndRemote() = runTest {
         // Make sure newTask is not in the remote or local datasources
-        assertThat(tasksRemoteDataSource.tasks).doesNotContain(newTask)
-        assertThat(tasksLocalDataSource.tasks).doesNotContain(newTask)
+        assertThat(tasksNetworkDataSource.tasks).doesNotContain(newTask.toNetworkModel())
+        assertThat(tasksLocalDataSource.tasks).doesNotContain(newTask.toLocalModel())
 
         // When a task is saved to the tasks repository
-        tasksRepository.saveTask(newTask)
+        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
 
         // Then the remote and local sources are called
-        assertThat(tasksRemoteDataSource.tasks).contains(newTask)
-        assertThat(tasksLocalDataSource.tasks).contains(newTask)
+        assertThat(tasksNetworkDataSource.tasks).contains(newTask.toNetworkModel())
+        assertThat(tasksLocalDataSource.tasks?.contains(newTask.toLocalModel()))
     }
 
     @Test
@@ -116,7 +123,7 @@ class DefaultTasksRepositoryTest {
         val tasks = tasksRepository.getTasks()
 
         // Set a different list of tasks in REMOTE
-        tasksRemoteDataSource.tasks = newTasks.toMutableList()
+        tasksNetworkDataSource.tasks = newTasks.toNetworkModels().toMutableList()
 
         // But if tasks are cached, subsequent calls load from cache
         val cachedTasks = tasksRepository.getTasks()
@@ -132,7 +139,7 @@ class DefaultTasksRepositoryTest {
     @Test(expected = Exception::class)
     fun getTasks_WithDirtyCache_remoteUnavailable_throwsException() = runTest {
         // Make remote data source unavailable
-        tasksRemoteDataSource.tasks = null
+        tasksNetworkDataSource.tasks = null
 
         // Load tasks forcing remote load
         tasksRepository.getTasks(true)
@@ -144,16 +151,16 @@ class DefaultTasksRepositoryTest {
     fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() =
         runTest {
             // When the remote data source is unavailable
-            tasksRemoteDataSource.tasks = null
+            tasksNetworkDataSource.tasks = null
 
             // The repository fetches from the local source
-            assertThat(tasksRepository.getTasks()).isEqualTo(localTasks)
+            assertThat(tasksRepository.getTasks()).isEqualTo(localTasks.toExternalModels())
         }
 
     @Test(expected = Exception::class)
     fun getTasks_WithBothDataSourcesUnavailable_throwsError() = runTest {
         // When both sources are unavailable
-        tasksRemoteDataSource.tasks = null
+        tasksNetworkDataSource.tasks = null
         tasksLocalDataSource.tasks = null
 
         // The repository throws an error
@@ -164,18 +171,18 @@ class DefaultTasksRepositoryTest {
     fun getTasks_refreshesLocalDataSource() = runTest {
         val initialLocal = tasksLocalDataSource.tasks
 
-        // First load will fetch from remote
+        // Forcing an update will fetch tasks from remote
         val newTasks = tasksRepository.getTasks(true)
 
-        assertThat(newTasks).isEqualTo(remoteTasks)
-        assertThat(newTasks).isEqualTo(tasksLocalDataSource.tasks)
+        assertThat(newTasks).isEqualTo(networkTasks.toExternalModels())
+        assertThat(newTasks).isEqualTo(tasksLocalDataSource.tasks?.toExternalModels())
         assertThat(tasksLocalDataSource.tasks).isEqualTo(initialLocal)
     }
 
     @Test
     fun completeTask_completesTaskToServiceAPIUpdatesCache() = runTest {
         // Save a task
-        tasksRepository.saveTask(newTask)
+        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
 
         // Make sure it's active
         assertThat(tasksRepository.getTask(newTask.id)?.isCompleted).isFalse()
@@ -190,7 +197,7 @@ class DefaultTasksRepositoryTest {
     @Test
     fun completeTask_activeTaskToServiceAPIUpdatesCache() = runTest {
         // Save a task
-        tasksRepository.saveTask(newTask)
+        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
         tasksRepository.completeTask(newTask.id)
 
         // Make sure it's completed
@@ -206,11 +213,11 @@ class DefaultTasksRepositoryTest {
     @Test
     fun getTask_repositoryCachesAfterFirstApiCall() = runTest {
         // Obtain a task from the local data source
-        tasksLocalDataSource.tasks = mutableListOf(task1)
+        tasksLocalDataSource.tasks = mutableListOf(task1.toLocalModel())
         val initial = tasksRepository.getTask(task1.id)
 
         // Change the tasks on the remote
-        tasksRemoteDataSource.tasks = newTasks.toMutableList()
+        tasksNetworkDataSource.tasks = newTasks.toNetworkModels().toMutableList()
 
         // Obtain the same task again
         val second = tasksRepository.getTask(task1.id)
@@ -222,12 +229,12 @@ class DefaultTasksRepositoryTest {
     @Test
     fun getTask_forceRefresh() = runTest {
         // Trigger the repository to load data, which loads from remote and caches
-        tasksRemoteDataSource.tasks = mutableListOf(task1)
+        tasksNetworkDataSource.tasks = mutableListOf(task1.toNetworkModel())
         val task1FirstTime = tasksRepository.getTask(task1.id, forceUpdate = true)
         assertThat(task1FirstTime?.id).isEqualTo(task1.id)
 
         // Configure the remote data source to return a different task
-        tasksRemoteDataSource.tasks = mutableListOf(task2)
+        tasksNetworkDataSource.tasks = mutableListOf(task2.toNetworkModel())
 
         // Force refresh
         val task1SecondTime = tasksRepository.getTask(task1.id, true)
@@ -241,7 +248,10 @@ class DefaultTasksRepositoryTest {
     @Test
     fun clearCompletedTasks() = runTest {
         val completedTask = task1.copy(isCompleted = true)
-        tasksRemoteDataSource.tasks = mutableListOf(completedTask, task2)
+        tasksNetworkDataSource.tasks = mutableListOf(
+            completedTask.toNetworkModel(),
+            task2.toNetworkModel()
+        )
         tasksRepository.clearCompletedTasks()
 
         val tasks = tasksRepository.getTasks(true)

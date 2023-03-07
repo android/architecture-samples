@@ -16,27 +16,19 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import kotlinx.coroutines.flow.Flow
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
 
 /**
- * Main entry point for accessing tasks data.
+ * Main entry point for accessing tasks data from the network.
+ *
  */
-interface TasksDataSource {
+interface NetworkDataSource {
 
-    fun getTasksStream(): Flow<List<Task>>
+    suspend fun loadTasks(): List<NetworkTask>
 
-    suspend fun getTasks(): List<Task>
+    suspend fun getTask(taskId: String): NetworkTask?
 
-    suspend fun refreshTasks()
-
-    fun getTaskStream(taskId: String): Flow<Task?>
-
-    suspend fun getTask(taskId: String): Task?
-
-    suspend fun refreshTask(taskId: String)
-
-    suspend fun saveTask(task: Task)
+    suspend fun saveTask(task: NetworkTask)
 
     suspend fun completeTask(taskId: String)
 

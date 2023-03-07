@@ -29,11 +29,12 @@ import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.util.saveTaskBlocking
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,6 +46,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
+@ExperimentalCoroutinesApi
 class TaskDetailScreenTest {
 
     @get:Rule(order = 0)
@@ -62,10 +64,12 @@ class TaskDetailScreenTest {
     }
 
     @Test
-    fun activeTaskDetails_DisplayedInUi() {
+    fun activeTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add active (incomplete) task to the DB
-        val activeTask = Task("Active Task", "AndroidX Rocks", false)
-        repository.saveTaskBlocking(activeTask)
+        val activeTask = repository.createTask(
+            title = "Active Task",
+            description = "AndroidX Rocks"
+        )
 
         // WHEN - Details screen is opened
         setContent(activeTask)
@@ -79,10 +83,10 @@ class TaskDetailScreenTest {
     }
 
     @Test
-    fun completedTaskDetails_DisplayedInUi() {
+    fun completedTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add completed task to the DB
-        val completedTask = Task("Completed Task", "AndroidX Rocks", true)
-        repository.saveTaskBlocking(completedTask)
+        val completedTask = repository.createTask("Completed Task", "AndroidX Rocks")
+        repository.completeTask(completedTask.id)
 
         // WHEN - Details screen is opened
         setContent(completedTask)

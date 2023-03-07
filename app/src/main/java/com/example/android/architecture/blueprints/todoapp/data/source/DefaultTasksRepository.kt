@@ -17,23 +17,56 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
+import com.example.android.architecture.blueprints.todoapp.data.toExternalModel
+import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
+import com.example.android.architecture.blueprints.todoapp.data.toNetworkModel
+import com.example.android.architecture.blueprints.todoapp.data.toTaskEntity
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  */
 class DefaultTasksRepository(
-    private val tasksRemoteDataSource: TasksDataSource,
-    private val tasksLocalDataSource: TasksDataSource,
+    private val tasksNetworkDataSource: NetworkDataSource,
+    private val tasksDao: TasksDao,
 ) : TasksRepository {
+
+    override suspend fun createTask(title: String, description: String): Task {
+        val task = Task(title = title, description = description)
+
+        coroutineScope {
+            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
+            launch {
+                tasksDao.insertTask(task.toLocalModel())
+            }
+        }
+        return task
+    }
+
+    override suspend fun updateTask(taskId: String, title: String, description: String) {
+
+        val task = getTask(taskId)?.copy(
+            title = title,
+            description = description
+        ) ?: throw Exception("Task (id $taskId) not found")
+
+        coroutineScope {
+            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
+            launch {
+                tasksDao.insertTask(task.toLocalModel())
+            }
+        }
+    }
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
             updateTasksFromRemoteDataSource()
         }
-        return tasksLocalDataSource.getTasks()
+        return tasksDao.getTasks().map { it.toExternalModel() }
     }
 
     override suspend fun refreshTasks() {
@@ -41,7 +74,11 @@ class DefaultTasksRepository(
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
-        return tasksLocalDataSource.getTasksStream()
+        return tasksDao.observeTasks().map { tasks ->
+            tasks.map { task ->
+                task.toExternalModel()
+            }
+        }
     }
 
     override suspend fun refreshTask(taskId: String) {
@@ -49,26 +86,28 @@ class DefaultTasksRepository(
     }
 
     private suspend fun updateTasksFromRemoteDataSource() {
-        val remoteTasks = tasksRemoteDataSource.getTasks()
+        val remoteTasks = tasksNetworkDataSource.loadTasks()
 
         // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-        tasksLocalDataSource.deleteAllTasks()
+        tasksDao.deleteTasks()
         remoteTasks.forEach { task ->
-            tasksLocalDataSource.saveTask(task)
+            tasksDao.insertTask(task.toTaskEntity())
         }
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return tasksLocalDataSource.getTaskStream(taskId)
+        return tasksDao.observeTaskById(taskId).map { it.toExternalModel() }
     }
 
     private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
-        val remoteTask = tasksRemoteDataSource.getTask(taskId)
+        val remoteTask = tasksNetworkDataSource.getTask(taskId)
 
         if (remoteTask == null) {
-            tasksLocalDataSource.deleteTask(taskId)
+            tasksDao.deleteTaskById(taskId)
         } else {
-            tasksLocalDataSource.saveTask(remoteTask)
+            tasksDao.insertTask(
+                remoteTask.toTaskEntity()
+            )
         }
     }
 
@@ -83,48 +122,41 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             updateTaskFromRemoteDataSource(taskId)
         }
-        return tasksLocalDataSource.getTask(taskId)
-    }
-
-    override suspend fun saveTask(task: Task) {
-        coroutineScope {
-            launch { tasksRemoteDataSource.saveTask(task) }
-            launch { tasksLocalDataSource.saveTask(task) }
-        }
+        return tasksDao.getTaskById(taskId)?.toExternalModel()
     }
 
     override suspend fun completeTask(taskId: String) {
         coroutineScope {
-            launch { tasksRemoteDataSource.completeTask(taskId) }
-            launch { tasksLocalDataSource.completeTask(taskId) }
+            launch { tasksNetworkDataSource.completeTask(taskId) }
+            launch { tasksDao.updateCompleted(taskId = taskId, completed = true) }
         }
     }
 
     override suspend fun activateTask(taskId: String) {
         coroutineScope {
-            launch { tasksRemoteDataSource.activateTask(taskId) }
-            launch { tasksLocalDataSource.activateTask(taskId) }
+            launch { tasksNetworkDataSource.activateTask(taskId) }
+            launch { tasksDao.updateCompleted(taskId = taskId, completed = false) }
         }
     }
 
     override suspend fun clearCompletedTasks() {
         coroutineScope {
-            launch { tasksRemoteDataSource.clearCompletedTasks() }
-            launch { tasksLocalDataSource.clearCompletedTasks() }
+            launch { tasksNetworkDataSource.clearCompletedTasks() }
+            launch { tasksDao.deleteCompletedTasks() }
         }
     }
 
     override suspend fun deleteAllTasks() {
         coroutineScope {
-            launch { tasksRemoteDataSource.deleteAllTasks() }
-            launch { tasksLocalDataSource.deleteAllTasks() }
+            launch { tasksNetworkDataSource.deleteAllTasks() }
+            launch { tasksDao.deleteTasks() }
         }
     }
 
     override suspend fun deleteTask(taskId: String) {
         coroutineScope {
-            launch { tasksRemoteDataSource.deleteTask(taskId) }
-            launch { tasksLocalDataSource.deleteTask(taskId) }
+            launch { tasksNetworkDataSource.deleteTask(taskId) }
+            launch { tasksDao.deleteTaskById(taskId) }
         }
     }
 }
