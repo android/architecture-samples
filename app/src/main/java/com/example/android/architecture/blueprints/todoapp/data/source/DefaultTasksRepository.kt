@@ -17,11 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.toExternalModel
 import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
 import com.example.android.architecture.blueprints.todoapp.data.toNetworkModel
 import com.example.android.architecture.blueprints.todoapp.data.toTaskEntity
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
