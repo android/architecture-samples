@@ -17,10 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.asExternalModel
-import com.example.android.architecture.blueprints.todoapp.data.asLocalModel
-import com.example.android.architecture.blueprints.todoapp.data.asNetworkModel
-import com.example.android.architecture.blueprints.todoapp.data.asTaskEntity
+import com.example.android.architecture.blueprints.todoapp.data.toExternalModel
+import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
+import com.example.android.architecture.blueprints.todoapp.data.toNetworkModel
+import com.example.android.architecture.blueprints.todoapp.data.toTaskEntity
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -39,9 +39,9 @@ class DefaultTasksRepository(
         val task = Task(title = title, description = description)
 
         coroutineScope {
-            launch { tasksNetworkDataSource.saveTask(task.asNetworkModel()) }
+            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
             launch {
-                tasksDao.insertTask(task.asLocalModel())
+                tasksDao.insertTask(task.toLocalModel())
             }
         }
         return task
@@ -55,9 +55,9 @@ class DefaultTasksRepository(
         ) ?: throw Exception("Task (id $taskId) not found")
 
         coroutineScope {
-            launch { tasksNetworkDataSource.saveTask(task.asNetworkModel()) }
+            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
             launch {
-                tasksDao.insertTask(task.asLocalModel())
+                tasksDao.insertTask(task.toLocalModel())
             }
         }
     }
@@ -66,7 +66,7 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             updateTasksFromRemoteDataSource()
         }
-        return tasksDao.getTasks().map { it.asExternalModel() }
+        return tasksDao.getTasks().map { it.toExternalModel() }
     }
 
     override suspend fun refreshTasks() {
@@ -76,7 +76,7 @@ class DefaultTasksRepository(
     override fun getTasksStream(): Flow<List<Task>> {
         return tasksDao.observeTasks().map { tasks ->
             tasks.map { task ->
-                task.asExternalModel()
+                task.toExternalModel()
             }
         }
     }
@@ -91,12 +91,12 @@ class DefaultTasksRepository(
         // Real apps might want to do a proper sync, deleting, modifying or adding each task.
         tasksDao.deleteTasks()
         remoteTasks.forEach { task ->
-            tasksDao.insertTask(task.asTaskEntity())
+            tasksDao.insertTask(task.toTaskEntity())
         }
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return tasksDao.observeTaskById(taskId).map { it.asExternalModel() }
+        return tasksDao.observeTaskById(taskId).map { it.toExternalModel() }
     }
 
     private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
@@ -106,7 +106,7 @@ class DefaultTasksRepository(
             tasksDao.deleteTaskById(taskId)
         } else {
             tasksDao.insertTask(
-                remoteTask.asTaskEntity()
+                remoteTask.toTaskEntity()
             )
         }
     }
@@ -122,7 +122,7 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             updateTaskFromRemoteDataSource(taskId)
         }
-        return tasksDao.getTaskById(taskId)?.asExternalModel()
+        return tasksDao.getTaskById(taskId)?.toExternalModel()
     }
 
     override suspend fun completeTask(taskId: String) {
