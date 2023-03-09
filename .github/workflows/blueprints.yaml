@@ -43,7 +43,7 @@ jobs:
         # comply, run spotless with a gradle init script and disable the cache.
         run: ./gradlew spotlessCheck --init-script gradle/init.gradle.kts --no-configuration-cache
 
-      - name: Robolectric
+      - name: Unit tests
         run: ./gradlew testDebugUnitTest
 
       # Needed to accept licenses
