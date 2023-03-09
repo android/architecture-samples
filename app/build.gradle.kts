@@ -170,7 +170,6 @@ dependencies {
     testImplementation(libs.androidx.archcore.testing)
     testImplementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.robolectric.core)
     testImplementation(libs.androidx.navigation.testing)
     testImplementation(libs.androidx.test.espresso.core)
     testImplementation(libs.androidx.test.espresso.contrib)
@@ -205,7 +204,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.intents)
     androidTestImplementation(libs.androidx.test.espresso.idling.resources)
     androidTestImplementation(libs.androidx.test.espresso.idling.concurrent)
-    androidTestImplementation(libs.robolectric.annotations)
 
     // AndroidX Test - Hilt testing
     androidTestImplementation(libs.hilt.android.testing)
