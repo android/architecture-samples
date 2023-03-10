@@ -107,9 +107,9 @@ class AddEditTaskScreenTest {
 
         // THEN - Verify that the repository saved the task
         val tasks = repository.getTasks(true)
-        assertEquals(tasks.size, 1)
-        assertEquals(tasks[0].title, "title")
-        assertEquals(tasks[0].description, "description")
+        assertEquals(1, tasks.size)
+        assertEquals("title", tasks[0].title)
+        assertEquals("description", tasks[0].description)
     }
 
     private fun findTextField(text: Int): SemanticsNodeInteraction {
