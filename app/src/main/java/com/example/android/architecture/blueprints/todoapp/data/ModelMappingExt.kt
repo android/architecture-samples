@@ -17,8 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TaskStatus
+import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkTask
+import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskStatus
 
 /**
  * Data model mapping extension functions. There are three model types:

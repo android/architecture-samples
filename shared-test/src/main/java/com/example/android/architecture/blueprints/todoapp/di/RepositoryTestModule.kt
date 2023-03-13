@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.di
 
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

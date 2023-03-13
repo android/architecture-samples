@@ -16,8 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source
 
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TaskStatus
+import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkTask
+import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskStatus
 
 class FakeNetworkDataSource(
     var tasks: MutableList<NetworkTask>? = mutableListOf()
