@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source
+package com.example.android.architecture.blueprints.todoapp.data
 
 import androidx.annotation.VisibleForTesting
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,9 +26,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 /**
- * Implementation of a remote data source with static access to the data for easy testing.
+ * Implementation of a tasks repository with static access to the data for easy testing.
  */
-class FakeRepository : TasksRepository {
+class FakeTasksRepository : TasksRepository {
 
     private var shouldThrowError = false
 

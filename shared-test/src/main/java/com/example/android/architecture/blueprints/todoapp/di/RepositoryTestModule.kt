@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.di
 
-import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
+import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
 import dagger.Module
 import dagger.Provides
@@ -34,6 +34,6 @@ object RepositoryTestModule {
     @Singleton
     @Provides
     fun provideTasksRepository(): TasksRepository {
-        return FakeRepository()
+        return FakeTasksRepository()
     }
 }

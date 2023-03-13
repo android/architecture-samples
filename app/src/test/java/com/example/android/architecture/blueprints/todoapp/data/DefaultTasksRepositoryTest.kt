@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source
+package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.toExternalModels
-import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
-import com.example.android.architecture.blueprints.todoapp.data.toNetworkModel
-import com.example.android.architecture.blueprints.todoapp.data.toNetworkModels
+import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTasksDao
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
