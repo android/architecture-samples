@@ -22,12 +22,10 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +36,12 @@ import org.junit.runner.RunWith
 @SmallTest
 class TasksDaoTest {
 
-    private lateinit var database: ToDoDatabase
+    // using an in-memory database because the information stored here disappears when the
+    // process is killed
+    private val database = Room.inMemoryDatabaseBuilder(
+        getApplicationContext(),
+        ToDoDatabase::class.java
+    ).allowMainThreadQueries().build()
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -49,18 +52,9 @@ class TasksDaoTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    // Ensure that we use an empty database for each test.
     @Before
-    fun initDb() {
-        // using an in-memory database because the information stored here disappears when the
-        // process is killed
-        database = Room.inMemoryDatabaseBuilder(
-            getApplicationContext(),
-            ToDoDatabase::class.java
-        ).allowMainThreadQueries().build()
-    }
-
-    @After
-    fun closeDb() = database.close()
+    fun initDb() = database.clearAllTables()
 
     @Test
     fun insertTaskAndGetById() = runTest {
@@ -72,11 +66,11 @@ class TasksDaoTest {
         val loaded = database.taskDao().getTaskById(task.id)
 
         // THEN - The loaded data contains the expected values
-        assertThat<LocalTask>(loaded as LocalTask, notNullValue())
-        assertThat(loaded.id, `is`(task.id))
-        assertThat(loaded.title, `is`(task.title))
-        assertThat(loaded.description, `is`(task.description))
-        assertThat(loaded.isCompleted, `is`(task.isCompleted))
+        assertNotNull(loaded as LocalTask)
+        assertEquals(task.id, loaded.id)
+        assertEquals(task.title, loaded.title)
+        assertEquals(task.description, loaded.description)
+        assertEquals(task.isCompleted, loaded.isCompleted)
     }
 
     @Test
@@ -96,10 +90,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(task.id)
-        assertThat(loaded?.id, `is`(task.id))
-        assertThat(loaded?.title, `is`("title2"))
-        assertThat(loaded?.description, `is`("description2"))
-        assertThat(loaded?.isCompleted, `is`(true))
+        assertEquals(task.id, loaded?.id)
+        assertEquals("title2", loaded?.title)
+        assertEquals("description2", loaded?.description)
+        assertEquals(true, loaded?.isCompleted)
     }
 
     @Test
@@ -112,11 +106,11 @@ class TasksDaoTest {
         val tasks = database.taskDao().getTasks()
 
         // THEN - There is only 1 task in the database, and contains the expected values
-        assertThat(tasks.size, `is`(1))
-        assertThat(tasks[0].id, `is`(task.id))
-        assertThat(tasks[0].title, `is`(task.title))
-        assertThat(tasks[0].description, `is`(task.description))
-        assertThat(tasks[0].isCompleted, `is`(task.isCompleted))
+        assertEquals(1, tasks.size)
+        assertEquals(tasks[0].id, task.id)
+        assertEquals(tasks[0].title, task.title)
+        assertEquals(tasks[0].description, task.description)
+        assertEquals(tasks[0].isCompleted, task.isCompleted)
     }
 
     @Test
@@ -136,10 +130,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(originalTask.id)
-        assertThat(loaded?.id, `is`(originalTask.id))
-        assertThat(loaded?.title, `is`("new title"))
-        assertThat(loaded?.description, `is`("new description"))
-        assertThat(loaded?.isCompleted, `is`(true))
+        assertEquals(originalTask.id, loaded?.id)
+        assertEquals("new title", loaded?.title)
+        assertEquals("new description", loaded?.description)
+        assertEquals(true, loaded?.isCompleted)
     }
 
     @Test
@@ -158,10 +152,10 @@ class TasksDaoTest {
 
         // THEN - The loaded data contains the expected values
         val loaded = database.taskDao().getTaskById(task.id)
-        assertThat(loaded?.id, `is`(task.id))
-        assertThat(loaded?.title, `is`(task.title))
-        assertThat(loaded?.description, `is`(task.description))
-        assertThat(loaded?.isCompleted, `is`(false))
+        assertEquals(task.id, loaded?.id)
+        assertEquals(task.title, loaded?.title)
+        assertEquals(task.description, loaded?.description)
+        assertEquals(false, loaded?.isCompleted)
     }
 
     @Test
@@ -175,7 +169,7 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks.isEmpty(), `is`(true))
+        assertEquals(true, tasks.isEmpty())
     }
 
     @Test
@@ -194,7 +188,7 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks.isEmpty(), `is`(true))
+        assertEquals(true, tasks.isEmpty())
     }
 
     @Test
@@ -209,6 +203,6 @@ class TasksDaoTest {
 
         // THEN - The list is empty
         val tasks = database.taskDao().getTasks()
-        assertThat(tasks.isEmpty(), `is`(true))
+        assertEquals(true, tasks.isEmpty())
     }
 }
