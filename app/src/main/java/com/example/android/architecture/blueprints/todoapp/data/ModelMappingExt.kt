@@ -77,6 +77,8 @@ fun LocalTask.toNetworkModel() = NetworkTask(
     status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
 )
 
+fun List<LocalTask>.toNetworkModels() = map(LocalTask::toNetworkModel)
+
 // External to Network
 fun Task.toNetworkModel() = toLocalModel().toNetworkModel()
 

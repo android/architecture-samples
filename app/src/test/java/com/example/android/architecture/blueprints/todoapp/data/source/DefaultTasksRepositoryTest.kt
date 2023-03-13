@@ -248,9 +248,9 @@ class DefaultTasksRepositoryTest {
     @Test
     fun clearCompletedTasks() = runTest {
         val completedTask = task1.copy(isCompleted = true)
-        tasksNetworkDataSource.tasks = mutableListOf(
-            completedTask.toNetworkModel(),
-            task2.toNetworkModel()
+        tasksLocalDataSource.tasks = mutableListOf(
+            completedTask.toLocalModel(),
+            task2.toLocalModel()
         )
         tasksRepository.clearCompletedTasks()
 

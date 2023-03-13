@@ -17,42 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp.data.source
 
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TaskStatus
 
 class FakeNetworkDataSource(
     var tasks: MutableList<NetworkTask>? = mutableListOf()
 ) : NetworkDataSource {
     override suspend fun loadTasks() = tasks ?: throw Exception("Task list is null")
 
-    override suspend fun getTask(taskId: String) = tasks?.firstOrNull { it.id == taskId }
-
-    override suspend fun saveTask(task: NetworkTask) {
-        tasks?.add(task)
-    }
-
-    override suspend fun completeTask(taskId: String) {
-        tasks?.firstOrNull { it.id == taskId }?.let {
-            deleteTask(it.id)
-            saveTask(it.copy(status = TaskStatus.COMPLETE))
-        }
-    }
-
-    override suspend fun activateTask(taskId: String) {
-        tasks?.firstOrNull { it.id == taskId }?.let {
-            deleteTask(it.id)
-            saveTask(it.copy(status = TaskStatus.ACTIVE))
-        }
-    }
-
-    override suspend fun clearCompletedTasks() {
-        tasks?.removeIf { it.status == TaskStatus.COMPLETE }
-    }
-
-    override suspend fun deleteAllTasks() {
-        tasks?.clear()
-    }
-
-    override suspend fun deleteTask(taskId: String) {
-        tasks?.removeIf { it.id == taskId }
+    override suspend fun saveTasks(tasks: List<NetworkTask>) {
+        this.tasks = tasks.toMutableList()
     }
 }
