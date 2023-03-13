@@ -17,8 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTasksDao
+import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
