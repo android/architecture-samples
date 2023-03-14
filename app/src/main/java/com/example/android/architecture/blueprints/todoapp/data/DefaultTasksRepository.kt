@@ -129,16 +129,12 @@ class DefaultTasksRepository(
     }
 
     override suspend fun clearCompletedTasks() {
-        withContext(coroutineDispatcher) {
-            tasksDao.deleteCompletedTasks()
-        }
+        tasksDao.deleteCompletedTasks()
         saveTasksToNetwork()
     }
 
     override suspend fun deleteAllTasks() {
-        withContext(coroutineDispatcher) {
-            tasksDao.deleteTasks()
-        }
+        tasksDao.deleteTasks()
         saveTasksToNetwork()
     }
 
