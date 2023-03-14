@@ -123,11 +123,22 @@ class DefaultTasksRepository(
         saveTasksToNetwork()
     }
 
+    /**
+     * The following methods load tasks from, and save tasks to, the network.
+     *
+     * Consider these to be long running operations, hence the need for `withContext` which
+     * can change the coroutine dispatcher so that the caller isn't blocked.
+     *
+     * Real apps may want to do a proper sync, rather than the "one-way sync everything" approach
+     * below. See https://developer.android.com/topic/architecture/data-layer/offline-first
+     * for more efficient and robust synchronisation strategies.
+     *
+     * Also, in a real app, these operations could be scheduled using WorkManager.
+     */
     private suspend fun loadTasksFromNetwork() {
         withContext(coroutineDispatcher) {
             val remoteTasks = tasksNetworkDataSource.loadTasks()
 
-            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
             tasksDao.deleteTasks()
             remoteTasks.forEach { task ->
                 tasksDao.insertTask(task.toTaskEntity())
@@ -137,7 +148,6 @@ class DefaultTasksRepository(
 
     private suspend fun saveTasksToNetwork() {
         withContext(coroutineDispatcher) {
-            // Real apps may want to use a proper sync strategy here to avoid data conflicts.
             val localTasks = tasksDao.getTasks()
             tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
         }
