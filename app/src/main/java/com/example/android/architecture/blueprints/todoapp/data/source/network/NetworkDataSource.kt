@@ -24,17 +24,5 @@ interface NetworkDataSource {
 
     suspend fun loadTasks(): List<NetworkTask>
 
-    suspend fun getTask(taskId: String): NetworkTask?
-
-    suspend fun saveTask(task: NetworkTask)
-
-    suspend fun completeTask(taskId: String)
-
-    suspend fun activateTask(taskId: String)
-
-    suspend fun clearCompletedTasks()
-
-    suspend fun deleteAllTasks()
-
-    suspend fun deleteTask(taskId: String)
+    suspend fun saveTasks(tasks: List<NetworkTask>)
 }

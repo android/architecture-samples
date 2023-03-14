@@ -48,44 +48,15 @@ object TasksNetworkDataSource : NetworkDataSource {
         return tasks
     }
 
-    override suspend fun getTask(taskId: String): NetworkTask? {
+    override suspend fun saveTasks(tasks: List<NetworkTask>) {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_IN_MILLIS)
-        return TASKS_SERVICE_DATA[taskId]
+        TASKS_SERVICE_DATA.clear()
+        TASKS_SERVICE_DATA.putAll(tasks.associateBy(NetworkTask::id))
     }
 
     private fun addTask(id: String, title: String, shortDescription: String) {
         val newTask = NetworkTask(id = id, title = title, shortDescription = shortDescription)
         TASKS_SERVICE_DATA[newTask.id] = newTask
-    }
-
-    override suspend fun saveTask(task: NetworkTask) {
-        TASKS_SERVICE_DATA[task.id] = task
-    }
-
-    override suspend fun completeTask(taskId: String) {
-        TASKS_SERVICE_DATA[taskId]?.let {
-            saveTask(it.copy(status = TaskStatus.COMPLETE))
-        }
-    }
-
-    override suspend fun activateTask(taskId: String) {
-        TASKS_SERVICE_DATA[taskId]?.let {
-            saveTask(it.copy(status = TaskStatus.ACTIVE))
-        }
-    }
-
-    override suspend fun clearCompletedTasks() {
-        TASKS_SERVICE_DATA = TASKS_SERVICE_DATA.filterValues {
-            it.status == TaskStatus.COMPLETE
-        } as LinkedHashMap<String, NetworkTask>
-    }
-
-    override suspend fun deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear()
-    }
-
-    override suspend fun deleteTask(taskId: String) {
-        TASKS_SERVICE_DATA.remove(taskId)
     }
 }
