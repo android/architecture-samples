@@ -47,7 +47,7 @@ class DefaultTasksRepository(
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)
         tasksDao.insertTask(task.toLocalModel())
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
         return task
     }
 
@@ -58,12 +58,12 @@ class DefaultTasksRepository(
         ) ?: throw Exception("Task (id $taskId) not found")
 
         tasksDao.insertTask(task.toLocalModel())
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
-            updateTasksFromNetworkDataSource()
+            loadTasksFromNetwork()
         }
         return withContext(coroutineDispatcher) {
             tasksDao.getTasks().toExternalModels()
@@ -71,7 +71,7 @@ class DefaultTasksRepository(
     }
 
     override suspend fun refreshTasks() {
-        updateTasksFromNetworkDataSource()
+        loadTasksFromNetwork()
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
@@ -83,10 +83,10 @@ class DefaultTasksRepository(
     }
 
     override suspend fun refreshTask(taskId: String) {
-        updateTasksFromNetworkDataSource()
+        loadTasksFromNetwork()
     }
 
-    private suspend fun updateTasksFromNetworkDataSource() {
+    private suspend fun loadTasksFromNetwork() {
         withContext(coroutineDispatcher) {
             val remoteTasks = tasksNetworkDataSource.loadTasks()
 
@@ -98,7 +98,7 @@ class DefaultTasksRepository(
         }
     }
 
-    private suspend fun sendTasksToNetworkDataSource() {
+    private suspend fun saveTasksToNetwork() {
         withContext(coroutineDispatcher) {
             // Real apps may want to use a proper sync strategy here to avoid data conflicts.
             val localTasks = tasksDao.getTasks()
@@ -118,37 +118,37 @@ class DefaultTasksRepository(
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
         if (forceUpdate) {
-            updateTasksFromNetworkDataSource()
+            loadTasksFromNetwork()
         }
         return tasksDao.getTaskById(taskId)?.toExternalModel()
     }
 
     override suspend fun completeTask(taskId: String) {
         tasksDao.updateCompleted(taskId = taskId, completed = true)
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 
     override suspend fun activateTask(taskId: String) {
         tasksDao.updateCompleted(taskId = taskId, completed = false)
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 
     override suspend fun clearCompletedTasks() {
         withContext(coroutineDispatcher) {
             tasksDao.deleteCompletedTasks()
         }
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 
     override suspend fun deleteAllTasks() {
         withContext(coroutineDispatcher) {
             tasksDao.deleteTasks()
         }
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 
     override suspend fun deleteTask(taskId: String) {
         tasksDao.deleteTaskById(taskId)
-        sendTasksToNetworkDataSource()
+        saveTasksToNetwork()
     }
 }
