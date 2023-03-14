@@ -20,8 +20,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R.string
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
+import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.FakeRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,7 +43,7 @@ class AddEditTaskViewModelTest {
     private lateinit var addEditTaskViewModel: AddEditTaskViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeRepository
+    private lateinit var tasksRepository: FakeTasksRepository
     private val task = Task(title = "Title1", description = "Description1", id = "0")
 
     // Set the main coroutines dispatcher for unit testing.
@@ -54,7 +54,7 @@ class AddEditTaskViewModelTest {
     @Before
     fun setupViewModel() {
         // We initialise the repository with no tasks
-        tasksRepository = FakeRepository().apply {
+        tasksRepository = FakeTasksRepository().apply {
             addTasks(task)
         }
     }
