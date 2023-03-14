@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source
+package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import kotlinx.coroutines.flow.Flow
 
 /**

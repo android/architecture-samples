@@ -18,11 +18,11 @@ package com.example.android.architecture.blueprints.todoapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.DefaultTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksNetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.network.TasksNetworkDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
