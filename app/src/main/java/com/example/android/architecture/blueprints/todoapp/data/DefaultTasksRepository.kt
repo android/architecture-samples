@@ -81,26 +81,6 @@ class DefaultTasksRepository(
         loadTasksFromNetwork()
     }
 
-    private suspend fun loadTasksFromNetwork() {
-        withContext(coroutineDispatcher) {
-            val remoteTasks = tasksNetworkDataSource.loadTasks()
-
-            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-            tasksDao.deleteTasks()
-            remoteTasks.forEach { task ->
-                tasksDao.insertTask(task.toTaskEntity())
-            }
-        }
-    }
-
-    private suspend fun saveTasksToNetwork() {
-        withContext(coroutineDispatcher) {
-            // Real apps may want to use a proper sync strategy here to avoid data conflicts.
-            val localTasks = tasksDao.getTasks()
-            tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
-        }
-    }
-
     override fun getTaskStream(taskId: String): Flow<Task?> {
         return tasksDao.observeTaskById(taskId).map { it.toExternalModel() }
     }
@@ -141,5 +121,25 @@ class DefaultTasksRepository(
     override suspend fun deleteTask(taskId: String) {
         tasksDao.deleteTaskById(taskId)
         saveTasksToNetwork()
+    }
+
+    private suspend fun loadTasksFromNetwork() {
+        withContext(coroutineDispatcher) {
+            val remoteTasks = tasksNetworkDataSource.loadTasks()
+
+            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
+            tasksDao.deleteTasks()
+            remoteTasks.forEach { task ->
+                tasksDao.insertTask(task.toTaskEntity())
+            }
+        }
+    }
+
+    private suspend fun saveTasksToNetwork() {
+        withContext(coroutineDispatcher) {
+            // Real apps may want to use a proper sync strategy here to avoid data conflicts.
+            val localTasks = tasksDao.getTasks()
+            tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
+        }
     }
 }
