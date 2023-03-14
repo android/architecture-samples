@@ -19,18 +19,29 @@ package com.example.android.architecture.blueprints.todoapp.data.source
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.toExternalModel
+import com.example.android.architecture.blueprints.todoapp.data.toExternalModels
 import com.example.android.architecture.blueprints.todoapp.data.toLocalModel
 import com.example.android.architecture.blueprints.todoapp.data.toNetworkModels
 import com.example.android.architecture.blueprints.todoapp.data.toTaskEntity
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 /**
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
+ *
+ * @param tasksNetworkDataSource - The network data source
+ * @param tasksDao - The local data source
+ * @param coroutineDispatcher - The dispatcher to be used for long running or complex operations,
+ * such as network calls or mapping many models. This is important to avoid blocking the calling
+ * thread.
  */
 class DefaultTasksRepository(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val tasksDao: TasksDao,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : TasksRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
@@ -54,7 +65,9 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             updateTasksFromNetworkDataSource()
         }
-        return tasksDao.getTasks().map { it.toExternalModel() }
+        return withContext(coroutineDispatcher) {
+            tasksDao.getTasks().toExternalModels()
+        }
     }
 
     override suspend fun refreshTasks() {
@@ -63,8 +76,8 @@ class DefaultTasksRepository(
 
     override fun getTasksStream(): Flow<List<Task>> {
         return tasksDao.observeTasks().map { tasks ->
-            tasks.map { task ->
-                task.toExternalModel()
+            withContext(coroutineDispatcher) {
+                tasks.toExternalModels()
             }
         }
     }
@@ -74,19 +87,23 @@ class DefaultTasksRepository(
     }
 
     private suspend fun updateTasksFromNetworkDataSource() {
-        val remoteTasks = tasksNetworkDataSource.loadTasks()
+        withContext(coroutineDispatcher) {
+            val remoteTasks = tasksNetworkDataSource.loadTasks()
 
-        // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-        tasksDao.deleteTasks()
-        remoteTasks.forEach { task ->
-            tasksDao.insertTask(task.toTaskEntity())
+            // Real apps might want to do a proper sync, deleting, modifying or adding each task.
+            tasksDao.deleteTasks()
+            remoteTasks.forEach { task ->
+                tasksDao.insertTask(task.toTaskEntity())
+            }
         }
     }
 
     private suspend fun sendTasksToNetworkDataSource() {
-        // Real apps may want to use a proper sync strategy here to avoid data conflicts.
-        val localTasks = tasksDao.getTasks()
-        tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
+        withContext(coroutineDispatcher) {
+            // Real apps may want to use a proper sync strategy here to avoid data conflicts.
+            val localTasks = tasksDao.getTasks()
+            tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
+        }
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
@@ -117,12 +134,16 @@ class DefaultTasksRepository(
     }
 
     override suspend fun clearCompletedTasks() {
-        tasksDao.deleteCompletedTasks()
+        withContext(coroutineDispatcher) {
+            tasksDao.deleteCompletedTasks()
+        }
         sendTasksToNetworkDataSource()
     }
 
     override suspend fun deleteAllTasks() {
-        tasksDao.deleteTasks()
+        withContext(coroutineDispatcher) {
+            tasksDao.deleteTasks()
+        }
         sendTasksToNetworkDataSource()
     }
 
