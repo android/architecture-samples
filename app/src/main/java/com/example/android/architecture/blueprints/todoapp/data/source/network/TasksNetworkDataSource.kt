@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source.remote
+package com.example.android.architecture.blueprints.todoapp.data.source.network
 
-import com.example.android.architecture.blueprints.todoapp.data.source.NetworkDataSource
 import kotlinx.coroutines.delay
 
 /**

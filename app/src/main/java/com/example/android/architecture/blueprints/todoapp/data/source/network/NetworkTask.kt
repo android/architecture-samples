@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source
-
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.NetworkTask
+package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 /**
- * Main entry point for accessing tasks data from the network.
+ * Internal model used to represent a task obtained from the network. This is used inside the data
+ * layer only.
  *
+ * See ModelMappingExt.kt for mapping functions used to convert this model to other
+ * models.
  */
-interface NetworkDataSource {
+data class NetworkTask(
+    val id: String,
+    val title: String,
+    val shortDescription: String,
+    val priority: Int? = null,
+    val status: TaskStatus = TaskStatus.ACTIVE
+)
 
-    suspend fun loadTasks(): List<NetworkTask>
-
-    suspend fun saveTasks(tasks: List<NetworkTask>)
+enum class TaskStatus {
+    ACTIVE,
+    COMPLETE
 }

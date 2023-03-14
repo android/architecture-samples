@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
