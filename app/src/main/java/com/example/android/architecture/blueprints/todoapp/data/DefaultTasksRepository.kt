@@ -18,141 +18,138 @@ package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
+ *
+ * @param tasksNetworkDataSource - The network data source
+ * @param tasksDao - The local data source
+ * @param coroutineDispatcher - The dispatcher to be used for long running or complex operations,
+ * such as network calls or mapping many models. This is important to avoid blocking the calling
+ * thread.
  */
 class DefaultTasksRepository(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val tasksDao: TasksDao,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : TasksRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)
-
-        coroutineScope {
-            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
-            launch {
-                tasksDao.insertTask(task.toLocalModel())
-            }
-        }
+        tasksDao.insertTask(task.toLocalModel())
+        saveTasksToNetwork()
         return task
     }
 
     override suspend fun updateTask(taskId: String, title: String, description: String) {
-
         val task = getTask(taskId)?.copy(
             title = title,
             description = description
         ) ?: throw Exception("Task (id $taskId) not found")
 
-        coroutineScope {
-            launch { tasksNetworkDataSource.saveTask(task.toNetworkModel()) }
-            launch {
-                tasksDao.insertTask(task.toLocalModel())
-            }
-        }
+        tasksDao.insertTask(task.toLocalModel())
+        saveTasksToNetwork()
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
-            updateTasksFromRemoteDataSource()
+            loadTasksFromNetwork()
         }
-        return tasksDao.getTasks().map { it.toExternalModel() }
+        return withContext(coroutineDispatcher) {
+            tasksDao.getTasks().toExternalModels()
+        }
     }
 
     override suspend fun refreshTasks() {
-        updateTasksFromRemoteDataSource()
+        loadTasksFromNetwork()
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
         return tasksDao.observeTasks().map { tasks ->
-            tasks.map { task ->
-                task.toExternalModel()
+            withContext(coroutineDispatcher) {
+                tasks.toExternalModels()
             }
         }
     }
 
     override suspend fun refreshTask(taskId: String) {
-        updateTaskFromRemoteDataSource(taskId)
-    }
-
-    private suspend fun updateTasksFromRemoteDataSource() {
-        val remoteTasks = tasksNetworkDataSource.loadTasks()
-
-        // Real apps might want to do a proper sync, deleting, modifying or adding each task.
-        tasksDao.deleteTasks()
-        remoteTasks.forEach { task ->
-            tasksDao.insertTask(task.toTaskEntity())
-        }
+        loadTasksFromNetwork()
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
         return tasksDao.observeTaskById(taskId).map { it.toExternalModel() }
     }
 
-    private suspend fun updateTaskFromRemoteDataSource(taskId: String) {
-        val remoteTask = tasksNetworkDataSource.getTask(taskId)
-
-        if (remoteTask == null) {
-            tasksDao.deleteTaskById(taskId)
-        } else {
-            tasksDao.insertTask(
-                remoteTask.toTaskEntity()
-            )
-        }
-    }
-
     /**
-     * Relies on [getTasks] to fetch data and picks the task with the same ID. Will return a null
-     * Task if the task cannot be found.
+     * Get a Task with the given ID. Will return null if the task cannot be found.
      *
      * @param taskId - The ID of the task
-     * @param forceUpdate - true if the task should be updated from the remote data source.
+     * @param forceUpdate - true if the task should be updated from the network data source first.
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
         if (forceUpdate) {
-            updateTaskFromRemoteDataSource(taskId)
+            loadTasksFromNetwork()
         }
         return tasksDao.getTaskById(taskId)?.toExternalModel()
     }
 
     override suspend fun completeTask(taskId: String) {
-        coroutineScope {
-            launch { tasksNetworkDataSource.completeTask(taskId) }
-            launch { tasksDao.updateCompleted(taskId = taskId, completed = true) }
-        }
+        tasksDao.updateCompleted(taskId = taskId, completed = true)
+        saveTasksToNetwork()
     }
 
     override suspend fun activateTask(taskId: String) {
-        coroutineScope {
-            launch { tasksNetworkDataSource.activateTask(taskId) }
-            launch { tasksDao.updateCompleted(taskId = taskId, completed = false) }
-        }
+        tasksDao.updateCompleted(taskId = taskId, completed = false)
+        saveTasksToNetwork()
     }
 
     override suspend fun clearCompletedTasks() {
-        coroutineScope {
-            launch { tasksNetworkDataSource.clearCompletedTasks() }
-            launch { tasksDao.deleteCompletedTasks() }
-        }
+        tasksDao.deleteCompletedTasks()
+        saveTasksToNetwork()
     }
 
     override suspend fun deleteAllTasks() {
-        coroutineScope {
-            launch { tasksNetworkDataSource.deleteAllTasks() }
-            launch { tasksDao.deleteTasks() }
-        }
+        tasksDao.deleteTasks()
+        saveTasksToNetwork()
     }
 
     override suspend fun deleteTask(taskId: String) {
-        coroutineScope {
-            launch { tasksNetworkDataSource.deleteTask(taskId) }
-            launch { tasksDao.deleteTaskById(taskId) }
+        tasksDao.deleteTaskById(taskId)
+        saveTasksToNetwork()
+    }
+
+    /**
+     * The following methods load tasks from, and save tasks to, the network.
+     *
+     * Consider these to be long running operations, hence the need for `withContext` which
+     * can change the coroutine dispatcher so that the caller isn't blocked.
+     *
+     * Real apps may want to do a proper sync, rather than the "one-way sync everything" approach
+     * below. See https://developer.android.com/topic/architecture/data-layer/offline-first
+     * for more efficient and robust synchronisation strategies.
+     *
+     * Also, in a real app, these operations could be scheduled using WorkManager.
+     */
+    private suspend fun loadTasksFromNetwork() {
+        withContext(coroutineDispatcher) {
+            val remoteTasks = tasksNetworkDataSource.loadTasks()
+
+            tasksDao.deleteTasks()
+            remoteTasks.forEach { task ->
+                tasksDao.insertTask(task.toTaskEntity())
+            }
+        }
+    }
+
+    private suspend fun saveTasksToNetwork() {
+        withContext(coroutineDispatcher) {
+            val localTasks = tasksDao.getTasks()
+            tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
         }
     }
 }
