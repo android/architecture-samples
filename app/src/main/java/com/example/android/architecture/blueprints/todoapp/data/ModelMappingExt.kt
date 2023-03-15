@@ -35,17 +35,17 @@ import com.example.android.architecture.blueprints.todoapp.data.source.network.T
  */
 
 // External to local
-fun Task.toLocalModel() = LocalTask(
+fun Task.toLocal() = LocalTask(
     id = id,
     title = title,
     description = description,
     isCompleted = isCompleted,
 )
 
-fun List<Task>.toLocalModels() = map(Task::toLocalModel)
+fun List<Task>.toLocalModels() = map(Task::toLocal)
 
 // Local to External
-fun LocalTask.toExternalModel() = Task(
+fun LocalTask.toExternal() = Task(
     id = id,
     title = title,
     description = description,
@@ -56,10 +56,10 @@ fun LocalTask.toExternalModel() = Task(
 // Without this, type erasure will cause compiler errors because these methods will have the same
 // signature on the JVM.
 @JvmName("localTasksToTasks")
-fun List<LocalTask>.toExternalModels() = map(LocalTask::toExternalModel)
+fun List<LocalTask>.toExternal() = map(LocalTask::toExternal)
 
 // Network to Local
-fun NetworkTask.toLocalTask() = LocalTask(
+fun NetworkTask.toLocal() = LocalTask(
     id = id,
     title = title,
     description = shortDescription,
@@ -67,26 +67,26 @@ fun NetworkTask.toLocalTask() = LocalTask(
 )
 
 @JvmName("networkTasksToLocalTasks")
-fun List<NetworkTask>.toLocalTasks() = map(NetworkTask::toLocalTask)
+fun List<NetworkTask>.toLocalTasks() = map(NetworkTask::toLocal)
 
 // Local to Network
-fun LocalTask.toNetworkModel() = NetworkTask(
+fun LocalTask.toNetwork() = NetworkTask(
     id = id,
     title = title,
     shortDescription = description,
     status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
 )
 
-fun List<LocalTask>.toNetworkModels() = map(LocalTask::toNetworkModel)
+fun List<LocalTask>.toNetwork() = map(LocalTask::toNetwork)
 
 // External to Network
-fun Task.toNetworkModel() = toLocalModel().toNetworkModel()
+fun Task.toNetwork() = toLocal().toNetwork()
 
 @JvmName("tasksToNetworkTasks")
-fun List<Task>.toNetworkModels() = map(Task::toNetworkModel)
+fun List<Task>.toNetwork() = map(Task::toNetwork)
 
 // Network to External
-fun NetworkTask.toExternalModel() = toLocalTask().toExternalModel()
+fun NetworkTask.toExternal() = toLocal().toExternal()
 
 @JvmName("networkTasksToTasks")
-fun List<NetworkTask>.toExternalModels() = map(NetworkTask::toExternalModel)
+fun List<NetworkTask>.toExternal() = map(NetworkTask::toExternal)
