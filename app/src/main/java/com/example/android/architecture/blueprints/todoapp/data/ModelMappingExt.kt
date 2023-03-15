@@ -24,13 +24,13 @@ import com.example.android.architecture.blueprints.todoapp.data.source.network.T
  * Data model mapping extension functions. There are three model types:
  *
  * - Task: External model exposed to other layers in the architecture.
- * Obtained using `toExternalModel`.
+ * Obtained using `toExternal`.
  *
  * - NetworkTask: Internal model used to represent a task from the network. Obtained using
- * `toNetworkModel`.
+ * `toNetwork`.
  *
  * - LocalTask: Internal model used to represent a task stored locally in a database. Obtained
- * using `toLocalModel`.
+ * using `toLocal`.
  *
  */
 
@@ -42,7 +42,7 @@ fun Task.toLocal() = LocalTask(
     isCompleted = isCompleted,
 )
 
-fun List<Task>.toLocalModels() = map(Task::toLocal)
+fun List<Task>.toLocal() = map(Task::toLocal)
 
 // Local to External
 fun LocalTask.toExternal() = Task(
@@ -55,7 +55,7 @@ fun LocalTask.toExternal() = Task(
 // Note: JvmName is used to provide a unique name for each extension function with the same name.
 // Without this, type erasure will cause compiler errors because these methods will have the same
 // signature on the JVM.
-@JvmName("localTasksToTasks")
+@JvmName("localToExternal")
 fun List<LocalTask>.toExternal() = map(LocalTask::toExternal)
 
 // Network to Local
@@ -66,8 +66,8 @@ fun NetworkTask.toLocal() = LocalTask(
     isCompleted = (status == TaskStatus.COMPLETE),
 )
 
-@JvmName("networkTasksToLocalTasks")
-fun List<NetworkTask>.toLocalTasks() = map(NetworkTask::toLocal)
+@JvmName("networkToLocal")
+fun List<NetworkTask>.toLocal() = map(NetworkTask::toLocal)
 
 // Local to Network
 fun LocalTask.toNetwork() = NetworkTask(
@@ -82,11 +82,11 @@ fun List<LocalTask>.toNetwork() = map(LocalTask::toNetwork)
 // External to Network
 fun Task.toNetwork() = toLocal().toNetwork()
 
-@JvmName("tasksToNetworkTasks")
+@JvmName("externalToNetwork")
 fun List<Task>.toNetwork() = map(Task::toNetwork)
 
 // Network to External
 fun NetworkTask.toExternal() = toLocal().toExternal()
 
-@JvmName("networkTasksToTasks")
+@JvmName("networkToExternal")
 fun List<NetworkTask>.toExternal() = map(NetworkTask::toExternal)
