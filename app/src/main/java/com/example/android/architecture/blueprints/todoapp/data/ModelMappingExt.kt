@@ -55,19 +55,19 @@ fun LocalTask.toExternalModel() = Task(
 // Note: JvmName is used to provide a unique name for each extension function with the same name.
 // Without this, type erasure will cause compiler errors because these methods will have the same
 // signature on the JVM.
-@JvmName("taskEntitiesToExternalModels")
+@JvmName("localTasksToTasks")
 fun List<LocalTask>.toExternalModels() = map(LocalTask::toExternalModel)
 
 // Network to Local
-fun NetworkTask.toTaskEntity() = LocalTask(
+fun NetworkTask.toLocalTask() = LocalTask(
     id = id,
     title = title,
     description = shortDescription,
     isCompleted = (status == TaskStatus.COMPLETE),
 )
 
-@JvmName("networkTasksToTaskEntities")
-fun List<NetworkTask>.toTaskEntities() = map(NetworkTask::toTaskEntity)
+@JvmName("networkTasksToLocalTasks")
+fun List<NetworkTask>.toLocalTasks() = map(NetworkTask::toLocalTask)
 
 // Local to Network
 fun LocalTask.toNetworkModel() = NetworkTask(
@@ -86,7 +86,7 @@ fun Task.toNetworkModel() = toLocalModel().toNetworkModel()
 fun List<Task>.toNetworkModels() = map(Task::toNetworkModel)
 
 // Network to External
-fun NetworkTask.toExternalModel() = toTaskEntity().toExternalModel()
+fun NetworkTask.toExternalModel() = toLocalTask().toExternalModel()
 
 @JvmName("networkTasksToTasks")
 fun List<NetworkTask>.toExternalModels() = map(NetworkTask::toExternalModel)

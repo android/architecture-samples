@@ -141,7 +141,7 @@ class DefaultTasksRepository(
 
             tasksDao.deleteTasks()
             remoteTasks.forEach { task ->
-                tasksDao.insertTask(task.toTaskEntity())
+                tasksDao.insertTask(task.toLocalTask())
             }
         }
     }
