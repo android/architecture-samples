@@ -24,28 +24,28 @@ import com.example.android.architecture.blueprints.todoapp.data.source.network.T
  * Data model mapping extension functions. There are three model types:
  *
  * - Task: External model exposed to other layers in the architecture.
- * Obtained using `toExternalModel`.
+ * Obtained using `toExternal`.
  *
  * - NetworkTask: Internal model used to represent a task from the network. Obtained using
- * `toNetworkModel`.
+ * `toNetwork`.
  *
  * - LocalTask: Internal model used to represent a task stored locally in a database. Obtained
- * using `toLocalModel`.
+ * using `toLocal`.
  *
  */
 
 // External to local
-fun Task.toLocalModel() = LocalTask(
+fun Task.toLocal() = LocalTask(
     id = id,
     title = title,
     description = description,
     isCompleted = isCompleted,
 )
 
-fun List<Task>.toLocalModels() = map(Task::toLocalModel)
+fun List<Task>.toLocal() = map(Task::toLocal)
 
 // Local to External
-fun LocalTask.toExternalModel() = Task(
+fun LocalTask.toExternal() = Task(
     id = id,
     title = title,
     description = description,
@@ -55,38 +55,38 @@ fun LocalTask.toExternalModel() = Task(
 // Note: JvmName is used to provide a unique name for each extension function with the same name.
 // Without this, type erasure will cause compiler errors because these methods will have the same
 // signature on the JVM.
-@JvmName("taskEntitiesToExternalModels")
-fun List<LocalTask>.toExternalModels() = map(LocalTask::toExternalModel)
+@JvmName("localToExternal")
+fun List<LocalTask>.toExternal() = map(LocalTask::toExternal)
 
 // Network to Local
-fun NetworkTask.toTaskEntity() = LocalTask(
+fun NetworkTask.toLocal() = LocalTask(
     id = id,
     title = title,
     description = shortDescription,
     isCompleted = (status == TaskStatus.COMPLETE),
 )
 
-@JvmName("networkTasksToTaskEntities")
-fun List<NetworkTask>.toTaskEntities() = map(NetworkTask::toTaskEntity)
+@JvmName("networkToLocal")
+fun List<NetworkTask>.toLocal() = map(NetworkTask::toLocal)
 
 // Local to Network
-fun LocalTask.toNetworkModel() = NetworkTask(
+fun LocalTask.toNetwork() = NetworkTask(
     id = id,
     title = title,
     shortDescription = description,
     status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
 )
 
-fun List<LocalTask>.toNetworkModels() = map(LocalTask::toNetworkModel)
+fun List<LocalTask>.toNetwork() = map(LocalTask::toNetwork)
 
 // External to Network
-fun Task.toNetworkModel() = toLocalModel().toNetworkModel()
+fun Task.toNetwork() = toLocal().toNetwork()
 
-@JvmName("tasksToNetworkTasks")
-fun List<Task>.toNetworkModels() = map(Task::toNetworkModel)
+@JvmName("externalToNetwork")
+fun List<Task>.toNetwork() = map(Task::toNetwork)
 
 // Network to External
-fun NetworkTask.toExternalModel() = toTaskEntity().toExternalModel()
+fun NetworkTask.toExternal() = toLocal().toExternal()
 
-@JvmName("networkTasksToTasks")
-fun List<NetworkTask>.toExternalModels() = map(NetworkTask::toExternalModel)
+@JvmName("networkToExternal")
+fun List<NetworkTask>.toExternal() = map(NetworkTask::toExternal)
