@@ -41,7 +41,7 @@ class DefaultTasksRepository(
 
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)
-        tasksDao.insertTask(task.toLocalModel())
+        tasksDao.insertTask(task.toLocal())
         saveTasksToNetwork()
         return task
     }
@@ -52,7 +52,7 @@ class DefaultTasksRepository(
             description = description
         ) ?: throw Exception("Task (id $taskId) not found")
 
-        tasksDao.insertTask(task.toLocalModel())
+        tasksDao.insertTask(task.toLocal())
         saveTasksToNetwork()
     }
 
@@ -61,7 +61,7 @@ class DefaultTasksRepository(
             loadTasksFromNetwork()
         }
         return withContext(coroutineDispatcher) {
-            tasksDao.getTasks().toExternalModels()
+            tasksDao.getTasks().toExternal()
         }
     }
 
@@ -72,7 +72,7 @@ class DefaultTasksRepository(
     override fun getTasksStream(): Flow<List<Task>> {
         return tasksDao.observeTasks().map { tasks ->
             withContext(coroutineDispatcher) {
-                tasks.toExternalModels()
+                tasks.toExternal()
             }
         }
     }
@@ -82,7 +82,7 @@ class DefaultTasksRepository(
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return tasksDao.observeTaskById(taskId).map { it.toExternalModel() }
+        return tasksDao.observeTaskById(taskId).map { it.toExternal() }
     }
 
     /**
@@ -95,7 +95,7 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             loadTasksFromNetwork()
         }
-        return tasksDao.getTaskById(taskId)?.toExternalModel()
+        return tasksDao.getTaskById(taskId)?.toExternal()
     }
 
     override suspend fun completeTask(taskId: String) {
@@ -141,7 +141,7 @@ class DefaultTasksRepository(
 
             tasksDao.deleteTasks()
             remoteTasks.forEach { task ->
-                tasksDao.insertTask(task.toTaskEntity())
+                tasksDao.insertTask(task.toLocal())
             }
         }
     }
@@ -149,7 +149,7 @@ class DefaultTasksRepository(
     private suspend fun saveTasksToNetwork() {
         withContext(coroutineDispatcher) {
             val localTasks = tasksDao.getTasks()
-            tasksNetworkDataSource.saveTasks(localTasks.toNetworkModels())
+            tasksNetworkDataSource.saveTasks(localTasks.toNetwork())
         }
     }
 }
