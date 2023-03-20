@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.Flow
 
 class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
 
-    private var _tasks : MutableMap<String, LocalTask>? = null
+    private var _tasks: MutableMap<String, LocalTask>? = null
 
-    var tasks : List<LocalTask>?
+    var tasks: List<LocalTask>?
         get() = _tasks?.values?.toList()
-        set(newTasks){
+        set(newTasks) {
             _tasks = newTasks?.associateBy { it.id }?.toMutableMap()
         }
 
@@ -53,7 +53,7 @@ class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
     }
 
     override suspend fun deleteById(taskId: String): Int {
-        return if (_tasks?.remove(taskId) == null){
+        return if (_tasks?.remove(taskId) == null) {
             0
         } else {
             1

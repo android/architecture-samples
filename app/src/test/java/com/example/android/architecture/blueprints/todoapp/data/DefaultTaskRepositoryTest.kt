@@ -52,8 +52,6 @@ class DefaultTaskRepositoryTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
-
-
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
