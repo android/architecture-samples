@@ -17,25 +17,23 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Data Access Object for the tasks table.
+ * Data Access Object for the task table.
  */
 @Dao
-interface TasksDao {
+interface TaskDao {
 
     /**
      * Observes list of tasks.
      *
      * @return all tasks.
      */
-    @Query("SELECT * FROM Tasks")
-    fun observeTasks(): Flow<List<LocalTask>>
+    @Query("SELECT * FROM task")
+    fun observeAll(): Flow<List<LocalTask>>
 
     /**
      * Observes a single task.
@@ -43,16 +41,16 @@ interface TasksDao {
      * @param taskId the task id.
      * @return the task with taskId.
      */
-    @Query("SELECT * FROM Tasks WHERE entryid = :taskId")
-    fun observeTaskById(taskId: String): Flow<LocalTask>
+    @Query("SELECT * FROM task WHERE id = :taskId")
+    fun observeById(taskId: String): Flow<LocalTask>
 
     /**
      * Select all tasks from the tasks table.
      *
      * @return all tasks.
      */
-    @Query("SELECT * FROM Tasks")
-    suspend fun getTasks(): List<LocalTask>
+    @Query("SELECT * FROM task")
+    suspend fun getAll(): List<LocalTask>
 
     /**
      * Select a task by id.
@@ -60,25 +58,24 @@ interface TasksDao {
      * @param taskId the task id.
      * @return the task with taskId.
      */
-    @Query("SELECT * FROM Tasks WHERE entryid = :taskId")
-    suspend fun getTaskById(taskId: String): LocalTask?
+    @Query("SELECT * FROM task WHERE id = :taskId")
+    suspend fun getById(taskId: String): LocalTask?
 
     /**
-     * Insert a task in the database. If the task already exists, replace it.
+     * Insert or update a task in the database. If a task already exists, replace it.
      *
-     * @param task the task to be inserted.
+     * @param task the task to be inserted or updated.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: LocalTask)
+    @Upsert
+    suspend fun upsert(task: LocalTask)
 
     /**
-     * Update a task.
+     * Insert or update tasks in the database. If a task already exists, replace it.
      *
-     * @param task task to be updated
-     * @return the number of tasks updated. This should always be 1.
+     * @param tasks the tasks to be inserted or updated.
      */
-    @Update
-    suspend fun updateTask(task: LocalTask): Int
+    @Upsert
+    fun upsertAll(tasks: List<LocalTask>)
 
     /**
      * Update the complete status of a task
@@ -86,7 +83,7 @@ interface TasksDao {
      * @param taskId id of the task
      * @param completed status to be updated
      */
-    @Query("UPDATE tasks SET completed = :completed WHERE entryid = :taskId")
+    @Query("UPDATE task SET isCompleted = :completed WHERE id = :taskId")
     suspend fun updateCompleted(taskId: String, completed: Boolean)
 
     /**
@@ -94,20 +91,20 @@ interface TasksDao {
      *
      * @return the number of tasks deleted. This should always be 1.
      */
-    @Query("DELETE FROM Tasks WHERE entryid = :taskId")
-    suspend fun deleteTaskById(taskId: String): Int
+    @Query("DELETE FROM task WHERE id = :taskId")
+    suspend fun deleteById(taskId: String): Int
 
     /**
      * Delete all tasks.
      */
-    @Query("DELETE FROM Tasks")
-    suspend fun deleteTasks()
+    @Query("DELETE FROM task")
+    suspend fun deleteAll()
 
     /**
      * Delete all completed tasks from the table.
      *
      * @return the number of tasks deleted.
      */
-    @Query("DELETE FROM Tasks WHERE completed = 1")
-    suspend fun deleteCompletedTasks(): Int
+    @Query("DELETE FROM task WHERE isCompleted = 1")
+    suspend fun deleteCompleted(): Int
 }

@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -28,20 +28,20 @@ import kotlinx.coroutines.withContext
  * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
  *
  * @param tasksNetworkDataSource - The network data source
- * @param tasksDao - The local data source
+ * @param taskDao - The local data source
  * @param coroutineDispatcher - The dispatcher to be used for long running or complex operations,
  * such as network calls or mapping many models. This is important to avoid blocking the calling
  * thread.
  */
 class DefaultTasksRepository(
     private val tasksNetworkDataSource: NetworkDataSource,
-    private val tasksDao: TasksDao,
+    private val taskDao: TaskDao,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : TasksRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)
-        tasksDao.insertTask(task.toLocal())
+        taskDao.upsert(task.toLocal())
         saveTasksToNetwork()
         return task
     }
@@ -52,7 +52,7 @@ class DefaultTasksRepository(
             description = description
         ) ?: throw Exception("Task (id $taskId) not found")
 
-        tasksDao.insertTask(task.toLocal())
+        taskDao.upsert(task.toLocal())
         saveTasksToNetwork()
     }
 
@@ -61,7 +61,7 @@ class DefaultTasksRepository(
             loadTasksFromNetwork()
         }
         return withContext(coroutineDispatcher) {
-            tasksDao.getTasks().toExternal()
+            taskDao.getAll().toExternal()
         }
     }
 
@@ -70,7 +70,7 @@ class DefaultTasksRepository(
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
-        return tasksDao.observeTasks().map { tasks ->
+        return taskDao.observeAll().map { tasks ->
             withContext(coroutineDispatcher) {
                 tasks.toExternal()
             }
@@ -82,7 +82,7 @@ class DefaultTasksRepository(
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return tasksDao.observeTaskById(taskId).map { it.toExternal() }
+        return taskDao.observeById(taskId).map { it.toExternal() }
     }
 
     /**
@@ -95,31 +95,31 @@ class DefaultTasksRepository(
         if (forceUpdate) {
             loadTasksFromNetwork()
         }
-        return tasksDao.getTaskById(taskId)?.toExternal()
+        return taskDao.getById(taskId)?.toExternal()
     }
 
     override suspend fun completeTask(taskId: String) {
-        tasksDao.updateCompleted(taskId = taskId, completed = true)
+        taskDao.updateCompleted(taskId = taskId, completed = true)
         saveTasksToNetwork()
     }
 
     override suspend fun activateTask(taskId: String) {
-        tasksDao.updateCompleted(taskId = taskId, completed = false)
+        taskDao.updateCompleted(taskId = taskId, completed = false)
         saveTasksToNetwork()
     }
 
     override suspend fun clearCompletedTasks() {
-        tasksDao.deleteCompletedTasks()
+        taskDao.deleteCompleted()
         saveTasksToNetwork()
     }
 
     override suspend fun deleteAllTasks() {
-        tasksDao.deleteTasks()
+        taskDao.deleteAll()
         saveTasksToNetwork()
     }
 
     override suspend fun deleteTask(taskId: String) {
-        tasksDao.deleteTaskById(taskId)
+        taskDao.deleteById(taskId)
         saveTasksToNetwork()
     }
 
@@ -138,17 +138,14 @@ class DefaultTasksRepository(
     private suspend fun loadTasksFromNetwork() {
         withContext(coroutineDispatcher) {
             val remoteTasks = tasksNetworkDataSource.loadTasks()
-
-            tasksDao.deleteTasks()
-            remoteTasks.forEach { task ->
-                tasksDao.insertTask(task.toLocal())
-            }
+            taskDao.deleteAll()
+            taskDao.upsertAll(remoteTasks.toLocal())
         }
     }
 
     private suspend fun saveTasksToNetwork() {
         withContext(coroutineDispatcher) {
-            val localTasks = tasksDao.getTasks()
+            val localTasks = taskDao.getAll()
             tasksNetworkDataSource.saveTasks(localTasks.toNetwork())
         }
     }

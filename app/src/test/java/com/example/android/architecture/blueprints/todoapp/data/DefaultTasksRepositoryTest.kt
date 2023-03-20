@@ -17,9 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTasksDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -40,8 +41,8 @@ class DefaultTasksRepositoryTest {
     private val localTasks = listOf(task3.toLocal()).sortedBy { it.id }
 
     private val newTasks = listOf(newTask).sortedBy { it.id }
-    private lateinit var tasksNetworkDataSource: FakeNetworkDataSource
-    private lateinit var tasksLocalDataSource: FakeTasksDao
+    private lateinit var networkDataSource: FakeNetworkDataSource
+    private lateinit var localDataSource: FakeTaskDao
 
     // Class under test
     private lateinit var tasksRepository: DefaultTasksRepository
@@ -51,14 +52,16 @@ class DefaultTasksRepositoryTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
+
+
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
-        tasksNetworkDataSource = FakeNetworkDataSource(networkTasks.toMutableList())
-        tasksLocalDataSource = FakeTasksDao(localTasks.toMutableList())
+        networkDataSource = FakeNetworkDataSource(networkTasks.toMutableList())
+        localDataSource = FakeTaskDao(localTasks)
         // Get a reference to the class under test
         tasksRepository = DefaultTasksRepository(
-            tasksNetworkDataSource, tasksLocalDataSource
+            networkDataSource, localDataSource
         )
     }
 
@@ -66,7 +69,7 @@ class DefaultTasksRepositoryTest {
     @Test
     fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
         val emptyRemoteSource = FakeNetworkDataSource()
-        val emptyLocalSource = FakeTasksDao()
+        val emptyLocalSource = FakeTaskDao()
 
         val tasksRepository = DefaultTasksRepository(
             emptyRemoteSource, emptyLocalSource
@@ -81,7 +84,7 @@ class DefaultTasksRepositoryTest {
         val initial = tasksRepository.getTasks(forceUpdate = true)
 
         // Change the remote data source
-        tasksNetworkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
 
         // Load the tasks again without forcing a refresh
         val second = tasksRepository.getTasks()
@@ -103,15 +106,15 @@ class DefaultTasksRepositoryTest {
     @Test
     fun saveTask_savesToLocalAndRemote() = runTest {
         // Make sure newTask is not in the remote or local datasources
-        assertThat(tasksNetworkDataSource.tasks).doesNotContain(newTask.toNetwork())
-        assertThat(tasksLocalDataSource.tasks).doesNotContain(newTask.toLocal())
+        assertThat(networkDataSource.tasks).doesNotContain(newTask.toNetwork())
+        assertThat(localDataSource.tasks).doesNotContain(newTask.toLocal())
 
         // When a task is saved to the tasks repository
         val newTask = tasksRepository.createTask(newTask.title, newTask.description)
 
         // Then the remote and local sources are called
-        assertThat(tasksNetworkDataSource.tasks).contains(newTask.toNetwork())
-        assertThat(tasksLocalDataSource.tasks?.contains(newTask.toLocal()))
+        assertThat(networkDataSource.tasks).contains(newTask.toNetwork())
+        assertThat(localDataSource.tasks?.contains(newTask.toLocal()))
     }
 
     @Test
@@ -120,7 +123,7 @@ class DefaultTasksRepositoryTest {
         val tasks = tasksRepository.getTasks()
 
         // Set a different list of tasks in REMOTE
-        tasksNetworkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
 
         // But if tasks are cached, subsequent calls load from cache
         val cachedTasks = tasksRepository.getTasks()
@@ -136,7 +139,7 @@ class DefaultTasksRepositoryTest {
     @Test(expected = Exception::class)
     fun getTasks_WithDirtyCache_remoteUnavailable_throwsException() = runTest {
         // Make remote data source unavailable
-        tasksNetworkDataSource.tasks = null
+        networkDataSource.tasks = null
 
         // Load tasks forcing remote load
         tasksRepository.getTasks(true)
@@ -148,7 +151,7 @@ class DefaultTasksRepositoryTest {
     fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() =
         runTest {
             // When the remote data source is unavailable
-            tasksNetworkDataSource.tasks = null
+            networkDataSource.tasks = null
 
             // The repository fetches from the local source
             assertThat(tasksRepository.getTasks()).isEqualTo(localTasks.toExternal())
@@ -157,8 +160,8 @@ class DefaultTasksRepositoryTest {
     @Test(expected = Exception::class)
     fun getTasks_WithBothDataSourcesUnavailable_throwsError() = runTest {
         // When both sources are unavailable
-        tasksNetworkDataSource.tasks = null
-        tasksLocalDataSource.tasks = null
+        networkDataSource.tasks = null
+        localDataSource.tasks = null
 
         // The repository throws an error
         tasksRepository.getTasks()
@@ -166,14 +169,13 @@ class DefaultTasksRepositoryTest {
 
     @Test
     fun getTasks_refreshesLocalDataSource() = runTest {
-        val initialLocal = tasksLocalDataSource.tasks
-
         // Forcing an update will fetch tasks from remote
+        val expectedTasks = networkTasks.toExternal()
+
         val newTasks = tasksRepository.getTasks(true)
 
-        assertThat(newTasks).isEqualTo(networkTasks.toExternal())
-        assertThat(newTasks).isEqualTo(tasksLocalDataSource.tasks?.toExternal())
-        assertThat(tasksLocalDataSource.tasks).isEqualTo(initialLocal)
+        assertEquals(expectedTasks, newTasks)
+        assertEquals(expectedTasks, localDataSource.tasks?.toExternal())
     }
 
     @Test
@@ -210,11 +212,11 @@ class DefaultTasksRepositoryTest {
     @Test
     fun getTask_repositoryCachesAfterFirstApiCall() = runTest {
         // Obtain a task from the local data source
-        tasksLocalDataSource.tasks = mutableListOf(task1.toLocal())
+        localDataSource = FakeTaskDao(mutableListOf(task1.toLocal()))
         val initial = tasksRepository.getTask(task1.id)
 
         // Change the tasks on the remote
-        tasksNetworkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
 
         // Obtain the same task again
         val second = tasksRepository.getTask(task1.id)
@@ -226,12 +228,12 @@ class DefaultTasksRepositoryTest {
     @Test
     fun getTask_forceRefresh() = runTest {
         // Trigger the repository to load data, which loads from remote and caches
-        tasksNetworkDataSource.tasks = mutableListOf(task1.toNetwork())
+        networkDataSource.tasks = mutableListOf(task1.toNetwork())
         val task1FirstTime = tasksRepository.getTask(task1.id, forceUpdate = true)
         assertThat(task1FirstTime?.id).isEqualTo(task1.id)
 
         // Configure the remote data source to return a different task
-        tasksNetworkDataSource.tasks = mutableListOf(task2.toNetwork())
+        networkDataSource.tasks = mutableListOf(task2.toNetwork())
 
         // Force refresh
         val task1SecondTime = tasksRepository.getTask(task1.id, true)
@@ -245,10 +247,7 @@ class DefaultTasksRepositoryTest {
     @Test
     fun clearCompletedTasks() = runTest {
         val completedTask = task1.copy(isCompleted = true)
-        tasksLocalDataSource.tasks = mutableListOf(
-            completedTask.toLocal(),
-            task2.toLocal()
-        )
+        localDataSource.tasks = listOf(completedTask.toLocal(), task2.toLocal())
         tasksRepository.clearCompletedTasks()
 
         val tasks = tasksRepository.getTasks(true)
