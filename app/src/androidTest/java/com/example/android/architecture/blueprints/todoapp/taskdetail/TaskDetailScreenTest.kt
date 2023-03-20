@@ -28,7 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -56,7 +56,7 @@ class TaskDetailScreenTest {
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     @Inject
-    lateinit var repository: TasksRepository
+    lateinit var repository: TaskRepository
 
     @Before
     fun setup() {

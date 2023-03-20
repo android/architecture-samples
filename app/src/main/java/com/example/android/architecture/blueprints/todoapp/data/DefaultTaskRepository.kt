@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 /**
- * Default implementation of [TasksRepository]. Single entry point for managing tasks' data.
+ * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
  *
  * @param tasksNetworkDataSource - The network data source
  * @param taskDao - The local data source
@@ -33,11 +33,11 @@ import kotlinx.coroutines.withContext
  * such as network calls or mapping many models. This is important to avoid blocking the calling
  * thread.
  */
-class DefaultTasksRepository(
+class DefaultTaskRepository(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val taskDao: TaskDao,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : TasksRepository {
+) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
         val task = Task(title = title, description = description)

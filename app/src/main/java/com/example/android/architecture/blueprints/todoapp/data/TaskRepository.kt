@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Interface to the data layer.
  */
-interface TasksRepository {
+interface TaskRepository {
 
     fun getTasksStream(): Flow<List<Task>>
 

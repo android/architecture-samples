@@ -35,7 +35,7 @@ import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -68,7 +68,7 @@ class TasksTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var repository: TasksRepository
+    lateinit var repository: TaskRepository
 
     @Before
     fun init() {

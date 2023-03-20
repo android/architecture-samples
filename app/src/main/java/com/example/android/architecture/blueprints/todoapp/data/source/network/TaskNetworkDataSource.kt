@@ -22,11 +22,11 @@ import kotlinx.coroutines.delay
  * Implementation of the data source that adds a latency simulating network.
  *
  */
-object TasksNetworkDataSource : NetworkDataSource {
+object TaskNetworkDataSource : NetworkDataSource {
 
     private const val SERVICE_LATENCY_IN_MILLIS = 2000L
 
-    private var TASKS_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
+    private var TASK_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
 
     init {
         addTask(
@@ -43,7 +43,7 @@ object TasksNetworkDataSource : NetworkDataSource {
 
     override suspend fun loadTasks(): List<NetworkTask> {
         // Simulate network by delaying the execution.
-        val tasks = TASKS_SERVICE_DATA.values.toList()
+        val tasks = TASK_SERVICE_DATA.values.toList()
         delay(SERVICE_LATENCY_IN_MILLIS)
         return tasks
     }
@@ -51,12 +51,12 @@ object TasksNetworkDataSource : NetworkDataSource {
     override suspend fun saveTasks(tasks: List<NetworkTask>) {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_IN_MILLIS)
-        TASKS_SERVICE_DATA.clear()
-        TASKS_SERVICE_DATA.putAll(tasks.associateBy(NetworkTask::id))
+        TASK_SERVICE_DATA.clear()
+        TASK_SERVICE_DATA.putAll(tasks.associateBy(NetworkTask::id))
     }
 
     private fun addTask(id: String, title: String, shortDescription: String) {
         val newTask = NetworkTask(id = id, title = title, shortDescription = shortDescription)
-        TASKS_SERVICE_DATA[newTask.id] = newTask
+        TASK_SERVICE_DATA[newTask.id] = newTask
     }
 }

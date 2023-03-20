@@ -31,7 +31,7 @@ import org.junit.Test
  * Unit tests for the implementation of the in-memory repository with cache.
  */
 @ExperimentalCoroutinesApi
-class DefaultTasksRepositoryTest {
+class DefaultTaskRepositoryTest {
 
     private val task1 = Task(title = "Title1", description = "Description1")
     private val task2 = Task(title = "Title2", description = "Description2")
@@ -45,7 +45,7 @@ class DefaultTasksRepositoryTest {
     private lateinit var localDataSource: FakeTaskDao
 
     // Class under test
-    private lateinit var tasksRepository: DefaultTasksRepository
+    private lateinit var tasksRepository: DefaultTaskRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -60,7 +60,7 @@ class DefaultTasksRepositoryTest {
         networkDataSource = FakeNetworkDataSource(networkTasks.toMutableList())
         localDataSource = FakeTaskDao(localTasks)
         // Get a reference to the class under test
-        tasksRepository = DefaultTasksRepository(
+        tasksRepository = DefaultTaskRepository(
             networkDataSource, localDataSource
         )
     }
@@ -71,7 +71,7 @@ class DefaultTasksRepositoryTest {
         val emptyRemoteSource = FakeNetworkDataSource()
         val emptyLocalSource = FakeTaskDao()
 
-        val tasksRepository = DefaultTasksRepository(
+        val tasksRepository = DefaultTaskRepository(
             emptyRemoteSource, emptyLocalSource
         )
 
