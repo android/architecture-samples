@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,13 +43,8 @@ class TaskDaoTest {
     ).allowMainThreadQueries().build()
 
     // Set the main coroutines dispatcher for unit testing.
-    @ExperimentalCoroutinesApi
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
-
-    // Executes each task synchronously using Architecture Components.
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
 
     // Ensure that we use an empty database for each test.
     @Before
