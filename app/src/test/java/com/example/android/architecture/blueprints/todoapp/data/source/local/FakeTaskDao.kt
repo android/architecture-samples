@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data.source.network
+package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-class FakeNetworkDataSource(
-    var tasks: MutableList<NetworkTask>? = mutableListOf()
-) : NetworkDataSource {
-    override suspend fun loadTasks() = tasks ?: throw Exception("Task list is null")
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
-    override suspend fun saveTasks(tasks: List<NetworkTask>) {
-        this.tasks = tasks.toMutableList()
-    }
-}
