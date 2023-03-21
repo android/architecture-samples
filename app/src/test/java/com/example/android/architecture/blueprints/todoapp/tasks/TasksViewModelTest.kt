@@ -22,7 +22,7 @@ import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.FakeTaskRepository
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +46,7 @@ class TasksViewModelTest {
     private lateinit var tasksViewModel: TasksViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeTasksRepository
+    private lateinit var tasksRepository: FakeTaskRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -56,7 +56,7 @@ class TasksViewModelTest {
     @Before
     fun setupViewModel() {
         // We initialise the tasks to 3, with one active and two completed
-        tasksRepository = FakeTasksRepository()
+        tasksRepository = FakeTaskRepository()
         val task1 = Task("Title1", "Description1")
         val task2 = Task("Title2", "Description2", true)
         val task3 = Task("Title3", "Description3", true)

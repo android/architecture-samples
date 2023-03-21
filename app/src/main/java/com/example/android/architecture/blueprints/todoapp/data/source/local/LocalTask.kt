@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -28,11 +27,11 @@ import androidx.room.PrimaryKey
  * models.
  */
 @Entity(
-    tableName = "tasks"
+    tableName = "task"
 )
 data class LocalTask(
-    @PrimaryKey @ColumnInfo(name = "entryid") val id: String,
-    var title: String = "",
-    var description: String = "",
-    @ColumnInfo(name = "completed") var isCompleted: Boolean = false,
+    @PrimaryKey val id: String,
+    var title: String,
+    var description: String,
+    var isCompleted: Boolean,
 )

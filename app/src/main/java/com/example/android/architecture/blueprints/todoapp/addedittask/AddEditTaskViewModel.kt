@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +47,7 @@ data class AddEditTaskUiState(
  */
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository,
+    private val taskRepository: TaskRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -100,7 +100,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun createNewTask() = viewModelScope.launch {
-        tasksRepository.createTask(uiState.value.title, uiState.value.description)
+        taskRepository.createTask(uiState.value.title, uiState.value.description)
         _uiState.update {
             it.copy(isTaskSaved = true)
         }
@@ -111,7 +111,7 @@ class AddEditTaskViewModel @Inject constructor(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            tasksRepository.updateTask(
+            taskRepository.updateTask(
                 taskId,
                 title = uiState.value.title,
                 description = uiState.value.description,
@@ -127,7 +127,7 @@ class AddEditTaskViewModel @Inject constructor(
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            tasksRepository.getTask(taskId).let { task ->
+            taskRepository.getTask(taskId).let { task ->
                 if (task != null) {
                     _uiState.update {
                         it.copy(
