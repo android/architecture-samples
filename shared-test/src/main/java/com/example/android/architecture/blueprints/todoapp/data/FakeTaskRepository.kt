@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.update
 /**
  * Implementation of a tasks repository with static access to the data for easy testing.
  */
-class FakeTasksRepository : TasksRepository {
+class FakeTaskRepository : TaskRepository {
 
     private var shouldThrowError = false
 

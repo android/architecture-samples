@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,7 +50,7 @@ data class TaskDetailUiState(
  */
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository,
+    private val taskRepository: TaskRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -59,7 +59,7 @@ class TaskDetailViewModel @Inject constructor(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = tasksRepository.getTaskStream(taskId)
+    private val _taskAsync = taskRepository.getTaskStream(taskId)
         .map { handleTask(it) }
         .catch { emit(Async.Error(R.string.loading_task_error)) }
 
@@ -93,17 +93,17 @@ class TaskDetailViewModel @Inject constructor(
         )
 
     fun deleteTask() = viewModelScope.launch {
-        tasksRepository.deleteTask(taskId)
+        taskRepository.deleteTask(taskId)
         _isTaskDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = uiState.value.task ?: return@launch
         if (completed) {
-            tasksRepository.completeTask(task.id)
+            taskRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task.id)
+            taskRepository.activateTask(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -111,7 +111,7 @@ class TaskDetailViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            tasksRepository.refreshTask(taskId)
+            taskRepository.refreshTask(taskId)
             _isLoading.value = false
         }
     }

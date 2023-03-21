@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.FakeTaskRepository
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +42,7 @@ class StatisticsViewModelTest {
     private lateinit var statisticsViewModel: StatisticsViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeTasksRepository
+    private lateinit var tasksRepository: FakeTaskRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -51,7 +51,7 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        tasksRepository = FakeTasksRepository()
+        tasksRepository = FakeTaskRepository()
         statisticsViewModel = StatisticsViewModel(tasksRepository)
     }
 

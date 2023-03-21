@@ -24,7 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
@@ -56,7 +56,7 @@ data class TasksUiState(
  */
 @HiltViewModel
 class TasksViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository,
+    private val taskRepository: TaskRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -67,7 +67,7 @@ class TasksViewModel @Inject constructor(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _filteredTasksAsync =
-        combine(tasksRepository.getTasksStream(), _savedFilterType) { tasks, type ->
+        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
@@ -105,7 +105,7 @@ class TasksViewModel @Inject constructor(
 
     fun clearCompletedTasks() {
         viewModelScope.launch {
-            tasksRepository.clearCompletedTasks()
+            taskRepository.clearCompletedTasks()
             showSnackbarMessage(R.string.completed_tasks_cleared)
             refresh()
         }
@@ -113,10 +113,10 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            tasksRepository.completeTask(task.id)
+            taskRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            tasksRepository.activateTask(task.id)
+            taskRepository.activateTask(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -140,7 +140,7 @@ class TasksViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            tasksRepository.refreshTasks()
+            taskRepository.refreshTasks()
             _isLoading.value = false
         }
     }

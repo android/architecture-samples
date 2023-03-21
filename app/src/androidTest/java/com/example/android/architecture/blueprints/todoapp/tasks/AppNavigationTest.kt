@@ -30,7 +30,7 @@ import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -62,7 +62,7 @@ class AppNavigationTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var tasksRepository: TasksRepository
+    lateinit var taskRepository: TaskRepository
 
     @Before
     fun init() {
@@ -130,7 +130,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleUIBackButton() = runTest {
         val taskName = "UI <- button"
-        tasksRepository.createTask(taskName, "Description")
+        taskRepository.createTask(taskName, "Description")
 
         setContent()
 
@@ -159,7 +159,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleBackButton() = runTest {
         val taskName = "Back button"
-        tasksRepository.createTask(taskName, "Description")
+        taskRepository.createTask(taskName, "Description")
 
         setContent()
 

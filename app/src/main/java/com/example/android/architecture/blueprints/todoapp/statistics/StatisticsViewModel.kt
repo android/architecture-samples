@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TasksRepository
+import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,11 +46,11 @@ data class StatisticsUiState(
  */
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val tasksRepository: TasksRepository
+    private val taskRepository: TaskRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<StatisticsUiState> =
-        tasksRepository.getTasksStream()
+        taskRepository.getTasksStream()
             .map { Async.Success(it) }
             .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
             .map { taskAsync -> produceStatisticsUiState(taskAsync) }
@@ -62,7 +62,7 @@ class StatisticsViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            tasksRepository.refreshTasks()
+            taskRepository.refreshTasks()
         }
     }
 
