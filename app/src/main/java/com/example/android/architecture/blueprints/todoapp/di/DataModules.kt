@@ -33,7 +33,7 @@ import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class RemoteTasksDataSource
+annotation class NetworkTaskDataSource
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -41,8 +41,8 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideTasksRepository(
-        @RemoteTasksDataSource remoteDataSource: NetworkDataSource,
+    fun provideTaskRepository(
+        @NetworkTaskDataSource remoteDataSource: NetworkDataSource,
         database: ToDoDatabase,
     ): TaskRepository {
         return DefaultTaskRepository(remoteDataSource, database.taskDao())
@@ -54,9 +54,9 @@ object RepositoryModule {
 object DataSourceModule {
 
     @Singleton
-    @RemoteTasksDataSource
+    @NetworkTaskDataSource
     @Provides
-    fun provideTasksRemoteDataSource(): NetworkDataSource = TaskNetworkDataSource
+    fun provideTaskRemoteDataSource(): NetworkDataSource = TaskNetworkDataSource
 }
 
 @Module

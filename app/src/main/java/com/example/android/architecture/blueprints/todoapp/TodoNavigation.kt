@@ -46,7 +46,7 @@ object TodoDestinationsArgs {
 }
 
 /**
- * Destinations used in the [TasksActivity]
+ * Destinations used in the [TodoActivity]
  */
 object TodoDestinations {
     const val TASKS_ROUTE = "$TASKS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"

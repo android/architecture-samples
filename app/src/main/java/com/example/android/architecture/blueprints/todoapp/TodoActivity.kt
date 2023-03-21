@@ -26,7 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * Main activity for the todoapp
  */
 @AndroidEntryPoint
-class TasksActivity : ComponentActivity() {
+class TodoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.android.architecture.blueprints.todoapp.TasksActivity"
+            android:name="com.example.android.architecture.blueprints.todoapp.TodoActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:theme="@style/AppTheme.OverlapSystemBar">
