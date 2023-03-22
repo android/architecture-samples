@@ -33,10 +33,10 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class DefaultTaskRepositoryTest {
 
-    private val task1 = Task(title = "Title1", description = "Description1")
-    private val task2 = Task(title = "Title2", description = "Description2")
-    private val task3 = Task(title = "Title3", description = "Description3")
-    private val newTask = Task(title = "Title new", description = "Description new")
+    private val task1 = Task(id = "1", title = "Title1", description = "Description1")
+    private val task2 = Task(id = "2", title = "Title2", description = "Description2")
+    private val task3 = Task(id = "3", title = "Title3", description = "Description3")
+    private val newTask = Task(id = "new", title = "Title new", description = "Description new")
     private val networkTasks = listOf(task1, task2).toNetwork().sortedBy { it.id }
     private val localTasks = listOf(task3.toLocal()).sortedBy { it.id }
 

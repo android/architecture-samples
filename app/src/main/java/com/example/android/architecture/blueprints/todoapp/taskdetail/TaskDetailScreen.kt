@@ -156,7 +156,12 @@ private fun EditTaskContentPreview() {
             EditTaskContent(
                 loading = false,
                 empty = false,
-                Task("Title", "Description", isCompleted = false),
+                Task(
+                    title = "Title",
+                    description = "Description",
+                    isCompleted = false,
+                    id = "ID"
+                ),
                 onTaskCheck = { },
                 onRefresh = { }
             )
@@ -172,7 +177,12 @@ private fun EditTaskContentTaskCompletedPreview() {
             EditTaskContent(
                 loading = false,
                 empty = false,
-                Task("Title", "Description", isCompleted = true),
+                Task(
+                    title = "Title",
+                    description = "Description",
+                    isCompleted = false,
+                    id = "ID"
+                ),
                 onTaskCheck = { },
                 onRefresh = { }
             )
@@ -188,7 +198,12 @@ private fun EditTaskContentEmptyPreview() {
             EditTaskContent(
                 loading = false,
                 empty = true,
-                Task("Title", "Description", isCompleted = false),
+                Task(
+                    title = "Title",
+                    description = "Description",
+                    isCompleted = false,
+                    id = "ID"
+                ),
                 onTaskCheck = { },
                 onRefresh = { }
             )
