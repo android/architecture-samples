@@ -43,7 +43,7 @@ import kotlinx.coroutines.withContext
 class DefaultTaskRepository @Inject constructor(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val taskDao: TaskDao,
-    private val expensiveWorkDispatcher: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher,
     private val scope: CoroutineScope,
 ) : TaskRepository {
 
