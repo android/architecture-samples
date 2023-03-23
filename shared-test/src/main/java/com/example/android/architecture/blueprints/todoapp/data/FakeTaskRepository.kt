@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 import androidx.annotation.VisibleForTesting
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +57,11 @@ class FakeTaskRepository : TaskRepository {
     }
 
     override suspend fun createTask(title: String, description: String): Task {
-        return Task(title = title, description = description).also {
+        return Task(
+            title = title,
+            description = description,
+            id = generateTaskId()
+        ).also {
             saveTask(it)
         }
     }
@@ -133,6 +138,8 @@ class FakeTaskRepository : TaskRepository {
             LinkedHashMap()
         }
     }
+
+    private fun generateTaskId() = UUID.randomUUID().toString()
 
     @VisibleForTesting
     fun addTasks(vararg tasks: Task) {
