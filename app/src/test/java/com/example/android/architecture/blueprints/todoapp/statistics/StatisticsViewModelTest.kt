@@ -67,10 +67,10 @@ class StatisticsViewModelTest {
     @Test
     fun loadNonEmptyTasksFromRepository_NonEmptyResults() = runTest {
         // We initialise the tasks to 3, with one active and two completed
-        val task1 = Task("Title1", "Description1")
-        val task2 = Task("Title2", "Description2", true)
-        val task3 = Task("Title3", "Description3", true)
-        val task4 = Task("Title4", "Description4", true)
+        val task1 = Task(id = "1", title = "Title1", description = "Desc1")
+        val task2 = Task(id = "2", title = "Title2", description = "Desc2", isCompleted = true)
+        val task3 = Task(id = "3", title = "Title3", description = "Desc3", isCompleted = true)
+        val task4 = Task(id = "4", title = "Title4", description = "Desc4", isCompleted = true)
         tasksRepository.addTasks(task1, task2, task3, task4)
 
         // Then the results are not empty

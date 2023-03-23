@@ -29,7 +29,12 @@ class StatisticsUtilsTest {
     @Test
     fun getActiveAndCompletedStats_noCompleted() {
         val tasks = listOf(
-            Task("title", "desc", isCompleted = false)
+            Task(
+                id = "id",
+                title = "title",
+                description = "desc",
+                isCompleted = false,
+            )
         )
         // When the list of tasks is computed with an active task
         val result = getActiveAndCompletedStats(tasks)
@@ -42,7 +47,12 @@ class StatisticsUtilsTest {
     @Test
     fun getActiveAndCompletedStats_noActive() {
         val tasks = listOf(
-            Task("title", "desc", isCompleted = true)
+            Task(
+                id = "id",
+                title = "title",
+                description = "desc",
+                isCompleted = true,
+            )
         )
         // When the list of tasks is computed with a completed task
         val result = getActiveAndCompletedStats(tasks)
@@ -56,11 +66,11 @@ class StatisticsUtilsTest {
     fun getActiveAndCompletedStats_both() {
         // Given 3 completed tasks and 2 active tasks
         val tasks = listOf(
-            Task("title", "desc", isCompleted = true),
-            Task("title", "desc", isCompleted = true),
-            Task("title", "desc", isCompleted = true),
-            Task("title", "desc", isCompleted = false),
-            Task("title", "desc", isCompleted = false)
+            Task(id = "1", title = "title", description = "desc", isCompleted = true),
+            Task(id = "2", title = "title", description = "desc", isCompleted = true),
+            Task(id = "3", title = "title", description = "desc", isCompleted = true),
+            Task(id = "4", title = "title", description = "desc", isCompleted = false),
+            Task(id = "5", title = "title", description = "desc", isCompleted = false),
         )
         // When the list of tasks is computed
         val result = getActiveAndCompletedStats(tasks)

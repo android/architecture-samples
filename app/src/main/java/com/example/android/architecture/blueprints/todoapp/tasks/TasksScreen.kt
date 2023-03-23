@@ -236,11 +236,36 @@ private fun TasksContentPreview() {
             TasksContent(
                 loading = false,
                 tasks = listOf(
-                    Task("Title 1", "Description 1"),
-                    Task("Title 2", "Description 2", true),
-                    Task("Title 3", "Description 3", true),
-                    Task("Title 4", "Description 4"),
-                    Task("Title 5", "Description 5", true)
+                    Task(
+                        title = "Title 1",
+                        description = "Description 1",
+                        isCompleted = false,
+                        id = "ID 1"
+                    ),
+                    Task(
+                        title = "Title 2",
+                        description = "Description 2",
+                        isCompleted = true,
+                        id = "ID 2"
+                    ),
+                    Task(
+                        title = "Title 3",
+                        description = "Description 3",
+                        isCompleted = true,
+                        id = "ID 3"
+                    ),
+                    Task(
+                        title = "Title 4",
+                        description = "Description 4",
+                        isCompleted = false,
+                        id = "ID 4"
+                    ),
+                    Task(
+                        title = "Title 5",
+                        description = "Description 5",
+                        isCompleted = true,
+                        id = "ID 5"
+                    ),
                 ),
                 currentFilteringLabel = R.string.label_all,
                 noTasksLabel = R.string.no_tasks_all,
@@ -291,7 +316,11 @@ private fun TaskItemPreview() {
     AppCompatTheme {
         Surface {
             TaskItem(
-                task = Task("Title", "Description"),
+                task = Task(
+                    title = "Title",
+                    description = "Description",
+                    id = "ID"
+                ),
                 onTaskClick = { },
                 onCheckedChange = { }
             )
@@ -305,7 +334,12 @@ private fun TaskItemCompletedPreview() {
     AppCompatTheme {
         Surface {
             TaskItem(
-                task = Task("Title", "Description", true),
+                task = Task(
+                    title = "Title",
+                    description = "Description",
+                    isCompleted = true,
+                    id = "ID"
+                ),
                 onTaskClick = { },
                 onCheckedChange = { }
             )

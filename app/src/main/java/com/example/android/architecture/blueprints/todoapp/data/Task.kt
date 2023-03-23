@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import java.util.UUID
-
 /**
  * Immutable model class for a Task.
  *
@@ -33,7 +31,7 @@ data class Task(
     val title: String = "",
     val description: String = "",
     val isCompleted: Boolean = false,
-    val id: String = UUID.randomUUID().toString()
+    val id: String,
 ) {
 
     val titleForList: String
