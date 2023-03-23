@@ -44,7 +44,7 @@ class DefaultTaskRepository @Inject constructor(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val taskDao: TaskDao,
     private val expensiveWorkDispatcher: CoroutineDispatcher,
-    private val fireAndForgetScope: CoroutineScope,
+    private val scope: CoroutineScope,
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
