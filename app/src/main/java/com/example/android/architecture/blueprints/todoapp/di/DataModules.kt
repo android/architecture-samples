@@ -30,6 +30,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.plus
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -44,8 +47,15 @@ object RepositoryModule {
     fun provideTaskRepository(
         @NetworkTaskDataSource remoteDataSource: NetworkDataSource,
         database: ToDoDatabase,
+        @DefaultDispatcher dispatcher: CoroutineDispatcher,
+        @ApplicationScope scope: CoroutineScope,
     ): TaskRepository {
-        return DefaultTaskRepository(remoteDataSource, database.taskDao())
+        return DefaultTaskRepository(
+            tasksNetworkDataSource = remoteDataSource,
+            taskDao = database.taskDao(),
+            expensiveWorkDispatcher = dispatcher,
+            fireAndForgetScope = scope,
+        )
     }
 }
 

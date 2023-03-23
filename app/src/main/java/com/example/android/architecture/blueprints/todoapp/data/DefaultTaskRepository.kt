@@ -18,10 +18,13 @@ package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -29,14 +32,18 @@ import kotlinx.coroutines.withContext
  *
  * @param tasksNetworkDataSource - The network data source
  * @param taskDao - The local data source
- * @param coroutineDispatcher - The dispatcher to be used for long running or complex operations,
- * such as network calls or mapping many models. This is important to avoid blocking the calling
- * thread.
+ * @param expensiveWorkDispatcher - The dispatcher to be used for long running or complex
+ * operations, such as ID generation or mapping many models. This is important to avoid blocking the
+ * calling thread.
+ * @param fireAndForgetScope - The coroutine scope used for fire-and-forget jobs, such as sending
+ * data to the network.
  */
-class DefaultTaskRepository(
+@Singleton
+class DefaultTaskRepository @Inject constructor(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val taskDao: TaskDao,
-    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    private val expensiveWorkDispatcher: CoroutineDispatcher,
+    private val fireAndForgetScope: CoroutineScope,
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
@@ -60,7 +67,7 @@ class DefaultTaskRepository(
         if (forceUpdate) {
             loadTasksFromNetwork()
         }
-        return withContext(coroutineDispatcher) {
+        return withContext(expensiveWorkDispatcher) {
             taskDao.getAll().toExternal()
         }
     }
@@ -71,7 +78,7 @@ class DefaultTaskRepository(
 
     override fun getTasksStream(): Flow<List<Task>> {
         return taskDao.observeAll().map { tasks ->
-            withContext(coroutineDispatcher) {
+            withContext(expensiveWorkDispatcher) {
                 tasks.toExternal()
             }
         }
@@ -136,15 +143,15 @@ class DefaultTaskRepository(
      * Also, in a real app, these operations could be scheduled using WorkManager.
      */
     private suspend fun loadTasksFromNetwork() {
-        withContext(coroutineDispatcher) {
+        withContext(expensiveWorkDispatcher) {
             val remoteTasks = tasksNetworkDataSource.loadTasks()
             taskDao.deleteAll()
             taskDao.upsertAll(remoteTasks.toLocal())
         }
     }
 
-    private suspend fun saveTasksToNetwork() {
-        withContext(coroutineDispatcher) {
+    private fun saveTasksToNetwork() {
+        fireAndForgetScope.launch {
             val localTasks = taskDao.getAll()
             tasksNetworkDataSource.saveTasks(localTasks.toNetwork())
         }
