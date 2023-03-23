@@ -20,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.util.UUID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -47,7 +48,16 @@ class DefaultTaskRepository @Inject constructor(
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
-        val task = Task(title = title, description = description)
+        // ID creation might be a complex operation so it's executed using the supplied
+        // coroutine dispatcher
+        val taskId = withContext(coroutineDispatcher) {
+            UUID.randomUUID().toString()
+        }
+        val task = Task(
+            title = title,
+            description = description,
+            id = taskId,
+        )
         taskDao.upsert(task.toLocal())
         saveTasksToNetwork()
         return task
