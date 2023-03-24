@@ -38,7 +38,7 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindTaskRepository(repository: DefaultTaskRepository) : TaskRepository
+    abstract fun bindTaskRepository(repository: DefaultTaskRepository): TaskRepository
 }
 
 @Module
@@ -65,5 +65,5 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideTaskDao(database: ToDoDatabase) : TaskDao = database.taskDao()
+    fun provideTaskDao(database: ToDoDatabase): TaskDao = database.taskDao()
 }

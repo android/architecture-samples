@@ -21,15 +21,10 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Fak
 import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineExceptionHandler
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.createTestCoroutineScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -116,6 +111,9 @@ class DefaultTaskRepositoryTest {
     fun saveTask_savesToLocalAndRemote() = runTest {
         // When a task is saved to the tasks repository
         val newTaskId = tasksRepository.createTask(newTask.title, newTask.description)
+
+        // Wait for the network to be updated
+        advanceUntilIdle()
 
         // Then the remote and local sources contain the new task
         assertEquals(true, networkDataSource.tasks?.map { it.id }?.contains(newTaskId))

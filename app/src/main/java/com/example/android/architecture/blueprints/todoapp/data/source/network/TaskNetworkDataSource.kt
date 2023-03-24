@@ -16,8 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.network
 
-import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 
 /**
  * Implementation of the data source that adds a latency simulating network.

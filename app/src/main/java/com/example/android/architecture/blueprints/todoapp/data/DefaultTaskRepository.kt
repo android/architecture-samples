@@ -20,15 +20,15 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
@@ -145,15 +145,15 @@ class DefaultTaskRepository @Inject constructor(
      * for more efficient and robust synchronisation strategies.
      *
      * Also, in a real app, these operations could be scheduled using WorkManager.
-     * 
+     *
      * Note that the refresh operation is a suspend function (forces callers to wait) and the save
      * operation is not. It returns immediately so callers don't have to wait.
      */
 
     /**
      * Delete everything in the local data source and replace it with everything from the network
-     * data source. 
-     * 
+     * data source.
+     *
      * `withContext` is used here in case the bulk `toLocal` mapping operation is complex.
      */
     override suspend fun refresh() {
