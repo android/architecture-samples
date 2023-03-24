@@ -99,7 +99,7 @@ class TasksScreenTest {
     @Test
     fun displayCompletedTask() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it.id) }
+            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
         }
 
         setContent()
@@ -134,7 +134,7 @@ class TasksScreenTest {
     @Test
     fun markTaskAsActive() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it.id) }
+            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
         }
 
         setContent()
@@ -156,7 +156,7 @@ class TasksScreenTest {
         // Add one active task and one completed task
         repository.apply {
             createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it.id) }
+            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
         }
 
         setContent()
@@ -173,7 +173,7 @@ class TasksScreenTest {
         repository.apply {
             createTask("TITLE1", "DESCRIPTION1")
             createTask("TITLE2", "DESCRIPTION2")
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it.id) }
+            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
         }
 
         setContent()
@@ -190,8 +190,8 @@ class TasksScreenTest {
         // Add one active task and 2 completed tasks
         repository.apply {
             createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it.id) }
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it.id) }
+            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
+            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
         }
 
         setContent()
@@ -208,7 +208,7 @@ class TasksScreenTest {
         // Add one active task and one completed task
         repository.apply {
             createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it.id) }
+            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
         }
 
         setContent()

@@ -27,7 +27,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
-import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -66,13 +65,13 @@ class TaskDetailScreenTest {
     @Test
     fun activeTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add active (incomplete) task to the DB
-        val activeTask = repository.createTask(
+        val activeTaskId = repository.createTask(
             title = "Active Task",
             description = "AndroidX Rocks"
         )
 
         // WHEN - Details screen is opened
-        setContent(activeTask)
+        setContent(activeTaskId)
 
         // THEN - Task details are displayed on the screen
         // make sure that the title/description are both shown and correct
@@ -85,11 +84,11 @@ class TaskDetailScreenTest {
     @Test
     fun completedTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add completed task to the DB
-        val completedTask = repository.createTask("Completed Task", "AndroidX Rocks")
-        repository.completeTask(completedTask.id)
+        val completedTaskId = repository.createTask("Completed Task", "AndroidX Rocks")
+        repository.completeTask(completedTaskId)
 
         // WHEN - Details screen is opened
-        setContent(completedTask)
+        setContent(completedTaskId)
 
         // THEN - Task details are displayed on the screen
         // make sure that the title/description are both shown and correct
@@ -99,14 +98,14 @@ class TaskDetailScreenTest {
         composeTestRule.onNode(isToggleable()).assertIsOn()
     }
 
-    private fun setContent(activeTask: Task) {
+    private fun setContent(activeTaskId: String) {
         composeTestRule.setContent {
             AppCompatTheme {
                 Surface {
                     TaskDetailScreen(
                         viewModel = TaskDetailViewModel(
                             repository,
-                            SavedStateHandle(mapOf("taskId" to activeTask.id))
+                            SavedStateHandle(mapOf("taskId" to activeTaskId))
                         ),
                         onEditTask = { /*TODO*/ },
                         onBack = { },
