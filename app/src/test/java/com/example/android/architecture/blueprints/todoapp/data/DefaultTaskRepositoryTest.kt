@@ -21,7 +21,15 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Fak
 import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineExceptionHandler
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -59,19 +67,18 @@ class DefaultTaskRepositoryTest {
         localDataSource = FakeTaskDao(localTasks)
         // Get a reference to the class under test
         tasksRepository = DefaultTaskRepository(
-            networkDataSource, localDataSource
+            networkDataSource = networkDataSource,
+            localDataSource = localDataSource,
+            dispatcher = StandardTestDispatcher(),
+            scope = TestScope()
         )
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
-        val emptyRemoteSource = FakeNetworkDataSource()
-        val emptyLocalSource = FakeTaskDao()
-
-        val tasksRepository = DefaultTaskRepository(
-            emptyRemoteSource, emptyLocalSource
-        )
+        networkDataSource.tasks?.clear()
+        localDataSource.deleteAll()
 
         assertThat(tasksRepository.getTasks().size).isEqualTo(0)
     }

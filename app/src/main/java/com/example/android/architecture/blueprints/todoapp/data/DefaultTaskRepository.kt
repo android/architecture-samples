@@ -33,8 +33,8 @@ import javax.inject.Singleton
 /**
  * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
  *
- * @param tasksNetworkDataSource - The network data source
- * @param taskDao - The local data source
+ * @param networkDataSource - The network data source
+ * @param localDataSource - The local data source
  * @param dispatcher - The dispatcher to be used for long running or complex operations, such as ID
  * generation or mapping many models.
  * @param scope - The coroutine scope used for jobs where the result isn't important, and shouldn't
@@ -42,8 +42,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class DefaultTaskRepository @Inject constructor(
-    private val tasksNetworkDataSource: NetworkDataSource,
-    private val taskDao: TaskDao,
+    private val networkDataSource: NetworkDataSource,
+    private val localDataSource: TaskDao,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
 ) : TaskRepository {
@@ -59,7 +59,7 @@ class DefaultTaskRepository @Inject constructor(
             description = description,
             id = taskId,
         )
-        taskDao.upsert(task.toLocal())
+        localDataSource.upsert(task.toLocal())
         saveTasksToNetwork()
         return task
     }
@@ -70,7 +70,7 @@ class DefaultTaskRepository @Inject constructor(
             description = description
         ) ?: throw Exception("Task (id $taskId) not found")
 
-        taskDao.upsert(task.toLocal())
+        localDataSource.upsert(task.toLocal())
         saveTasksToNetwork()
     }
 
@@ -79,12 +79,12 @@ class DefaultTaskRepository @Inject constructor(
             refresh()
         }
         return withContext(dispatcher) {
-            taskDao.getAll().toExternal()
+            localDataSource.getAll().toExternal()
         }
     }
 
     override fun getTasksStream(): Flow<List<Task>> {
-        return taskDao.observeAll().map { tasks ->
+        return localDataSource.observeAll().map { tasks ->
             withContext(dispatcher) {
                 tasks.toExternal()
             }
@@ -96,7 +96,7 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return taskDao.observeById(taskId).map { it.toExternal() }
+        return localDataSource.observeById(taskId).map { it.toExternal() }
     }
 
     /**
@@ -109,31 +109,31 @@ class DefaultTaskRepository @Inject constructor(
         if (forceUpdate) {
             refresh()
         }
-        return taskDao.getById(taskId)?.toExternal()
+        return localDataSource.getById(taskId)?.toExternal()
     }
 
     override suspend fun completeTask(taskId: String) {
-        taskDao.updateCompleted(taskId = taskId, completed = true)
+        localDataSource.updateCompleted(taskId = taskId, completed = true)
         saveTasksToNetwork()
     }
 
     override suspend fun activateTask(taskId: String) {
-        taskDao.updateCompleted(taskId = taskId, completed = false)
+        localDataSource.updateCompleted(taskId = taskId, completed = false)
         saveTasksToNetwork()
     }
 
     override suspend fun clearCompletedTasks() {
-        taskDao.deleteCompleted()
+        localDataSource.deleteCompleted()
         saveTasksToNetwork()
     }
 
     override suspend fun deleteAllTasks() {
-        taskDao.deleteAll()
+        localDataSource.deleteAll()
         saveTasksToNetwork()
     }
 
     override suspend fun deleteTask(taskId: String) {
-        taskDao.deleteById(taskId)
+        localDataSource.deleteById(taskId)
         saveTasksToNetwork()
     }
 
@@ -158,9 +158,9 @@ class DefaultTaskRepository @Inject constructor(
      */
     override suspend fun refresh() {
         withContext(dispatcher) {
-            val remoteTasks = tasksNetworkDataSource.loadTasks()
-            taskDao.deleteAll()
-            taskDao.upsertAll(remoteTasks.toLocal())
+            val remoteTasks = networkDataSource.loadTasks()
+            localDataSource.deleteAll()
+            localDataSource.upsertAll(remoteTasks.toLocal())
         }
     }
 
@@ -173,8 +173,8 @@ class DefaultTaskRepository @Inject constructor(
      */
     private fun saveTasksToNetwork() {
         scope.launch {
-            val localTasks = taskDao.getAll()
-            tasksNetworkDataSource.saveTasks(localTasks.toNetwork())
+            val localTasks = localDataSource.getAll()
+            networkDataSource.saveTasks(localTasks.toNetwork())
         }
     }
 }
