@@ -18,39 +18,40 @@ package com.example.android.architecture.blueprints.todoapp.data
 
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
-import javax.inject.Inject
-import javax.inject.Singleton
-import java.util.UUID
+import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
+import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
  *
  * @param tasksNetworkDataSource - The network data source
  * @param taskDao - The local data source
- * @param expensiveWorkDispatcher - The dispatcher to be used for long running or complex
- * operations, such as ID generation or mapping many models. This is important to avoid blocking the
- * calling thread.
- * @param fireAndForgetScope - The coroutine scope used for fire-and-forget jobs, such as sending
- * data to the network.
+ * @param dispatcher - The dispatcher to be used for long running or complex operations, such as ID
+ * generation or mapping many models.
+ * @param scope - The coroutine scope used for jobs where the result isn't important, and shouldn't
+ * block the caller, such as sending data to the network.
  */
 @Singleton
 class DefaultTaskRepository @Inject constructor(
     private val tasksNetworkDataSource: NetworkDataSource,
     private val taskDao: TaskDao,
-    private val defaultDispatcher: CoroutineDispatcher,
-    private val scope: CoroutineScope,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): Task {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
-        val taskId = withContext(coroutineDispatcher) {
+        val taskId = withContext(dispatcher) {
             UUID.randomUUID().toString()
         }
         val task = Task(
@@ -75,27 +76,23 @@ class DefaultTaskRepository @Inject constructor(
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
-            loadTasksFromNetwork()
+            refresh()
         }
-        return withContext(expensiveWorkDispatcher) {
+        return withContext(dispatcher) {
             taskDao.getAll().toExternal()
         }
     }
 
-    override suspend fun refreshTasks() {
-        loadTasksFromNetwork()
-    }
-
     override fun getTasksStream(): Flow<List<Task>> {
         return taskDao.observeAll().map { tasks ->
-            withContext(expensiveWorkDispatcher) {
+            withContext(dispatcher) {
                 tasks.toExternal()
             }
         }
     }
 
     override suspend fun refreshTask(taskId: String) {
-        loadTasksFromNetwork()
+        refresh()
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
@@ -110,7 +107,7 @@ class DefaultTaskRepository @Inject constructor(
      */
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
         if (forceUpdate) {
-            loadTasksFromNetwork()
+            refresh()
         }
         return taskDao.getById(taskId)?.toExternal()
     }
@@ -141,27 +138,41 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     /**
-     * The following methods load tasks from, and save tasks to, the network.
-     *
-     * Consider these to be long running operations, hence the need for `withContext` which
-     * can change the coroutine dispatcher so that the caller isn't blocked.
+     * The following methods load tasks from (refresh), and save tasks to, the network.
      *
      * Real apps may want to do a proper sync, rather than the "one-way sync everything" approach
      * below. See https://developer.android.com/topic/architecture/data-layer/offline-first
      * for more efficient and robust synchronisation strategies.
      *
      * Also, in a real app, these operations could be scheduled using WorkManager.
+     * 
+     * Note that the refresh operation is a suspend function (forces callers to wait) and the save
+     * operation is not. It returns immediately so callers don't have to wait.
      */
-    private suspend fun loadTasksFromNetwork() {
-        withContext(expensiveWorkDispatcher) {
+
+    /**
+     * Delete everything in the local data source and replace it with everything from the network
+     * data source. 
+     * 
+     * `withContext` is used here in case the bulk `toLocal` mapping operation is complex.
+     */
+    override suspend fun refresh() {
+        withContext(dispatcher) {
             val remoteTasks = tasksNetworkDataSource.loadTasks()
             taskDao.deleteAll()
             taskDao.upsertAll(remoteTasks.toLocal())
         }
     }
 
+    /**
+     * Send the tasks from the local data source to the network data source
+     *
+     * Returns immediately after launching the job. Real apps may want to either suspend here until
+     * the operation is complete, or provide a mechanism for the result to be communicated back
+     * to other layers.
+     */
     private fun saveTasksToNetwork() {
-        fireAndForgetScope.launch {
+        scope.launch {
             val localTasks = taskDao.getAll()
             tasksNetworkDataSource.saveTasks(localTasks.toNetwork())
         }

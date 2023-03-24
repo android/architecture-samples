@@ -48,12 +48,12 @@ class FakeTaskRepository : TaskRepository {
         shouldThrowError = value
     }
 
-    override suspend fun refreshTasks() {
+    override suspend fun refresh() {
         // Tasks already refreshed
     }
 
     override suspend fun refreshTask(taskId: String) {
-        refreshTasks()
+        refresh()
     }
 
     override suspend fun createTask(title: String, description: String): Task {

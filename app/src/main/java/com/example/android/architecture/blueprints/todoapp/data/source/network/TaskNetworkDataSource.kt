@@ -17,14 +17,15 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
 /**
  * Implementation of the data source that adds a latency simulating network.
  *
  */
-object TaskNetworkDataSource : NetworkDataSource {
+class TaskNetworkDataSource @Inject constructor() : NetworkDataSource {
 
-    private const val SERVICE_LATENCY_IN_MILLIS = 2000L
+    private val SERVICE_LATENCY_IN_MILLIS = 2000L
 
     private var TASK_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
 
