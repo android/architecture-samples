@@ -56,14 +56,12 @@ class FakeTaskRepository : TaskRepository {
         refreshTasks()
     }
 
-    override suspend fun createTask(title: String, description: String): Task {
-        return Task(
-            title = title,
-            description = description,
-            id = generateTaskId()
-        ).also {
+    override suspend fun createTask(title: String, description: String): String {
+        val taskId = generateTaskId()
+        Task(title = title, description = description, id = taskId).also {
             saveTask(it)
         }
+        return taskId
     }
 
     override fun getTasksStream(): Flow<List<Task>> = observableTasks

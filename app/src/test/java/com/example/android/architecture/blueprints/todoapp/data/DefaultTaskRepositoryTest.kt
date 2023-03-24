@@ -36,11 +36,15 @@ class DefaultTaskRepositoryTest {
     private val task1 = Task(id = "1", title = "Title1", description = "Description1")
     private val task2 = Task(id = "2", title = "Title2", description = "Description2")
     private val task3 = Task(id = "3", title = "Title3", description = "Description3")
-    private val newTask = Task(id = "new", title = "Title new", description = "Description new")
-    private val networkTasks = listOf(task1, task2).toNetwork().sortedBy { it.id }
-    private val localTasks = listOf(task3.toLocal()).sortedBy { it.id }
 
-    private val newTasks = listOf(newTask).sortedBy { it.id }
+    private val newTaskTitle = "Title new"
+    private val newTaskDescription = "Description new"
+    private val newTask = Task(id = "new", title = newTaskTitle, description = newTaskDescription)
+    private val newTasks = listOf(newTask)
+
+    private val networkTasks = listOf(task1, task2).toNetwork()
+    private val localTasks = listOf(task3.toLocal())
+
     private lateinit var networkDataSource: FakeNetworkDataSource
     private lateinit var localDataSource: FakeTaskDao
 
@@ -103,16 +107,12 @@ class DefaultTaskRepositoryTest {
 
     @Test
     fun saveTask_savesToLocalAndRemote() = runTest {
-        // Make sure newTask is not in the remote or local datasources
-        assertThat(networkDataSource.tasks).doesNotContain(newTask.toNetwork())
-        assertThat(localDataSource.tasks).doesNotContain(newTask.toLocal())
-
         // When a task is saved to the tasks repository
-        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
+        val newTaskId = tasksRepository.createTask(newTask.title, newTask.description)
 
-        // Then the remote and local sources are called
-        assertThat(networkDataSource.tasks).contains(newTask.toNetwork())
-        assertThat(localDataSource.tasks?.contains(newTask.toLocal()))
+        // Then the remote and local sources contain the new task
+        assertEquals(true, networkDataSource.tasks?.map { it.id }?.contains(newTaskId))
+        assertEquals(true, localDataSource.tasks?.map { it.id }?.contains(newTaskId))
     }
 
     @Test
@@ -179,32 +179,32 @@ class DefaultTaskRepositoryTest {
     @Test
     fun completeTask_completesTaskToServiceAPIUpdatesCache() = runTest {
         // Save a task
-        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
+        val newTaskId = tasksRepository.createTask(newTask.title, newTask.description)
 
         // Make sure it's active
-        assertThat(tasksRepository.getTask(newTask.id)?.isCompleted).isFalse()
+        assertThat(tasksRepository.getTask(newTaskId)?.isCompleted).isFalse()
 
         // Mark is as complete
-        tasksRepository.completeTask(newTask.id)
+        tasksRepository.completeTask(newTaskId)
 
         // Verify it's now completed
-        assertThat(tasksRepository.getTask(newTask.id)?.isCompleted).isTrue()
+        assertThat(tasksRepository.getTask(newTaskId)?.isCompleted).isTrue()
     }
 
     @Test
     fun completeTask_activeTaskToServiceAPIUpdatesCache() = runTest {
         // Save a task
-        val newTask = tasksRepository.createTask(newTask.title, newTask.description)
-        tasksRepository.completeTask(newTask.id)
+        val newTaskId = tasksRepository.createTask(newTask.title, newTask.description)
+        tasksRepository.completeTask(newTaskId)
 
         // Make sure it's completed
-        assertThat(tasksRepository.getTask(newTask.id)?.isActive).isFalse()
+        assertThat(tasksRepository.getTask(newTaskId)?.isActive).isFalse()
 
         // Mark is as active
-        tasksRepository.activateTask(newTask.id)
+        tasksRepository.activateTask(newTaskId)
 
         // Verify it's now activated
-        assertThat(tasksRepository.getTask(newTask.id)?.isActive).isTrue()
+        assertThat(tasksRepository.getTask(newTaskId)?.isActive).isTrue()
     }
 
     @Test
