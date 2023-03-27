@@ -16,7 +16,13 @@
 
 package com.example.android.architecture.blueprints.todoapp.util
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -34,6 +40,7 @@ val primaryDarkColor: Color = Color(0xFF263238)
  * @param modifier the modifier to apply to this layout.
  * @param content (slot) the main content to show
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LoadingContent(
     loading: Boolean,
@@ -43,14 +50,13 @@ fun LoadingContent(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    if (empty) {
-        emptyContent()
-    } else {
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(loading),
-            onRefresh = onRefresh,
-            modifier = modifier,
-            content = content,
-        )
+    val pullRefreshState = rememberPullRefreshState(loading, onRefresh)
+    Box(modifier = modifier.pullRefresh(pullRefreshState)) {
+        if (empty) {
+            emptyContent()
+        } else {
+            content()
+        }
+        PullRefreshIndicator(loading, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 }
