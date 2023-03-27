@@ -20,43 +20,34 @@ import android.content.Context
 import androidx.room.Room
 import com.example.android.architecture.blueprints.todoapp.data.DefaultTaskRepository
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 import javax.inject.Singleton
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class NetworkTaskDataSource
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+abstract class RepositoryModule {
 
     @Singleton
-    @Provides
-    fun provideTaskRepository(
-        @NetworkTaskDataSource remoteDataSource: NetworkDataSource,
-        database: ToDoDatabase,
-    ): TaskRepository {
-        return DefaultTaskRepository(remoteDataSource, database.taskDao())
-    }
+    @Binds
+    abstract fun bindTaskRepository(repository: DefaultTaskRepository): TaskRepository
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataSourceModule {
+abstract class DataSourceModule {
 
     @Singleton
-    @NetworkTaskDataSource
-    @Provides
-    fun provideTaskRemoteDataSource(): NetworkDataSource = TaskNetworkDataSource
+    @Binds
+    abstract fun bindNetworkDataSource(dataSource: TaskNetworkDataSource): NetworkDataSource
 }
 
 @Module
@@ -72,4 +63,7 @@ object DatabaseModule {
             "Tasks.db"
         ).build()
     }
+
+    @Provides
+    fun provideTaskDao(database: ToDoDatabase): TaskDao = database.taskDao()
 }
