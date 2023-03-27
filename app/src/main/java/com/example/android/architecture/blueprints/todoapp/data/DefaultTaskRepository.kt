@@ -37,8 +37,8 @@ import kotlinx.coroutines.withContext
  * @param localDataSource - The local data source
  * @param dispatcher - The dispatcher to be used for long running or complex operations, such as ID
  * generation or mapping many models.
- * @param scope - The coroutine scope used for jobs where the result isn't important, and shouldn't
- * block the caller, such as sending data to the network.
+ * @param scope - The coroutine scope used for deferred jobs where the result isn't important, such
+ * as sending data to the network.
  */
 @Singleton
 class DefaultTaskRepository @Inject constructor(
@@ -144,8 +144,6 @@ class DefaultTaskRepository @Inject constructor(
      * below. See https://developer.android.com/topic/architecture/data-layer/offline-first
      * for more efficient and robust synchronisation strategies.
      *
-     * Also, in a real app, these operations could be scheduled using WorkManager.
-     *
      * Note that the refresh operation is a suspend function (forces callers to wait) and the save
      * operation is not. It returns immediately so callers don't have to wait.
      */
@@ -167,14 +165,20 @@ class DefaultTaskRepository @Inject constructor(
     /**
      * Send the tasks from the local data source to the network data source
      *
-     * Returns immediately after launching the job. Real apps may want to either suspend here until
-     * the operation is complete, or provide a mechanism for the result to be communicated back
-     * to other layers.
+     * Returns immediately after launching the job. Real apps may want to suspend here until the
+     * operation is complete or (better) use WorkManager to schedule this work. Both approaches
+     * should provide a mechanism for failures to be communicated back to the user so that
+     * they are aware that their data isn't being backed up.
      */
     private fun saveTasksToNetwork() {
         scope.launch {
-            val localTasks = localDataSource.getAll()
-            networkDataSource.saveTasks(localTasks.toNetwork())
+            try {
+                val localTasks = localDataSource.getAll()
+                networkDataSource.saveTasks(localTasks.toNetwork())
+            } catch (e: Exception) {
+                // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
+                // to an app level UI state holder which could then display a Toast message.
+            }
         }
     }
 }
