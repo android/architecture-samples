@@ -27,7 +27,7 @@ interface TaskRepository {
 
     suspend fun getTasks(forceUpdate: Boolean = false): List<Task>
 
-    suspend fun refreshTasks()
+    suspend fun refresh()
 
     fun getTaskStream(taskId: String): Flow<Task?>
 

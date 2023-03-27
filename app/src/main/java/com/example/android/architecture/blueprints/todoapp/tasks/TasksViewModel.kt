@@ -140,7 +140,7 @@ class TasksViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refreshTasks()
+            taskRepository.refresh()
             _isLoading.value = false
         }
     }
