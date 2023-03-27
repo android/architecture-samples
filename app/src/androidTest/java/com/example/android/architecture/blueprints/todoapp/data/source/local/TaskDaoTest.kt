@@ -42,10 +42,6 @@ class TaskDaoTest {
         ToDoDatabase::class.java
     ).allowMainThreadQueries().build()
 
-    // Set the main coroutines dispatcher for unit testing.
-    @get:Rule
-    val mainCoroutineRule = MainCoroutineRule()
-
     // Ensure that we use an empty database for each test.
     @Before
     fun initDb() = database.clearAllTables()
