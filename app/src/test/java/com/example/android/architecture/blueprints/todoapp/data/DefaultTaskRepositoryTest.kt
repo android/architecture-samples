@@ -116,8 +116,8 @@ class DefaultTaskRepositoryTest {
         advanceUntilIdle()
 
         // Then the remote and local sources contain the new task
-        assertEquals(true, networkDataSource.tasks?.map { it.id }?.contains(newTaskId))
-        assertEquals(true, localDataSource.tasks?.map { it.id }?.contains(newTaskId))
+        assertThat(networkDataSource.tasks?.map { it.id }?.contains(newTaskId))
+        assertThat(localDataSource.tasks?.map { it.id }?.contains(newTaskId))
     }
 
     @Test
