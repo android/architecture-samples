@@ -40,7 +40,7 @@ class DefaultTaskRepository(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : TaskRepository {
 
-    override suspend fun createTask(title: String, description: String): Task {
+    override suspend fun createTask(title: String, description: String): String {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
         val taskId = withContext(coroutineDispatcher) {
@@ -53,7 +53,7 @@ class DefaultTaskRepository(
         )
         taskDao.upsert(task.toLocal())
         saveTasksToNetwork()
-        return task
+        return taskId
     }
 
     override suspend fun updateTask(taskId: String, title: String, description: String) {
