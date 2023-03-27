@@ -36,7 +36,7 @@ class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
 
     override suspend fun getById(taskId: String): LocalTask? = _tasks?.get(taskId)
 
-    override fun upsertAll(tasks: List<LocalTask>) {
+    override suspend fun upsertAll(tasks: List<LocalTask>) {
         _tasks?.putAll(tasks.associateBy { it.id })
     }
 
