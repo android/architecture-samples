@@ -252,6 +252,7 @@ class DefaultTaskRepositoryTest {
         val completedTask = task1.copy(isCompleted = true)
         localDataSource.tasks = listOf(completedTask.toLocal(), task2.toLocal())
         tasksRepository.clearCompletedTasks()
+        advanceUntilIdle()
 
         val tasks = tasksRepository.getTasks(true)
 
@@ -281,6 +282,7 @@ class DefaultTaskRepositoryTest {
 
         // Delete first task
         tasksRepository.deleteTask(task1.id)
+        advanceUntilIdle()
 
         // Fetch data again
         val afterDeleteTasks = tasksRepository.getTasks(true)
