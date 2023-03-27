@@ -195,7 +195,7 @@ class TasksTest {
         // Add 1 completed task
         val taskTitle = "ACTIVE"
         repository.apply {
-            createTask(taskTitle, "DESCRIPTION").also { completeTask(it.id) }
+            createTask(taskTitle, "DESCRIPTION").also { completeTask(it) }
         }
 
         setContent()
@@ -249,7 +249,7 @@ class TasksTest {
         // Add 1 completed task
         val taskTitle = "COMP-ACT"
         repository.apply {
-            createTask(taskTitle, "DESCRIPTION").also { completeTask(it.id) }
+            createTask(taskTitle, "DESCRIPTION").also { completeTask(it) }
         }
 
         setContent()

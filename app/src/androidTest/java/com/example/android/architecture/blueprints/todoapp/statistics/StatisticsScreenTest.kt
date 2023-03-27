@@ -66,7 +66,7 @@ class StatisticsScreenTest {
         repository.apply {
             createTask("Title1", "Description1")
             createTask("Title2", "Description2").also {
-                completeTask(it.id)
+                completeTask(it)
             }
         }
 
