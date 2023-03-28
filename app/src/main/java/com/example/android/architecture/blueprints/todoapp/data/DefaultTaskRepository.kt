@@ -174,7 +174,7 @@ class DefaultTaskRepository @Inject constructor(
         scope.launch {
             try {
                 val localTasks = localDataSource.getAll()
-                val networkTasks = withContext(dispatcher){
+                val networkTasks = withContext(dispatcher) {
                     localTasks.toNetwork()
                 }
                 networkDataSource.saveTasks(networkTasks)
