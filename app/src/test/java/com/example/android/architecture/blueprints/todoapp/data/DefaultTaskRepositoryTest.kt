@@ -23,7 +23,10 @@ import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,16 +51,16 @@ class DefaultTaskRepositoryTest {
     private val networkTasks = listOf(task1, task2).toNetwork()
     private val localTasks = listOf(task3.toLocal())
 
+    // Test dependencies
     private lateinit var networkDataSource: FakeNetworkDataSource
     private lateinit var localDataSource: FakeTaskDao
+
+    private var testDispatcher = UnconfinedTestDispatcher()
+    private var testScope = TestScope(testDispatcher)
 
     // Class under test
     private lateinit var taskRepository: DefaultTaskRepository
 
-    // Set the main coroutines dispatcher for unit testing.
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    val mainCoroutineRule = MainCoroutineRule()
 
     @ExperimentalCoroutinesApi
     @Before
@@ -68,8 +71,8 @@ class DefaultTaskRepositoryTest {
         taskRepository = DefaultTaskRepository(
             networkDataSource = networkDataSource,
             localDataSource = localDataSource,
-            dispatcher = StandardTestDispatcher(),
-            scope = TestScope()
+            dispatcher = testDispatcher,
+            scope = testScope
         )
     }
 
@@ -108,12 +111,9 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun saveTask_savesToLocalAndRemote() = runTest {
+    fun saveTask_savesToLocalAndRemote() = testScope.runTest {
         // When a task is saved to the tasks repository
         val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
-
-        // Wait for the network to be updated
-        advanceUntilIdle()
 
         // Then the remote and local sources contain the new task
         assertThat(networkDataSource.tasks?.map { it.id }?.contains(newTaskId))
@@ -182,7 +182,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun completeTask_completesTaskToServiceAPIUpdatesCache() = runTest {
+    fun completeTask_completesTaskToServiceAPIUpdatesCache() = testScope.runTest {
         // Save a task
         val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
 
@@ -197,7 +197,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun completeTask_activeTaskToServiceAPIUpdatesCache() = runTest {
+    fun completeTask_activeTaskToServiceAPIUpdatesCache() = testScope.runTest {
         // Save a task
         val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
         taskRepository.completeTask(newTaskId)
@@ -248,11 +248,10 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun clearCompletedTasks() = runTest {
+    fun clearCompletedTasks() = testScope.runTest {
         val completedTask = task1.copy(isCompleted = true)
         localDataSource.tasks = listOf(completedTask.toLocal(), task2.toLocal())
         taskRepository.clearCompletedTasks()
-        advanceUntilIdle()
 
         val tasks = taskRepository.getTasks(true)
 
@@ -262,7 +261,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun deleteAllTasks() = runTest {
+    fun deleteAllTasks() = testScope.runTest {
         val initialTasks = taskRepository.getTasks()
 
         // Verify tasks are returned
@@ -277,12 +276,11 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun deleteSingleTask() = runTest {
+    fun deleteSingleTask() = testScope.runTest {
         val initialTasksSize = taskRepository.getTasks(true).size
 
         // Delete first task
         taskRepository.deleteTask(task1.id)
-        advanceUntilIdle()
 
         // Fetch data again
         val afterDeleteTasks = taskRepository.getTasks(true)
