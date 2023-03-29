@@ -71,7 +71,7 @@ class DefaultTaskRepositoryTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun getTasks_emptyRepositoryAndUninitializedCache() = runTest {
+    fun getTasks_emptyRepositoryAndUninitializedCache() = testScope.runTest {
         networkDataSource.tasks?.clear()
         localDataSource.deleteAll()
 
@@ -79,7 +79,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTasks_repositoryCachesAfterFirstApiCall() = runTest {
+    fun getTasks_repositoryCachesAfterFirstApiCall() = testScope.runTest {
         // Trigger the repository to load tasks from the remote data source
         val initial = taskRepository.getTasks(forceUpdate = true)
 
@@ -95,7 +95,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTasks_requestsAllTasksFromRemoteDataSource() = runTest {
+    fun getTasks_requestsAllTasksFromRemoteDataSource() = testScope.runTest {
         // When tasks are requested from the tasks repository
         val tasks = taskRepository.getTasks(true)
 
@@ -114,7 +114,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = runTest {
+    fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = testScope.runTest {
         // First call returns from REMOTE
         val tasks = taskRepository.getTasks()
 
@@ -133,7 +133,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test(expected = Exception::class)
-    fun getTasks_WithDirtyCache_remoteUnavailable_throwsException() = runTest {
+    fun getTasks_WithDirtyCache_remoteUnavailable_throwsException() = testScope.runTest {
         // Make remote data source unavailable
         networkDataSource.tasks = null
 
@@ -145,7 +145,7 @@ class DefaultTaskRepositoryTest {
 
     @Test
     fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() =
-        runTest {
+        testScope.runTest {
             // When the remote data source is unavailable
             networkDataSource.tasks = null
 
@@ -154,7 +154,7 @@ class DefaultTaskRepositoryTest {
         }
 
     @Test(expected = Exception::class)
-    fun getTasks_WithBothDataSourcesUnavailable_throwsError() = runTest {
+    fun getTasks_WithBothDataSourcesUnavailable_throwsError() = testScope.runTest {
         // When both sources are unavailable
         networkDataSource.tasks = null
         localDataSource.tasks = null
@@ -164,7 +164,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTasks_refreshesLocalDataSource() = runTest {
+    fun getTasks_refreshesLocalDataSource() = testScope.runTest {
         // Forcing an update will fetch tasks from remote
         val expectedTasks = networkTasks.toExternal()
 
@@ -206,7 +206,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTask_repositoryCachesAfterFirstApiCall() = runTest {
+    fun getTask_repositoryCachesAfterFirstApiCall() = testScope.runTest {
         // Obtain a task from the local data source
         localDataSource = FakeTaskDao(mutableListOf(task1.toLocal()))
         val initial = taskRepository.getTask(task1.id)
@@ -222,7 +222,7 @@ class DefaultTaskRepositoryTest {
     }
 
     @Test
-    fun getTask_forceRefresh() = runTest {
+    fun getTask_forceRefresh() = testScope.runTest {
         // Trigger the repository to load data, which loads from remote and caches
         networkDataSource.tasks = mutableListOf(task1.toNetwork())
         val task1FirstTime = taskRepository.getTask(task1.id, forceUpdate = true)
