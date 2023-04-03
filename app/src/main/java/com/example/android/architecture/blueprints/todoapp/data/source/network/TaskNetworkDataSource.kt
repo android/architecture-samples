@@ -18,46 +18,35 @@ package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 import javax.inject.Inject
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
-/**
- * Implementation of the data source that adds a latency simulating network.
- *
- */
 class TaskNetworkDataSource @Inject constructor() : NetworkDataSource {
 
-    private val SERVICE_LATENCY_IN_MILLIS = 2000L
-
-    private var TASK_SERVICE_DATA = LinkedHashMap<String, NetworkTask>(2)
-
-    init {
-        addTask(
+    // A mutex is used to ensure that reads and writes are thread-safe.
+    private val accessMutex = Mutex()
+    private var tasks = listOf(
+        NetworkTask(
             id = "PISA",
             title = "Build tower in Pisa",
             shortDescription = "Ground looks good, no foundation work required."
-        )
-        addTask(
+        ),
+        NetworkTask(
             id = "TACOMA",
             title = "Finish bridge in Tacoma",
             shortDescription = "Found awesome girders at half the cost!"
         )
-    }
+    )
 
-    override suspend fun loadTasks(): List<NetworkTask> {
-        // Simulate network by delaying the execution.
-        val tasks = TASK_SERVICE_DATA.values.toList()
+    override suspend fun loadTasks(): List<NetworkTask> = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
         return tasks
     }
 
-    override suspend fun saveTasks(tasks: List<NetworkTask>) {
-        // Simulate network by delaying the execution.
+    override suspend fun saveTasks(newTasks: List<NetworkTask>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        TASK_SERVICE_DATA.clear()
-        TASK_SERVICE_DATA.putAll(tasks.associateBy(NetworkTask::id))
-    }
-
-    private fun addTask(id: String, title: String, shortDescription: String) {
-        val newTask = NetworkTask(id = id, title = title, shortDescription = shortDescription)
-        TASK_SERVICE_DATA[newTask.id] = newTask
+        tasks = newTasks
     }
 }
+
+private const val SERVICE_LATENCY_IN_MILLIS = 2000L

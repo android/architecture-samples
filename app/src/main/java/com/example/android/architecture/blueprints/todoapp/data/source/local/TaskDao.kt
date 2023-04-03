@@ -75,7 +75,7 @@ interface TaskDao {
      * @param tasks the tasks to be inserted or updated.
      */
     @Upsert
-    fun upsertAll(tasks: List<LocalTask>)
+    suspend fun upsertAll(tasks: List<LocalTask>)
 
     /**
      * Update the complete status of a task
