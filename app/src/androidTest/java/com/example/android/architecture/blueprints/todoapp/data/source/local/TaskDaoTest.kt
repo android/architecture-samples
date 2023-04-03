@@ -20,13 +20,11 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -37,19 +35,16 @@ class TaskDaoTest {
 
     // using an in-memory database because the information stored here disappears when the
     // process is killed
-    private val database = Room.inMemoryDatabaseBuilder(
-        getApplicationContext(),
-        ToDoDatabase::class.java
-    ).allowMainThreadQueries().build()
+    private lateinit var database: ToDoDatabase
 
-    // Set the main coroutines dispatcher for unit testing.
-    @get:Rule
-    val mainCoroutineRule = MainCoroutineRule()
-
-    // Ensure that we use an empty database for each test.
+    // Ensure that we use a new database for each test.
     @Before
-    fun initDb() = database.clearAllTables()
-
+    fun initDb() {
+        database = Room.inMemoryDatabaseBuilder(
+            getApplicationContext(),
+            ToDoDatabase::class.java
+        ).allowMainThreadQueries().build()
+    }
     @Test
     fun insertTaskAndGetById() = runTest {
         // GIVEN - insert a task
