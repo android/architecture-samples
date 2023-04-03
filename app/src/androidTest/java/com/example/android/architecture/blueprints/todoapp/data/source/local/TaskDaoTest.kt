@@ -35,15 +35,16 @@ class TaskDaoTest {
 
     // using an in-memory database because the information stored here disappears when the
     // process is killed
-    private val database = Room.inMemoryDatabaseBuilder(
-        getApplicationContext(),
-        ToDoDatabase::class.java
-    ).allowMainThreadQueries().build()
+    private lateinit var database: ToDoDatabase
 
-    // Ensure that we use an empty database for each test.
+    // Ensure that we use a new database for each test.
     @Before
-    fun initDb() = database.clearAllTables()
-
+    fun initDb() {
+        database = Room.inMemoryDatabaseBuilder(
+            getApplicationContext(),
+            ToDoDatabase::class.java
+        ).allowMainThreadQueries().build()
+    }
     @Test
     fun insertTaskAndGetById() = runTest {
         // GIVEN - insert a task
