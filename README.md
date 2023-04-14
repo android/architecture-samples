@@ -48,7 +48,7 @@ The app in this project aims to be simple enough that you can understand it quic
 
 ## Opening a sample in Android Studio
 
-To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the root directory in Android Studio. The following series of steps illustrate how to open the [usecases](tree/usecases/) sample.
+To open one of the samples in Android Studio, begin by checking out one of the sample branches, and then open the root directory in Android Studio. The following series of steps illustrate how to open the [usecases](https://github.com/android/architecture-samples/tree/usecases) sample.
 
 Clone the repository:
 
