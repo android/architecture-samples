@@ -78,7 +78,7 @@ class TasksTest {
     @Test
     fun editTask() = runTest {
         val originalTaskTitle = "TITLE1"
-        repository.createTask(originalTaskTitle, "DESCRIPTION")
+        repository.create(originalTaskTitle, "DESCRIPTION")
 
         setContent()
 
@@ -143,8 +143,8 @@ class TasksTest {
     @Test
     fun createTwoTasks_deleteOneTask() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION")
-            createTask("TITLE2", "DESCRIPTION")
+            create("TITLE1", "DESCRIPTION")
+            create("TITLE2", "DESCRIPTION")
         }
 
         setContent()
@@ -169,7 +169,7 @@ class TasksTest {
     fun markTaskAsCompleteOnDetailScreen_taskIsCompleteInList() = runTest {
         // Add 1 active task
         val taskTitle = "COMPLETED"
-        repository.createTask(taskTitle, "DESCRIPTION")
+        repository.create(taskTitle, "DESCRIPTION")
 
         setContent()
 
@@ -195,7 +195,7 @@ class TasksTest {
         // Add 1 completed task
         val taskTitle = "ACTIVE"
         repository.apply {
-            createTask(taskTitle, "DESCRIPTION").also { completeTask(it) }
+            create(taskTitle, "DESCRIPTION").also { complete(it) }
         }
 
         setContent()
@@ -221,7 +221,7 @@ class TasksTest {
     fun markTaskAsCompleteAndActiveOnDetailScreen_taskIsActiveInList() = runTest {
         // Add 1 active task
         val taskTitle = "ACT-COMP"
-        repository.createTask(taskTitle, "DESCRIPTION")
+        repository.create(taskTitle, "DESCRIPTION")
 
         setContent()
 
@@ -249,7 +249,7 @@ class TasksTest {
         // Add 1 completed task
         val taskTitle = "COMP-ACT"
         repository.apply {
-            createTask(taskTitle, "DESCRIPTION").also { completeTask(it) }
+            create(taskTitle, "DESCRIPTION").also { complete(it) }
         }
 
         setContent()

@@ -67,7 +67,7 @@ class TasksViewModel @Inject constructor(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _filteredTasksAsync =
-        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
+        combine(taskRepository.observeAll(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
@@ -105,7 +105,7 @@ class TasksViewModel @Inject constructor(
 
     fun clearCompletedTasks() {
         viewModelScope.launch {
-            taskRepository.clearCompletedTasks()
+            taskRepository.clearAllCompleted()
             showSnackbarMessage(R.string.completed_tasks_cleared)
             refresh()
         }
@@ -113,10 +113,10 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            taskRepository.completeTask(task.id)
+            taskRepository.complete(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
+            taskRepository.activate(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }

@@ -100,7 +100,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun createNewTask() = viewModelScope.launch {
-        taskRepository.createTask(uiState.value.title, uiState.value.description)
+        taskRepository.create(uiState.value.title, uiState.value.description)
         _uiState.update {
             it.copy(isTaskSaved = true)
         }
@@ -111,7 +111,7 @@ class AddEditTaskViewModel @Inject constructor(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            taskRepository.updateTask(
+            taskRepository.update(
                 taskId,
                 title = uiState.value.title,
                 description = uiState.value.description,
@@ -127,7 +127,7 @@ class AddEditTaskViewModel @Inject constructor(
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            taskRepository.getTask(taskId).let { task ->
+            taskRepository.get(taskId).let { task ->
                 if (task != null) {
                     _uiState.update {
                         it.copy(

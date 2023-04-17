@@ -52,11 +52,11 @@ class FakeTaskRepository : TaskRepository {
         // Tasks already refreshed
     }
 
-    override suspend fun refreshTask(taskId: String) {
+    override suspend fun refresh(taskId: String) {
         refresh()
     }
 
-    override suspend fun createTask(title: String, description: String): String {
+    override suspend fun create(title: String, description: String): String {
         val taskId = generateTaskId()
         Task(title = title, description = description, id = taskId).also {
             saveTask(it)
@@ -64,29 +64,29 @@ class FakeTaskRepository : TaskRepository {
         return taskId
     }
 
-    override fun getTasksStream(): Flow<List<Task>> = observableTasks
+    override fun observeAll(): Flow<List<Task>> = observableTasks
 
-    override fun getTaskStream(taskId: String): Flow<Task?> {
+    override fun observe(taskId: String): Flow<Task?> {
         return observableTasks.map { tasks ->
             return@map tasks.firstOrNull { it.id == taskId }
         }
     }
 
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
+    override suspend fun get(taskId: String, forceUpdate: Boolean): Task? {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
         return savedTasks.value[taskId]
     }
 
-    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
+    override suspend fun getAll(forceUpdate: Boolean): List<Task> {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
         return observableTasks.first()
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String) {
+    override suspend fun update(taskId: String, title: String, description: String) {
         val updatedTask = _savedTasks.value[taskId]?.copy(
             title = title,
             description = description
@@ -103,19 +103,19 @@ class FakeTaskRepository : TaskRepository {
         }
     }
 
-    override suspend fun completeTask(taskId: String) {
+    override suspend fun complete(taskId: String) {
         _savedTasks.value[taskId]?.let {
             saveTask(it.copy(isCompleted = true))
         }
     }
 
-    override suspend fun activateTask(taskId: String) {
+    override suspend fun activate(taskId: String) {
         _savedTasks.value[taskId]?.let {
             saveTask(it.copy(isCompleted = false))
         }
     }
 
-    override suspend fun clearCompletedTasks() {
+    override suspend fun clearAllCompleted() {
         _savedTasks.update { tasks ->
             tasks.filterValues {
                 !it.isCompleted
@@ -123,7 +123,7 @@ class FakeTaskRepository : TaskRepository {
         }
     }
 
-    override suspend fun deleteTask(taskId: String) {
+    override suspend fun delete(taskId: String) {
         _savedTasks.update { tasks ->
             val newTasks = LinkedHashMap<String, Task>(tasks)
             newTasks.remove(taskId)
@@ -131,7 +131,7 @@ class FakeTaskRepository : TaskRepository {
         }
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAll() {
         _savedTasks.update {
             LinkedHashMap()
         }
