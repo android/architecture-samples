@@ -65,7 +65,7 @@ class TaskDetailScreenTest {
     @Test
     fun activeTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add active (incomplete) task to the DB
-        val activeTaskId = repository.createTask(
+        val activeTaskId = repository.create(
             title = "Active Task",
             description = "AndroidX Rocks"
         )
@@ -84,8 +84,8 @@ class TaskDetailScreenTest {
     @Test
     fun completedTaskDetails_DisplayedInUi() = runTest {
         // GIVEN - Add completed task to the DB
-        val completedTaskId = repository.createTask("Completed Task", "AndroidX Rocks")
-        repository.completeTask(completedTaskId)
+        val completedTaskId = repository.create("Completed Task", "AndroidX Rocks")
+        repository.complete(completedTaskId)
 
         // WHEN - Details screen is opened
         setContent(completedTaskId)

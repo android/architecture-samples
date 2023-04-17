@@ -50,7 +50,7 @@ class StatisticsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<StatisticsUiState> =
-        taskRepository.getTasksStream()
+        taskRepository.observeAll()
             .map { Async.Success(it) }
             .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
             .map { taskAsync -> produceStatisticsUiState(taskAsync) }
