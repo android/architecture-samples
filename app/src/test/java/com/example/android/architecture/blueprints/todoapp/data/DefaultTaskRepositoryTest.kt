@@ -16,13 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTaskDao
 import com.google.common.truth.Truth.assertThat
-import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
-import com.example.android.architecture.blueprints.todoapp.data.source.local.toExternal
-import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkTask
-import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.network.toLocal
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
