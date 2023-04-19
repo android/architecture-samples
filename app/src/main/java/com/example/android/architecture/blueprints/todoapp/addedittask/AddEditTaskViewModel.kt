@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,8 +46,8 @@ data class AddEditTaskUiState(
  */
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    // TODO: private val taskRepository: DefaultTaskRepository,
 ) : ViewModel() {
 
     private val taskId: String? = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]
@@ -100,7 +99,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun createNewTask() = viewModelScope.launch {
-        taskRepository.createTask(uiState.value.title, uiState.value.description)
+        // TODO: taskRepository.createTask(uiState.value.title, uiState.value.description)
         _uiState.update {
             it.copy(isTaskSaved = true)
         }
@@ -111,11 +110,6 @@ class AddEditTaskViewModel @Inject constructor(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            taskRepository.updateTask(
-                taskId,
-                title = uiState.value.title,
-                description = uiState.value.description,
-            )
             _uiState.update {
                 it.copy(isTaskSaved = true)
             }
@@ -127,22 +121,7 @@ class AddEditTaskViewModel @Inject constructor(
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            taskRepository.getTask(taskId).let { task ->
-                if (task != null) {
-                    _uiState.update {
-                        it.copy(
-                            title = task.title,
-                            description = task.description,
-                            isTaskCompleted = task.isCompleted,
-                            isLoading = false
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                }
-            }
+
         }
     }
 }

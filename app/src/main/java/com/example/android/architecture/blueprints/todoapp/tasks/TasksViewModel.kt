@@ -24,7 +24,6 @@ import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
@@ -37,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -56,9 +56,11 @@ data class TasksUiState(
  */
 @HiltViewModel
 class TasksViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    // TODO private val taskRepository: DefaultTaskRepository,
 ) : ViewModel() {
+
+    private val tasksStream = flow<List<Task>> {emptyList<Task>() }
 
     private val _savedFilterType =
         savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
@@ -67,7 +69,7 @@ class TasksViewModel @Inject constructor(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _filteredTasksAsync =
-        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
+        combine(tasksStream, _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
@@ -105,7 +107,6 @@ class TasksViewModel @Inject constructor(
 
     fun clearCompletedTasks() {
         viewModelScope.launch {
-            taskRepository.clearCompletedTasks()
             showSnackbarMessage(R.string.completed_tasks_cleared)
             refresh()
         }
@@ -113,10 +114,9 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            taskRepository.completeTask(task.id)
+            // TODO: taskRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -140,7 +140,7 @@ class TasksViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refresh()
+            // TODO: taskRepository.refresh()
             _isLoading.value = false
         }
     }
