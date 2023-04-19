@@ -15,15 +15,3 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data
-
-import com.google.common.truth.Truth.assertThat
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Test
-
-

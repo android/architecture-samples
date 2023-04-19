@@ -15,8 +15,3 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.network
-
-import javax.inject.Inject
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock

@@ -15,10 +15,3 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
-
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.example.android.architecture.blueprints.todoapp.data.Task
-
-
-

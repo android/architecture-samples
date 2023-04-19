@@ -15,12 +15,3 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
-
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runTest
-import org.junit.Test
-
-
