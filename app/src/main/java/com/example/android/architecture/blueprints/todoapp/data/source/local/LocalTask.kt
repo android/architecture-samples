@@ -15,3 +15,58 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkTask
+
+@Entity(
+    tableName = "task"
+)
+data class LocalTask(
+    @PrimaryKey val id: String,
+    var title: String,
+    var description: String,
+    var isCompleted: Boolean,
+)
+
+// Convert a LocalTask to a Task
+fun LocalTask.toExternal() = Task(
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted,
+)
+
+// Convenience function which converts a list of LocalTasks to a list of Tasks
+fun List<LocalTask>.toExternal() = map(LocalTask::toExternal) // Equivalent to map { it.toExternal() }
+
+fun Task.toLocal() = LocalTask(
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted,
+)
+
+fun NetworkTask.toLocal() = LocalTask(
+    id = id,
+    title = title,
+    description = shortDescription,
+    isCompleted = (status == NetworkTask.TaskStatus.COMPLETE),
+)
+
+fun List<NetworkTask>.toLocal() = map(NetworkTask::toLocal)
+
+fun LocalTask.toNetwork() = NetworkTask(
+    id = id,
+    title = title,
+    shortDescription = description,
+    status = if (isCompleted) {
+        NetworkTask.TaskStatus.COMPLETE
+    } else {
+        NetworkTask.TaskStatus.ACTIVE
+    }
+)
+
+fun List<LocalTask>.toNetwork() = map(LocalTask::toNetwork)

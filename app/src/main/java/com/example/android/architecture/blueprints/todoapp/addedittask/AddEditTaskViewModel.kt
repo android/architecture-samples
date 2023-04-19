@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
+import com.example.android.architecture.blueprints.todoapp.data.DefaultTaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +48,7 @@ data class AddEditTaskUiState(
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    // TODO: private val taskRepository: DefaultTaskRepository,
+    private val taskRepository: DefaultTaskRepository,
 ) : ViewModel() {
 
     private val taskId: String? = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]
@@ -99,7 +100,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun createNewTask() = viewModelScope.launch {
-        // TODO: taskRepository.createTask(uiState.value.title, uiState.value.description)
+        taskRepository.create(uiState.value.title, uiState.value.description)
         _uiState.update {
             it.copy(isTaskSaved = true)
         }

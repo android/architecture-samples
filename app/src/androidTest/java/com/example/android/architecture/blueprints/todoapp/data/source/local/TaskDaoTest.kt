@@ -15,3 +15,42 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
+
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Test
+
+class TaskDaoTest {
+
+    private lateinit var database: ToDoDatabase
+
+    @Before
+    fun initDb() {
+        database = Room.inMemoryDatabaseBuilder(
+            getApplicationContext(),
+            ToDoDatabase::class.java
+        ).allowMainThreadQueries().build()
+    }
+
+    @Test
+    fun insertTaskAndGetTasks() = runTest {
+
+        val task = LocalTask(
+            title = "title",
+            description = "description",
+            id = "id",
+            isCompleted = false,
+        )
+        database.taskDao().upsert(task)
+
+        val tasks = database.taskDao().observeAll().first()
+
+        assertEquals(1, tasks.size)
+        assertEquals(task, tasks[0])
+    }
+}
+
