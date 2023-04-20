@@ -35,10 +35,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
@@ -50,6 +53,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -112,12 +116,12 @@ private fun AddEditTaskContent(
     modifier: Modifier = Modifier
 ) {
     if (loading) {
-        SwipeRefresh(
-            // Show the loading spinner—`loading` is `true` in this code path
-            state = rememberSwipeRefreshState(true),
+        LoadingContent(
+            loading = true,
             onRefresh = { /* DO NOTHING */ },
-            content = { },
-        )
+            empty = false,
+            emptyContent = {/* DO NOTHING */ },
+            content = {})
     } else {
         Column(
             modifier
