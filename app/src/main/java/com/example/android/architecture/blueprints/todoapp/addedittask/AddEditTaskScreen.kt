@@ -116,7 +116,8 @@ private fun AddEditTaskContent(
             onRefresh = { /* DO NOTHING */ },
             empty = false,
             emptyContent = {/* DO NOTHING */ },
-            content = {})
+            content = {}
+        )
     } else {
         Column(
             modifier
