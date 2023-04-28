@@ -51,7 +51,7 @@ protobuf = "3.21.12"
 protobufPlugin = "0.8.19"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "0.8.0"
-room = "2.5.0-rc01"
+room = "2.5.1"
 spotless = "5.12.5"
 timber = "5.0.1"
 # @keep

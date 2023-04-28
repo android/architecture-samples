@@ -61,7 +61,10 @@ class TaskDetailViewModel @Inject constructor(
     private val _isTaskDeleted = MutableStateFlow(false)
     private val _taskAsync = taskRepository.getTaskStream(taskId)
         .map { handleTask(it) }
-        .catch { emit(Async.Error(R.string.loading_task_error)) }
+        .catch { e ->
+            e.printStackTrace()
+            emit(Async.Error(R.string.loading_task_error))
+        }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         _userMessage, _isLoading, _isTaskDeleted, _taskAsync

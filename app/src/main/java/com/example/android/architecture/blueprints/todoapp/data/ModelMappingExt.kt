@@ -56,7 +56,7 @@ fun LocalTask.toExternal() = Task(
 // Without this, type erasure will cause compiler errors because these methods will have the same
 // signature on the JVM.
 @JvmName("localToExternal")
-fun List<LocalTask>.toExternal() = map(LocalTask::toExternal)
+fun List<LocalTask>.toExternal() = map { it.toExternal() }
 
 // Network to Local
 fun NetworkTask.toLocal() = LocalTask(

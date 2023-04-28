@@ -20,15 +20,14 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
@@ -96,7 +95,9 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     override fun getTaskStream(taskId: String): Flow<Task?> {
-        return localDataSource.observeById(taskId).map { it.toExternal() }
+        return localDataSource.observeById(taskId).map { task ->
+            task.toExternal()
+        }
     }
 
     /**
@@ -151,37 +152,24 @@ class DefaultTaskRepository @Inject constructor(
     /**
      * Delete everything in the local data source and replace it with everything from the network
      * data source.
-     *
-     * `withContext` is used here in case the bulk `toLocal` mapping operation is complex.
      */
     override suspend fun refresh() {
-        withContext(dispatcher) {
-            val remoteTasks = networkDataSource.loadTasks()
-            localDataSource.deleteAll()
-            localDataSource.upsertAll(remoteTasks.toLocal())
-        }
+        val remoteTasks = networkDataSource.loadTasks()
+        localDataSource.deleteAll()
+        localDataSource.upsertAll(remoteTasks.toLocal())
     }
 
     /**
      * Send the tasks from the local data source to the network data source
-     *
-     * Returns immediately after launching the job. Real apps may want to suspend here until the
-     * operation is complete or (better) use WorkManager to schedule this work. Both approaches
-     * should provide a mechanism for failures to be communicated back to the user so that
-     * they are aware that their data isn't being backed up.
      */
-    private fun saveTasksToNetwork() {
-        scope.launch {
-            try {
-                val localTasks = localDataSource.getAll()
-                val networkTasks = withContext(dispatcher) {
-                    localTasks.toNetwork()
-                }
-                networkDataSource.saveTasks(networkTasks)
-            } catch (e: Exception) {
-                // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
-                // to an app level UI state holder which could then display a Toast message.
-            }
+    private suspend fun saveTasksToNetwork() {
+        try {
+            val localTasks = localDataSource.getAll()
+            val networkTasks = localTasks.toNetwork()
+            networkDataSource.saveTasks(networkTasks)
+        } catch (e: Exception) {
+            // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
+            // to an app level UI state holder which could then display a Toast message.
         }
     }
 }
