@@ -115,7 +115,7 @@ private fun AddEditTaskContent(
             loading = true,
             onRefresh = {/*DO NOTHING*/},
             empty = false,
-            emptyContent = {/*DO NOTHING */},
+            emptyContent = {/*DO NOTHING*/},
             content = {}
         )
     } else {
