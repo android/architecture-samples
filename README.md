@@ -17,15 +17,14 @@ In this branch you'll find:
 This project hosts each sample app in separate repository branches. For more information, see the `README.md` file in each branch.
 
 ### Stable samples - Kotlin
-|     Sample     | Description |
-| ------------- | ------------- |
-| [main](https://github.com/googlesamples/android-architecture/tree/main) | This branch |
-| [service-locator](https://github.com/googlesamples/android-architecture/tree/service-locator) | A simple setup that removes Hilt in favor of a service locator |
-| [livedata](https://github.com/googlesamples/android-architecture/tree/livedata) | Uses LiveData instead of StateFlow as the data stream solution |
-| [usecases](https://github.com/googlesamples/android-architecture/tree/usecases) | Adds a new domain layer that uses UseCases for business logic (not using Compose yet) |
-| [views](https://github.com/googlesamples/android-architecture/tree/views) | Uses Views instead of Jetpack Compose to render UI elements on the screen |
-| [views-hilt](https://github.com/googlesamples/android-architecture/tree/views-hilt) | Uses Views and Hilt instead together |
-
+| Sample                                                                                        | Description                                                                           |
+|-----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [main](https://github.com/googlesamples/android-architecture/tree/main)                       | This branch                                                                           |
+| [service-locator](https://github.com/googlesamples/android-architecture/tree/service-locator) | A simple setup that removes Hilt in favor of a service locator                        |
+| [livedata](https://github.com/googlesamples/android-architecture/tree/livedata)               | Uses LiveData instead of StateFlow as the data stream solution                        |
+| [views](https://github.com/googlesamples/android-architecture/tree/views)                     | Uses Views instead of Jetpack Compose to render UI elements on the screen             |
+| [views-hilt](https://github.com/googlesamples/android-architecture/tree/views-hilt)           | Uses Views and Hilt instead together                                                  |
+| [multimodule](https://github.com/googlesamples/android-architecture/tree/multimodule)         | Multi-module sample                                                                   |
 
 ## Screenshots
 
