@@ -1,3 +1,7 @@
+import com.android.build.api.dsl.Packaging
+import org.gradle.api.JavaVersion.VERSION_17
+
+
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -20,15 +24,18 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-}
+
+    }
+
+
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
 
+    compileSdkPreview = "UpsideDownCake"
     defaultConfig {
         applicationId = "com.example.android.architecture.blueprints.main"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        minSdk = 33
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -44,7 +51,7 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
-            isTestCoverageEnabled = true
+            enableUnitTestCoverage= true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             testProguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguardTest-rules.pro")
         }
@@ -81,22 +88,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = VERSION_17
+        targetCompatibility = VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 
-    packagingOptions {
-        excludes += "META-INF/AL2.0"
-        excludes += "META-INF/LGPL2.1"
-    }
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
+    namespace = "com.example.android.architecture.blueprints.todoapp"
+    buildToolsVersion = "34.0.0 rc4"
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {

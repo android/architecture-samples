@@ -1,3 +1,6 @@
+import org.apache.tools.ant.util.JavaEnvUtils.VERSION_11
+import org.gradle.api.JavaVersion.VERSION_17
+
 /*
  * Copyright 2023 The Android Open Source Project
  *
@@ -23,10 +26,17 @@ plugins {
 
 android {
     namespace = "com.example.android.architecture.blueprints.todoapp.shared.test"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdkPreview = "UpsideDownCake"
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
+        minSdk = 33
     }
+    compileOptions {
+        sourceCompatibility = VERSION_17
+        targetCompatibility = VERSION_17
+        compileSdkVersion = "android-33"
+        compileSdkPreview = "UpsideDownCake"
+    }
+    buildToolsVersion = "33.0.2"
 }
 
 dependencies {
