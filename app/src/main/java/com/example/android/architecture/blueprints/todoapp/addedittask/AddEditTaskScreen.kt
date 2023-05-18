@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
 import androidx.annotation.StringRes
@@ -49,8 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.accompanist.swiperefresh.SwipeRefresh as SwipeRefresh1
 
 @Composable
 fun AddEditTaskScreen(
@@ -100,6 +102,7 @@ fun AddEditTaskScreen(
     }
 }
 
+
 @Composable
 private fun AddEditTaskContent(
     loading: Boolean,
@@ -110,7 +113,7 @@ private fun AddEditTaskContent(
     modifier: Modifier = Modifier
 ) {
     if (loading) {
-        SwipeRefresh(
+        SwipeRefresh1(
             // Show the loading spinner—`loading` is `true` in this code path
             state = rememberSwipeRefreshState(true),
             onRefresh = { /* DO NOTHING */ },
