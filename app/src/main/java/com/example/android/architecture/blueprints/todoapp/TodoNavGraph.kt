@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.app.Activity
+import androidx.compose.compiler.plugins.kotlin.EmptyFunctionMetrics.composable
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.rememberDrawerState
@@ -42,6 +43,9 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksScreen
 import com.example.android.architecture.blueprints.todoapp.util.AppModalDrawer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.example.android.architecture.blueprints.todoapp.TodoDestinations.TASKS_ROUTE as TASKS_ROUTE1
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.QUIT_ARG as QUIT_ARG1
+import com.example.android.architecture.blueprints.todoapp.navigateExit as navigateExit1
 
 @Composable
 fun TodoNavGraph(
@@ -49,7 +53,7 @@ fun TodoNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    startDestination: String = TodoDestinations.TASKS_ROUTE,
+    startDestination: String = TASKS_ROUTE1,
     navActions: TodoNavigationActions = remember(navController) {
         TodoNavigationActions(navController)
     }
@@ -58,12 +62,10 @@ fun TodoNavGraph(
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
 
     NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier
+        navController, startDestination, modifier
     ) {
         composable(
-            TodoDestinations.TASKS_ROUTE,
+            TASKS_ROUTE1,
             arguments = listOf(
                 navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
             )
@@ -74,7 +76,8 @@ fun TodoNavGraph(
                     onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
                     onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
                     onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
-                    openDrawer = { coroutineScope.launch { drawerState.open() } }
+                    openDrawer = { coroutineScope.launch { drawerState.open() } },
+
                 )
             }
         }
@@ -88,7 +91,8 @@ fun TodoNavGraph(
             arguments = listOf(
                 navArgument(TITLE_ARG) { type = NavType.IntType },
                 navArgument(TASK_ID_ARG) { type = NavType.StringType; nullable = true },
-            )
+
+                )
         ) { entry ->
             val taskId = entry.arguments?.getString(TASK_ID_ARG)
             AddEditTaskScreen(
@@ -110,7 +114,17 @@ fun TodoNavGraph(
                 onDeleteTask = { navActions.navigateToTasks(DELETE_RESULT_OK) }
             )
         }
+
+
+        composable(TodoDestinations.QUIT_ROUTE) {
+
+                System.exit(0)
+
+        }
     }
+}
+fun navigateExit() {
+    System.exit(0)
 }
 
 // Keys for navigation

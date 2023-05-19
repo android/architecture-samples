@@ -83,7 +83,8 @@ fun TasksScreen(
                 onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
                 onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
                 onClearCompletedTasks = { viewModel.clearCompletedTasks() },
-                onRefresh = { viewModel.refresh() }
+                onRefresh = { viewModel.refresh() },
+                onQuit = {System.exit(0)}
             )
         },
         modifier = modifier.fillMaxSize(),

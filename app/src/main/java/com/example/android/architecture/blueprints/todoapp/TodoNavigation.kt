@@ -34,6 +34,7 @@ private object TodoScreens {
     const val STATISTICS_SCREEN = "statistics"
     const val TASK_DETAIL_SCREEN = "task"
     const val ADD_EDIT_TASK_SCREEN = "addEditTask"
+
 }
 
 /**
@@ -43,6 +44,7 @@ object TodoDestinationsArgs {
     const val USER_MESSAGE_ARG = "userMessage"
     const val TASK_ID_ARG = "taskId"
     const val TITLE_ARG = "title"
+    const val QUIT_ARG = "quit"
 }
 
 /**
@@ -53,6 +55,7 @@ object TodoDestinations {
     const val STATISTICS_ROUTE = STATISTICS_SCREEN
     const val TASK_DETAIL_ROUTE = "$TASK_DETAIL_SCREEN/{$TASK_ID_ARG}"
     const val ADD_EDIT_TASK_ROUTE = "$ADD_EDIT_TASK_SCREEN/{$TITLE_ARG}?$TASK_ID_ARG={$TASK_ID_ARG}"
+    const val QUIT_ROUTE= "QUIT_SCREEN"
 }
 
 /**
@@ -102,5 +105,11 @@ class TodoNavigationActions(private val navController: NavHostController) {
                 if (taskId != null) "$it?$TASK_ID_ARG=$taskId" else it
             }
         )
+
     }
+
+    fun onQuit() {
+        System.exit(0)
+    }
+
 }

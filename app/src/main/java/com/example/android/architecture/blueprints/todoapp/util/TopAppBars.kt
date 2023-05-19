@@ -53,7 +53,8 @@ fun TasksTopAppBar(
     onFilterActiveTasks: () -> Unit,
     onFilterCompletedTasks: () -> Unit,
     onClearCompletedTasks: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onQuit: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
@@ -64,7 +65,7 @@ fun TasksTopAppBar(
         },
         actions = {
             FilterTasksMenu(onFilterAllTasks, onFilterActiveTasks, onFilterCompletedTasks)
-            MoreTasksMenu(onClearCompletedTasks, onRefresh)
+            MoreTasksMenu(onClearCompletedTasks, onRefresh, onQuit)
         },
         modifier = Modifier.fillMaxWidth()
     )
@@ -99,7 +100,8 @@ private fun FilterTasksMenu(
 @Composable
 private fun MoreTasksMenu(
     onClearCompletedTasks: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onQuit: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
@@ -111,6 +113,9 @@ private fun MoreTasksMenu(
         }
         DropdownMenuItem(onClick = { onRefresh(); closeMenu() }) {
             Text(text = stringResource(id = R.string.refresh))
+        }
+        DropdownMenuItem(onClick = { onQuit(); closeMenu() }) {
+            Text(text = "Quit")
         }
     }
 }
@@ -187,7 +192,7 @@ fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
 private fun TasksTopAppBarPreview() {
     AppCompatTheme {
         Surface {
-            TasksTopAppBar({}, {}, {}, {}, {}, {})
+            TasksTopAppBar({}, {}, {}, {}, {}, {}, {})
         }
     }
 }

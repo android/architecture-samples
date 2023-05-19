@@ -142,8 +142,8 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
-android-application = { id = "com.android.application", version = "8.0.1" }
-android-library = { id = "com.android.library", version = "8.0.1" }
+android-application = { id = "com.android.application", version = "8.1.0-beta03" }
+android-library = { id = "com.android.library", version = "8.1.0-beta03" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

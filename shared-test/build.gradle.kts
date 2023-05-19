@@ -1,4 +1,3 @@
-import org.apache.tools.ant.util.JavaEnvUtils.VERSION_11
 import org.gradle.api.JavaVersion.VERSION_17
 
 /*
