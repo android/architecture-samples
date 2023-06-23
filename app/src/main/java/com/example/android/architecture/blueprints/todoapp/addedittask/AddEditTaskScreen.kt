@@ -50,8 +50,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -112,11 +111,12 @@ private fun AddEditTaskContent(
     modifier: Modifier = Modifier
 ) {
     if (loading) {
-        SwipeRefresh(
-            // Show the loading spinner—`loading` is `true` in this code path
-            state = rememberSwipeRefreshState(true),
+        LoadingContent(
+            loading = true,
             onRefresh = { /* DO NOTHING */ },
-            content = { },
+            empty = false,
+            emptyContent = { /* DO NOTHING */ },
+            content = {}
         )
     } else {
         Column(
