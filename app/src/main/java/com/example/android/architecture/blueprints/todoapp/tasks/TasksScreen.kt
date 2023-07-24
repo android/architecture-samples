@@ -165,7 +165,9 @@ private fun TasksContent(
                     TaskItem(
                         task = task,
                         onTaskClick = onTaskClick,
-                        onCheckedChange = { onTaskCheckedChange(task, it) }
+                        onCheckedChange = {
+                            onTaskCheckedChange(task, it)
+                        }
                     )
                 }
             }
@@ -202,7 +204,7 @@ private fun TaskItem(
             textDecoration = if (task.isCompleted) {
                 TextDecoration.LineThrough
             } else {
-                null
+                TextDecoration.None
             }
         )
     }
