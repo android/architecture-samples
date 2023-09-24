@@ -128,7 +128,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android.core)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Jetpack Compose
     val composeBom = platform(libs.androidx.compose.bom)
