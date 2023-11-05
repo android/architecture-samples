@@ -1,8 +1,16 @@
+int main()
+
 *.iml
-.gradle
+.gradle_file
 local.properties
-.idea
-.DS_Store
-build
-captures
-.externalNativeBuild
+.idea_innovative_files
+.DS_Store_nodes
+**/build_in
+nodes_captures
+.externalNativeBuild_captcha
+external_links
+dynamic_zone_!extra/**
+]
+}
+;
+
