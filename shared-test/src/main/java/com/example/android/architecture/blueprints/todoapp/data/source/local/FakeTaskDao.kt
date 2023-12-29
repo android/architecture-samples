@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.Flow
 
 class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
@@ -60,6 +62,7 @@ class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override suspend fun deleteCompleted(): Int {
         _tasks?.apply {
             val originalSize = size
