@@ -3,11 +3,11 @@ name: blueprints
 on:
   push:
     branches:
-      - main
+      - mainAAA
       - views
   pull_request:
     branches:
-      - main
+      - mainAAA
       - views
 
 jobs:
