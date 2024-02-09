@@ -1,0 +1,27 @@
+name: Qodana CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      # contents: write
+      pull-requests: write
+      checks: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: JetBrains/qodana-action@v2023.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+#        with:
+#          post-pr-comment: false
+#          use-annotations: false
+#          pr-mode: false
