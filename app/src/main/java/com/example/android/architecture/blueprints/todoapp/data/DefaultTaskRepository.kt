@@ -25,6 +25,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -45,8 +46,42 @@ class DefaultTaskRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val localDataSource: TaskDao,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
+    @ApplicationScope scope: CoroutineScope,
 ) : TaskRepository {
+
+    private val networkSyncEventQueue = Channel<Unit>()
+    init {
+        scope.launch {
+            for (syncEvent in networkSyncEventQueue) saveTasksToNetwork()
+        }
+    }
+
+    /**
+     * Send the tasks from the local data source to the network data sources.
+     *
+     * Real apps may want to use WorkManager to schedule this work, and provide a mechanism for
+     * failures to be communicated back to the user so that they are aware that their data isn't
+     * being backed up.
+     * */
+    private suspend fun saveTasksToNetwork() {
+        try {
+            val localTasks = localDataSource.getAll()
+            val networkTasks = withContext(dispatcher) {
+                localTasks.toNetwork()
+            }
+            networkDataSource.saveTasks(networkTasks)
+        } catch (e: Exception) {
+            // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
+            // to an app level UI state holder which could then display a Toast message.
+        }
+    }
+
+    /**
+     * Inform this repository that the local data needs sending to the network.
+     */
+    private fun sendNetworkSyncEvent() {
+        networkSyncEventQueue.trySend(Unit)
+    }
 
     override suspend fun createTask(title: String, description: String): String {
         // ID creation might be a complex operation so it's executed using the supplied
@@ -60,7 +95,7 @@ class DefaultTaskRepository @Inject constructor(
             id = taskId,
         )
         localDataSource.upsert(task.toLocal())
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
         return taskId
     }
 
@@ -71,7 +106,7 @@ class DefaultTaskRepository @Inject constructor(
         ) ?: throw Exception("Task (id $taskId) not found")
 
         localDataSource.upsert(task.toLocal())
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
@@ -114,27 +149,27 @@ class DefaultTaskRepository @Inject constructor(
 
     override suspend fun completeTask(taskId: String) {
         localDataSource.updateCompleted(taskId = taskId, completed = true)
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     override suspend fun activateTask(taskId: String) {
         localDataSource.updateCompleted(taskId = taskId, completed = false)
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     override suspend fun clearCompletedTasks() {
         localDataSource.deleteCompleted()
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     override suspend fun deleteAllTasks() {
         localDataSource.deleteAll()
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     override suspend fun deleteTask(taskId: String) {
         localDataSource.deleteById(taskId)
-        saveTasksToNetwork()
+        sendNetworkSyncEvent()
     }
 
     /**
@@ -159,29 +194,6 @@ class DefaultTaskRepository @Inject constructor(
             val remoteTasks = networkDataSource.loadTasks()
             localDataSource.deleteAll()
             localDataSource.upsertAll(remoteTasks.toLocal())
-        }
-    }
-
-    /**
-     * Send the tasks from the local data source to the network data source
-     *
-     * Returns immediately after launching the job. Real apps may want to suspend here until the
-     * operation is complete or (better) use WorkManager to schedule this work. Both approaches
-     * should provide a mechanism for failures to be communicated back to the user so that
-     * they are aware that their data isn't being backed up.
-     */
-    private fun saveTasksToNetwork() {
-        scope.launch {
-            try {
-                val localTasks = localDataSource.getAll()
-                val networkTasks = withContext(dispatcher) {
-                    localTasks.toNetwork()
-                }
-                networkDataSource.saveTasks(networkTasks)
-            } catch (e: Exception) {
-                // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
-                // to an app level UI state holder which could then display a Toast message.
-            }
         }
     }
 }
