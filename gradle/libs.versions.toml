@@ -42,7 +42,7 @@ kotlin = "1.9.23"
 kotlinxCoroutines = "1.8.0"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.3"
-ksp = "1.9.22-1.0.18"
+ksp = "1.9.23-1.0.20"
 lint = "31.3.1"
 # @keep
 minSdk = "21"
@@ -55,7 +55,7 @@ room = "2.6.1"
 spotless = "5.12.5"
 timber = "5.0.1"
 # @keep
-targetSdk = "33"
+targetSdk = "34"
 truth = "1.4.2"
 turbine = "0.12.1"
 
