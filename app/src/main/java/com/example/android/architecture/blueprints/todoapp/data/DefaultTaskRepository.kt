@@ -40,7 +40,6 @@ import kotlinx.coroutines.withContext
  * @param scope - The coroutine scope used for deferred jobs where the result isn't important, such
  * as sending data to the network.
  */
-@Singleton
 class DefaultTaskRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val localDataSource: TaskDao,
