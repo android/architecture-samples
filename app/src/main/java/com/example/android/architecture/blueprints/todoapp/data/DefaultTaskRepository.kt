@@ -57,7 +57,7 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     /**
-     * Send the tasks from the local data source to the network data sources.
+     * Send the tasks from the local data source to the network data source.
      *
      * Real apps may want to use WorkManager to schedule this work, and provide a mechanism for
      * failures to be communicated back to the user so that they are aware that their data isn't
