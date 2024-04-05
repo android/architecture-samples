@@ -128,7 +128,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android.core)
     implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)
 
     // Jetpack Compose
     val composeBom = platform(libs.androidx.compose.bom)
@@ -166,7 +166,7 @@ dependencies {
 
     // JVM tests - Hilt
     testImplementation(libs.hilt.android.testing)
-    kspTest(libs.hilt.compiler)
+    kaptTest(libs.hilt.compiler)
 
     // Dependencies for Android unit tests
     androidTestImplementation(composeBom)
@@ -196,5 +196,5 @@ dependencies {
 
     // AndroidX Test - Hilt testing
     androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.compiler)
+    kaptAndroidTest(libs.hilt.compiler)
 }
