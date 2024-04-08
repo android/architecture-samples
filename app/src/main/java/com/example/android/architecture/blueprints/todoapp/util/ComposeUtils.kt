@@ -50,7 +50,7 @@ fun LoadingContent(
             state = rememberSwipeRefreshState(loading),
             onRefresh = onRefresh,
             modifier = modifier,
-            content = content,
+            content = content
         )
     }
 }

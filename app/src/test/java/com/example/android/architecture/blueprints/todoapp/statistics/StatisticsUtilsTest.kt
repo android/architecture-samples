@@ -33,7 +33,7 @@ class StatisticsUtilsTest {
                 id = "id",
                 title = "title",
                 description = "desc",
-                isCompleted = false,
+                isCompleted = false
             )
         )
         // When the list of tasks is computed with an active task
@@ -51,7 +51,7 @@ class StatisticsUtilsTest {
                 id = "id",
                 title = "title",
                 description = "desc",
-                isCompleted = true,
+                isCompleted = true
             )
         )
         // When the list of tasks is computed with a completed task
@@ -70,7 +70,7 @@ class StatisticsUtilsTest {
             Task(id = "2", title = "title", description = "desc", isCompleted = true),
             Task(id = "3", title = "title", description = "desc", isCompleted = true),
             Task(id = "4", title = "title", description = "desc", isCompleted = false),
-            Task(id = "5", title = "title", description = "desc", isCompleted = false),
+            Task(id = "5", title = "title", description = "desc", isCompleted = false)
         )
         // When the list of tasks is computed
         val result = getActiveAndCompletedStats(tasks)

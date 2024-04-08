@@ -84,32 +84,44 @@ private fun FilterTasksMenu(
             )
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onFilterAllTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = {
+            onFilterAllTasks()
+            closeMenu()
+        }) {
             Text(text = stringResource(id = R.string.nav_all))
         }
-        DropdownMenuItem(onClick = { onFilterActiveTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = {
+            onFilterActiveTasks()
+            closeMenu()
+        }) {
             Text(text = stringResource(id = R.string.nav_active))
         }
-        DropdownMenuItem(onClick = { onFilterCompletedTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = {
+            onFilterCompletedTasks()
+            closeMenu()
+        }) {
             Text(text = stringResource(id = R.string.nav_completed))
         }
     }
 }
 
 @Composable
-private fun MoreTasksMenu(
-    onClearCompletedTasks: () -> Unit,
-    onRefresh: () -> Unit
-) {
+private fun MoreTasksMenu(onClearCompletedTasks: () -> Unit, onRefresh: () -> Unit) {
     TopAppBarDropdownMenu(
         iconContent = {
             Icon(Icons.Filled.MoreVert, stringResource(id = R.string.menu_more))
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onClearCompletedTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = {
+            onClearCompletedTasks()
+            closeMenu()
+        }) {
             Text(text = stringResource(id = R.string.menu_clear))
         }
-        DropdownMenuItem(onClick = { onRefresh(); closeMenu() }) {
+        DropdownMenuItem(onClick = {
+            onRefresh()
+            closeMenu()
+        }) {
             Text(text = stringResource(id = R.string.refresh))
         }
     }

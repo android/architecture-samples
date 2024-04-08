@@ -42,7 +42,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -50,7 +49,6 @@ import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun TaskDetailScreen(
     onEditTask: (String) -> Unit,
@@ -112,7 +110,7 @@ private fun EditTaskContent(
 ) {
     val screenPadding = Modifier.padding(
         horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-        vertical = dimensionResource(id = R.dimen.vertical_margin),
+        vertical = dimensionResource(id = R.dimen.vertical_margin)
     )
     val commonModifier = modifier
         .fillMaxWidth()
@@ -133,7 +131,7 @@ private fun EditTaskContent(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .then(screenPadding),
+                    .then(screenPadding)
 
             ) {
                 if (task != null) {

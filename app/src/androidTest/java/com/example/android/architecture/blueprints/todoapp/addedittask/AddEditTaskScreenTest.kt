@@ -76,7 +76,7 @@ class AddEditTaskScreenTest {
                         viewModel = AddEditTaskViewModel(repository, SavedStateHandle()),
                         topBarTitle = R.string.add_task,
                         onTaskUpdate = { },
-                        onBack = { },
+                        onBack = { }
                     )
                 }
             }

@@ -53,7 +53,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
@@ -64,7 +63,6 @@ import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun TasksScreen(
     @StringRes userMessage: Int,
@@ -174,18 +172,14 @@ private fun TasksContent(
 }
 
 @Composable
-private fun TaskItem(
-    task: Task,
-    onCheckedChange: (Boolean) -> Unit,
-    onTaskClick: (Task) -> Unit
-) {
+private fun TaskItem(task: Task, onCheckedChange: (Boolean) -> Unit, onTaskClick: (Task) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-                vertical = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.list_item_padding)
             )
             .clickable { onTaskClick(task) }
     ) {
@@ -265,14 +259,14 @@ private fun TasksContentPreview() {
                         description = "Description 5",
                         isCompleted = true,
                         id = "ID 5"
-                    ),
+                    )
                 ),
                 currentFilteringLabel = R.string.label_all,
                 noTasksLabel = R.string.no_tasks_all,
                 noTasksIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
                 onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onTaskCheckedChange = { _, _ -> }
             )
         }
     }
@@ -291,7 +285,7 @@ private fun TasksContentEmptyPreview() {
                 noTasksIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
                 onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onTaskCheckedChange = { _, _ -> }
             )
         }
     }

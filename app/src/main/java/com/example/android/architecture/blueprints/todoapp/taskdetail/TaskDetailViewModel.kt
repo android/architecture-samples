@@ -56,15 +56,18 @@ class TaskDetailViewModel @Inject constructor(
 
     val taskId: String = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]!!
 
-    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
-    private val _isLoading = MutableStateFlow(false)
-    private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = taskRepository.getTaskStream(taskId)
+    private val userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
+    private val isLoading = MutableStateFlow(false)
+    private val isTaskDeleted = MutableStateFlow(false)
+    private val taskAsync = taskRepository.getTaskStream(taskId)
         .map { handleTask(it) }
         .catch { emit(Async.Error(R.string.loading_task_error)) }
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
+        userMessage,
+        isLoading,
+        isTaskDeleted,
+        taskAsync
     ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
         when (taskAsync) {
             Async.Loading -> {
@@ -94,7 +97,7 @@ class TaskDetailViewModel @Inject constructor(
 
     fun deleteTask() = viewModelScope.launch {
         taskRepository.deleteTask(taskId)
-        _isTaskDeleted.value = true
+        isTaskDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
@@ -109,19 +112,19 @@ class TaskDetailViewModel @Inject constructor(
     }
 
     fun refresh() {
-        _isLoading.value = true
+        isLoading.value = true
         viewModelScope.launch {
             taskRepository.refreshTask(taskId)
-            _isLoading.value = false
+            isLoading.value = false
         }
     }
 
     fun snackbarMessageShown() {
-        _userMessage.value = null
+        userMessage.value = null
     }
 
     private fun showSnackbarMessage(message: Int) {
-        _userMessage.value = message
+        userMessage.value = message
     }
 
     private fun handleTask(task: Task?): Async<Task?> {

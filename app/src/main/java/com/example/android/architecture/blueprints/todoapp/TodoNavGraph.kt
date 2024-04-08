@@ -65,7 +65,10 @@ fun TodoNavGraph(
         composable(
             TodoDestinations.TASKS_ROUTE,
             arguments = listOf(
-                navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
+                navArgument(USER_MESSAGE_ARG) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
             )
         ) { entry ->
             AppModalDrawer(drawerState, currentRoute, navActions) {
@@ -87,7 +90,10 @@ fun TodoNavGraph(
             TodoDestinations.ADD_EDIT_TASK_ROUTE,
             arguments = listOf(
                 navArgument(TITLE_ARG) { type = NavType.IntType },
-                navArgument(TASK_ID_ARG) { type = NavType.StringType; nullable = true },
+                navArgument(TASK_ID_ARG) {
+                    type = NavType.StringType
+                    nullable = true
+                }
             )
         ) { entry ->
             val taskId = entry.arguments?.getString(TASK_ID_ARG)

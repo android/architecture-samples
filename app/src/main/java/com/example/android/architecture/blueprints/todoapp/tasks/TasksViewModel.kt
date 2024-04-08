@@ -60,21 +60,24 @@ class TasksViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _savedFilterType =
+    private val savedFilterType =
         savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
 
-    private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
-    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
-    private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasksAsync =
-        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
+    private val filterUiInfo = savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
+    private val userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
+    private val isLoading = MutableStateFlow(false)
+    private val filteredTasksAsync =
+        combine(taskRepository.getTasksStream(), savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
         }
             .map { Async.Success(it) }
             .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
 
     val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
+        filterUiInfo,
+        isLoading,
+        userMessage,
+        filteredTasksAsync
     ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
         when (tasksAsync) {
             Async.Loading -> {
@@ -130,18 +133,18 @@ class TasksViewModel @Inject constructor(
     }
 
     fun snackbarMessageShown() {
-        _userMessage.value = null
+        userMessage.value = null
     }
 
     private fun showSnackbarMessage(message: Int) {
-        _userMessage.value = message
+        userMessage.value = message
     }
 
     fun refresh() {
-        _isLoading.value = true
+        isLoading.value = true
         viewModelScope.launch {
             taskRepository.refresh()
-            _isLoading.value = false
+            isLoading.value = false
         }
     }
 
@@ -166,19 +169,22 @@ class TasksViewModel @Inject constructor(
         when (requestType) {
             ALL_TASKS -> {
                 FilteringUiInfo(
-                    R.string.label_all, R.string.no_tasks_all,
+                    R.string.label_all,
+                    R.string.no_tasks_all,
                     R.drawable.logo_no_fill
                 )
             }
             ACTIVE_TASKS -> {
                 FilteringUiInfo(
-                    R.string.label_active, R.string.no_tasks_active,
+                    R.string.label_active,
+                    R.string.no_tasks_active,
                     R.drawable.ic_check_circle_96dp
                 )
             }
             COMPLETED_TASKS -> {
                 FilteringUiInfo(
-                    R.string.label_completed, R.string.no_tasks_completed,
+                    R.string.label_completed,
+                    R.string.no_tasks_completed,
                     R.drawable.ic_verified_user_96dp
                 )
             }
@@ -191,5 +197,5 @@ const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
 data class FilteringUiInfo(
     val currentFilteringLabel: Int = R.string.label_all,
     val noTasksLabel: Int = R.string.no_tasks_all,
-    val noTaskIconRes: Int = R.drawable.logo_no_fill,
+    val noTaskIconRes: Int = R.drawable.logo_no_fill
 )

@@ -45,6 +45,7 @@ class TaskDaoTest {
             ToDoDatabase::class.java
         ).allowMainThreadQueries().build()
     }
+
     @Test
     fun insertTaskAndGetById() = runTest {
         // GIVEN - insert a task
@@ -52,7 +53,7 @@ class TaskDaoTest {
             title = "title",
             description = "description",
             id = "id",
-            isCompleted = false,
+            isCompleted = false
         )
         database.taskDao().upsert(task)
 
@@ -74,7 +75,7 @@ class TaskDaoTest {
             title = "title",
             description = "description",
             id = "id",
-            isCompleted = false,
+            isCompleted = false
         )
         database.taskDao().upsert(task)
 
@@ -102,7 +103,7 @@ class TaskDaoTest {
             title = "title",
             description = "description",
             id = "id",
-            isCompleted = false,
+            isCompleted = false
         )
         database.taskDao().upsert(task)
 
@@ -124,7 +125,7 @@ class TaskDaoTest {
             title = "title",
             description = "description",
             id = "id",
-            isCompleted = false,
+            isCompleted = false
         )
 
         database.taskDao().upsert(originalTask)
@@ -175,7 +176,7 @@ class TaskDaoTest {
             title = "title",
             description = "description",
             id = "id",
-            isCompleted = false,
+            isCompleted = false
         )
         database.taskDao().upsert(task)
 
@@ -195,7 +196,7 @@ class TaskDaoTest {
                 title = "title",
                 description = "description",
                 id = "id",
-                isCompleted = false,
+                isCompleted = false
             )
         )
 
