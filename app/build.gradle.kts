@@ -89,9 +89,9 @@ android {
         jvmTarget = "17"
     }
 
-    packagingOptions {
-        excludes += "META-INF/AL2.0"
-        excludes += "META-INF/LGPL2.1"
+    packaging {
+        jniLibs.excludes += "META-INF/AL2.0"
+        jniLibs.excludes += "META-INF/LGPL2.1"
     }
 
     composeOptions {
