@@ -27,13 +27,13 @@ jobs:
         with:
           java-version: 17
 
-      #- uses: actions/cache@v2
-      #  with:
-            #    path: |
-            #~/.gradle/caches/modules-*
-            #~/.gradle/caches/jars-*
-          #~/.gradle/caches/build-cache-*
-          #key: gradle-${{ hashFiles('checksum.txt') }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/modules-*
+            ~/.gradle/caches/jars-*
+            ~/.gradle/caches/build-cache-*
+          key: gradle-${{ hashFiles('checksum.txt') }}
 
       - name: Build project and UnitTest
         run: ./gradlew assembleDebug compileDebugUnitTestKotlin
