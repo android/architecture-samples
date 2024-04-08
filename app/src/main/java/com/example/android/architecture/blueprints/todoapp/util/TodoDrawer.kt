@@ -106,9 +106,7 @@ private fun AppDrawer(
 }
 
 @Composable
-private fun DrawerHeader(
-    modifier: Modifier = Modifier
-) {
+private fun DrawerHeader(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -158,7 +156,8 @@ private fun DrawerButton(
         ) {
             Icon(
                 painter = painter,
-                contentDescription = null, // decorative
+                // decorative
+                contentDescription = null,
                 tint = tintColor
             )
             Spacer(Modifier.width(16.dp))

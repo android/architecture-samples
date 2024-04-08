@@ -39,7 +39,7 @@ fun Task.toLocal() = LocalTask(
     id = id,
     title = title,
     description = description,
-    isCompleted = isCompleted,
+    isCompleted = isCompleted
 )
 
 fun List<Task>.toLocal() = map(Task::toLocal)
@@ -49,7 +49,7 @@ fun LocalTask.toExternal() = Task(
     id = id,
     title = title,
     description = description,
-    isCompleted = isCompleted,
+    isCompleted = isCompleted
 )
 
 // Note: JvmName is used to provide a unique name for each extension function with the same name.
@@ -63,7 +63,7 @@ fun NetworkTask.toLocal() = LocalTask(
     id = id,
     title = title,
     description = shortDescription,
-    isCompleted = (status == TaskStatus.COMPLETE),
+    isCompleted = (status == TaskStatus.COMPLETE)
 )
 
 @JvmName("networkToLocal")
@@ -74,7 +74,11 @@ fun LocalTask.toNetwork() = NetworkTask(
     id = id,
     title = title,
     shortDescription = description,
-    status = if (isCompleted) { TaskStatus.COMPLETE } else { TaskStatus.ACTIVE }
+    status = if (isCompleted) {
+        TaskStatus.COMPLETE
+    } else {
+        TaskStatus.ACTIVE
+    }
 )
 
 fun List<LocalTask>.toNetwork() = map(LocalTask::toNetwork)

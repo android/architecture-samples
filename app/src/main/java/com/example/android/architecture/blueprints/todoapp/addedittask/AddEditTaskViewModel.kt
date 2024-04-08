@@ -114,7 +114,7 @@ class AddEditTaskViewModel @Inject constructor(
             taskRepository.updateTask(
                 taskId,
                 title = uiState.value.title,
-                description = uiState.value.description,
+                description = uiState.value.description
             )
             _uiState.update {
                 it.copy(isTaskSaved = true)

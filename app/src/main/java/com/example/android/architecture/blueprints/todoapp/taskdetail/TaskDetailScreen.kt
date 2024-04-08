@@ -110,7 +110,7 @@ private fun EditTaskContent(
 ) {
     val screenPadding = Modifier.padding(
         horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-        vertical = dimensionResource(id = R.dimen.vertical_margin),
+        vertical = dimensionResource(id = R.dimen.vertical_margin)
     )
     val commonModifier = modifier
         .fillMaxWidth()
@@ -131,7 +131,7 @@ private fun EditTaskContent(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .then(screenPadding),
+                    .then(screenPadding)
 
             ) {
                 if (task != null) {

@@ -172,18 +172,14 @@ private fun TasksContent(
 }
 
 @Composable
-private fun TaskItem(
-    task: Task,
-    onCheckedChange: (Boolean) -> Unit,
-    onTaskClick: (Task) -> Unit
-) {
+private fun TaskItem(task: Task, onCheckedChange: (Boolean) -> Unit, onTaskClick: (Task) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-                vertical = dimensionResource(id = R.dimen.list_item_padding),
+                vertical = dimensionResource(id = R.dimen.list_item_padding)
             )
             .clickable { onTaskClick(task) }
     ) {
@@ -263,14 +259,14 @@ private fun TasksContentPreview() {
                         description = "Description 5",
                         isCompleted = true,
                         id = "ID 5"
-                    ),
+                    )
                 ),
                 currentFilteringLabel = R.string.label_all,
                 noTasksLabel = R.string.no_tasks_all,
                 noTasksIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
                 onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onTaskCheckedChange = { _, _ -> }
             )
         }
     }
@@ -289,7 +285,7 @@ private fun TasksContentEmptyPreview() {
                 noTasksIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
                 onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onTaskCheckedChange = { _, _ -> }
             )
         }
     }

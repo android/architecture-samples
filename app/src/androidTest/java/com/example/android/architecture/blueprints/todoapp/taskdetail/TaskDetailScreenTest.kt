@@ -109,7 +109,7 @@ class TaskDetailScreenTest {
                         ),
                         onEditTask = { /*TODO*/ },
                         onBack = { },
-                        onDeleteTask = { },
+                        onDeleteTask = { }
                     )
                 }
             }

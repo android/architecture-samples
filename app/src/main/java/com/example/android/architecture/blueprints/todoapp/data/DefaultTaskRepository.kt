@@ -43,7 +43,7 @@ class DefaultTaskRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val localDataSource: TaskDao,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
+    @ApplicationScope private val scope: CoroutineScope
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): String {
@@ -55,7 +55,7 @@ class DefaultTaskRepository @Inject constructor(
         val task = Task(
             title = title,
             description = description,
-            id = taskId,
+            id = taskId
         )
         localDataSource.upsert(task.toLocal())
         saveTasksToNetwork()

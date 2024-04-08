@@ -31,7 +31,7 @@ data class Task(
     val title: String = "",
     val description: String = "",
     val isCompleted: Boolean = false,
-    val id: String,
+    val id: String
 ) {
 
     val titleForList: String
