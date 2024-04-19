@@ -28,7 +28,8 @@
         <activity
             android:name="com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme.OverlapSystemBar">
+            android:theme="@style/AppTheme.OverlapSystemBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
