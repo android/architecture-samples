@@ -5,14 +5,16 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
+    namespace = "com.example.android.architecture.blueprints.todoapp"
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "com.example.android.architecture.blueprints.master"
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
+        minSdk rootProject.minSdkVersion
+        targetSdk rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
 
@@ -177,4 +179,7 @@ dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+    //MultiDex
+    implementation "androidx.multidex:multidex:$multiDexVersion"
 }

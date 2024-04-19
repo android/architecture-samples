@@ -20,9 +20,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.Event
@@ -91,9 +91,8 @@ class TasksViewModel @Inject constructor(
     val newTaskEvent: LiveData<Event<Unit>> = _newTaskEvent
 
     private var resultMessageShown: Boolean = false
-
-    // This LiveData depends on another so we can use a transformation.
-    val empty: LiveData<Boolean> = Transformations.map(_items) {
+    
+    val empty: LiveData<Boolean> = _items.map {
         it.isEmpty()
     }
 
@@ -121,12 +120,14 @@ class TasksViewModel @Inject constructor(
                     R.drawable.logo_no_fill, true
                 )
             }
+
             ACTIVE_TASKS -> {
                 setFilter(
                     R.string.label_active, R.string.no_tasks_active,
                     R.drawable.ic_check_circle_96dp, false
                 )
             }
+
             COMPLETED_TASKS -> {
                 setFilter(
                     R.string.label_completed, R.string.no_tasks_completed,
@@ -229,13 +230,14 @@ class TasksViewModel @Inject constructor(
                 ACTIVE_TASKS -> if (task.isActive) {
                     tasksToShow.add(task)
                 }
+
                 COMPLETED_TASKS -> if (task.isCompleted) {
                     tasksToShow.add(task)
                 }
             }
         }
         return tasksToShow
-        }
+    }
 
     fun refresh() {
         _forceUpdate.value = true
