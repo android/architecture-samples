@@ -87,6 +87,7 @@ class DefaultTaskRepository @Inject constructor(
         return localDataSource.observeAll().map { tasks ->
             withContext(dispatcher) {
                 tasks.toExternal()
+                    .sortedBy { it.isCompleted }
             }
         }
     }

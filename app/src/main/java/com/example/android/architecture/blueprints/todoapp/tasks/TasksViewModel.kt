@@ -31,6 +31,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * UiState for the task list screen.
@@ -84,6 +86,7 @@ class TasksViewModel @Inject constructor(
                 TasksUiState(userMessage = tasksAsync.errorMessage)
             }
             is Async.Success -> {
+                println("TasksViewModel.uiState was recomposed")
                 TasksUiState(
                     items = tasksAsync.data,
                     filteringUiInfo = filterUiInfo,
@@ -113,6 +116,7 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
+            delay(2.seconds)
             taskRepository.completeTask(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
