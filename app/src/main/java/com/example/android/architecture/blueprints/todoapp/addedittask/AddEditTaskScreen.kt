@@ -115,11 +115,11 @@ private fun AddEditTaskContent(
     modifier: Modifier = Modifier
 ) {
     var isRefreshing by remember { mutableStateOf(false) }
-    val state = rememberPullToRefreshState()
+    val refreshingState = rememberPullToRefreshState()
     if (loading) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            state = state,
+            state = refreshingState,
             onRefresh = { /* DO NOTHING */ },
             content = { }
         )
