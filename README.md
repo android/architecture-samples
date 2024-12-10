@@ -1,5 +1,5 @@
-> [!CAUTION]"""
-> This codelab is deprecated and it will be removed soon."""
+> [!CAUTION]
+> This codelab is deprecated and it will be removed soon.
 
 # Android Architecture Samples
 
