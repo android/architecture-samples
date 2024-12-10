@@ -25,7 +25,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
           ls /dev/kvm
-        
+          
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
       - name: Set Up JDK
         uses: actions/setup-java@v4
         with:
