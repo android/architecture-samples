@@ -14,8 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.architecture.blueprints.todoapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <application
         android:allowBackup="false"
@@ -27,8 +26,7 @@
         <activity
             android:name="com.example.android.architecture.blueprints.todoapp.TodoActivity"
             android:windowSoftInputMode="adjustResize"
-            android:exported="true"
-            android:theme="@style/AppTheme.OverlapSystemBar">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

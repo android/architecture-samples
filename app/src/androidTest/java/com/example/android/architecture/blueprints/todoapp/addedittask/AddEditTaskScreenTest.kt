@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.addedittask
 
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
@@ -32,11 +32,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoTheme
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
-import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -44,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Integration test for the Add Task screen.
@@ -70,7 +70,7 @@ class AddEditTaskScreenTest {
 
         // GIVEN - On the "Add Task" screen.
         composeTestRule.setContent {
-            AppCompatTheme {
+            TodoTheme {
                 Surface {
                     AddEditTaskScreen(
                         viewModel = AddEditTaskViewModel(repository, SavedStateHandle()),

@@ -22,36 +22,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.StatisticsTopAppBar
-import com.google.accompanist.appcompattheme.AppCompatTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun StatisticsScreen(
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StatisticsViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = { StatisticsTopAppBar(openDrawer) }
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { StatisticsTopAppBar(openDrawer) },
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -76,7 +75,7 @@ private fun StatisticsContent(
     modifier: Modifier = Modifier
 ) {
     val commonModifier = modifier
-        .fillMaxWidth()
+        .fillMaxSize()
         .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
 
     LoadingContent(
@@ -112,31 +111,21 @@ private fun StatisticsContent(
 @Preview
 @Composable
 fun StatisticsContentPreview() {
-    AppCompatTheme {
-        Surface {
-            StatisticsContent(
-                loading = false,
-                empty = false,
-                activeTasksPercent = 80f,
-                completedTasksPercent = 20f,
-                onRefresh = { }
-            )
-        }
+    Surface {
+        StatisticsContent(
+            loading = false,
+            empty = false,
+            activeTasksPercent = 80f,
+            completedTasksPercent = 20f,
+            onRefresh = { }
+        )
     }
 }
 
 @Preview
 @Composable
 fun StatisticsContentEmptyPreview() {
-    AppCompatTheme {
-        Surface {
-            StatisticsContent(
-                loading = false,
-                empty = true,
-                activeTasksPercent = 0f,
-                completedTasksPercent = 0f,
-                onRefresh = { }
-            )
-        }
+    Surface {
+        StatisticsScreen({})
     }
 }
