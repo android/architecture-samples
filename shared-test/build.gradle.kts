@@ -16,7 +16,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -26,6 +25,15 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
@@ -39,7 +47,7 @@ dependencies {
     implementation(libs.androidx.test.rules)
     implementation(libs.hilt.android.core)
     implementation(libs.hilt.android.testing)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Room
     implementation(libs.room.runtime)

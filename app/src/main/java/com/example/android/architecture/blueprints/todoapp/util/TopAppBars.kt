@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.android.architecture.blueprints.todoapp.util
 
 import androidx.annotation.StringRes
@@ -21,18 +23,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.android.architecture.blueprints.todoapp.R
-import com.google.accompanist.appcompattheme.AppCompatTheme
+import com.example.android.architecture.blueprints.todoapp.TodoTheme
 
 @Composable
 fun TasksTopAppBar(
@@ -84,15 +88,15 @@ private fun FilterTasksMenu(
             )
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onFilterAllTasks(); closeMenu() }) {
-            Text(text = stringResource(id = R.string.nav_all))
-        }
-        DropdownMenuItem(onClick = { onFilterActiveTasks(); closeMenu() }) {
-            Text(text = stringResource(id = R.string.nav_active))
-        }
-        DropdownMenuItem(onClick = { onFilterCompletedTasks(); closeMenu() }) {
-            Text(text = stringResource(id = R.string.nav_completed))
-        }
+        DropdownMenuItem(onClick = { onFilterAllTasks(); closeMenu() },
+            text = { Text(text = stringResource(id = R.string.nav_all)) }
+        )
+        DropdownMenuItem(onClick = { onFilterActiveTasks(); closeMenu() },
+            text = { Text(text = stringResource(id = R.string.nav_active)) }
+        )
+        DropdownMenuItem(onClick = { onFilterCompletedTasks(); closeMenu() },
+            text = { Text(text = stringResource(id = R.string.nav_completed)) }
+        )
     }
 }
 
@@ -106,12 +110,14 @@ private fun MoreTasksMenu(
             Icon(Icons.Filled.MoreVert, stringResource(id = R.string.menu_more))
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onClearCompletedTasks(); closeMenu() }) {
-            Text(text = stringResource(id = R.string.menu_clear))
-        }
-        DropdownMenuItem(onClick = { onRefresh(); closeMenu() }) {
-            Text(text = stringResource(id = R.string.refresh))
-        }
+        DropdownMenuItem(
+            text = { Text(text = stringResource(id = R.string.menu_clear)) },
+            onClick = { onClearCompletedTasks(); closeMenu() }
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(id = R.string.refresh)) },
+            onClick = { onRefresh(); closeMenu() }
+        )
     }
 }
 
@@ -175,7 +181,7 @@ fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
         title = { Text(text = stringResource(title)) },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.menu_back))
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(id = R.string.menu_back))
             }
         },
         modifier = Modifier.fillMaxWidth()
@@ -185,7 +191,7 @@ fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
 @Preview
 @Composable
 private fun TasksTopAppBarPreview() {
-    AppCompatTheme {
+    TodoTheme {
         Surface {
             TasksTopAppBar({}, {}, {}, {}, {}, {})
         }
@@ -195,7 +201,7 @@ private fun TasksTopAppBarPreview() {
 @Preview
 @Composable
 private fun StatisticsTopAppBarPreview() {
-    AppCompatTheme {
+    TodoTheme {
         Surface {
             StatisticsTopAppBar { }
         }
@@ -205,7 +211,7 @@ private fun StatisticsTopAppBarPreview() {
 @Preview
 @Composable
 private fun TaskDetailTopAppBarPreview() {
-    AppCompatTheme {
+    TodoTheme {
         Surface {
             TaskDetailTopAppBar({ }, { })
         }
@@ -215,7 +221,7 @@ private fun TaskDetailTopAppBarPreview() {
 @Preview
 @Composable
 private fun AddEditTaskTopAppBarPreview() {
-    AppCompatTheme {
+    TodoTheme {
         Surface {
             AddEditTaskTopAppBar(R.string.add_task) { }
         }

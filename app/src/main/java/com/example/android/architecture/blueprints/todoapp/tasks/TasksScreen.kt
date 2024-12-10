@@ -29,20 +29,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Checkbox
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,18 +54,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoTheme
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
-import com.google.accompanist.appcompattheme.AppCompatTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun TasksScreen(
     @StringRes userMessage: Int,
@@ -74,10 +73,11 @@ fun TasksScreen(
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
-        scaffoldState = scaffoldState,
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TasksTopAppBar(
                 openDrawer = openDrawer,
@@ -88,9 +88,8 @@ fun TasksScreen(
                 onRefresh = { viewModel.refresh() }
             )
         },
-        modifier = modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddTask) {
+            SmallFloatingActionButton(onClick = onAddTask) {
                 Icon(Icons.Filled.Add, stringResource(id = R.string.add_task))
             }
         }
@@ -112,8 +111,8 @@ fun TasksScreen(
         // Check for user messages to display on the screen
         uiState.userMessage?.let { message ->
             val snackbarText = stringResource(message)
-            LaunchedEffect(scaffoldState, viewModel, message, snackbarText) {
-                scaffoldState.snackbarHostState.showSnackbar(snackbarText)
+            LaunchedEffect(snackbarHostState, viewModel, message, snackbarText) {
+                snackbarHostState.showSnackbar(snackbarText)
                 viewModel.snackbarMessageShown()
             }
         }
@@ -158,7 +157,7 @@ private fun TasksContent(
                     horizontal = dimensionResource(id = R.dimen.list_item_padding),
                     vertical = dimensionResource(id = R.dimen.vertical_margin)
                 ),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.headlineSmall
             )
             LazyColumn {
                 items(tasks) { task ->
@@ -195,7 +194,7 @@ private fun TaskItem(
         )
         Text(
             text = task.titleForList,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(
                 start = dimensionResource(id = R.dimen.horizontal_margin)
             ),
@@ -231,7 +230,7 @@ private fun TasksEmptyContent(
 @Preview
 @Composable
 private fun TasksContentPreview() {
-    AppCompatTheme {
+    MaterialTheme {
         Surface {
             TasksContent(
                 loading = false,
@@ -281,7 +280,7 @@ private fun TasksContentPreview() {
 @Preview
 @Composable
 private fun TasksContentEmptyPreview() {
-    AppCompatTheme {
+    MaterialTheme {
         Surface {
             TasksContent(
                 loading = false,
@@ -300,7 +299,7 @@ private fun TasksContentEmptyPreview() {
 @Preview
 @Composable
 private fun TasksEmptyContentPreview() {
-    AppCompatTheme {
+    TodoTheme {
         Surface {
             TasksEmptyContent(
                 noTasksLabel = R.string.no_tasks_all,
@@ -313,7 +312,7 @@ private fun TasksEmptyContentPreview() {
 @Preview
 @Composable
 private fun TaskItemPreview() {
-    AppCompatTheme {
+    MaterialTheme {
         Surface {
             TaskItem(
                 task = Task(
@@ -331,7 +330,7 @@ private fun TaskItemPreview() {
 @Preview
 @Composable
 private fun TaskItemCompletedPreview() {
-    AppCompatTheme {
+    MaterialTheme {
         Surface {
             TaskItem(
                 task = Task(

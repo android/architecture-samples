@@ -23,34 +23,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Checkbox
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
 import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
-import com.google.accompanist.appcompattheme.AppCompatTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun TaskDetailScreen(
     onEditTask: (String) -> Unit,
@@ -58,16 +56,15 @@ fun TaskDetailScreen(
     onDeleteTask: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TaskDetailViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+
 ) {
     Scaffold(
-        scaffoldState = scaffoldState,
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask)
-        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
+            SmallFloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
                 Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
             }
         }
@@ -86,8 +83,8 @@ fun TaskDetailScreen(
         // Check for user messages to display on the screen
         uiState.userMessage?.let { userMessage ->
             val snackbarText = stringResource(userMessage)
-            LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
-                scaffoldState.snackbarHostState.showSnackbar(snackbarText)
+            LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
+                snackbarHostState.showSnackbar(snackbarText)
                 viewModel.snackbarMessageShown()
             }
         }
@@ -139,8 +136,8 @@ private fun EditTaskContent(
                 if (task != null) {
                     Checkbox(task.isCompleted, onTaskCheck)
                     Column {
-                        Text(text = task.title, style = MaterialTheme.typography.h6)
-                        Text(text = task.description, style = MaterialTheme.typography.body1)
+                        Text(text = task.title, style = MaterialTheme.typography.headlineSmall)
+                        Text(text = task.description, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -151,62 +148,57 @@ private fun EditTaskContent(
 @Preview
 @Composable
 private fun EditTaskContentPreview() {
-    AppCompatTheme {
-        Surface {
-            EditTaskContent(
-                loading = false,
-                empty = false,
-                Task(
-                    title = "Title",
-                    description = "Description",
-                    isCompleted = false,
-                    id = "ID"
-                ),
-                onTaskCheck = { },
-                onRefresh = { }
-            )
-        }
+    Surface {
+        EditTaskContent(
+            loading = false,
+            empty = false,
+            Task(
+                title = "Title",
+                description = "Description",
+                isCompleted = false,
+                id = "ID"
+            ),
+            onTaskCheck = { },
+            onRefresh = { }
+        )
     }
+
 }
 
 @Preview
 @Composable
 private fun EditTaskContentTaskCompletedPreview() {
-    AppCompatTheme {
-        Surface {
-            EditTaskContent(
-                loading = false,
-                empty = false,
-                Task(
-                    title = "Title",
-                    description = "Description",
-                    isCompleted = false,
-                    id = "ID"
-                ),
-                onTaskCheck = { },
-                onRefresh = { }
-            )
-        }
+    Surface {
+        EditTaskContent(
+            loading = false,
+            empty = false,
+            Task(
+                title = "Title",
+                description = "Description",
+                isCompleted = false,
+                id = "ID"
+            ),
+            onTaskCheck = { },
+            onRefresh = { }
+        )
     }
 }
 
 @Preview
 @Composable
 private fun EditTaskContentEmptyPreview() {
-    AppCompatTheme {
-        Surface {
-            EditTaskContent(
-                loading = false,
-                empty = true,
-                Task(
-                    title = "Title",
-                    description = "Description",
-                    isCompleted = false,
-                    id = "ID"
-                ),
-                onTaskCheck = { },
-                onRefresh = { }
-            )
-        }
+    Surface {
+        EditTaskContent(
+            loading = false,
+            empty = true,
+            Task(
+                title = "Title",
+                description = "Description",
+                isCompleted = false,
+                id = "ID"
+            ),
+            onTaskCheck = { },
+            onRefresh = { }
+        )
     }
 }

@@ -17,12 +17,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
+    namespace = "com.example.android.architecture.blueprints.todoapp"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -78,24 +79,21 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
-    packagingOptions {
+    packaging {
         excludes += "META-INF/AL2.0"
         excludes += "META-INF/LGPL2.1"
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -128,7 +126,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android.core)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Jetpack Compose
     val composeBom = platform(libs.androidx.compose.bom)
@@ -139,7 +137,8 @@ dependencies {
     implementation(libs.androidx.compose.foundation.core)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.animation)
-    implementation(libs.androidx.compose.material.core)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -166,7 +165,7 @@ dependencies {
 
     // JVM tests - Hilt
     testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.compiler)
+    kspTest(libs.hilt.compiler)
 
     // Dependencies for Android unit tests
     androidTestImplementation(composeBom)
@@ -196,5 +195,5 @@ dependencies {
 
     // AndroidX Test - Hilt testing
     androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
 }
