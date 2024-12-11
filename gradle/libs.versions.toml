@@ -8,7 +8,6 @@ androidxAppCompat = "1.7.0"
 androidxArchCore = "2.2.0"
 androidxBrowser = "1.4.0"
 androidxComposeBom = "2024.11.00"
-androidxComposeCompiler = "1.5.15"
 androidxCompose = "1.2.0"
 androidxComposeRuntimeTracing = "1.7.5"
 androidxCore = "1.15.0"
@@ -72,7 +71,6 @@ androidx-archcore-testing = { group = "androidx.arch.core", name = "core-testing
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
-androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "androidxComposeCompiler" }
 androidx-compose-foundation-core = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
 androidx-compose-material-core = { group = "androidx.compose.material", name = "material" }
