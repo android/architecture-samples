@@ -48,7 +48,7 @@ class DefaultTaskRepository @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) : TaskRepository {
 
-    override suspend fun createTask(title: String, description: String): String {
+    override suspend fun create(title: String, description: String): String {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
         val taskId = withContext(dispatcher) {
@@ -64,8 +64,8 @@ class DefaultTaskRepository @Inject constructor(
         return taskId
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String) {
-        val task = getTask(taskId)?.copy(
+    override suspend fun update(taskId: String, title: String, description: String) {
+        val task = get(taskId)?.copy(
             title = title,
             description = description
         ) ?: throw Exception("Task (id $taskId) not found")
@@ -74,7 +74,7 @@ class DefaultTaskRepository @Inject constructor(
         saveTasksToNetwork()
     }
 
-    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
+    override suspend fun getAll(forceUpdate: Boolean): List<Task> {
         if (forceUpdate) {
             refresh()
         }
@@ -83,7 +83,7 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override fun getTasksStream(): Flow<List<Task>> {
+    override fun observeAll(): Flow<List<Task>> {
         return localDataSource.observeAll().map { tasks ->
             withContext(dispatcher) {
                 tasks.toExternal()
@@ -91,11 +91,11 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override suspend fun refreshTask(taskId: String) {
+    override suspend fun refresh(taskId: String) {
         refresh()
     }
 
-    override fun getTaskStream(taskId: String): Flow<Task?> {
+    override fun observe(taskId: String): Flow<Task?> {
         return localDataSource.observeById(taskId).map { it.toExternal() }
     }
 
@@ -105,34 +105,34 @@ class DefaultTaskRepository @Inject constructor(
      * @param taskId - The ID of the task
      * @param forceUpdate - true if the task should be updated from the network data source first.
      */
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
+    override suspend fun get(taskId: String, forceUpdate: Boolean): Task? {
         if (forceUpdate) {
             refresh()
         }
         return localDataSource.getById(taskId)?.toExternal()
     }
 
-    override suspend fun completeTask(taskId: String) {
+    override suspend fun complete(taskId: String) {
         localDataSource.updateCompleted(taskId = taskId, completed = true)
         saveTasksToNetwork()
     }
 
-    override suspend fun activateTask(taskId: String) {
+    override suspend fun activate(taskId: String) {
         localDataSource.updateCompleted(taskId = taskId, completed = false)
         saveTasksToNetwork()
     }
 
-    override suspend fun clearCompletedTasks() {
+    override suspend fun clearAllCompleted() {
         localDataSource.deleteCompleted()
         saveTasksToNetwork()
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAll() {
         localDataSource.deleteAll()
         saveTasksToNetwork()
     }
 
-    override suspend fun deleteTask(taskId: String) {
+    override suspend fun delete(taskId: String) {
         localDataSource.deleteById(taskId)
         saveTasksToNetwork()
     }

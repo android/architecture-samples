@@ -130,7 +130,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleUIBackButton() = runTest {
         val taskName = "UI <- button"
-        taskRepository.createTask(taskName, "Description")
+        taskRepository.create(taskName, "Description")
 
         setContent()
 
@@ -159,7 +159,7 @@ class AppNavigationTest {
     @Test
     fun taskDetailScreen_doubleBackButton() = runTest {
         val taskName = "Back button"
-        taskRepository.createTask(taskName, "Description")
+        taskRepository.create(taskName, "Description")
 
         setContent()
 

@@ -106,7 +106,7 @@ class AddEditTaskScreenTest {
             .performClick()
 
         // THEN - Verify that the repository saved the task
-        val tasks = repository.getTasks(true)
+        val tasks = repository.getAll(true)
         assertEquals(1, tasks.size)
         assertEquals("title", tasks[0].title)
         assertEquals("description", tasks[0].description)
