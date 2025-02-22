@@ -90,7 +90,7 @@ class TaskDetailViewModelTest {
 
     @Test
     fun activateTask() = runTest {
-        tasksRepository.deleteAllTasks()
+        tasksRepository.deleteAll()
         tasksRepository.addTasks(task.copy(isCompleted = true))
 
         // Verify that the task was completed initially
@@ -101,7 +101,7 @@ class TaskDetailViewModelTest {
         taskDetailViewModel.setCompleted(false)
 
         // Then the task is not completed and the snackbar shows the correct message
-        val newTask = tasksRepository.getTask(task.id)
+        val newTask = tasksRepository.get(task.id)
         assertTrue((newTask?.isActive) ?: false)
         assertThat(taskDetailViewModel.uiState.first().userMessage)
             .isEqualTo(R.string.task_marked_active)
