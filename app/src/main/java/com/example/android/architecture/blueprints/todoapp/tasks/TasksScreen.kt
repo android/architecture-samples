@@ -201,7 +201,7 @@ private fun TaskItem(
             textDecoration = if (task.isCompleted) {
                 TextDecoration.LineThrough
             } else {
-                null
+                TextDecoration.None
             }
         )
     }
