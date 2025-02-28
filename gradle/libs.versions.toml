@@ -41,7 +41,7 @@ kotlin = "2.1.10"
 kotlinxCoroutines = "1.10.1"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
-ksp = "2.1.10-1.0.30"
+ksp = "2.1.10-1.0.31"
 lint = "31.7.3"
 # @keep
 minSdk = "21"
