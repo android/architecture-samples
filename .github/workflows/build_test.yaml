@@ -1,6 +1,7 @@
 name: build_test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -56,5 +57,3 @@ jobs:
         with:
           name: test-reports-${{ matrix.api-level }}
           path: ./app/build/reports/androidTests
-
-
