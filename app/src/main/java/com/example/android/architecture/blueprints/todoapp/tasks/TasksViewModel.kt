@@ -60,12 +60,41 @@ class TasksViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    /**
+     * Initial entry
+     * Key: TASKS_FILTER_SAVED_STATE_KEY
+     * Value: ALL_TASKS
+     */
     private val _savedFilterType =
         savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
 
+    /**
+     * Iterate over StateFlow and convert each item to FilterUiInfo DataClass
+     */
     private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
+
+    /**
+     * Initialize userMessage StateFlow
+     */
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
+
+    /**
+     * Initialize loading StateFlow
+     */
     private val _isLoading = MutableStateFlow(false)
+
+    /**
+     * taskRepository.getTasksStream(): yields Flow<List<Task>>
+     * _savedFilterType: yields StateFlow<TasksFilterType>
+     *
+     * Flow.combine(): waits until each flow has emitted at least one value, then uses the latest
+     * value of each as parameters for the transformation block of Flow.combine function
+     *
+     * transform: suspend (a: T1, b: T2) -> R
+     *
+     * map: transformation on result of combine transform lambda
+     * catch: catches upstream exception
+     */
     private val _filteredTasksAsync =
         combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
             filterTasks(tasks, type)
@@ -73,9 +102,26 @@ class TasksViewModel @Inject constructor(
             .map { Async.Success(it) }
             .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
 
+    /**
+     * uiState: Immutable State exposed to UI for rendering components
+     *
+     * _filterUiInfo: Flow<FilteringUiInfo> type
+     *     Iterate over StateFlow and convert each item to FilterUiInfo DataClass
+     *
+     * _isLoading: MutableStateFlow<Boolean> type
+     *     Initialized loading StateFlow
+     *
+     * _userMessage: MutableStateFlow<Int?> type
+     *     Initialized userMessage StateFlow
+     *
+     * _filteredTasksAsync: Flow<Async<List<Task>>>
+     *     data from taskRepository.getTasksStream()
+     */
     val uiState: StateFlow<TasksUiState> = combine(
         _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
     ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
+        // combined lambda will execute immediately as all flow have emitted a value
+        // Update TasksUiState on sealed class Async state Loading/Error/Success scenarios
         when (tasksAsync) {
             Async.Loading -> {
                 TasksUiState(isLoading = true)
@@ -93,16 +139,28 @@ class TasksViewModel @Inject constructor(
             }
         }
     }
+        // Converts a cold Flow into a hot StateFlow that is started in the given coroutine scope.
         .stateIn(
             scope = viewModelScope,
+            // When the UI stops observing, upstream flows stay active for some time to allow the
+            // system to come back from a short-lived configuration change (such as rotations).
+
+            // Essentially, starts collecting when there's a collector, stops after a delay if
+            // no one's listening.
             started = WhileUiSubscribed,
             initialValue = TasksUiState(isLoading = true)
         )
 
+    /**
+     * add an entry for requestType parameter to savedStateHandle
+     */
     fun setFiltering(requestType: TasksFilterType) {
         savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
+    /**
+     * Clear completedTasks from repository, show snackbarMessage & refresh repository data.
+     */
     fun clearCompletedTasks() {
         viewModelScope.launch {
             taskRepository.clearCompletedTasks()
@@ -111,6 +169,9 @@ class TasksViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Mark Task as completed or active
+     */
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
             taskRepository.completeTask(task.id)
@@ -121,6 +182,9 @@ class TasksViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Based on result parameter show specific SnackbarMessage(Saved/Added/Deleted)
+     */
     fun showEditResultMessage(result: Int) {
         when (result) {
             EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
@@ -129,14 +193,23 @@ class TasksViewModel @Inject constructor(
         }
     }
 
+    /**
+     * reset _userMessage to null
+     */
     fun snackbarMessageShown() {
         _userMessage.value = null
     }
 
+    /**
+     * assign message parameter to _userMessage
+     */
     private fun showSnackbarMessage(message: Int) {
         _userMessage.value = message
     }
 
+    /**
+     * refresh repository and handle loading state accordingly
+     */
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -145,6 +218,10 @@ class TasksViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Filter @param tasks list to contain @param filteringType only. Return filtered List<Task>
+     * @param filteringType: ALL_TASKS, ACTIVE_TASKS & COMPLETED_TASKS
+     */
     private fun filterTasks(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
         val tasksToShow = ArrayList<Task>()
         // We filter the tasks based on the requestType
@@ -162,6 +239,9 @@ class TasksViewModel @Inject constructor(
         return tasksToShow
     }
 
+    /**
+     * Map requestType to FilteringUiInfo DataClass
+     */
     private fun getFilterUiInfo(requestType: TasksFilterType): FilteringUiInfo =
         when (requestType) {
             ALL_TASKS -> {
