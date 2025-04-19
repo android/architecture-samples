@@ -22,7 +22,15 @@ package com.example.android.architecture.blueprints.todoapp.data.source.network
  */
 interface NetworkDataSource {
 
+    /**
+     * Load list of Tasks from network
+     * @return List<NeNetworkTask>
+     */
     suspend fun loadTasks(): List<NetworkTask>
 
-    suspend fun saveTasks(tasks: List<NetworkTask>)
+    /**
+     * Save list of Tasks to network
+     * @param List<NetworkTask>
+     */
+    suspend fun saveTasks(newTasks: List<NetworkTask>)
 }
