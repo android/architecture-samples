@@ -24,5 +24,5 @@ interface NetworkDataSource {
 
     suspend fun loadTasks(): List<NetworkTask>
 
-    suspend fun saveTasks(tasks: List<NetworkTask>)
+    suspend fun saveTasks(newTasks: List<NetworkTask>)
 }
