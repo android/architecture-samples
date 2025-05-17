@@ -1,0 +1,303 @@
+Clone - Clone a repository into a new directory 
+Init - Create an empty Git repository or reinitialize an existing one 
+Add - Add file contents to the index 
+Mv - Move or rename a file, a directory, or a symlink 
+Restore - Restore working tree and from the index 
+Bisect - Use binary search to find the commit that introduced a bug 
+Diff - Show changes between commits, commit and working tree,etc 
+Grep - Print lines matching a pattern 
+Log - Show content logs 
+Show - Show various types of objects 
+Status - Show the working tree status 
+Branch - List, create or delete branches 
+Commit - Record changes to the repository 
+Merge - Join two or more development histories together 
+Rebase - Reapply commits on top of another base tip 
+Switch - Switch branches 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 1
+Tag - Create, list, delete or verify a tag object signed with GPG 
+Fetch - Download objects and refs from another repository 
+Pull - Fetch from and integrate with another repository or a local branch 
+Push - Update remote refs along with associated objects 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 2
+1.2  Procedure 2: Cloning A Repository 
+Step 1: Install Git 
+If you don't have Git installed, you can download and install it from the official website: Git 
+Downloads 
+Step 2: Open a Terminal or Command Prompt or powershell 
+Open your terminal or command prompt. This could be Git Bash, Command Prompt 
+(Windows), or Terminal (Mac/Linux). 
+Step 3: Navigate to the Desired Directory 
+Navigate to the directory on your local disk where you want to clone the repository. You can 
+use the cd command to change directories. For example: 
+cd path/to/your/directory 
+Step 4: Get the Repository URL 
+Go to the GitHub repository you want to clone and copy the repository URL. You can find it 
+on the repository's page, usually under the "Code" button. 
+Step 5: Clone the Repository 
+Use the git clone command to clone the repository. Replace <repository_url> with the actual 
+URL you copied. 
+git clone <repository_url> 
+For example: 
+git clone https://github.com/username/repository.git 
+Step 6: Enter Credentials (if required) 
+If the repository is private, Git may prompt you to enter your GitHub username and password 
+or personal access token. 
+Step 7: Verify the Cloning Process 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 3
+Git will download the repository to your local disk. Once the process is complete, you should 
+see a new directory with the repository name in your specified local directory. 
+Step 8: Navigate into the Cloned Repository 
+Navigate into the cloned repository directory using the cd command: cd repository
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 4
+1.3  Procedure 3: Forking A Repository 
+1. Navigate to the Repository: Go to the repository you want to fork on the Git hosting platform
+ (e.g., GitHub).
+ 2. Click the “Fork” Button: Look for the “Fork” button usually located in the upper right corner
+ of the repository page. Clicking this button will initiate the forking process.
+ 3. Choose Where to Fork: If you have multiple accounts or organizations, you might be
+ prompted to choose where to fork the repository.
+ 4. Wait for Forking to Complete: The platform will create a copy of the repository under your
+ account. This process may take a few moments, depending on the size of the repository.
+ 5. Clone Your Fork: Once the forking process is complete, clone your forked repository to your
+ local machine using the git clone command. Replace <repository_URL> with the URL of your
+ forked repository: git clone <repository_URL>
+ 6. Make Changes: Now you can make changes to the code, add new features, fix bugs, etc., in
+ your local copy of the repository.
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 5
+1.4  Procedure 4: Performing The First Commit 
+1. Initialize a Git Repository: If you haven’t already done so, navigate to the root directory of
+ your project in the terminal and initialize a new Git repository using the following command:
+ git init
+ 2. Add Files to the Staging Area: Use the git add command to add files or directories to the
+ staging area. For example, to add all files in the current directory and its subdirectories, you
+ can use: git add .
+ 3. Commit the Changes: Once you’ve added the files to the staging area, you can commit them
+ to the repository using the git commit command. This command will open a text editor (usually
+ Vim or Nano) for you to enter a commit message. git commit
+ 4. Alternatively, you can provide a commit message directly on the command line using the 
+m flag: git commit -m "Initial commit"
+ 5. Verify the Commit: After committing, you can use git log to view the commit history and
+ verify that your first commit was successful: git log
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 6
+1.5  Procedure 5: Push Changes to Repository 
+To push changes to a repository on GitHub using a personal access token (PAT), follow these 
+steps: 
+Commit Changes: Make the necessary changes to your files in your local repository. 
+Stage Changes: Use the git add command to stage the changes you want to include in the 
+commit. For example: 
+git add . 
+Commit Changes: Commit the staged changes with a descriptive message using the git commit 
+command. For example: 
+git commit -m "Your commit message here" 
+Push Changes: Use the git push command to push your commits to the remote repository on 
+GitHub. Include your PAT in the URL as a password. The syntax is similar to the clone 
+command but with git push instead of git clone. For example: 
+git push  https://<your-username>:<your-token>@github.com/<your- 
+username>/<repository>.git 
+Replace <your-username> with your GitHub username, <your-token> with the token you 
+generated, and <repository> with the name of your repository. 
+Enter Credentials: You may be prompted to enter your GitHub username and the PAT you 
+generated. Enter them when prompted. 
+Verify Changes: Once the push is successful, visit your repository on GitHub to verify that the 
+changes have been pushed successfully. 
+    Important Notes: 
+Treat your personal access token like a password. Keep it secure and do not share it publicly. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 7
+It's recommended to use HTTPS for pushing changes to repositories when using a personal 
+access token. 
+If you're pushing to a repository where you have write access, your changes should now be 
+reflected in the remote repository on GitHub. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 8
+1.6  Procedure 6: Pull Changes from Repository 
+Make Changes in Remote Repository (Optional): If you want to make changes directly in the 
+remote repository (e.g., via a web interface or another user's contribution), do so. 
+Navigate to Your Repository Directory: Use the cd command to navigate to the directory of 
+your local repository: cd C:\path\to\your\repository 
+Pull Changes from Remote Repository: Use the git pull command to fetch and merge changes 
+from the remote repository into your local repository. Specify the remote repository's name 
+(typically origin) and the branch name (e.g., master): 
+git pull origin master 
+If you're pulling from a branch other than master, replace master with the appropriate branch 
+name. 
+Authentication (if prompted): If authentication is required, provide your credentials. 
+Verify Updated Code: After the pull operation completes, verify that the changes made directly 
+in the remote repository are now reflected in your local repository. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 9
+1.7  Procedure 7: Credential Manager 
+To remove a GitHub account from Credential Manager on a Windows machine, you can follow 
+these steps: 
+Open Credential Manager: Press Win + S to open the search bar. Type 
+"Credential Manager" and select it from the search results. 
+Locate GitHub credentials: In Credential Manager, you'll see a list of stored credentials. Look 
+for any entries related to GitHub. 
+Remove GitHub credentials: Click on the entry for GitHub, and then click on the "Remove" or 
+"Delete" option. This will delete the stored credentials for that GitHub account. 
+Confirm removal: Confirm that you want to remove the credentials if prompted. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 10
+1.8  Procedure 8: Creating A New Issue 
+Creating an Issue 
+1. Navigate to Repository: Go to the repository on the Git hosting platform (e.g., GitHub).
+ 2. Click on “Issues”: Look for the “Issues” tab and click on it to access the issues section of the
+ repository.
+ 3. Create New Issue: Click on the “New Issue” button to create a new issue.
+ 4. Provide Details: Enter a title and description for the issue, including relevant information
+ such as what needs to be addressed, steps to reproduce the problem, and any other pertinent
+ details.
+ 5. Assignees, Labels, and Milestones: Optionally, you can assign the issue to specific
+ individuals, apply labels to categorize it, and set milestones to track progress.
+ 6. Submit Issue: Once you’ve filled in the details, click on the “Submit new issue” button to
+ create the issue.
+ Templates for ISSUE 
+**Issue/Feature Description:** 
+**Why this issue to fixed / feature is needed(give scenarios or use cases):** 
+**How to reproduce, in case of a bug:** 
+**Other Notes / Environment Information: (Please give the env information, log link or any 
+useful information for this issue)** 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 11
+1.9  Procedure 9: Pull Request 
+Creating a Pull Request 
+1. Fork the Repository: If you haven’t already, fork the repository you want to contribute to.
+ This creates a copy of the repository under your account.
+ 2. Clone Your Fork: Clone your forked repository to your local machine using the git clone
+ command.
+ git clone <repository_URL> 
+3. Create a Branch: Create a new branch to work on your changes. It’s good practice to create
+ a separate branch for each feature or issue you’re addressing.
+ git checkout -b <branch_name> 
+4. Make Changes: Make the necessary changes to the codebase on your local branch.
+ 5. Commit Changes: Once you’ve made your changes, commit them to your local repository
+ with descriptive commit messages.
+ git add . 
+git commit -m "Description of changes" 
+6. Push Changes: Push your local branch to your forked repository on the Git hosting platform.
+ git push origin <branch_name>
+ 7. Create Pull Request: Navigate to your forked repository on the Git hosting platform and click
+ on the “Pull Request” button.
+ 8. Select Branches: Choose the branch you pushed your changes to in your fork as the
+ “compare” branch, and the original repository’s branch you want to merge into as the “base”
+ branch.
+ 9. Review Changes: Provide a title and description for your pull request, summarizing the
+ changes you made. You can also include any relevant context or details.
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 12
+10. Submit Pull Request: Once you’re satisfied with the changes and everything looks good,
+ submit the pull request.
+ 11. Review and Merge: The maintainers of the original repository will review your pull
+ request, provide feedback if necessary, and merge it into the main codebase if approved.
+ Template For Pull Request 
+1.Please give clear description and fill all the needed fields in the PR template below
+ 2.Provide all the test report and results for the PR. It is mandatory. Otherwise,
+ your PR may get rejected without any review/discussion
+ 3.If the PR is incomplete/in progress, please add [WIP] at the beginning of the PR title.
+ 4.Provide the link to the issue and other relevant files related to the PR-->
+ **What type of PR is this?**
+ >Uncomment only one ` /kind <>` line, hit enter to put that in a new line, and remove
+ leading whitespace from that line:
+ >
+ > /kind new feature 
+>/kind bug fix
+ >/kind cleanup
+ >/kind revert change
+ >/kind design
+ >/kind documentation
+ >/kind enhancement
+ **What this PR does / why we need it**: 
+**Which issue(s) this PR fixes**: 
+<!-- 
+*Please provide the issues number or link.
+ Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.-->
+ Fixes #
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 13
+**Test Report Added?**: 
+>Uncomment only one ` /kind <>` line, hit enter to put that in a new line, and remove
+ leading whitespace from that line:
+ >/kind TESTED
+ >/kind NOT-TESTED
+ **Test Report**:
+ <!--
+ *Please provide the test report link (public accessible, screen shot or copy paste the test report, or
+ add the testing details.
+ 23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 14
+1.10 Procedure 10: Perform Merge Conflict 
+Pull the Latest Changes: Before making any changes, ensure your local repository is up-to- 
+date with the remote repository. Pull the latest changes from the remote branch you intend to 
+merge into. 
+git checkout <your_branch> 
+    git pull origin <remote_branch> 
+Merge the Target Branch: Merge the target branch into your current branch. 
+git merge <target_branch> 
+Resolve Merge Conflicts: If there are conflicting changes, Git will notify you about the 
+conflicts and mark them in the affected files. You need to manually resolve these conflicts. 
+Open Files with Conflicts: Open the conflicted files in your preferred text editor. Git marks the 
+conflicting sections within the file using special markers like <<<<<<<, =======, and 
+>>>>>>>. 
+Resolve Conflicts Manually: Inside the conflicted file(s), locate the conflicting sections marked 
+by Git and decide how to resolve them. You can choose to keep one version of the code, 
+combine both versions, or write an entirely new version. Remove the conflict markers 
+(<<<<<<<, =======, >>>>>>>) once you've resolved the conflicts. 
+Stage the Changes: After resolving the conflicts, stage the changes using the git add command. 
+git add <conflicted_file(s)> 
+Commit the Changes: Once you've resolved all conflicts in the files, commit the changes. 
+git commit -m "Resolved merge conflicts" 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 15
+1.11 Procedure 11: Branching 
+Creating a Branch: You can create a new branch directly on the GitHub website or using Git 
+commands locally on your machine (git checkout -b branch-name). 
+Making Changes: After creating a branch, you can make changes to the codebase, add new 
+files, modify existing ones, etc. 
+Committing Changes: Once you've made changes, you commit them to the branch using git 
+commit with a commit message describing the changes. 
+Pushing Changes: If you're working locally, you push your branch to the GitHub repository 
+using git push origin branch-name. 
+Pull Request: When you're ready to merge your changes back into the main codebase, you 
+create a pull request (PR) on GitHub. This allows others to review your changes before 
+merging. 
+Review and Merge: Other contributors review your changes in the pull request. Once 
+approved, the changes are merged into the main branch. 
+Deleting Branch: After merging, you can delete the branch both locally (git branch -d branch
+name) and on GitHub, to keep your repository clean. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 16
+1.12 Procedure 12: Creating Personal Access, Token 
+Git clone https://<your-username>:<your-token>@github.com/<your- 
+username>/<repository>.git 
+To create a personal access token (PAT) on GitHub, you can follow these steps: Log 
+in to GitHub: Make sure you are logged in to your GitHub account. 
+Access Settings: In the upper-right corner of GitHub, click on your profile picture, and then 
+click on "Settings." 
+Navigate to Developer Settings: In the left sidebar, click on "Developer settings," and then 
+click on "Personal access tokens." 
+Generate a New Token: Click on the "Generate token" button. 
+Configure Token Settings: Enter a name for your token in the "Token name" field. 
+Select the scopes (permissions) that your token should have. Be cautious and only grant the 
+necessary permissions. 
+Optionally, set an expiration period for the token. 
+Generate Token: Click the "Generate token" button at the bottom. 
+Copy the Token: GitHub will generate the token. Copy the token immediately as you won't 
+be able to see it again. 
+Important Notes: Treat your personal access token like a password. Keep it secure and do not 
+share it publicly. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 17
+If you need to use the token in a command-line operation (e.g., for Git operations), include it 
+in the URL as a password. For example: git clonehttps://<your-username>:<your- 
+token>@github.com/<your-username>/<repository>.git 
+Replace <your-username> with your GitHub username and <your-token> with the token you 
+generated. 
+23BCAB23 Basics of Open Source Demystified
+ Kristu Jayanti College (Autonomous) 1
