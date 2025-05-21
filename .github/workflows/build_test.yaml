@@ -1,4 +1,4 @@
-name: build_test
+name: ONE
 
 on:
   workflow_dispatch:
