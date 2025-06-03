@@ -7,14 +7,14 @@ orbs:
 jobs:
   unit-test:
     executor:
-      name: android/android-docker
-      tag: 2024.11.1
+      name: android/android_docker
+      tag: 2025.03.1
     steps:
       - checkout
-      - android/restore-gradle-cache
-      - android/run-tests:
-          test-command: ./gradlew testDebug
-      - android/save-gradle-cache
+      - android/restore_gradle_cache
+      - android/run_tests:
+          test_command: ./gradlew testDebug
+      - android/save_gradle_cache
       - run:
           name: Save test results
           command: |
@@ -32,14 +32,14 @@ jobs:
         type: string
         default: system-images;android-35;google_apis;x86_64
     executor:
-      name: android/android-machine
-      resource-class: xlarge
-      tag: 2024.11.1
+      name: android/android_machine
+      resource_class: xlarge
+      tag: 2025.03.1
     steps:
       - checkout
-      - android/start-emulator-and-run-tests:
-          test-command: ./gradlew connectedDebugAndroidTest
-          system-image: << parameters.system-image >>
+      - android/start_emulator_and_run_tests:
+          test_command: ./gradlew connectedDebugAndroidTest
+          system_image: << parameters.system-image >>
       - run:
           name: Save test results
           command: |
@@ -54,10 +54,10 @@ jobs:
   benchmarks-ftl:
     executor:
       name: android/android-docker
-      tag: 2024.11.1-node
+      tag: 2025.03.1-node
     steps:
       - checkout
-      - android/restore-gradle-cache
+      - android/restore_gradle_cache
       - run:
           name: Build app and test app
           command: ./gradlew app:assembleRelease macrobenchmark:assemble
@@ -90,11 +90,11 @@ jobs:
 
   release-build:
     executor:
-      name: android/android-docker
-      tag: 2024.11.1
+      name: android/android_docker
+      tag: 2025.03.1
     steps:
       - checkout
-      - android/restore-gradle-cache
+      - android/restore_gradle_cache
       - run:
           name: Assemble release build
           command: |
@@ -106,11 +106,11 @@ workflows:
   test-and-build:
     jobs:
       - unit-test
-      - android/run-ui-tests:
+      - android/run_ui_tests:
           executor:
-            name: android/android-machine
-            resource-class: xlarge
-            tag: 2024.11.1
+            name: android/android_machine
+            resource_class: xlarge
+            tag: 2025.03.1
           filters:
             branches:
               ignore: main # regular commits
