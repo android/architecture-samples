@@ -6,3 +6,4 @@ local.properties
 build
 captures
 .externalNativeBuild
+.kotlin

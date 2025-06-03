@@ -1,0 +1,142 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@3.1.0
+  gcp-cli: circleci/gcp-cli@3.3.1
+
+jobs:
+  unit-test:
+    executor:
+      name: android/android-docker
+      tag: 2024.11.1
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/run-tests:
+          test-command: ./gradlew testDebug
+      - android/save-gradle-cache
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+      - store_artifacts:
+          path: ~/test-results/junit
+
+  android-test:
+    parameters:
+      system-image:
+        type: string
+        default: system-images;android-35;google_apis;x86_64
+    executor:
+      name: android/android-machine
+      resource-class: xlarge
+      tag: 2024.11.1
+    steps:
+      - checkout
+      - android/start-emulator-and-run-tests:
+          test-command: ./gradlew connectedDebugAndroidTest
+          system-image: << parameters.system-image >>
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/build/outputs/androidTest-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+      - store_artifacts:
+          path: ~/test-results/junit
+
+  benchmarks-ftl:
+    executor:
+      name: android/android-docker
+      tag: 2024.11.1-node
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - run:
+          name: Build app and test app
+          command: ./gradlew app:assembleRelease macrobenchmark:assemble
+      - gcp-cli/initialize:
+          gcloud-service-key: GCP_SA_KEY
+          google-project-id: GCP_PROJECT_ID
+      - run:
+          name: run on FTL
+          command: |
+            gcloud firebase test android run \
+              --type instrumentation \
+              --app app/build/outputs/apk/release/app-release.apk \
+              --test macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk \
+              --device model=redfin:,version=30,locale=en,orientation=portrait \
+              --directories-to-pull /sdcard/Download \
+              --results-bucket gs://android-sample-benchmarks \
+              --results-dir macrobenchmark \
+              --environment-variables clearPackageData=true,additionalTestOutputDir=/sdcard/Download,no-isolated-storage=true
+      - run:
+          name: Download benchmark data
+          command: |
+            mkdir ~/benchmarks
+            gsutil cp -r 'gs://android-sample-benchmarks/macrobenchmark/**/artifacts/sdcard/Download/*'  ~/benchmarks
+            gsutil rm -r gs://android-sample-benchmarks/macrobenchmark
+      - store_artifacts:
+          path: ~/benchmarks
+      - run:
+          name: Evaluate benchmark results
+          command: node scripts/eval_startup_benchmark_output.js
+
+  release-build:
+    executor:
+      name: android/android-docker
+      tag: 2024.11.1
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - run:
+          name: Assemble release build
+          command: |
+            ./gradlew assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+
+workflows:
+  test-and-build:
+    jobs:
+      - unit-test
+      - android/run-ui-tests:
+          executor:
+            name: android/android-machine
+            resource-class: xlarge
+            tag: 2024.11.1
+          filters:
+            branches:
+              ignore: main # regular commits
+      - android-test:
+          matrix:
+            alias: android-test-all
+            parameters:
+              system-image:
+                - system-images;android-35;google_apis;x86_64
+                - system-images;android-30;google_apis;x86
+                - system-images;android-29;google_apis;x86
+                - system-images;android-28;google_apis;x86
+                - system-images;android-27;google_apis;x86
+                - system-images;android-26;google_apis;x86
+                - system-images;android-25;google_apis;x86
+          name: android-test-<<matrix.system-image>>
+          filters:
+            branches:
+              only: main # Commits to main branch
+      #      - benchmarks-emulator
+      #      - benchmarks-ftl
+      - release-build:
+          requires:
+            - unit-test
+            - android-test-all
+          #            - benchmarks-ftl
+          filters:
+            branches:
+              only: main # Commits to main branch
