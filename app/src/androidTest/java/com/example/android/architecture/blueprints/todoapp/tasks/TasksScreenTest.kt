@@ -71,7 +71,7 @@ class TasksScreenTest {
     @Test
     fun displayTask_whenRepositoryHasData() = runTest {
         // GIVEN - One task already in the repository
-        repository.createTask("TITLE1", "DESCRIPTION1")
+        repository.create("TITLE1", "DESCRIPTION1")
 
         // WHEN - On startup
         setContent()
@@ -82,7 +82,7 @@ class TasksScreenTest {
 
     @Test
     fun displayActiveTask() = runTest {
-        repository.createTask("TITLE1", "DESCRIPTION1")
+        repository.create("TITLE1", "DESCRIPTION1")
 
         setContent()
 
@@ -99,7 +99,7 @@ class TasksScreenTest {
     @Test
     fun displayCompletedTask() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1").also { complete(it) }
         }
 
         setContent()
@@ -115,7 +115,7 @@ class TasksScreenTest {
 
     @Test
     fun markTaskAsComplete() = runTest {
-        repository.createTask("TITLE1", "DESCRIPTION1")
+        repository.create("TITLE1", "DESCRIPTION1")
 
         setContent()
 
@@ -134,7 +134,7 @@ class TasksScreenTest {
     @Test
     fun markTaskAsActive() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1").also { complete(it) }
         }
 
         setContent()
@@ -155,8 +155,8 @@ class TasksScreenTest {
     fun showAllTasks() = runTest {
         // Add one active task and one completed task
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1")
+            create("TITLE2", "DESCRIPTION2").also { complete(it) }
         }
 
         setContent()
@@ -171,9 +171,9 @@ class TasksScreenTest {
     fun showActiveTasks() = runTest {
         // Add 2 active tasks and one completed task
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2")
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1")
+            create("TITLE2", "DESCRIPTION2")
+            create("TITLE3", "DESCRIPTION3").also { complete(it) }
         }
 
         setContent()
@@ -189,9 +189,9 @@ class TasksScreenTest {
     fun showCompletedTasks() = runTest {
         // Add one active task and 2 completed tasks
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1")
+            create("TITLE2", "DESCRIPTION2").also { complete(it) }
+            create("TITLE3", "DESCRIPTION3").also { complete(it) }
         }
 
         setContent()
@@ -207,8 +207,8 @@ class TasksScreenTest {
     fun clearCompletedTasks() = runTest {
         // Add one active task and one completed task
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
+            create("TITLE1", "DESCRIPTION1")
+            create("TITLE2", "DESCRIPTION2").also { complete(it) }
         }
 
         setContent()

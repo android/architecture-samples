@@ -59,7 +59,7 @@ class TaskDetailViewModel @Inject constructor(
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
     private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = taskRepository.getTaskStream(taskId)
+    private val _taskAsync = taskRepository.observe(taskId)
         .map { handleTask(it) }
         .catch { emit(Async.Error(R.string.loading_task_error)) }
 
@@ -93,17 +93,17 @@ class TaskDetailViewModel @Inject constructor(
         )
 
     fun deleteTask() = viewModelScope.launch {
-        taskRepository.deleteTask(taskId)
+        taskRepository.delete(taskId)
         _isTaskDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = uiState.value.task ?: return@launch
         if (completed) {
-            taskRepository.completeTask(task.id)
+            taskRepository.complete(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
+            taskRepository.activate(task.id)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -111,7 +111,7 @@ class TaskDetailViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refreshTask(taskId)
+            taskRepository.refresh(taskId)
             _isLoading.value = false
         }
     }
