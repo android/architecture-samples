@@ -107,7 +107,6 @@ class TasksViewModel @Inject constructor(
         viewModelScope.launch {
             taskRepository.clearCompletedTasks()
             showSnackbarMessage(R.string.completed_tasks_cleared)
-            refresh()
         }
     }
 

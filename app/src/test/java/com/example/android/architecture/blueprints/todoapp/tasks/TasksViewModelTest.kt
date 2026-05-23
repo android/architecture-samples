@@ -144,12 +144,11 @@ class TasksViewModelTest {
         // When completed tasks are cleared
         tasksViewModel.clearCompletedTasks()
 
-        // Fetch tasks
-        tasksViewModel.refresh()
+        advanceUntilIdle()
 
-        // Fetch tasks
-        val allTasks = tasksViewModel.uiState.first().items
-        val completedTasks = allTasks?.filter { it.isCompleted }
+        val uiState = tasksViewModel.uiState.first { !it.isLoading }
+        val allTasks = uiState.items
+        val completedTasks = allTasks.filter { it.isCompleted }
 
         // Verify there are no completed tasks left
         assertThat(completedTasks).isEmpty()
@@ -158,8 +157,7 @@ class TasksViewModelTest {
         assertThat(allTasks).hasSize(1)
 
         // Verify snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.completed_tasks_cleared)
+        assertThat(uiState.userMessage).isEqualTo(R.string.completed_tasks_cleared)
     }
 
     @Test
