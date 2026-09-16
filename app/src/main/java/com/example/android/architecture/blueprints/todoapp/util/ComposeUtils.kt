@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.android.architecture.blueprints.todoapp.util
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 val primaryDarkColor: Color = Color(0xFF263238)
 
@@ -46,11 +48,12 @@ fun LoadingContent(
     if (empty) {
         emptyContent()
     } else {
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(loading),
+        PullToRefreshBox(
+            isRefreshing = loading,
             onRefresh = onRefresh,
             modifier = modifier,
-            content = content,
-        )
+        ) {
+            content()
+        }
     }
 }
