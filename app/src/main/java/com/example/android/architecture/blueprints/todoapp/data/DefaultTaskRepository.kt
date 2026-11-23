@@ -48,30 +48,49 @@ class DefaultTaskRepository @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) : TaskRepository {
 
-    override suspend fun createTask(title: String, description: String): String {
-        // ID creation might be a complex operation so it's executed using the supplied
-        // coroutine dispatcher
-        val taskId = withContext(dispatcher) {
-            UUID.randomUUID().toString()
-        }
-        val task = Task(
-            title = title,
-            description = description,
-            id = taskId,
-        )
-        localDataSource.upsert(task.toLocal())
+
+    /**
+     * Executes the given [action] locally, then triggers [saveTasksToNetwork] (local-first pattern).
+     * The [saveTasksToNetwork] function is located in current class.
+     *
+     * @param T The return type of the operation.
+     * @param action The local operation to execute.
+     * @return The result of the [action].
+     * @throws Exception if the local operation or synchronization fails.
+     */
+    private inline fun <T> runBeforeSaveTasksToNetwork(action: () -> T): T {
+        val result = action()
         saveTasksToNetwork()
-        return taskId
+        return result
+    }
+
+    override suspend fun createTask(title: String, description: String): String {
+        return runBeforeSaveTasksToNetwork {
+            // ID creation might be a complex operation so it's executed using the supplied
+            // coroutine dispatcher
+            val taskId = withContext(dispatcher) {
+                UUID.randomUUID().toString()
+            }
+            val task = Task(
+                title = title,
+                description = description,
+                id = taskId,
+            )
+            localDataSource.upsert(task.toLocal())
+            taskId
+        }
     }
 
     override suspend fun updateTask(taskId: String, title: String, description: String) {
-        val task = getTask(taskId)?.copy(
-            title = title,
-            description = description
-        ) ?: throw Exception("Task (id $taskId) not found")
+        runBeforeSaveTasksToNetwork {
+            val task = getTask(taskId)?.copy(
+                title = title,
+                description = description
+            ) ?: throw Exception("Task (id $taskId) not found")
 
-        localDataSource.upsert(task.toLocal())
-        saveTasksToNetwork()
+            localDataSource.upsert(task.toLocal())
+            saveTasksToNetwork()
+        }
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
@@ -113,28 +132,33 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     override suspend fun completeTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = true)
-        saveTasksToNetwork()
+        runBeforeSaveTasksToNetwork {
+            localDataSource.updateCompleted(taskId = taskId, completed = true)
+        }
     }
 
     override suspend fun activateTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = false)
-        saveTasksToNetwork()
+        runBeforeSaveTasksToNetwork {
+            localDataSource.updateCompleted(taskId = taskId, completed = false)
+        }
     }
 
     override suspend fun clearCompletedTasks() {
-        localDataSource.deleteCompleted()
-        saveTasksToNetwork()
+        runBeforeSaveTasksToNetwork {
+            localDataSource.deleteCompleted()
+        }
     }
 
     override suspend fun deleteAllTasks() {
-        localDataSource.deleteAll()
-        saveTasksToNetwork()
+        runBeforeSaveTasksToNetwork {
+            localDataSource.deleteAll()
+        }
     }
 
     override suspend fun deleteTask(taskId: String) {
-        localDataSource.deleteById(taskId)
-        saveTasksToNetwork()
+       runBeforeSaveTasksToNetwork {
+           localDataSource.deleteById(taskId)
+       }
     }
 
     /**
